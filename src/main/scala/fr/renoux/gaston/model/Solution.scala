@@ -12,7 +12,12 @@ case class Solution(
 
   def score(constraints: Set[_ <: Constraint]): Double =
   /* toSeq is needed to avoid removing duplicate scores ! */
-    constraints.toSeq map (_.evaluate(this)) sum
+    constraints.toSeq map (_.score(this)) sum
+
+  def areMandatoryConstraintsSatisified(constraints: Set[_ <: Constraint]): Boolean = constraints forall {
+    case m: MandatoryConstraint => m.isRespected(this)
+    case _ => true
+  }
 
 }
 

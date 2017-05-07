@@ -8,7 +8,7 @@ case class PersonTopicPreference(
                                   topic: Topic,
                                   value: Preference.Strength) extends Preference {
 
-  override def evaluate(solution: Solution): Double = solution.personsPerTopic map {
+  override def score(solution: Solution): Double = solution.personsPerTopic map {
     case (t, persons) if t == topic && persons(person) => value.score
     case _ => ScoringConstants.Zero
   } sum

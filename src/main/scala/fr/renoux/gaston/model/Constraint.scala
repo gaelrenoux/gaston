@@ -5,6 +5,10 @@ package fr.renoux.gaston.model
   */
 trait Constraint {
   def isMandatory: Boolean
+  def score(solution: Solution): Double
+}
 
-  def evaluate(solution: Solution): Double
+trait MandatoryConstraint extends Constraint {
+  override val isMandatory = true
+  def isRespected(solution: Solution): Boolean
 }

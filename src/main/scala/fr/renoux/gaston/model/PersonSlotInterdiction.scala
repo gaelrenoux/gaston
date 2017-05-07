@@ -5,9 +5,14 @@ package fr.renoux.gaston.model
   */
 case class PersonSlotInterdiction(person: Person, slot: Slot) extends Interdiction {
 
-  override def evaluate(solution: Solution): Double = solution.personsPerSlot map {
+  override def score(solution: Solution): Double = solution.personsPerSlot map {
     case (s, persons) if s == slot && persons(person) => ScoringConstants.BrokenMandatoryConstraint
     case _ => ScoringConstants.Zero
   } sum
+
+  override def isRespected(solution: Solution): Boolean = solution.personsPerSlot forall {
+    case (s, persons) if s == slot && persons(person) => false
+    case _ => true
+  }
 
 }

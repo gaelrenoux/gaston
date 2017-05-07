@@ -9,11 +9,14 @@ case class PersonTopicObligation(person: Person, topic: Topic) extends Obligatio
 
   val logger = Logger[PersonTopicObligation]
 
-  override def evaluate(solution: Solution): Double =  {
+  override def score(solution: Solution): Double = solution.personsPerTopic map {
+    case (t, persons) if t == topic && !persons(person) => ScoringConstants.BrokenMandatoryConstraint
+    case _ => ScoringConstants.Zero
+  } sum
 
-    solution.personsPerTopic map {
-      case (t, persons) if t == topic && !persons(person) => ScoringConstants.BrokenMandatoryConstraint
-      case _ => ScoringConstants.Zero
-    } sum
+  override def isRespected(solution: Solution): Boolean = solution.personsPerTopic forall {
+    case (t, persons) if t == topic && !persons(person) => false
+    case _ => true
   }
+
 }

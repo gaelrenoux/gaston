@@ -5,8 +5,13 @@ package fr.renoux.gaston.model
   */
 case class PersonTopicInterdiction(person: Person, topic: Topic) extends Interdiction {
 
-  override def evaluate(solution: Solution): Double = solution.personsPerTopic map {
+  override def score(solution: Solution): Double = solution.personsPerTopic map {
     case (t, persons) if t == topic && persons(person) => ScoringConstants.BrokenMandatoryConstraint
     case _ => ScoringConstants.Zero
   } sum
+
+  override def isRespected(solution: Solution): Boolean = solution.personsPerTopic forall {
+    case (t, persons) if t == topic && persons(person) => false
+    case _ => true
+  }
 }

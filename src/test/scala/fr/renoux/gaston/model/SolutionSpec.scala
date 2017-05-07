@@ -14,7 +14,7 @@ class SolutionSpec extends FlatSpec with Matchers {
   "Solution score" should "be the sum of constraint scores" in {
     val solutionScore = Solutions.Perfect.score(Constraints.All)
     log.debug(s"Solution score: $solutionScore")
-    val constraintScores = Constraints.All.toSeq map (_.evaluate(Solutions.Perfect))
+    val constraintScores = Constraints.All.toSeq map (_.score(Solutions.Perfect))
     log.debug(s"Constraints scores: $constraintScores")
     solutionScore should be(constraintScores.sum)
   }
