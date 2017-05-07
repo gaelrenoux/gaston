@@ -1,0 +1,19 @@
+package fr.renoux.gaston.model
+
+/**
+  * Created by gael on 07/05/17.
+  */
+case class Solution(
+                     schedule: Set[(Slot, Topic, Set[Person])]
+                   ) {
+
+  lazy val personsPerSlot: Map[Slot, Set[Person]] = schedule groupBy (_._1) mapValues { x => x flatMap (_._3) }
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = schedule groupBy (_._2) mapValues { x => x flatMap (_._3) }
+
+  def score(constraints: Set[Constraint]): Double = constraints map (_.evaluate(this)) sum
+
+}
+
+object Solution {
+  def apply(schedule: (Slot, Topic, Set[Person])*): Solution = new Solution(schedule.toSet)
+}
