@@ -10,7 +10,9 @@ case class Solution(
   lazy val personsPerSlot: Map[Slot, Set[Person]] = schedule groupBy (_._1) mapValues { x => x flatMap (_._3) }
   lazy val personsPerTopic: Map[Topic, Set[Person]] = schedule groupBy (_._2) mapValues { x => x flatMap (_._3) }
 
-  def score(constraints: Set[Constraint]): Double = constraints map (_.evaluate(this)) sum
+  def score(constraints: Set[_ <: Constraint]): Double =
+  /* toSeq is needed to avoid removing duplicate scores ! */
+    constraints.toSeq map (_.evaluate(this)) sum
 
 }
 
