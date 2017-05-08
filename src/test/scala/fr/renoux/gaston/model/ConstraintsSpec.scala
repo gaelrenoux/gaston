@@ -13,53 +13,46 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   import TestModel.Solutions._
 
 
-  behavior of "Obligation"
-  it should "return the broken mandatory constraint score when broken" in {
-    LeonardoLeads.score(Terrible) should be(ScoringConstants.BrokenMandatoryConstraint)
-    LeonardoInTheMorning.score(Terrible) should be(ScoringConstants.BrokenMandatoryConstraint)
+  behavior of "TopicNeedsNumberOfPersons"
+  it should "return 1 when broken once" in {
+    FightingNeedsTwoToFourPersons.countBroken(Terrible) should be(1)
   }
   it should "return zero when respected" in {
-    LeonardoLeads.score(Perfect) should be(ScoringConstants.Zero)
-    LeonardoInTheMorning.score(Perfect) should be(ScoringConstants.Zero)
+    FightingNeedsTwoToFourPersons.countBroken(Perfect) should be(0)
   }
 
-  behavior of "Interdiction"
-  it should "return the broken mandatory constraint score when broken" in {
-    LeonardoDoesNotParty.score(Terrible) should be(ScoringConstants.BrokenMandatoryConstraint)
-    LeonardoNotInTheNight.score(Terrible) should be(ScoringConstants.BrokenMandatoryConstraint)
+  behavior of "PersonTopicObligation"
+  it should "return 1 when broken once" in {
+    LeonardoLeads.countBroken(Terrible) should be(1)
   }
   it should "return zero when respected" in {
-    LeonardoDoesNotParty.score(Perfect) should be(ScoringConstants.Zero)
-    LeonardoNotInTheNight.score(Perfect) should be(ScoringConstants.Zero)
+    LeonardoLeads.countBroken(Perfect) should be(0)
+  }
+
+  behavior of "PersonTopicInterdiction"
+  it should "return 1 when broken once" in {
+    LeonardoDoesNotParty.countBroken(Terrible) should be(1)
+  }
+  it should "return zero when respected" in {
+    LeonardoDoesNotParty.countBroken(Perfect) should be(0)
+  }
+
+  behavior of "PersonPresence"
+  it should "return 1 when broken once" in {
+    LeonardoInTheMorning.countBroken(Terrible) should be(1)
+    LeonardoNotInTheNight.countBroken(Terrible) should be(1)
+  }
+  it should "return zero when respected" in {
+    LeonardoInTheMorning.countBroken(Perfect) should be(0)
+    LeonardoNotInTheNight.countBroken(Perfect) should be(0)
   }
 
   behavior of "Preferences"
-  it should "return the strong score when it is strong and satisfied" in {
-    LeonardoLovesFighting.score(Perfect) should be(ScoringConstants.StrongPreference)
+  it should "return 1 when satisfied once" in {
+    LeonardoLovesFighting.countSatisfied(Perfect) should be(1)
   }
-  it should "return the weak score when it is weak and satisfied" in {
-    LeonardoLikesMachines.score(Perfect) should be(ScoringConstants.WeakPreference)
-  }
-  it should "return zero when not respected" in {
-    LeonardoLovesFighting.score(Terrible) should be(ScoringConstants.Zero)
-    LeonardoLikesMachines.score(Terrible) should be(ScoringConstants.Zero)
-  }
-
-  behavior of "PersonHasSomethingForAllSlots"
-  it should "return the broken mandatory constraint score when broken" in {
-    LeonardoHasSomethingForAllSlots.score(Terrible) should be(ScoringConstants.BrokenMandatoryConstraint)
-  }
-  it should "return zero when respected" in {
-    log.debug("personsPerSlot " + Perfect.personsPerSlot)
-    LeonardoHasSomethingForAllSlots.score(Perfect) should be(ScoringConstants.Zero)
-  }
-
-  behavior of "TopicNeedsNumberOfPersons"
-  it should "return the broken mandatory constraint score when broken" in {
-    FightingNeedsTwoToFourPersons.score(Terrible) should be(ScoringConstants.BrokenMandatoryConstraint)
-  }
-  it should "return zero when respected" in {
-    FightingNeedsTwoToFourPersons.score(Perfect) should be(ScoringConstants.Zero)
+  it should "return zero when not satisfied" in {
+    LeonardoLovesFighting.countSatisfied(Terrible) should be(0)
   }
 
 }

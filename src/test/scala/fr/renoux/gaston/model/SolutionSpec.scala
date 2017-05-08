@@ -11,6 +11,7 @@ class SolutionSpec extends FlatSpec with Matchers {
 
   import TestModel._
 
+  /*
   "Solution score" should "be the sum of constraint scores" in {
     val solutionScore = Solutions.Perfect.score(Constraints.All)
     log.debug(s"Solution score: $solutionScore")
@@ -22,6 +23,6 @@ class SolutionSpec extends FlatSpec with Matchers {
   it should "be minus infinite for one or more missed mandatory constraints" in {
     val solutionScore = Solutions.Terrible.score(Constraints.All)
     solutionScore should be(Double.NegativeInfinity)
-  }
+  }*/
 
 }

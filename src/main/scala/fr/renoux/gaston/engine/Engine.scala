@@ -1,6 +1,7 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.{Person, Problem, Solution, Topic}
+import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -16,6 +17,8 @@ object Engine {
   }
 
   def generateRandomSolution(problem: Problem)(implicit random: Random) = {
+
+
     val slotsCount = problem.slots.size
     val topicsCount = problem.topics.size
     val personsCount = problem.persons.size
@@ -42,18 +45,18 @@ object Engine {
       couples map { c => (slot, c._1, c._2) }
     } toSet
 
-    Solution(flatSchedule)
+    Schedule(flatSchedule)
   }
 
-  def getBetterSolution(problem: Problem, solution: Solution)(implicit random: Random) =
-    if (solution.areMandatoryConstraintsSatisified(problem.constraints)) getBetterSolutionWithSmallChanges(problem, solution)
-    else getBetterSolutionWithBigChanges(problem, solution)
+  def initializeScheduleSatisfyingConstraints(problem: Problem)
+                                             (slots: Seq[Slot], topics: Seq[Topic], persons: Seq[Person]) = {
+    for (slot <- slots) yield (slot -> {
 
-  private def getBetterSolutionWithBigChanges(problem: Problem, solution: Solution, triesLeft: Int = 1000)(implicit random: Random) = if (triesLeft == 0) None else {
-    /* switch topics between slots, then people between slots */
-  }
 
-  private def getBetterSolutionWithSmallChanges(problem: Problem, solution: Solution, triesLeft: Int = 1000)(implicit random: Random) = if (triesLeft == 0) None else {
+
+
+    })
+
 
   }
 
