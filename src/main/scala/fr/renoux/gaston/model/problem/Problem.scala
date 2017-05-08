@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.problem
 
-import fr.renoux.gaston.model.constraints.{Constraint, PersonPresence, PersonTopicObligation}
+import fr.renoux.gaston.model.constraints.{Constraint, PersonAbsence, PersonTopicObligation, TopicNeedsNumberOfPersons}
 import fr.renoux.gaston.model.preferences.Preference
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 import fr.renoux.gaston.util.CollectionImplicits._
@@ -13,24 +13,30 @@ case class Problem(
                     topics: Set[Topic],
                     persons: Set[Person],
                     constraints: Set[Constraint],
-                    preferences: Set[Preference],
-                    defaultPersonPresence: Boolean = true
+                    preferences: Set[Preference]
                   ) {
 
   //TODO deduplicate constraints (multipe prefs with the same person and topic, for instance)
 
-  lazy val mandatoryPersonsPerTopic = constraints collect {
-    case PersonTopicObligation(person, topic) => topic -> person
-  } groupBy (_._1) mapValues (_ map (_._2))
+  lazy val mandatoryPersonsPerTopic = {
+
+    val fromConstraints = constraints collect {
+      case PersonTopicObligation(person, topic) => topic -> person
+    } groupBy (_._1) mapValues (_ map (_._2))
+
+    val topicsWithNoMandatoryPerson = (topics filterNot fromConstraints.keySet) map (_ -> Set[Person]()) toMap
+
+    fromConstraints ++ topicsWithNoMandatoryPerson
+  }
 
   lazy val personSlotsPossibilities = {
-    val noted = constraints collect {
-      case PersonPresence(p, s, bool) if bool != defaultPersonPresence => (p, s)
+    val notedAbsences = constraints collect {
+      case PersonAbsence(p, s) => (p, s)
     }
     for {
       p <- persons
       s <- slots
-      if noted((p, s)) != defaultPersonPresence
+      if !notedAbsences((p, s))
     } yield (p, s)
   }
 
@@ -57,6 +63,15 @@ case class Problem(
     couples.groupToMap
   }
 
+  lazy val parallelization = (topics.size.toDouble / slots.size).ceil.toInt
+
+  lazy val minNumberPerTopic = constraints.collect {
+    case TopicNeedsNumberOfPersons(t, min, max) if min.isDefined => (t, min.get)
+  } toMap
+
+  lazy val maxNumberPerTopic = constraints.collect {
+    case TopicNeedsNumberOfPersons(t, min, max) if max.isDefined => (t, max.get)
+  } toMap
 
 }
 

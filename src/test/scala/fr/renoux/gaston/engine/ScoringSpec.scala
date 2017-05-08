@@ -1,4 +1,4 @@
-package fr.renoux.gaston.model
+package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import org.scalatest.{FlatSpec, Matchers}
@@ -6,10 +6,8 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
   * Created by gael on 07/05/17.
   */
-class SolutionSpec extends FlatSpec with Matchers {
-  val log = Logger[SolutionSpec]
-
-  import TestModel._
+class ScoringSpec extends FlatSpec with Matchers {
+  val log = Logger[ScoringSpec]
 
   /*
   "Solution score" should "be the sum of constraint scores" in {

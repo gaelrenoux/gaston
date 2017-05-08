@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model.constraints
 
+import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.Schedule
 
 /**
@@ -8,13 +9,22 @@ import fr.renoux.gaston.model.Schedule
 trait Constraint {
   def countBroken(schedule: Schedule): Long
   def isRespected(schedule: Schedule): Boolean
+  val isApplicableToPartialSolution: Boolean
 }
 
 abstract class AbstractConstraint[Checked] extends Constraint {
 
-  def countBroken(schedule: Schedule): Long = elementsChecked(schedule) filterNot check(schedule) size
+  private val log = Logger[Constraint]
 
-  def isRespected(schedule: Schedule): Boolean = elementsChecked(schedule) forall check(schedule)
+  override val isApplicableToPartialSolution: Boolean = true
+
+  override def countBroken(schedule: Schedule): Long = elementsChecked(schedule) filterNot check(schedule) size
+
+  override def isRespected(schedule: Schedule): Boolean = {
+    val bool = elementsChecked(schedule) forall check(schedule)
+    if (!bool) log.debug(s"Constraint $this is broken on $schedule")
+    bool
+  }
 
   def elementsChecked(schedule: Schedule): Seq[Checked]
 

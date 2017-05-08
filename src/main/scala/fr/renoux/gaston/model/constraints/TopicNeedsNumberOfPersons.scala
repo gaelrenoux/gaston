@@ -18,4 +18,6 @@ case class TopicNeedsNumberOfPersons(topic: Topic, min: Opt[Int] = None, max: Op
     (min forall (value >= _)) && (max forall (value <= _))
   }
 
+  override val isApplicableToPartialSolution = false
+
 }

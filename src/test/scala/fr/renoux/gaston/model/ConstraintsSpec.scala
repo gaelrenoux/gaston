@@ -9,8 +9,9 @@ import org.scalatest.{FlatSpec, Matchers}
 class ConstraintsSpec extends FlatSpec with Matchers {
   val log = Logger[ConstraintsSpec]
 
-  import TestModel.Constraints._
-  import TestModel.Solutions._
+  import fr.renoux.gaston.TestModel.Constraints._
+  import fr.renoux.gaston.TestModel.Preferences._
+  import fr.renoux.gaston.TestModel.Solutions._
 
 
   behavior of "TopicNeedsNumberOfPersons"
@@ -37,13 +38,11 @@ class ConstraintsSpec extends FlatSpec with Matchers {
     LeonardoDoesNotParty.countBroken(Perfect) should be(0)
   }
 
-  behavior of "PersonPresence"
+  behavior of "PersonAbsence"
   it should "return 1 when broken once" in {
-    LeonardoInTheMorning.countBroken(Terrible) should be(1)
     LeonardoNotInTheNight.countBroken(Terrible) should be(1)
   }
   it should "return zero when respected" in {
-    LeonardoInTheMorning.countBroken(Perfect) should be(0)
     LeonardoNotInTheNight.countBroken(Perfect) should be(0)
   }
 
