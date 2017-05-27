@@ -11,7 +11,7 @@ import scala.util.Random
 class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers {
   val log = Logger[ConstrainedScheduleFactorySpec]
 
-  import fr.renoux.gaston.TestModel._
+  import fr.renoux.gaston.SimpleTestModel._
 
   "makePartialSchedule" should "work a partial schedule when there is one" in {
     val factory = new ConstrainedScheduleFactory(Problems.Complete)

@@ -9,9 +9,9 @@ import org.scalatest.{FlatSpec, Matchers}
 class ConstraintsSpec extends FlatSpec with Matchers {
   val log = Logger[ConstraintsSpec]
 
-  import fr.renoux.gaston.TestModel.Constraints._
-  import fr.renoux.gaston.TestModel.Preferences._
-  import fr.renoux.gaston.TestModel.Solutions._
+  import fr.renoux.gaston.SimpleTestModel.Constraints._
+  import fr.renoux.gaston.SimpleTestModel.Preferences._
+  import fr.renoux.gaston.SimpleTestModel.Solutions._
 
 
   behavior of "TopicNeedsNumberOfPersons"

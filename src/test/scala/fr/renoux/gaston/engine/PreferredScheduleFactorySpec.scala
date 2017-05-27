@@ -11,19 +11,22 @@ import scala.util.Random
 class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   val log = Logger[PreferredScheduleFactorySpec]
 
-  import fr.renoux.gaston.TestModel._
+  import fr.renoux.gaston.ComplexTestModel._
 
   "generateRandomSolution" should "work a valid random schedule" in {
     implicit val random = new Random(0L)
 
     val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
     val partialSolution = csFactory.makePartialSchedule
+    log.debug(s"Partial solution: $partialSolution")
 
     val psFactory = new PreferredScheduleFactory(Problems.Complete)
-    val solution = psFactory.completePartialSchedule(partialSolution.get)
+    val tempSolution = psFactory.completePartialSchedule(partialSolution.get)
+    log.debug(s"Temporary solution: $tempSolution")
+    val finalSolution = psFactory.improveUntilItChecks(tempSolution)
+    log.debug(s"Solution: $finalSolution")
 
-    log.debug(s"Solution: $solution")
-    Problems.Complete.constraints.forall { c => c.isRespected(solution) } should be(true)
+    Problems.Complete.isSolved(finalSolution) should be(true)
   }
 
 }

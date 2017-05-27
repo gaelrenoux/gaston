@@ -1,8 +1,8 @@
 package fr.renoux.gaston.model.problem
 
-import fr.renoux.gaston.model.constraints.{Constraint, PersonAbsence, PersonTopicObligation, TopicNeedsNumberOfPersons}
+import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
-import fr.renoux.gaston.model.{Person, Slot, Topic}
+import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
@@ -27,6 +27,17 @@ case class Problem(
     val topicsWithNoMandatoryPerson = (topics filterNot fromConstraints.keySet) map (_ -> Set[Person]()) toMap
 
     fromConstraints ++ topicsWithNoMandatoryPerson
+  }
+
+  lazy val forbiddenPersonsPerTopic = {
+
+    val fromConstraints = constraints collect {
+      case PersonTopicInterdiction(person, topic) => topic -> person
+    } groupBy (_._1) mapValues (_ map (_._2))
+
+    val topicsWithNoForbiddenPersons = (topics filterNot fromConstraints.keySet) map (_ -> Set[Person]()) toMap
+
+    fromConstraints ++ topicsWithNoForbiddenPersons
   }
 
   lazy val personSlotsPossibilities = {
@@ -73,6 +84,8 @@ case class Problem(
   lazy val maxNumberPerTopic = constraints.collect {
     case TopicNeedsNumberOfPersons(t, min, max) if max.isDefined => (t, max.get)
   } toMap
+
+  def isSolved(solution: Schedule) = constraints.forall { c => c.isRespected(solution) }
 
 }
 

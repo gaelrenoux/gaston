@@ -9,7 +9,7 @@ import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 /**
   * Created by gael on 07/05/17.
   */
-object TestModel {
+object SimpleTestModel {
 
   object Persons {
     val Leonardo = Person("Leonardo")
