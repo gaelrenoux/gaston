@@ -63,6 +63,7 @@ case class Problem(
     couples.groupToMap
   }
 
+  /** how many topics can we have during the same slot */
   lazy val parallelization = (topics.size.toDouble / slots.size).ceil.toInt
 
   lazy val minNumberPerTopic = constraints.collect {

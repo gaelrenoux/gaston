@@ -4,7 +4,7 @@ import fr.renoux.gaston.model.{Person, Schedule, Topic}
 import fr.renoux.gaston.util.Opt
 
 /**
-  * Created by gael on 07/05/17.
+  * Min and max number of persons on a topic.
   */
 case class TopicNeedsNumberOfPersons(topic: Topic, min: Opt[Int] = None, max: Opt[Int] = None) extends AbstractConstraint[(Topic, Set[Person])] {
 
@@ -18,6 +18,7 @@ case class TopicNeedsNumberOfPersons(topic: Topic, min: Opt[Int] = None, max: Op
     (min forall (value >= _)) && (max forall (value <= _))
   }
 
-  override val isApplicableToPartialSolution = false
+  /** If there's a minimum, you can't check a partial solution */
+  override val isApplicableToPartialSolution = min.isEmpty
 
 }

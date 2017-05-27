@@ -1,10 +1,9 @@
 package fr.renoux.gaston.model.constraints
 
-import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model._
 
 /**
-  * Created by gael on 07/05/17.
+  * A person is missing on some spot.
   */
 case class PersonAbsence(person: Person, slot: Slot) extends AbstractConstraint[(Slot, Set[Person])] {
 

@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model.{Person, Schedule, Topic}
 
 /**
-  * Created by gael on 07/05/17.
+  * A person cannot be assigned to a topic.
   */
 case class PersonTopicInterdiction(person: Person, topic: Topic) extends AbstractConstraint[(Topic, Set[Person])] {
 

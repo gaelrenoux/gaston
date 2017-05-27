@@ -10,8 +10,9 @@ object Implicits {
 
   implicit class PreferencesOps(wrapped: Iterable[_ <: Preference]) {
 
+    /** From a list of preferences, get all persons with a preference for some topic. */
     def personsWithPreferenceForTopic(topic: Topic): Map[Person, Strength] = wrapped flatMap {
-      case PersonTopicPreference(p, t, str) => Some(p -> str)
+      case PersonTopicPreference(p, t, str) if t == topic => Some(p -> str)
       case _ => None
     } toMap
   }

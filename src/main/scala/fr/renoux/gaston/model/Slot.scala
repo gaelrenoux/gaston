@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
 /**
-  * Created by gael on 07/05/17.
+  * A slot in the schedule. The same people can't be twice on the same spot.
   */
 case class Slot(name: String)

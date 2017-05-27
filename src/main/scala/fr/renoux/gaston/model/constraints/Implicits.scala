@@ -8,8 +8,9 @@ import fr.renoux.gaston.model.{Person, Topic}
 object Implicits {
 
   implicit class ConstraintsOps(wrapped: Iterable[_ <: Constraint]) {
+    /** From a list of constraints, get all persons mandatory for some topic. */
     def personsMandatoryForTopic(topic: Topic): Set[Person] = wrapped flatMap {
-      case PersonTopicObligation(p, t) => Some(p)
+      case PersonTopicObligation(p, t) if t == topic => Some(p)
       case _ => None
     } toSet
   }

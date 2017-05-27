@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model.{Person, Schedule, Topic}
 
 /**
-  * Created by gael on 07/05/17.
+  * A person must be assigned to ant instance of this topic.
   */
 case class PersonTopicObligation(person: Person, topic: Topic) extends AbstractConstraint[(Topic, Set[Person])] {
 

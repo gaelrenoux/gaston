@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
 /**
-  * Created by gael on 07/05/17.
+  * What we're doing during those slots.
   */
 case class Topic(name: String)

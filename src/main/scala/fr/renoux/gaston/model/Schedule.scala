@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
 /**
-  * Created by gael on 07/05/17.
+  * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
                      triplets: Set[(Slot, Topic, Set[Person])]
