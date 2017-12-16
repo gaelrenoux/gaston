@@ -1,0 +1,33 @@
+package fr.renoux.gaston.model
+
+case class Score(value: Double) extends AnyVal {
+  def *(w: Weight) = Score(value * w.value)
+}
+
+object Score {
+
+  val Zero = Score(0)
+
+  implicit object ScoreIsNumeric extends Numeric[Score] {
+    override def plus(x: Score, y: Score): Score = Score(x.value + y.value)
+
+    override def minus(x: Score, y: Score): Score = Score(x.value - y.value)
+
+    override def times(x: Score, y: Score): Score = Score(x.value * y.value)
+
+    override def negate(x: Score): Score = Score(-x.value)
+
+    override def fromInt(x: Int): Score = Score(x)
+
+    override def toInt(x: Score): Int = x.value.toInt
+
+    override def toLong(x: Score): Long = x.value.toLong
+
+    override def toFloat(x: Score): Float = x.value.toFloat
+
+    override def toDouble(x: Score): Double = x.value.toDouble
+
+    override def compare(x: Score, y: Score): Int = x.value.compareTo(y.value)
+  }
+
+}

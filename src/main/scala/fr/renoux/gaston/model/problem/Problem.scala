@@ -1,12 +1,13 @@
 package fr.renoux.gaston.model.problem
 
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
-import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.Opt
 
 /**
-  * Created by gael on 07/05/17.
+  * A problem to solve. A schedule solves a problem.
   */
 case class Problem(
                     slots: Set[Slot],
@@ -16,31 +17,32 @@ case class Problem(
                     preferences: Set[Preference]
                   ) {
 
-  //TODO deduplicate constraints (multipe prefs with the same person and topic, for instance)
+  /** For each topic, which persons are mandatory */
+  lazy val mandatoryPersonsPerTopic: Map[Topic, Set[Person]] = {
 
-  lazy val mandatoryPersonsPerTopic = {
-
-    val fromConstraints = constraints collect {
+    val topicsWithMandatoryPersons = constraints collect {
       case PersonTopicObligation(person, topic) => topic -> person
     } groupBy (_._1) mapValues (_ map (_._2))
 
-    val topicsWithNoMandatoryPerson = (topics filterNot fromConstraints.keySet) map (_ -> Set[Person]()) toMap
+    val topicsWithNoMandatoryPerson = topics.diff(topicsWithMandatoryPersons.keySet) map (_ -> Set[Person]()) toMap
 
-    fromConstraints ++ topicsWithNoMandatoryPerson
+    topicsWithMandatoryPersons ++ topicsWithNoMandatoryPerson
   }
 
-  lazy val forbiddenPersonsPerTopic = {
+  /** For each topic, which persons are forbidden */
+  lazy val forbiddenPersonsPerTopic: Map[Topic, Set[Person]] = {
 
-    val fromConstraints = constraints collect {
+    val topicsWithForbiddenPersons = constraints collect {
       case PersonTopicInterdiction(person, topic) => topic -> person
     } groupBy (_._1) mapValues (_ map (_._2))
 
-    val topicsWithNoForbiddenPersons = (topics filterNot fromConstraints.keySet) map (_ -> Set[Person]()) toMap
+    val topicsWithNoForbiddenPersons = topics.diff(topicsWithForbiddenPersons.keySet) map (_ -> Set[Person]()) toMap
 
-    fromConstraints ++ topicsWithNoForbiddenPersons
+    topicsWithForbiddenPersons ++ topicsWithNoForbiddenPersons
   }
 
-  lazy val personSlotsPossibilities = {
+  /** Indicates wether a person is available on a slot or not. */
+  lazy val personSlotsPossibilities: Set[(Person, Slot)] = {
     val notedAbsences = constraints collect {
       case PersonAbsence(p, s) => (p, s)
     }
@@ -51,11 +53,15 @@ case class Problem(
     } yield (p, s)
   }
 
-  lazy val slotsPerPerson = personSlotsPossibilities.groupToMap
+  /** For each persons, its available slots */
+  lazy val slotsPerPerson: Map[Person, Set[Slot]] = personSlotsPossibilities.groupToMap
 
-  lazy val personsPerSlot = personSlotsPossibilities.map(_.swap).groupToMap
+  /** For each slot, the available persons */
+  lazy val personsPerSlot: Map[Slot, Set[Person]] = personSlotsPossibilities.map(_.swap).groupToMap
 
-  lazy val incompatibleTopicsPerTopic = {
+  /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
+    *  are mandatory). */
+  lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
     val couples = for {
       topic1 <- topics
       topic2 <- topics
@@ -65,27 +71,38 @@ case class Problem(
     couples.groupToMap
   }
 
-  lazy val incompatibleTopicsPerSlot = {
+  /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
+    *  is missing). */
+  lazy val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slots
       topic <- topics
-      if personsPerSlot(slot).intersect(mandatoryPersonsPerTopic(topic)).isEmpty
+      if mandatoryPersonsPerTopic(topic).exists(!personsPerSlot(slot).contains(_))
     } yield (slot, topic)
     couples.groupToMap
   }
 
-  /** how many topics can we have during the same slot */
-  lazy val parallelization = (topics.size.toDouble / slots.size).ceil.toInt
+  /** Maximum number of topics we must have during the same slot */
+  lazy val parallelization: Int = (topics.size.toDouble / slots.size).ceil.toInt
 
-  lazy val minNumberPerTopic = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, min, _) if min.isDefined => (t, min.get)
+  /** The min number of persons for each topic that has a min number of persons */
+  lazy val minNumberPerTopic: Map[Topic, Int] = constraints.collect {
+    case TopicNeedsNumberOfPersons(t, Opt(Some(min)), _) => (t, min)
   } toMap
 
-  lazy val maxNumberPerTopic = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, _, max) if max.isDefined => (t, max.get)
+  /** The max number of persons for each topic that has a max number of persons */
+  lazy val maxNumberPerTopic: Map[Topic, Int] = constraints.collect {
+    case TopicNeedsNumberOfPersons(t, _, Opt(Some(max))) => (t, max)
   } toMap
 
-  def isSolved(solution: Schedule) = constraints.forall { c => c.isRespected(solution) }
+  /** @return true if the schedule respects all constraints */
+  def isSolved(solution: Schedule): Boolean = constraints.forall { c => c.isRespected(solution) }
 
+  /** Returns Left with the number (>0) of broken constraints, or Right with the score. */
+  def score(solution: Schedule): Either[Int, Score] = {
+    val constraintsBroken = constraints.map(_.countBroken(solution)).sum
+    if (constraintsBroken > 0) Left(constraintsBroken)
+    else Right(preferences.map(_.score(solution)).sum)
+  }
 }
 

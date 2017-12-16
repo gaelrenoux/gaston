@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model.Schedule
 
 /**
-  * Mandatory constraint on the solution.
+  * Mandatory constraint on the solution. Constraints should implement #equals and #hashCode to allow deduplication.
   */
 trait Constraint {
 

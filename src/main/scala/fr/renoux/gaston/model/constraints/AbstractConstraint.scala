@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.Schedule
 
 /**
-  * Abstract class for constraints providing a basis for how to check things. Checked is an instance that can be checked
+  * Abstract class for constraints providing a basis for how to check things. Checked is an object that can be checked
   * individually, obtained by aggregating some stuff from the schedule. */
 abstract class AbstractConstraint[Checked] extends Constraint {
 
@@ -24,7 +24,8 @@ abstract class AbstractConstraint[Checked] extends Constraint {
   }
 
   /** On a schedule, what are the elements to look at to now if it's working. Aggregated from the schedule's records. */
-  def elementsChecked(schedule: Schedule): Iterable[Checked]
+  protected def elementsChecked(schedule: Schedule): Iterable[Checked]
 
   /** How to check if one of those elements is OK */
-  def check(checked: Checked): Boolean}
+  protected def check(checked: Checked): Boolean
+}

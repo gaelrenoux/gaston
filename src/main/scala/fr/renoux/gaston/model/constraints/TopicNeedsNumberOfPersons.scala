@@ -8,9 +8,9 @@ import fr.renoux.gaston.util.Opt
   */
 case class TopicNeedsNumberOfPersons(topic: Topic, min: Opt[Int] = None, max: Opt[Int] = None) extends AbstractConstraint[(Topic, Set[Person])] {
 
-  override def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
+  override protected def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
 
-  override def check(checked: (Topic, Set[Person])): Boolean = {
+  override protected def check(checked: (Topic, Set[Person])): Boolean = {
     topic != checked._1 || checkBetweenMinMax(checked._2.size)
   }
 

@@ -13,5 +13,4 @@ object Opt {
   implicit def scalarToOpt[A](a: A): Opt[A] = Opt(Some(a))
 
   implicit def optToOption[A](o: Opt[A]): Option[A] = o.wrapped
-
 }

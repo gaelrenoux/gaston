@@ -7,9 +7,9 @@ import fr.renoux.gaston.model.{Person, Schedule, Topic}
   */
 case class PersonTopicObligation(person: Person, topic: Topic) extends AbstractConstraint[(Topic, Set[Person])] {
 
-  override def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
+  override protected def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
 
-  override def check(checked: (Topic, Set[Person])): Boolean = {
+  override protected def check(checked: (Topic, Set[Person])): Boolean = {
     topic != checked._1 || checked._2(person)
   }
 

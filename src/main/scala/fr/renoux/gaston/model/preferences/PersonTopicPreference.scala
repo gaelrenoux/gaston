@@ -8,11 +8,11 @@ import fr.renoux.gaston.model._
 case class PersonTopicPreference(
                                   person: Person,
                                   topic: Topic,
-                                  strength: Preference.Strength) extends AbstractPreference[(Topic, Set[Person])] {
+                                  reward: Score) extends Preference {
 
-  override def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
-
-  override def check(checked: (Topic, Set[Person])): Boolean = {
-    checked._1 == topic && checked._2(person)
+  override def score(schedule: Schedule): Score = {
+    val topicPersons = schedule.personsPerTopic(topic)
+    if (topicPersons(person)) person.weight * reward
+    else Score.Zero
   }
 }

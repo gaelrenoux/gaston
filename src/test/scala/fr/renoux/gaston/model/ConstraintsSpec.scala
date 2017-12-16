@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.io.Definitions
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
@@ -47,11 +48,11 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   }
 
   behavior of "Preferences"
-  it should "return 1 when satisfied once" in {
-    LeonardoLovesFighting.countSatisfied(Perfect) should be(1)
+  it should "return weight when satisfied once" in {
+    LeonardoLovesFighting.score(Perfect) should be(Score(Definitions.StrongPreference.value))
   }
   it should "return zero when not satisfied" in {
-    LeonardoLovesFighting.countSatisfied(Terrible) should be(0)
+    LeonardoLovesFighting.score(Terrible) should be(Score.Zero)
   }
 
 }

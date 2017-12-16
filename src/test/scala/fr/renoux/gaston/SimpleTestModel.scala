@@ -2,7 +2,6 @@ package fr.renoux.gaston
 
 import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.Preference.{Strong, Weak}
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
@@ -85,16 +84,17 @@ object SimpleTestModel {
 
     import Persons._
     import Topics._
+    import io.Definitions._
 
-    val LeonardoLovesFighting = PersonTopicPreference(Leonardo, Fighting, Strong)
-    val RaphaelLovesPartying = PersonTopicPreference(Raphael, Party, Strong)
-    val DonatelloLovesLeading = PersonTopicPreference(Donatello, Leading, Strong)
-    val MichelangeloLovesMachines = PersonTopicPreference(Michelangelo, Machines, Strong)
+    val LeonardoLovesFighting = PersonTopicPreference(Leonardo, Fighting, StrongPreference)
+    val RaphaelLovesPartying = PersonTopicPreference(Raphael, Party, StrongPreference)
+    val DonatelloLovesLeading = PersonTopicPreference(Donatello, Leading, StrongPreference)
+    val MichelangeloLovesMachines = PersonTopicPreference(Michelangelo, Machines, StrongPreference)
 
-    val LeonardoLikesMachines = PersonTopicPreference(Leonardo, Machines, Weak)
-    val RaphaelLikesLeading = PersonTopicPreference(Raphael, Leading, Weak)
-    val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, Weak)
-    val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, Weak)
+    val LeonardoLikesMachines = PersonTopicPreference(Leonardo, Machines, WeakPreference)
+    val RaphaelLikesLeading = PersonTopicPreference(Raphael, Leading, WeakPreference)
+    val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, WeakPreference)
+    val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, WeakPreference)
 
     val All: Set[Preference] = Set(
       LeonardoLovesFighting,
