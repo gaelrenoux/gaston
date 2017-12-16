@@ -1,31 +1,35 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.util.RandomImplicits._
-
-import scala.util.Random
-
 /**
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-                     triplets: Set[(Slot, Topic, Set[Person])]
+                     records: Set[Schedule.Record]
                    ) {
 
-  private lazy val slots = triplets map (_._1)
-  lazy val personsPerSlot: Map[Slot, Set[Person]] = triplets groupBy (_._1) mapValues { x => x flatMap (_._3) }
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = triplets groupBy (_._2) mapValues { x => x flatMap (_._3) }
-  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = triplets groupBy (_._1) mapValues { x => x map (_._2) }
+  //private lazy val slots = triplets map (_._1)
+  lazy val personsPerSlot: Map[Slot, Set[Person]] = records groupBy (_.slot) mapValues { x => x flatMap (_.persons) }
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = records groupBy (_.topic) mapValues { x => x flatMap (_.persons) }
+  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records groupBy (_.slot) mapValues { x => x map (_.topic) }
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic mapValues (_.size)
 
-  def merge(addedTriplets: Set[(Slot, Topic, Set[Person])]): Schedule = {
-    val cumulatedTriplets = triplets ++ addedTriplets
-    val mergedMap = cumulatedTriplets groupBy (t => (t._1, t._2)) mapValues (_.flatMap(_._3))
-    val mergedTriplets = mergedMap.toSet map { c: ((Slot, Topic), Set[Person]) => (c._1._1, c._1._2, c._2) }
-    copy(triplets = mergedTriplets)
+  /** Merge more triplets into this schedule. */
+  def merge(addedRecords: Set[Schedule.Record]): Schedule = {
+    val cumulatedRecords = records ++ addedRecords
+    val mergedMap = cumulatedRecords groupBy (t => (t.slot, t.topic)) mapValues (_.flatMap(_.persons))
+    val mergedRecords = mergedMap.toSet map Schedule.Record.fromTuple2
+    Schedule(mergedRecords)
   }
 
 }
 
 object Schedule {
-  def apply(schedule: (Slot, Topic, Set[Person])*): Schedule = new Schedule(schedule.toSet)
+  case class Record(slot: Slot, topic: Topic, persons: Set[Person])
+
+  object Record {
+    def fromTuple(tuple: (Slot, Topic, Set[Person])) = Record(tuple._1, tuple._2, tuple._3)
+    def fromTuple2(tuple: ((Slot, Topic), Set[Person])) = Record(tuple._1._1, tuple._1._2, tuple._2)
+  }
+
+  def apply(schedule: Record*): Schedule = new Schedule(schedule.toSet)
 }

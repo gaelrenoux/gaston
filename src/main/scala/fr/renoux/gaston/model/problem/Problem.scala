@@ -78,11 +78,11 @@ case class Problem(
   lazy val parallelization = (topics.size.toDouble / slots.size).ceil.toInt
 
   lazy val minNumberPerTopic = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, min, max) if min.isDefined => (t, min.get)
+    case TopicNeedsNumberOfPersons(t, min, _) if min.isDefined => (t, min.get)
   } toMap
 
   lazy val maxNumberPerTopic = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, min, max) if max.isDefined => (t, max.get)
+    case TopicNeedsNumberOfPersons(t, _, max) if max.isDefined => (t, max.get)
   } toMap
 
   def isSolved(solution: Schedule) = constraints.forall { c => c.isRespected(solution) }

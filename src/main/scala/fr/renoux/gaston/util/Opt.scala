@@ -1,7 +1,7 @@
 package fr.renoux.gaston.util
 
 /**
-  * Created by gael on 07/05/17.
+  * Commodity class to have optional arguments on methods or classes without having to pass them as Some[A].
   */
 case class Opt[A](wrapped: Option[A]) extends AnyVal
 

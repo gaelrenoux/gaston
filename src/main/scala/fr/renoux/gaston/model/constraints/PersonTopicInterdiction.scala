@@ -7,9 +7,9 @@ import fr.renoux.gaston.model.{Person, Schedule, Topic}
   */
 case class PersonTopicInterdiction(person: Person, topic: Topic) extends AbstractConstraint[(Topic, Set[Person])] {
 
-  def elementsChecked(schedule: Schedule): Seq[(Topic, Set[Person])] = schedule.personsPerTopic.toSeq
+  override def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
 
-  def check(schedule: Schedule)(checked: (Topic, Set[Person])): Boolean = {
+  override def check(checked: (Topic, Set[Person])): Boolean = {
     topic != checked._1 || !checked._2(person)
   }
 }

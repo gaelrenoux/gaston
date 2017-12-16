@@ -7,9 +7,9 @@ import fr.renoux.gaston.model._
   */
 case class PersonAbsence(person: Person, slot: Slot) extends AbstractConstraint[(Slot, Set[Person])] {
 
-  def elementsChecked(schedule: Schedule): Seq[(Slot, Set[Person])] = schedule.personsPerSlot.toSeq
+  override def elementsChecked(schedule: Schedule): Iterable[(Slot, Set[Person])] = schedule.personsPerSlot
 
-  def check(schedule: Schedule)(checked: (Slot, Set[Person])): Boolean = {
+  override def check(checked: (Slot, Set[Person])): Boolean = {
     slot != checked._1 || !checked._2(person)
   }
 

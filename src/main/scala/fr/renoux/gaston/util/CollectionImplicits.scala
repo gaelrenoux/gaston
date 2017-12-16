@@ -7,23 +7,23 @@ import scala.annotation.tailrec
   */
 object CollectionImplicits {
 
-  implicit class CoupleSetOps[A, B](wrapped: Set[(A, B)]) {
+  implicit class CoupleSetOps[A, B](val wrapped: Set[(A, B)]) extends AnyVal {
     /** Converts a set of couples to a map of the first element to a set of the second. */
     def groupToMap: Map[A, Set[B]] = wrapped.groupBy(_._1).mapValues(_.map(_._2))
   }
 
-  implicit class ListOps[A](wrapped: List[A]) {
+  implicit class ListOps[A](val wrapped: List[A]) extends AnyVal {
 
-    /** Takes multiple elements rather than one */
+    /** Takes chunks from the list, with a specific size. */
     def take(firstElementCount: Int, secondElementCount: Int, elementsCount: Int*): List[List[A]] = {
       val elts = firstElementCount :: secondElementCount :: elementsCount.toList
       recTake(elts, wrapped)._1
     }
 
-    /** Takes multiple elements rather than one. */
+    /** Takes chunks from the list, with a specific size. */
     def take(elementsCount: Iterable[Int]): List[List[A]] = recTake(elementsCount.toList, wrapped)._1
 
-    /** Takes multiple elements rather than one. Returns the elements taken and all elements left */
+    /** Takes chunks from the list, with a specific size. Returns the elements taken and all elements left */
     def takeWithRemainder(elementsCount: Iterable[Int]): (List[List[A]], List[A]) = recTake(elementsCount.toList, wrapped)
 
     @tailrec

@@ -1,5 +1,6 @@
 package fr.renoux.gaston
 
+import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference.{Strong, Weak}
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
@@ -119,18 +120,18 @@ object SimpleTestModel {
     import Topics._
 
     val Terrible = Schedule(
-      (Morning, Leading, Set(Michelangelo)),
-      (AfterNoon, Fighting, Set(Donatello)),
-      (Evening, Machines, Set(Raphael)),
-      (Night, Party, Set(Leonardo))
+      Record(Morning, Leading, Set(Michelangelo)),
+      Record(AfterNoon, Fighting, Set(Donatello)),
+      Record(Evening, Machines, Set(Raphael)),
+      Record(Night, Party, Set(Leonardo))
     )
 
     val Perfect = Schedule(
-      (Morning, Leading, Set(Leonardo, Donatello, Raphael)),
-      (AfterNoon, Fighting, Set(Raphael, Leonardo, Michelangelo)),
-      (Evening, Machines, Set(Donatello, Michelangelo, Leonardo)),
-      (Night, Party, Set(Michelangelo, Raphael, Donatello)),
-      (Noonish, Cooking, Set(Leonardo, Raphael, Donatello, Michelangelo))
+      Record(Morning, Leading, Set(Leonardo, Donatello, Raphael)),
+      Record(AfterNoon, Fighting, Set(Raphael, Leonardo, Michelangelo)),
+      Record(Evening, Machines, Set(Donatello, Michelangelo, Leonardo)),
+      Record(Night, Party, Set(Michelangelo, Raphael, Donatello)),
+      Record(Noonish, Cooking, Set(Leonardo, Raphael, Donatello, Michelangelo))
     )
   }
 

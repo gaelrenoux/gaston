@@ -46,8 +46,8 @@ class ConstrainedScheduleFactory(val problem: Problem) {
     val currentTopic = topicsLeft.head
     val nextTopics = topicsLeft.tail
 
-    val triplet = (currentSlot, currentTopic, problem.mandatoryPersonsPerTopic(currentTopic)) //new triplet we want to try
-    val candidate = partialSchedule.copy(triplets = partialSchedule.triplets + triplet) // generate a new candidate with this triplet
+    val record = Schedule.Record(currentSlot, currentTopic, problem.mandatoryPersonsPerTopic(currentTopic)) //new record we want to try
+    val candidate = partialSchedule.copy(records = partialSchedule.records + record) // generate a new candidate with this record
     val candidateAcceptable = problem.constraints forall { c => !c.isApplicableToPartialSolution || c.isRespected(candidate) }
 
     val solution =

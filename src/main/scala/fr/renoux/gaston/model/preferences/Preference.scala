@@ -11,16 +11,7 @@ trait Preference {
   def countSatisfied(schedule: Schedule): Int
 }
 
-abstract class AbstractPreference[Checked] extends Preference {
 
-  def countSatisfied(schedule: Schedule): Int = elementsChecked(schedule) count check(schedule)
-
-  /** On a schedule, what are the elements to look at to now if it's working. */
-  def elementsChecked(schedule: Schedule): Seq[Checked]
-
-  /** How to check if one of those elements is OK */
-  def check(schedule: Schedule)(checked: Checked): Boolean
-}
 
 object Preference {
 

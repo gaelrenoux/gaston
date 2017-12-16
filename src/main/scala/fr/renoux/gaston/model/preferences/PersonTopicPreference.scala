@@ -10,9 +10,9 @@ case class PersonTopicPreference(
                                   topic: Topic,
                                   strength: Preference.Strength) extends AbstractPreference[(Topic, Set[Person])] {
 
-  override def elementsChecked(schedule: Schedule): Seq[(Topic, Set[Person])] = schedule.personsPerTopic.toSeq
+  override def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
 
-  override def check(schedule: Schedule)(checked: (Topic, Set[Person])): Boolean = {
+  override def check(checked: (Topic, Set[Person])): Boolean = {
     checked._1 == topic && checked._2(person)
   }
 }
