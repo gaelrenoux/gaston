@@ -1,7 +1,7 @@
 package fr.renoux.gaston.util
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.RicherCollections._
 
 import scala.collection.mutable
 
@@ -28,7 +28,8 @@ object Dispatch {
       val slotSizes = Seq.fill(slots)(slotBaseSize).zipWithIndex map { case (s, ix) =>
         if (ix < remainder) s + 1 else s
       }
-      list.take(slotSizes)
+      val (result, Nil) = list.takeChunks(slotSizes)
+      result
     }
   }
 
@@ -36,8 +37,8 @@ object Dispatch {
   class EqualDispatchWithMaxes private[Dispatch](maxes: Seq[Int]) {
     private val slotCount = maxes.size
 
-    def apply[A](list: List[A]): (List[List[A]], List[A]) = {
-      val itemCount = list.size
+    def apply[A](seq: Seq[A]): (Seq[Seq[A]], Seq[A]) = {
+      val itemCount = seq.size
       /* sometimes maxes are set at max int, no need to go that high */
       val realMaxes = maxes map (math.min(_, itemCount))
 
@@ -56,7 +57,7 @@ object Dispatch {
       }
       log.trace(s"Sizes are $sizes")
 
-      list.takeWithRemainder(sizes)
+      seq.takeChunks(sizes)
     }
 
   }

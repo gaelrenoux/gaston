@@ -3,7 +3,7 @@ package fr.renoux.gaston.engine
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Schedule, Slot}
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.RicherCollections._
 import fr.renoux.gaston.util.Dispatch
 import fr.renoux.gaston.util.RandomImplicits._
 
@@ -17,7 +17,8 @@ class PreferredScheduleFactory(problem: Problem) {
 
   private val log = Logger[PreferredScheduleFactory]
 
-  /** Starts with a partial schedule satisfying all constraints, and generates a random schedule. The new random schedule may violate some constraints. */
+  /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
+    * schedule respecting all constraint. */
   def completePartialSchedule(partialSchedule: Schedule)(implicit random: Random): Schedule = {
 
     /* first step : solve all number constraints, which were not included in the partialSchedule */
@@ -51,7 +52,7 @@ class PreferredScheduleFactory(problem: Problem) {
         throw new IllegalStateException(s"too many persons: $personsLeft for $topicAndPersonsCount")
       }
 
-      val (personsAddedToReachMin, personsLeftLeft) = personsLeft.takeWithRemainder(topicAndPersonsCount.map(_._2.needed))
+      val (personsAddedToReachMin, personsLeftLeft) = personsLeft.takeChunks(topicAndPersonsCount.map(_._2.needed))
 
       val (personsAddedToFinish, remainder) = Dispatch.equallyWithMaxes(topicAndPersonsCount.map(_._2.optional))(personsLeftLeft)
 
@@ -71,7 +72,12 @@ class PreferredScheduleFactory(problem: Problem) {
       tps map { case (t, ps) => Schedule.Record(s, t, ps.toSet) }
     }
 
-    partialSchedule.merge(addedTriplets)
+    val result = partialSchedule.merge(addedTriplets)
+/*    if (!problem.isSolvedBy(result)) {
+      val missedConstraints = problem.constraints.filter(!_.isRespected(result))
+      throw new IllegalStateException(s"Random result violate some constraints: $missedConstraints")
+    }*/
+    result
   }
 
   private def availablePersons(schedule: Schedule, slot: Slot)(implicit random: Random) = {
@@ -82,7 +88,7 @@ class PreferredScheduleFactory(problem: Problem) {
   /** Takes a schedule and improves it so that it checks all constraints */
   @tailrec
   final def improveUntilItChecks(schedule: Schedule, limit: Long = 10000)(implicit random: Random): Schedule = {
-    if (problem.isSolved(schedule)) schedule
+    if (problem.isSolvedBy(schedule)) schedule
     else if (limit < 0) throw new IllegalArgumentException
     else {
       if (limit % 1000 == 0) log.trace(s"Limit in improveUntilItChecks is $limit")

@@ -2,8 +2,9 @@ package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.io.Definitions
+import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonsIncompatibilityAntiPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 import fr.renoux.gaston.util.RandomImplicits._
@@ -58,11 +59,18 @@ object ComplexTestModel {
   }
 
   object Preferences {
-    val All: Set[Preference] = for {
+    val PersonTopics: Set[Preference] = for {
       p <- Persons.All
       (t, i) <- random.pick(Topics.All, 9).zipWithIndex
       str = if (i < 3) Definitions.StrongPreference else Definitions.WeakPreference
     } yield PersonTopicPreference(p, t, str)
+
+    val Incompatibilities: Set[Preference] = Set {
+      val p = random.pick(Persons.All, 3)
+      PersonsIncompatibilityAntiPreference(p.head, p.tail.toSet, -Definitions.StrongPreference)
+    }
+
+    val All: Set[Preference] = PersonTopics ++ Incompatibilities
   }
 
   object Problems {

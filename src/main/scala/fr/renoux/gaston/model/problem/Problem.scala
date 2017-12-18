@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.problem
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.RicherCollections._
 import fr.renoux.gaston.util.Opt
 
 /**
@@ -95,8 +95,12 @@ case class Problem(
     case TopicNeedsNumberOfPersons(t, _, Opt(Some(max))) => (t, max)
   } toMap
 
+  /* @return true if the partialSchedule respects all constraints applicable to partial schedules  */
+  def isAcceptablePartial(candidate: Schedule): Boolean =
+    constraints forall { c => !c.isApplicableToPartialSolution || c.isRespected(candidate) }
+
   /** @return true if the schedule respects all constraints */
-  def isSolved(solution: Schedule): Boolean = constraints.forall { c => c.isRespected(solution) }
+  def isSolvedBy(solution: Schedule): Boolean = constraints.forall { c => c.isRespected(solution) }
 
   /** Returns Left with the number (>0) of broken constraints, or Right with the score. */
   def score(solution: Schedule): Either[Int, Score] = {

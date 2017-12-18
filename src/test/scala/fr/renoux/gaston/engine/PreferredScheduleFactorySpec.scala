@@ -28,7 +28,7 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
       val finalSolution = psFactory.improveUntilItChecks(tempSolution)
       log.debug(s"Solution: $finalSolution")
 
-      Problems.Complete.isSolved(finalSolution) should be(true)
+      Problems.Complete.isSolvedBy(finalSolution) should be(true)
     }
   }
 

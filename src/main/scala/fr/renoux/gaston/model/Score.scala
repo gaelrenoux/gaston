@@ -8,16 +8,18 @@ object Score {
 
   val Zero = Score(0)
 
-  implicit object ScoreIsNumeric extends Numeric[Score] {
+  implicit object ScoreIsFractional extends Fractional[Score] {
     override def plus(x: Score, y: Score): Score = Score(x.value + y.value)
 
     override def minus(x: Score, y: Score): Score = Score(x.value - y.value)
 
     override def times(x: Score, y: Score): Score = Score(x.value * y.value)
 
+    override def div(x: Score, y: Score): Score = Score(x.value / y.value)
+
     override def negate(x: Score): Score = Score(-x.value)
 
-    override def fromInt(x: Int): Score = Score(x)
+    override def fromInt(x: Int): Score = Score(x.toDouble)
 
     override def toInt(x: Score): Int = x.value.toInt
 
@@ -28,6 +30,8 @@ object Score {
     override def toDouble(x: Score): Double = x.value.toDouble
 
     override def compare(x: Score, y: Score): Int = x.value.compareTo(y.value)
+
+    override def abs(x: Score): Score = Score(math.abs(x.value))
   }
 
 }

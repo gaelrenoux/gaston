@@ -12,16 +12,18 @@ object Weight {
     ws.map(_.value).foldLeft(w.value)(_ * _)
   )
 
-  implicit object WeightINumeric extends Numeric[Weight] {
+  implicit object WeightIsFractional extends Fractional[Weight] {
     override def plus(x: Weight, y: Weight): Weight = Weight(x.value + y.value)
 
     override def minus(x: Weight, y: Weight): Weight = Weight(x.value - y.value)
 
     override def times(x: Weight, y: Weight): Weight = Weight(x.value * y.value)
 
+    override def div(x: Weight, y: Weight): Weight = Weight(x.value / y.value)
+
     override def negate(x: Weight): Weight = Weight(-x.value)
 
-    override def fromInt(x: Int): Weight = Weight(x)
+    override def fromInt(x: Int): Weight = Weight(x.toDouble)
 
     override def toInt(x: Weight): Int = x.value.toInt
 
@@ -32,6 +34,8 @@ object Weight {
     override def toDouble(x: Weight): Double = x.value.toDouble
 
     override def compare(x: Weight, y: Weight): Int = x.value.compareTo(y.value)
+
+    override def abs(x: Weight): Weight = Weight(math.abs(x.value))
   }
 
 }
