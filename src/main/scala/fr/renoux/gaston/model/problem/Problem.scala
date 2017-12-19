@@ -3,8 +3,8 @@ package fr.renoux.gaston.model.problem
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
-import fr.renoux.gaston.util.RicherCollections._
 import fr.renoux.gaston.util.Opt
+import fr.renoux.gaston.util.RicherCollections._
 
 /**
   * A problem to solve. A schedule solves a problem.
@@ -102,11 +102,26 @@ case class Problem(
   /** @return true if the schedule respects all constraints */
   def isSolvedBy(solution: Schedule): Boolean = constraints.forall { c => c.isRespected(solution) }
 
-  /** Returns Left with the number (>0) of broken constraints, or Right with the score. */
-  def score(solution: Schedule): Either[Int, Score] = {
-    val constraintsBroken = constraints.map(_.countBroken(solution)).sum
-    if (constraintsBroken > 0) Left(constraintsBroken)
-    else Right(preferences.map(_.score(solution)).sum)
+  /** Returns the score. */
+  def score(solution: Schedule): Score = {
+    val individualScores = preferences.toSeq.map(_.score(solution))
+    individualScores.sum
+  }
+
+  lazy val toFormattedString: String = {
+    this.toString
+    val builder = new StringBuilder("Problem:\n")
+    builder.append("  Slots:\n")
+    slots.toSeq.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    builder.append("  Topics:\n")
+    topics.toSeq.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    builder.append("  Persons:\n")
+    persons.toSeq.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    builder.append("  Constraints:\n")
+    constraints.toSeq.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    builder.append("  Preferences:\n")
+    preferences.toSeq.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    builder.toString
   }
 }
 

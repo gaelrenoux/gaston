@@ -11,25 +11,58 @@ import scala.util.Random
 class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   val log = Logger[PreferredScheduleFactorySpec]
 
-  import fr.renoux.gaston.ComplexTestModel._
+  import fr.renoux.gaston._
 
-  "generateRandomSolution" should "work a valid random schedule" in {
+  "simpleAmelioration" should "work a valid random schedule (on a complex model)" in {
+    val complexTestModel = ComplexTestModel(42L)
+    var bestScore = Double.NegativeInfinity
+    for (seed <- 0L until 5L) {
+      implicit val random: Random = new Random(seed)
+      log.info(s"Seed: $seed")
+
+      val csFactory = new ConstrainedScheduleFactory(complexTestModel.Problems.Complete)
+      val Some(initialSolution) = csFactory.makeSchedule
+      val initialScore = complexTestModel.Problems.Complete.score(initialSolution)
+      log.info(s"Temporary solution (score $initialScore): $initialSolution")
+
+      val psFactory = new PreferredScheduleFactory(complexTestModel.Problems.Complete)
+      val finalSolution = psFactory.simpleRandomizedAmelioration(initialSolution, initialScore, 10000)
+      val finalScore = complexTestModel.Problems.Complete.score(finalSolution)
+      log.info(s"Solution (score $finalScore): $finalSolution")
+
+      complexTestModel.Problems.Complete.isSolvedBy(finalSolution) should be(true)
+      finalScore should be > initialScore
+
+      bestScore = math.max(bestScore, finalScore.value)
+    }
+
+    log.info(s"Bestest score was $bestScore")
+  }
+
+  "systematicAmelioration" should "work a valid schedule (on a complex model)" in {
+    val complexTestModel = ComplexTestModel(42L)
+    var bestScore = Double.NegativeInfinity
     for (seed <- 0L until 10L) {
       implicit val random: Random = new Random(seed)
-      log.debug(s"Seed: $seed")
+      log.info(s"Seed: $seed")
 
-      val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
-      val partialSolution = csFactory.makePartialSchedule
-      log.debug(s"Partial solution: $partialSolution")
+      val csFactory = new ConstrainedScheduleFactory(complexTestModel.Problems.Complete)
+      val Some(initialSolution) = csFactory.makeSchedule
+      val initialScore = complexTestModel.Problems.Complete.score(initialSolution)
+      log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
-      val psFactory = new PreferredScheduleFactory(Problems.Complete)
-      val tempSolution = psFactory.completePartialSchedule(partialSolution.get)
-      log.debug(s"Temporary solution: $tempSolution")
-      val finalSolution = psFactory.improveUntilItChecks(tempSolution)
-      log.debug(s"Solution: $finalSolution")
+      val psFactory = new PreferredScheduleFactory(complexTestModel.Problems.Complete)
+      val finalSolution = psFactory.systematicAmelioration(initialSolution, initialScore, 1000)
+      val finalScore = complexTestModel.Problems.Complete.score(finalSolution)
+      log.info(s"Solution (score $finalScore): $finalSolution")
 
-      Problems.Complete.isSolvedBy(finalSolution) should be(true)
+      complexTestModel.Problems.Complete.isSolvedBy(finalSolution) should be(true)
+      finalScore should be > initialScore
+
+      bestScore = math.max(bestScore, finalScore.value)
     }
+
+    log.info(s"Bestest score was $bestScore")
   }
 
 }

@@ -11,22 +11,57 @@ import scala.util.Random
 class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers {
   val log = Logger[ConstrainedScheduleFactorySpec]
 
-  import fr.renoux.gaston.SimpleTestModel._
+  import fr.renoux.gaston._
 
-  "makePartialSchedule" should "work a partial schedule when there is one" in {
-    val factory = new ConstrainedScheduleFactory(Problems.Complete)
-    val partialSolution = factory.makePartialSchedule(new Random(0L))
-    log.debug(s"Solution: $partialSolution")
-    Problems.Complete.constraints.forall { c => !c.isApplicableToPartialSolution || c.isRespected(Solutions.Perfect) } should be(true)
-    partialSolution.isDefined should be (true)
+  "makeSchedule" should "work out a schedule when there is one (on a simple model)" in {
+    val factory = new ConstrainedScheduleFactory(SimpleTestModel.Problems.Complete)
+    val solution = factory.makeSchedule(new Random(0L))
+    log.debug(s"Solution: $solution")
+    solution.isDefined should be(true)
   }
 
-  it should "always return a valid partial schedule if any" in {
-    val factory = new ConstrainedScheduleFactory(Problems.Complete)
-    val partialSolution = factory.makePartialSchedule(new Random(0L))
-    log.debug(s"Solution: $partialSolution")
-    partialSolution foreach { s =>
-      Problems.Complete.constraints.forall { c => !c.isApplicableToPartialSolution || c.isRespected(s) } should be(true)
+  it should "work out a schedule when there is one (on a complex model)" in {
+    val factory = new ConstrainedScheduleFactory(ComplexTestModel(42L).Problems.Complete)
+    val solution = factory.makeSchedule(new Random(0L))
+    log.debug(s"Solution: $solution")
+    solution.isDefined should be(true)
+  }
+
+  it should "always return a valid schedule if any (on a simple model)" in {
+    val factory = new ConstrainedScheduleFactory(SimpleTestModel.Problems.Complete)
+    val solution = factory.makeSchedule(new Random(0L))
+    solution foreach { s =>
+      log.debug(s"Solution: ${s.toFormattedString}")
+      SimpleTestModel.Problems.Complete.constraints.filter(!_.isRespected(s)) should be (Set())
+    }
+  }
+
+  it should "always return a valid schedule if any (on a complex model)" in {
+    val factory = new ConstrainedScheduleFactory(ComplexTestModel(42L).Problems.Complete)
+    val solution = factory.makeSchedule(new Random(0L))
+    solution foreach { s =>
+      log.debug(s"Solution: ${s.toFormattedString}")
+      SimpleTestModel.Problems.Complete.constraints.filter(!_.isRespected(s)) should be (Set())
+    }
+  }
+
+  it should "return a schedule where topics are equitably dispatched on slots (on a simple model)" in {
+    val factory = new ConstrainedScheduleFactory(SimpleTestModel.Problems.Complete)
+    val solution = factory.makeSchedule(new Random(0L))
+    solution foreach { s =>
+      log.debug(s"Solution: ${s.toFormattedString}")
+      val topicPerSlotsCounts = s.topicsPerSlot.map(_._2.size)
+      topicPerSlotsCounts.max should be <= (topicPerSlotsCounts.min + 1)
+    }
+  }
+
+  it should "return a schedule where topics are equitably dispatched on slots (on a complex model)" in {
+    val factory = new ConstrainedScheduleFactory(ComplexTestModel(42L).Problems.Complete)
+    val solution = factory.makeSchedule(new Random(0L))
+    solution foreach { s =>
+      log.debug(s"Solution: ${s.toFormattedString}")
+      val topicPerSlotsCounts = s.topicsPerSlot.map(_._2.size)
+      topicPerSlotsCounts.max should be <= (topicPerSlotsCounts.min + 1)
     }
   }
 

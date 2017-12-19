@@ -2,129 +2,103 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Schedule, Slot}
-import fr.renoux.gaston.util.RicherCollections._
-import fr.renoux.gaston.util.Dispatch
+import fr.renoux.gaston.model.{Person, Schedule, Score, Slot}
 import fr.renoux.gaston.util.RandomImplicits._
 
 import scala.annotation.tailrec
+import scala.collection.immutable.Queue
 import scala.util.Random
 
 /**
-  * Created by gael on 07/05/17.
+  * Improves an existing Schedule by satisfying preferences.
   */
 class PreferredScheduleFactory(problem: Problem) {
 
   private val log = Logger[PreferredScheduleFactory]
 
-  /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
-    * schedule respecting all constraint. */
-  def completePartialSchedule(partialSchedule: Schedule)(implicit random: Random): Schedule = {
-
-    /* first step : solve all number constraints, which were not included in the partialSchedule */
-    val additions = for (slot <- problem.slots) yield {
-
-      val personsLeft = availablePersons(partialSchedule, slot)
-      val topics = partialSchedule.topicsPerSlot(slot)
-
-      case class PersonsCount(
-                               existing: Int, //how many persons are already present
-                               needed: Int, //how many persons are needed to reach the min
-                               optional: Int //how many persons can we add after the min is reached (or with existing number if already higher than min)
-                             )
-
-      val topicAndPersonsCount = random.shuffle(topics.toSeq) map { t =>
-        val min = problem.minNumberPerTopic.getOrElse(t, 0)
-        val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
-        val existing = partialSchedule.countPersonsPerTopic(t)
-        val needed = math.max(0, min - existing)
-        val optional = max - math.max(min, existing)
-        t -> PersonsCount(existing, needed, optional)
-      }
-
-      val personsNeededCount = topicAndPersonsCount.map(_._2.needed).sum
-      if (personsLeft.size < personsNeededCount) {
-        throw new IllegalStateException(s"not enough persons: $personsLeft for $topicAndPersonsCount")
-      }
-
-      val personsOptionalCount = topicAndPersonsCount.map(_._2.optional).sum
-      if (personsLeft.size > personsNeededCount + personsOptionalCount) {
-        throw new IllegalStateException(s"too many persons: $personsLeft for $topicAndPersonsCount")
-      }
-
-      val (personsAddedToReachMin, personsLeftLeft) = personsLeft.takeChunks(topicAndPersonsCount.map(_._2.needed))
-
-      val (personsAddedToFinish, remainder) = Dispatch.equallyWithMaxes(topicAndPersonsCount.map(_._2.optional))(personsLeftLeft)
-
-      if (remainder.nonEmpty) {
-        throw new IllegalStateException(s"too many persons, somehow: $personsLeft for $topicAndPersonsCount")
-      }
-
-      val added = topicAndPersonsCount zip (personsAddedToReachMin zip personsAddedToFinish) map { case ((topic, _), (needed, optional)) =>
-        topic -> (needed ++ optional)
-      }
-
-      log.debug(s"Added persons on slot $slot: $added")
-      slot -> added
-    }
-
-    val addedTriplets = additions flatMap { case (s, tps) =>
-      tps map { case (t, ps) => Schedule.Record(s, t, ps.toSet) }
-    }
-
-    val result = partialSchedule.merge(addedTriplets)
-/*    if (!problem.isSolvedBy(result)) {
-      val missedConstraints = problem.constraints.filter(!_.isRespected(result))
-      throw new IllegalStateException(s"Random result violate some constraints: $missedConstraints")
-    }*/
-    result
-  }
-
-  private def availablePersons(schedule: Schedule, slot: Slot)(implicit random: Random) = {
-    val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot(slot)
-    random.shuffle(personsLeftSet.toList)
-  }
-
-  /** Takes a schedule and improves it so that it checks all constraints */
+  /** Use random swaps trying to always improve the solution. Pretty fast, but no garantee to have a perfect solution. */
   @tailrec
-  final def improveUntilItChecks(schedule: Schedule, limit: Long = 10000)(implicit random: Random): Schedule = {
-    if (problem.isSolvedBy(schedule)) schedule
-    else if (limit < 0) throw new IllegalArgumentException
-    else {
-      if (limit % 1000 == 0) log.trace(s"Limit in improveUntilItChecks is $limit")
-      improveUntilItChecks(randomSwap(schedule), limit - 1)
-    }
+  final def simpleRandomizedAmelioration(schedule: Schedule, score: Score, rounds: Int = 10000)(implicit rand: Random): Schedule = if (rounds == 0) schedule else {
+
+    val candidate = randomSwap(schedule)
+    val candidateScore = problem.score(candidate)
+
+    if (candidateScore.value >= score.value) simpleRandomizedAmelioration(candidate, candidateScore, rounds - 1)
+    else simpleRandomizedAmelioration(schedule, score, rounds - 1)
   }
 
-
-  def randomSwap(schedule: Schedule, limit: Int = 1000)(implicit rand: Random): Schedule = {
-    if (limit < 0) throw new IllegalArgumentException(s"$schedule")
+  @tailrec
+  private def randomSwap(schedule: Schedule, attempts: Int = 1000)(implicit rand: Random): Schedule = {
+    if (attempts < 0) throw new IllegalArgumentException(s"$schedule")
 
     val suitableSlots = schedule.topicsPerSlot.filter(_._2.size > 1).keySet
     if (suitableSlots.isEmpty) throw new IllegalArgumentException("Can't swap anything...")
     val slot = rand.pick(suitableSlots)
     val picks = rand.pick(schedule.records filter (_.slot == slot), 2)
-    val t1 = picks(0)
-    val t2 = picks(1)
-    /* we have picked two triplets on the same random slot */
+    val r1 = picks(0)
+    val r2 = picks(1)
+    /* we have picked two records on the same random slot */
 
-    val mandatoryPersonsT1 = problem.mandatoryPersonsPerTopic(t1.topic)
-    val mandatoryPersonsT2 = problem.mandatoryPersonsPerTopic(t2.topic)
-    val forbiddenPersonsT1 = problem.forbiddenPersonsPerTopic(t1.topic)
-    val forbiddenPersonsT2 = problem.forbiddenPersonsPerTopic(t2.topic)
+    val mandatoryPersonsR1 = problem.mandatoryPersonsPerTopic(r1.topic)
+    val mandatoryPersonsR2 = problem.mandatoryPersonsPerTopic(r2.topic)
+    val forbiddenPersonsR1 = problem.forbiddenPersonsPerTopic(r1.topic)
+    val forbiddenPersonsR2 = problem.forbiddenPersonsPerTopic(r2.topic)
 
-    val acceptableT1Picks = t1.persons -- mandatoryPersonsT1 -- forbiddenPersonsT2
-    val acceptableT2Picks = t2.persons -- mandatoryPersonsT2 -- forbiddenPersonsT1
+    val acceptableT1Picks = r1.persons -- mandatoryPersonsR1 -- forbiddenPersonsR2
+    val acceptableT2Picks = r2.persons -- mandatoryPersonsR2 -- forbiddenPersonsR1
 
-    if (acceptableT1Picks.isEmpty || acceptableT2Picks.isEmpty) randomSwap(schedule, limit - 1)
+    if (acceptableT1Picks.isEmpty || acceptableT2Picks.isEmpty) randomSwap(schedule, attempts - 1)
     else {
       val p1 = rand.pick(acceptableT1Picks)
       val p2 = rand.pick(acceptableT2Picks)
 
-      val newT1 = t1.copy(persons = t1.persons - p1 + p2)
-      val newT2 = t2.copy(persons = t2.persons - p2 + p1)
+      val newR1 = r1.copy(persons = r1.persons - p1 + p2)
+      val newR2 = r2.copy(persons = r2.persons - p2 + p1)
 
-      schedule.copy(schedule.records - t1 - t2 + newT1 + newT2)
+      log.trace(s"Swapping ${p1.name} and ${p2.name} on slot ${slot.name}")
+      schedule.copy(schedule.records - r1 - r2 + newR1 + newR2)
     }
+  }
+
+  /** Systematically explores all swaps. Not perfect because it only swaps, it does not explore more. Slower than the randomized method. */
+  @tailrec
+  final def systematicAmelioration(schedule: Schedule, score: Score, maxRounds: Int = 1000, slots: Queue[Slot] = Queue(problem.slots.toSeq: _*)): Schedule =
+    if (maxRounds == 0) {
+      log.debug("Stopping systematic amelioration because max number of rounds was reached")
+      schedule
+    } else if (slots.isEmpty) {
+      log.debug("Stopping systematic amelioration because all slots are perfect")
+      schedule
+    } else {
+        val (slot, slotsTail) = slots.dequeue
+        val (candidate, candidateScore) = bestSwapOnSlot(schedule, slot)
+        if (candidateScore.value > score.value)
+          systematicAmelioration(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot))
+        else
+          systematicAmelioration(schedule, score, maxRounds - 1, slotsTail)
+    }
+
+  /** Returns the best possible swap on a specific slot */
+  private def bestSwapOnSlot(schedule: Schedule, slot: Slot): (Schedule, Score) = {
+    val topics = schedule.topicsPerSlot(slot)
+    val records = schedule.records.filter(_.slot == slot)
+
+    val movableFromTopic = topics map { t => t -> (schedule.personsPerTopic(t) -- problem.mandatoryPersonsPerTopic(t)) } toMap
+
+    val swappedSchedules = for {
+      r1 <- records
+      r2 <- records - r1
+      p1 <- movableFromTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
+      p2 <- movableFromTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)
+    } yield {
+      val newR1 = r1.copy(persons = r1.persons - p1 + p2)
+      val newR2 = r2.copy(persons = r2.persons - p2 + p1)
+      schedule.copy(schedule.records - r1 - r2 + newR1 + newR2)
+      /* if (p1 == Person("fatima") && p2 == Person("adam")) Some(schedule.copy(schedule.records - r1 - r2 + newR1 + newR2))
+      else None */
+    }
+
+    val bestCandidate = swappedSchedules map { s => (s, problem.score(s)) } maxBy (_._2)
+    bestCandidate
   }
 }

@@ -9,22 +9,24 @@ import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 import fr.renoux.gaston.util.RandomImplicits._
 
+import scala.collection.mutable
 import scala.util.Random
 
 /**
   * Created by gael on 07/05/17.
   */
-object ComplexTestModel {
+class ComplexTestModel(seed: Long) {
 
-  private val log = Logger(ComplexTestModel.getClass)
+  private val log = Logger(classOf[ComplexTestModel])
 
-  implicit val random = new Random(25756L)
+  implicit val random = new Random(seed)
 
   object Persons {
-    private val firstNames = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda")
-    private val lastNames = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda")
-    private val personsSeq = for (i <- 0 until 30) yield Person(s"${random.pick(firstNames)} ${random.pick(lastNames)}")
-    val All: Set[Person] = personsSeq.toSet
+    //private val firstNames = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda")
+    //private val lastNames = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda")
+    //private val personsSeq = for (i <- 0 until 30) yield Person(s"${random.pick(firstNames)} ${random.pick(lastNames)}")
+    //val All: Set[Person] = personsSeq.toSet
+    val All: Set[Person] = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda").map(Person(_))
   }
 
   object Topics {
@@ -70,13 +72,13 @@ object ComplexTestModel {
       PersonsIncompatibilityAntiPreference(p.head, p.tail.toSet, -Definitions.StrongPreference)
     }
 
-    val All: Set[Preference] = PersonTopics ++ Incompatibilities
+    val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"), Topic("sigma"), Score(100))
   }
 
   object Problems {
     val Complete = {
       val p = Problem(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
-      log.debug(s"Problem is $p")
+      log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }
   }
@@ -84,3 +86,8 @@ object ComplexTestModel {
 }
 
 
+object ComplexTestModel {
+  private val cache = mutable.Map[Long, ComplexTestModel]()
+
+  def apply(seed: Long): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
+}

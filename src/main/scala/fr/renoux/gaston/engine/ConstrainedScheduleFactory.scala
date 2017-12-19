@@ -3,9 +3,8 @@ package fr.renoux.gaston.engine
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
-import fr.renoux.gaston.util.RicherCollections._
-import fr.renoux.gaston.util.Dispatch
 
+import scala.annotation.tailrec
 import scala.util.Random
 
 /**
@@ -18,19 +17,20 @@ class ConstrainedScheduleFactory(val problem: Problem) {
 
   /** Returns a Schedule satisfying all constraints, based on given random. Returns None if such a schedule cannot be
     *  constructed. */
-  def makeSchedule(implicit random: Random): Option[Schedule] = makePartialSchedule map completePartialSchedule
+  def makeSchedule(implicit random: Random): Option[Schedule] = makePartialSchedule flatMap completePartialSchedule
 
 
   /** Returns a Schedule satisfying all constraints except number constraints, based on given random. Returns None if
     * such a schedule cannot be constructed. */
-  def makePartialSchedule(implicit random: Random): Option[Schedule] = {
+  private def makePartialSchedule(implicit random: Random): Option[Schedule] = {
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
-    backtrackForConstraints(Schedule())(slots, 0, topics)
+    backtrackAssignTopicsToSlots(Schedule())(slots, 0, topics)
   }
 
 
   /**
+    * Uses backtracking to construct a partial schedule with all topics assigned to slots, and mandatory people assigned to their topics.
     *
     * @param partialSchedule        Partial schedule we are starting from
     * @param slotsLeft              All slots we haven't handled yet
@@ -39,16 +39,16 @@ class ConstrainedScheduleFactory(val problem: Problem) {
     * @param topicsPassed           Topics we have to handle but were already deemed unacceptable for the current solution
     * @return Some schedule that fits.
     */
-  private def backtrackForConstraints(partialSchedule: Schedule)
-                                     (slotsLeft: List[Slot], currentSlotTopicsCount: Int, topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil): Option[Schedule] = {
+  private def backtrackAssignTopicsToSlots(partialSchedule: Schedule)
+                                          (slotsLeft: List[Slot], currentSlotTopicsCount: Int, topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil): Option[Schedule] = {
     if (topicsLeft.isEmpty && topicsPassed.isEmpty) {
-      log.debug("Finishing backtrackForConstraints because we have no more topics")
+      log.debug("Finishing backtrackAssignTopicsToSlots because we have no more topics")
       Some(partialSchedule) // we have integrated all topics
     } else if (topicsLeft.isEmpty) {
-      log.debug("Hit a dead end")
+      log.trace("Hit a dead end")
       None // some topics were deemed unacceptable, and we have no more topics left : no solution
     } else if (slotsLeft.isEmpty) {
-      log.debug("Finishing backtrackForConstraints because we have no more slots")
+      log.debug("Finishing backtrackAssignTopicsToSlots because we have no more slots")
       Some(partialSchedule) // some topics are left but we have no more slots
     } else {
       val currentSlot = slotsLeft.head
@@ -68,7 +68,7 @@ class ConstrainedScheduleFactory(val problem: Problem) {
            * If not, there's no way it's going to work better with one more topic (schedule is even more constrained). */
           val (newTopicsLeft, newTopicsPassed) = if (newSlotTopicsCount == 0) (topicsPassed ::: nextTopics, Nil) else (nextTopics, topicsPassed)
 
-          backtrackForConstraints(candidate)(newSlotsLeft, newSlotTopicsCount, newTopicsLeft, newTopicsPassed)
+          backtrackAssignTopicsToSlots(candidate)(newSlotsLeft, newSlotTopicsCount, newTopicsLeft, newTopicsPassed)
 
         } else {
           log.trace(s"Candidate is not acceptable: $candidate")
@@ -78,7 +78,7 @@ class ConstrainedScheduleFactory(val problem: Problem) {
       solution orElse {
         log.trace(s"Backtracking from: $candidate")
         /* candidate was not acceptable, or went into a dead end. Let's try with next topic */
-        backtrackForConstraints(partialSchedule)(slotsLeft, currentSlotTopicsCount, nextTopics, currentTopic :: topicsPassed)
+        backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft, currentSlotTopicsCount, nextTopics, currentTopic :: topicsPassed)
       }
     }
   }
@@ -86,72 +86,100 @@ class ConstrainedScheduleFactory(val problem: Problem) {
 
   /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
     * schedule respecting all constraints. */
-  private def completePartialSchedule(partialSchedule: Schedule)(implicit random: Random): Schedule = {
+  private def completePartialSchedule(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
 
-    /* first step : solve all number constraints, which were not included in the partialSchedule */
-    val additions = for (slot <- problem.slots) yield {
+    @tailrec
+    def completeForSlots(slots: List[Slot], scheduleOption: Option[Schedule]): Option[Schedule] = (slots, scheduleOption) match {
+      case (Nil, _) => scheduleOption
+      case (_, None) => None
 
-      val personsLeft = availablePersons(partialSchedule, slot)
-      val topics = partialSchedule.topicsPerSlot(slot)
+      case (slot :: slotsTail, Some(schedule)) =>
 
-      case class PersonsCount(
-                               existing: Int, //how many persons are already present
-                               needed: Int, //how many persons are needed to reach the min
-                               optional: Int //how many persons can we add after the min is reached (or with existing number if already higher than min)
-                             )
+        val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot(slot)
+        val personsLeft = random.shuffle(personsLeftSet.toSeq)
 
-      val topicAndPersonsCount = random.shuffle(topics.toSeq) map { t =>
-        val min = problem.minNumberPerTopic.getOrElse(t, 0)
-        val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
-        val existing = partialSchedule.countPersonsPerTopic(t)
-        val needed = math.max(0, min - existing)
-        val optional = max - math.max(min, existing)
-        t -> PersonsCount(existing, needed, optional)
-      }
+        val topicsWithValues = schedule.topicsPerSlot(slot) map { t =>
+          val min = problem.minNumberPerTopic.getOrElse(t, 0)
+          val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
+          val current = schedule.countPersonsPerTopic(t)
 
-      val personsNeededCount = topicAndPersonsCount.map(_._2.needed).sum
-      if (personsLeft.size < personsNeededCount) {
-        throw new IllegalStateException(s"not enough persons: $personsLeft for $topicAndPersonsCount")
-      }
+          ((t, min - current), (t, max - math.max(min, current)))
+        } unzip
 
-      val personsOptionalCount = topicAndPersonsCount.map(_._2.optional).sum
-      if (personsLeft.size > personsNeededCount + personsOptionalCount) {
-        throw new IllegalStateException(s"too many persons: $personsLeft for $topicAndPersonsCount")
-      }
+        val topicsNeedingMin = topicsWithValues._1 filter (_._2 > 0)
+        val topicsOpenToMax = topicsWithValues._2 filter (_._2 > 0)
 
-      val (personsAddedToReachMin, personsLeftLeft) = personsLeft.takeChunks(topicAndPersonsCount.map(_._2.needed))
+        val newSchedule = backtrackAssignPersonsToTopics(schedule)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft.toList)
 
-      val (personsAddedToFinish, remainder) = Dispatch.equallyWithMaxes(topicAndPersonsCount.map(_._2.optional))(personsLeftLeft)
-
-      if (remainder.nonEmpty) {
-        throw new IllegalStateException(s"too many persons, somehow: $personsLeft for $topicAndPersonsCount")
-      }
-
-      val added = topicAndPersonsCount zip (personsAddedToReachMin zip personsAddedToFinish) map { case ((topic, _), (needed, optional)) =>
-        topic -> (needed ++ optional)
-      }
-
-      log.debug(s"Added persons on slot $slot: $added")
-      slot -> added
+        completeForSlots(slotsTail, newSchedule)
     }
 
-    val addedTriplets = additions flatMap { case (s, tps) =>
-      tps map { case (t, ps) => Schedule.Record(s, t, ps.toSet) }
-    }
-
-    val result = partialSchedule.merge(addedTriplets)
-    if (!problem.isSolvedBy(result)) {
-      val missedConstraints = problem.constraints.filter(!_.isRespected(result))
-      throw new IllegalStateException(s"Random result violate some constraints: $missedConstraints")
-    }
-    result
+    completeForSlots(problem.slots.toList, Some(partialSchedule))
   }
 
-  /** List available persons on a certain slot, given an existing partial schedule */
-  private def availablePersons(schedule: Schedule, slot: Slot)(implicit random: Random): Seq[Person] = {
-    val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot(slot)
-    random.shuffle(personsLeftSet.toSeq)
-  }
+
+  /**
+    * Assign persons to a list of topics.
+    *
+    * @param partialSchedule   Partial schedule from which we start
+    * @param topicsNeedingMin  Topics to which we need to add people to reach the min number of persons
+    * @param topicsOpenToMax   Topics to which we can add people up to the the max number of persons
+    * @param personsLeft       Persons that need to be assigned to topics
+    * @param personsLeftPassed Persons that needs to be assigned to topics but which have been passed for the head of the topic list
+    * @return None if no schedule is possible, Some(schedule) if possible
+    */
+  private def backtrackAssignPersonsToTopics(partialSchedule: Schedule)
+                                            (topicsNeedingMin: List[(Topic, Int)], topicsOpenToMax: List[(Topic, Int)], personsLeft: List[Person], personsLeftPassed: List[Person] = Nil): Option[Schedule] =
+    (topicsNeedingMin, topicsOpenToMax, personsLeft) match {
+      case (Nil, _, Nil) =>
+        log.debug("Finishing backtrackAssignPersonsToTopics because we have no more persons and all topics have their min numbers")
+        Some(partialSchedule) // no more persons left and min numbers all reached !
+
+      case (_, _, Nil) =>
+        log.trace("Hit a dead end in backtrackAssignPersonsToTopics because we have no more persons and some topics don't have their min numbers")
+        None //no more persons left and min numbers are not reached
+
+      case (Nil, Nil, _) =>
+        log.trace("Hit a dead end in backtrackAssignPersonsToTopics because we have more persons and all topics have their max numbers")
+        None //more persons left and max numbers are reached
+
+      case ((topic, _) :: _, _, person :: ptail) if problem.forbiddenPersonsPerTopic(topic)(person) =>
+        backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMax, ptail, person :: personsLeftPassed)
+
+      case ((topic, count) :: ttail, _, person :: ptail) =>
+        val newSchedule = partialSchedule.addPersonToTopic(person, topic);
+        {
+          if (count == 1) backtrackAssignPersonsToTopics(newSchedule)(ttail, topicsOpenToMax, ptail ++ personsLeftPassed, Nil)
+          else backtrackAssignPersonsToTopics(newSchedule)((topic, count - 1) :: ttail, topicsOpenToMax, ptail, personsLeftPassed)
+        } orElse {
+          log.trace("Backtracking in backtrackAssignPersonsToTopics")
+          backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMax, ptail, person :: personsLeftPassed)
+        }
+
+      case (Nil, (topic, _) :: _, person :: ptail) if problem.forbiddenPersonsPerTopic(topic)(person) =>
+        backtrackAssignPersonsToTopics(partialSchedule)(Nil, topicsOpenToMax, ptail, person :: personsLeftPassed)
+
+      case (Nil, (topic, count) :: ttail, person :: ptail) =>
+        val newSchedule = partialSchedule.addPersonToTopic(person, topic);
+        {
+          if (count == 1) backtrackAssignPersonsToTopics(newSchedule)(Nil, ttail, ptail ++ personsLeftPassed, Nil)
+          else backtrackAssignPersonsToTopics(newSchedule)(Nil, (topic, count - 1) :: ttail, ptail, personsLeftPassed)
+        } orElse {
+          log.trace("Backtracking in backtrackAssignPersonsToTopics")
+          backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMax, ptail, person :: personsLeftPassed)
+        }
+    }
+
+}
+
+object ConstrainedScheduleFactory {
+
+  /** Counting people on a certain topic */
+  private case class PersonsCount(
+                                   existing: Int, //how many persons are already present
+                                   needed: Int, //how many persons are needed to reach the min
+                                   optional: Int //how many persons can we add after the min is reached (or with existing number if already higher than min)
+                                 )
 
 
 }
