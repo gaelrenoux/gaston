@@ -19,6 +19,11 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+
+  "com.typesafe" % "config" % "1.3.1",
+  "com.github.pureconfig" %% "pureconfig" % "0.8.0",
+  "com.github.scopt" %% "scopt" % "3.7.0",
+
   "org.scalactic" %% "scalactic" % "3.0.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
 

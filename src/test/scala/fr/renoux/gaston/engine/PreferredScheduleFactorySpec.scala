@@ -1,6 +1,8 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.Settings
+import fr.renoux.gaston.io.UdoInput
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
@@ -10,27 +12,27 @@ import scala.util.Random
   */
 class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   val log = Logger[PreferredScheduleFactorySpec]
-
-  import fr.renoux.gaston._
+  implicit val settings: Settings = UdoInput.fromClassPath._2
+  val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
 
   "simpleAmelioration" should "work a valid random schedule (on a complex model)" in {
-    val complexTestModel = ComplexTestModel(42L)
+    import ComplexTestModel._
     var bestScore = Double.NegativeInfinity
     for (seed <- 0L until 5L) {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
-      val csFactory = new ConstrainedScheduleFactory(complexTestModel.Problems.Complete)
+      val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = complexTestModel.Problems.Complete.score(initialSolution)
+      val initialScore = Problems.Complete.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
-      val psFactory = new PreferredScheduleFactory(complexTestModel.Problems.Complete)
-      val finalSolution = psFactory.simpleRandomizedAmelioration(initialSolution, initialScore, 10000)
-      val finalScore = complexTestModel.Problems.Complete.score(finalSolution)
+      val psFactory = new PreferredScheduleFactory(Problems.Complete)
+      val finalSolution = psFactory.simpleRandomizedAmelioration(initialSolution, initialScore, 1000)
+      val finalScore = Problems.Complete.score(finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
-      complexTestModel.Problems.Complete.isSolvedBy(finalSolution) should be(true)
+      Problems.Complete.isSolvedBy(finalSolution) should be(true)
       finalScore should be > initialScore
 
       bestScore = math.max(bestScore, finalScore.value)
@@ -40,23 +42,23 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   }
 
   "systematicAmelioration" should "work a valid schedule (on a complex model)" in {
-    val complexTestModel = ComplexTestModel(42L)
+    import ComplexTestModel._
     var bestScore = Double.NegativeInfinity
-    for (seed <- 0L until 10L) {
+    for (seed <- 0L until 5L) {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
-      val csFactory = new ConstrainedScheduleFactory(complexTestModel.Problems.Complete)
+      val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = complexTestModel.Problems.Complete.score(initialSolution)
+      val initialScore = Problems.Complete.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
-      val psFactory = new PreferredScheduleFactory(complexTestModel.Problems.Complete)
-      val finalSolution = psFactory.systematicAmelioration(initialSolution, initialScore, 1000)
-      val finalScore = complexTestModel.Problems.Complete.score(finalSolution)
+      val psFactory = new PreferredScheduleFactory(Problems.Complete)
+      val finalSolution = psFactory.systematicAmelioration(initialSolution, initialScore, 100)
+      val finalScore = Problems.Complete.score(finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
-      complexTestModel.Problems.Complete.isSolvedBy(finalSolution) should be(true)
+      Problems.Complete.isSolvedBy(finalSolution) should be(true)
       finalScore should be > initialScore
 
       bestScore = math.max(bestScore, finalScore.value)

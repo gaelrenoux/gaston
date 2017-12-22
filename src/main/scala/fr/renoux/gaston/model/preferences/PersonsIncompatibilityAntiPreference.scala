@@ -7,7 +7,7 @@ import fr.renoux.gaston.model._
   * record in the schedule. The reward here is negative, as we count the number of such occurences, and counts once for
   * each couple violating the preference.
   */
-case class PersonsIncompatibilityAntiPreference(one: Person, others: Set[Person], reward: Score) extends AbstractPreference[Set[Person]] {
+case class PersonsIncompatibilityAntiPreference(ones: Set[Person], others: Set[Person], reward: Score) extends AbstractPreference[Set[Person]] {
 
   assert (reward.value <= 0)
 
@@ -15,10 +15,19 @@ case class PersonsIncompatibilityAntiPreference(one: Person, others: Set[Person]
     schedule.records.toSeq.map(_.persons) //toSeq needed: we do not want to deduplicate !
 
   override protected def score(scored: Set[Person]): Score = {
-    if (!scored.contains(one)) Score.Zero
-    else others.intersect(scored) map { p =>
-      Weight.combine(one.weight, p.weight) * reward
-    } sum
+    val presentOnes = scored.intersect(ones)
+    if (presentOnes.isEmpty) Score.Zero
+    else {
+      val presentOthers = others.intersect(scored)
+      if (presentOthers.isEmpty) Score.Zero
+      else {
+        val rewards = for {
+          one <- presentOnes
+          other <- presentOthers
+        } yield Weight.combine(one.weight, other.weight) * reward
+        rewards.sum
+      }
+    }
   }
 
 }

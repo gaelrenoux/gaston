@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.Definitions
+import fr.renoux.gaston.io.UdoInput
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
@@ -9,10 +9,12 @@ import org.scalatest.{FlatSpec, Matchers}
   */
 class ConstraintsSpec extends FlatSpec with Matchers {
   val log = Logger[ConstraintsSpec]
+  implicit val settings = UdoInput.fromClassPath._2
+  val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 
-  import fr.renoux.gaston.SimpleTestModel.Constraints._
-  import fr.renoux.gaston.SimpleTestModel.Preferences._
-  import fr.renoux.gaston.SimpleTestModel.Solutions._
+  import SimpleTestModel.Constraints._
+  import SimpleTestModel.Preferences._
+  import SimpleTestModel.Solutions._
 
 
   behavior of "TopicNeedsNumberOfPersons"
@@ -49,7 +51,7 @@ class ConstraintsSpec extends FlatSpec with Matchers {
 
   behavior of "Preferences"
   it should "return weight when satisfied once" in {
-    LeonardoLovesFighting.score(Perfect) should be(Score(Definitions.StrongPreference.value))
+    LeonardoLovesFighting.score(Perfect) should be(settings.strongPreference)
   }
   it should "return zero when not satisfied" in {
     LeonardoLovesFighting.score(Terrible) should be(Score.Zero)

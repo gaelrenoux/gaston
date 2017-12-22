@@ -38,7 +38,6 @@ case class Schedule(
 
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
-    val orderedRecords = records.toSeq.sortBy(r => (r.slot.name, r.topic.name))
     val personsPerTopicPerSlot = records.groupBy(_.slot.name).mapValues(_.groupBy(_.topic.name).mapValues(_.flatMap(_.persons).map(_.name)))
     val orderedPersonsPerTopicPerSlot = personsPerTopicPerSlot.mapValues(_.mapValues(_.toSeq.sorted).toSeq.sortBy(_._1)).toSeq.sortBy(_._1)
 

@@ -9,7 +9,7 @@ import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 /**
   * Created by gael on 07/05/17.
   */
-object SimpleTestModel {
+class SimpleTestModel(implicit settings: Settings) {
 
   object Persons {
     val Leonardo = Person("Leonardo")
@@ -84,17 +84,16 @@ object SimpleTestModel {
 
     import Persons._
     import Topics._
-    import io.Definitions._
 
-    val LeonardoLovesFighting = PersonTopicPreference(Leonardo, Fighting, StrongPreference)
-    val RaphaelLovesPartying = PersonTopicPreference(Raphael, Party, StrongPreference)
-    val DonatelloLovesLeading = PersonTopicPreference(Donatello, Leading, StrongPreference)
-    val MichelangeloLovesMachines = PersonTopicPreference(Michelangelo, Machines, StrongPreference)
+    val LeonardoLovesFighting = PersonTopicPreference(Leonardo, Fighting, settings.strongPreference)
+    val RaphaelLovesPartying = PersonTopicPreference(Raphael, Party, settings.strongPreference)
+    val DonatelloLovesLeading = PersonTopicPreference(Donatello, Leading, settings.strongPreference)
+    val MichelangeloLovesMachines = PersonTopicPreference(Michelangelo, Machines, settings.strongPreference)
 
-    val LeonardoLikesMachines = PersonTopicPreference(Leonardo, Machines, WeakPreference)
-    val RaphaelLikesLeading = PersonTopicPreference(Raphael, Leading, WeakPreference)
-    val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, WeakPreference)
-    val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, WeakPreference)
+    val LeonardoLikesMachines = PersonTopicPreference(Leonardo, Machines, settings.weakPreference)
+    val RaphaelLikesLeading = PersonTopicPreference(Raphael, Leading, settings.weakPreference)
+    val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, settings.weakPreference)
+    val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, settings.weakPreference)
 
     val All: Set[Preference] = Set(
       LeonardoLovesFighting,
@@ -135,4 +134,9 @@ object SimpleTestModel {
     )
   }
 
+}
+
+
+object SimpleTestModel {
+  def apply(implicit settings: Settings): SimpleTestModel = new SimpleTestModel
 }

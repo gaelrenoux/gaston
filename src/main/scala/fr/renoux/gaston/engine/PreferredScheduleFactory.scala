@@ -2,7 +2,7 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Schedule, Score, Slot}
+import fr.renoux.gaston.model.{Schedule, Score, Slot}
 import fr.renoux.gaston.util.RandomImplicits._
 
 import scala.annotation.tailrec

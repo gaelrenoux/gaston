@@ -1,7 +1,6 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.Definitions
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonsIncompatibilityAntiPreference, Preference}
@@ -15,17 +14,13 @@ import scala.util.Random
 /**
   * Created by gael on 07/05/17.
   */
-class ComplexTestModel(seed: Long) {
+class ComplexTestModel(seed: Long)(implicit settings: Settings) {
 
   private val log = Logger(classOf[ComplexTestModel])
 
   implicit val random = new Random(seed)
 
   object Persons {
-    //private val firstNames = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda")
-    //private val lastNames = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda")
-    //private val personsSeq = for (i <- 0 until 30) yield Person(s"${random.pick(firstNames)} ${random.pick(lastNames)}")
-    //val All: Set[Person] = personsSeq.toSet
     val All: Set[Person] = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda").map(Person(_))
   }
 
@@ -64,12 +59,11 @@ class ComplexTestModel(seed: Long) {
     val PersonTopics: Set[Preference] = for {
       p <- Persons.All
       (t, i) <- random.pick(Topics.All, 9).zipWithIndex
-      str = if (i < 3) Definitions.StrongPreference else Definitions.WeakPreference
+      str = if (i < 3) settings.strongPreference else settings.weakPreference
     } yield PersonTopicPreference(p, t, str)
-
     val Incompatibilities: Set[Preference] = Set {
       val p = random.pick(Persons.All, 3)
-      PersonsIncompatibilityAntiPreference(p.head, p.tail.toSet, -Definitions.StrongPreference)
+      PersonsIncompatibilityAntiPreference(Set(p.head), p.tail.toSet, -settings.strongPreference)
     }
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"), Topic("sigma"), Score(100))
@@ -89,5 +83,5 @@ class ComplexTestModel(seed: Long) {
 object ComplexTestModel {
   private val cache = mutable.Map[Long, ComplexTestModel]()
 
-  def apply(seed: Long): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
+  def apply(seed: Long)(implicit settings: Settings): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
 }
