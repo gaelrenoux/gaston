@@ -6,10 +6,10 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
   * Created by gael on 07/05/17.
   */
-class RicherCollectionsSpec extends FlatSpec with Matchers {
-  val log = Logger[RicherCollectionsSpec]
+class CollectionImplicitsSpec extends FlatSpec with Matchers {
+  val log = Logger[CollectionImplicitsSpec]
 
-  import RicherCollections._
+  import CollectionImplicits._
 
   val TestList = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
 

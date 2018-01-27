@@ -3,7 +3,7 @@ import sbt.Keys._
 name := "gaston"
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.4"
 scalacOptions ++= Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs
   "-feature", // Emit warning and location for usages of features that should be imported explicitly

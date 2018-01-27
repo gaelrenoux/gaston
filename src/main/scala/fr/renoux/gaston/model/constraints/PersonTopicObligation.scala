@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model.{Person, Schedule, Topic}
 
 /**
-  * A person must be assigned to an instance of this topic.
+  * A person must be assigned to this topic.
   */
 case class PersonTopicObligation(person: Person, topic: Topic) extends AbstractConstraint[(Topic, Set[Person])] {
 

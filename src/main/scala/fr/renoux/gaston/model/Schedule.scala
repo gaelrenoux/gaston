@@ -24,12 +24,6 @@ case class Schedule(
   }
 
   def addPersonToTopic(person: Person, topic: Topic) = Schedule {
-    if (topic.name == "gamma") {
-      val count = records.find(_.topic.name == "gamma").map(_.persons.size).getOrElse(0)
-      if (count > 11)
-        throw new IllegalArgumentException
-    }
-
     records map {
       case Record(s, t, ps) if t == topic => Record(s, t, ps + person)
       case r => r

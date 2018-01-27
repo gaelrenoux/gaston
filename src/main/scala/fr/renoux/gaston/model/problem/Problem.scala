@@ -4,7 +4,7 @@ import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
 import fr.renoux.gaston.util.Opt
-import fr.renoux.gaston.util.RicherCollections._
+import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
   * A problem to solve. A schedule solves a problem.

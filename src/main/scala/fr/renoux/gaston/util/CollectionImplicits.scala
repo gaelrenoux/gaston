@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 /**
   * Created by gael on 07/05/17.
   */
-object RicherCollections {
+object CollectionImplicits {
 
   
   trait GroupableToMap[A[_]] {

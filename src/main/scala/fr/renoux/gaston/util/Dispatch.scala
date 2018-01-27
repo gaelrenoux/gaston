@@ -1,7 +1,7 @@
 package fr.renoux.gaston.util
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.util.RicherCollections._
+import fr.renoux.gaston.util.CollectionImplicits._
 
 import scala.collection.mutable
 
@@ -12,6 +12,7 @@ object Dispatch {
 
   private val log = Logger(Dispatch.getClass)
 
+  /** Split without any more constraint than having each part about the same size, given a number of available slots. */
   def equally(slotCount: Int) = new EqualDispatch(slotCount)
 
   def equallyWithMaxes(maxes: Seq[Int]) = new EqualDispatchWithMaxes(maxes)
