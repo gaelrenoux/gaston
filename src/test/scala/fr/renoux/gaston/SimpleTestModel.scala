@@ -2,7 +2,7 @@ package fr.renoux.gaston
 
 import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonsIncompatibilityAntiPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
@@ -16,7 +16,10 @@ class SimpleTestModel(implicit settings: Settings) {
     val Raphael = Person("Raphael")
     val Donatello = Person("Donatello")
     val Michelangelo = Person("Michelangelo")
-    val All: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
+    val Bebop = Person("Bebop")
+    val Rocksteady = Person("Rocksteady")
+    val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
+    val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
   }
 
   object Topics {
@@ -95,6 +98,8 @@ class SimpleTestModel(implicit settings: Settings) {
     val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, settings.weakPreference)
     val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, settings.weakPreference)
 
+    val EnemiesHate = PersonsIncompatibilityAntiPreference(Persons.AllTurtles, Persons.AllEnemies, settings.strongPreference.negative)
+
     val All: Set[Preference] = Set(
       LeonardoLovesFighting,
       RaphaelLovesPartying,
@@ -109,7 +114,7 @@ class SimpleTestModel(implicit settings: Settings) {
   }
 
   object Problems {
-    val Complete = Problem(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+    val Complete = Problem(Slots.All, Topics.All, Persons.AllTurtles, Constraints.All, Preferences.All)
   }
 
   object Solutions {
@@ -119,10 +124,10 @@ class SimpleTestModel(implicit settings: Settings) {
     import Topics._
 
     val Terrible = Schedule(
-      Record(Morning, Leading, Set(Michelangelo)),
-      Record(AfterNoon, Fighting, Set(Donatello)),
-      Record(Evening, Machines, Set(Raphael)),
-      Record(Night, Party, Set(Leonardo))
+      Record(Morning, Leading, Set(Michelangelo, Rocksteady)),
+      Record(AfterNoon, Fighting, Set(Donatello, Rocksteady)),
+      Record(Evening, Machines, Set(Raphael, Bebop)),
+      Record(Night, Party, Set(Leonardo, Bebop))
     )
 
     val Perfect = Schedule(

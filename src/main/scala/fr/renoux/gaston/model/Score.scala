@@ -2,6 +2,7 @@ package fr.renoux.gaston.model
 
 case class Score(value: Double) extends AnyVal {
   def *(w: Weight) = Score(value * w.value)
+  def negative = Score(-value)
 }
 
 object Score {

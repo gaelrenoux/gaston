@@ -9,7 +9,7 @@ case class Schedule(
 
   import fr.renoux.gaston.model.Schedule._
 
-  //private lazy val slots = triplets map (_._1)
+  lazy val slots: Set[Slot] = records map (_.slot)
   lazy val personsPerSlot: Map[Slot, Set[Person]] = records groupBy (_.slot) mapValues { x => x flatMap (_.persons) }
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records groupBy (_.topic) mapValues { x => x flatMap (_.persons) }
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records groupBy (_.slot) mapValues { x => x map (_.topic) }
