@@ -1,13 +1,15 @@
 package fr.renoux.gaston.util
 
 import scala.annotation.tailrec
+import scala.collection.TraversableLike
+import scala.collection.generic.CanBuildFrom
 
 /**
   * Created by gael on 07/05/17.
   */
 object CollectionImplicits {
 
-  
+  /** Typeclass for collections than can be grouped to a Map */
   trait GroupableToMap[A[_]] {
     /** Converts a set of couples to a map of the first element to a set of the second. */
     def groupToMap[B, C](a: A[(B, C)]): Map[B, A[C]]
@@ -28,6 +30,7 @@ object CollectionImplicits {
   }
 
 
+  /** Typeclass for collections where elements can be taken by chunks rather than one by one */
   trait CanTakeChunks[T[_] <: Traversable[_]] {
 
     /** Takes chunks from the list, with a specific size. */
@@ -35,8 +38,6 @@ object CollectionImplicits {
 
     /** Takes chunks from the list, with a specific size. Returns the elements taken and all elements left */
     def takeChunks[A](as: T[A], elementsCount: Iterable[Int]): (T[T[A]], T[A])
-
-    (1 :: Nil).take(3)
   }
 
   implicit object ListCanTakeChunks extends CanTakeChunks[List] {
@@ -76,6 +77,16 @@ object CollectionImplicits {
 
     /** Takes chunks from the list, with a specific size. Returns the elements taken and all elements left */
     def takeChunks(elementsCount: Iterable[Int])(implicit canTakeChunks: CanTakeChunks[T]): (T[T[A]], T[A]) = canTakeChunks.takeChunks(wrapped, elementsCount)
+
+  }
+
+
+  implicit class CanReplaceOps[A, R](val wrapped: TraversableLike[A, R]) extends AnyVal {
+
+    /** Takes chunks from the list, with a specific size. */
+    def replace[B >: A, That](pf: PartialFunction[A, B])
+                                (implicit bf: CanBuildFrom[R, B, That]): That =
+      wrapped map pf.orElse(PartialFunction(identity))
 
   }
 

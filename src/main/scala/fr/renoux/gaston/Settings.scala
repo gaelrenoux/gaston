@@ -5,5 +5,6 @@ import fr.renoux.gaston.model.Score
 case class Settings(
                      weakPreference: Score,
                      strongPreference: Score,
+                     incompatibilityPreference: Score,
                      scoringStrategy: ScoringStrategy = ScoringStrategy.MiniMax
                    )

@@ -1,8 +1,8 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.Settings
-import fr.renoux.gaston.io.UdoInput
+import fr.renoux.gaston.{Settings, UdoConTestModel}
+import fr.renoux.gaston.io.{Input, UdoConTableReader}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
@@ -12,7 +12,7 @@ import scala.util.Random
   */
 class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   val log = Logger[PreferredScheduleFactorySpec]
-  implicit val settings: Settings = UdoInput.fromClassPath._2
+  implicit val settings: Settings = Input.fromClassPath._2
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
 
   "simpleAmelioration" should "work a valid random schedule (on a complex model)" in {
@@ -66,5 +66,22 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
 
     log.info(s"Bestest score was $bestScore")
   }
+
+  /*
+  "generateRandomSolution" should "work a valid udocon schedule" in {
+    implicit val random = new Random(0L)
+
+    val csFactory = new ConstrainedScheduleFactory(UdoConTestModel.problem)
+    val partialSolution = csFactory.makePartialSchedule
+    log.debug(s"Partial solution: $partialSolution")
+
+    val psFactory = new PreferredScheduleFactory(UdoConTestModel.problem)
+    val tempSolution = psFactory.completePartialSchedule(partialSolution.get)
+    log.debug(s"Temporary solution: $tempSolution")
+    val finalSolution = psFactory.improveUntilItChecks(tempSolution)
+    log.debug(s"Solution: $finalSolution")
+
+    UdoConTestModel.problem.isSolved(finalSolution) should be(true)
+  } */
 
 }

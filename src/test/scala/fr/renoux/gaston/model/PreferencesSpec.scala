@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.UdoInput
+import fr.renoux.gaston.io.Input
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
@@ -9,7 +9,7 @@ import org.scalatest.{FlatSpec, Matchers}
   */
 class PreferencesSpec extends FlatSpec with Matchers {
   val log = Logger[PreferencesSpec]
-  implicit val settings = UdoInput.fromClassPath._2
+  implicit val settings = Input.fromClassPath._2
   val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 
   import SimpleTestModel.Preferences._
