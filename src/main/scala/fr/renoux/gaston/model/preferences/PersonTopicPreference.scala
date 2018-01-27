@@ -2,9 +2,6 @@ package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model._
 
-/**
-  * Created by gael on 07/05/17.
-  */
 case class PersonTopicPreference(
                                   person: Person,
                                   topic: Topic,
@@ -12,7 +9,7 @@ case class PersonTopicPreference(
 
   override def score(schedule: Schedule): Score = {
     val topicPersons = schedule.personsPerTopic(topic)
-    if (topicPersons(person)) person.weight * reward
+    if (topicPersons(person)) reward
     else Score.Zero
   }
 }

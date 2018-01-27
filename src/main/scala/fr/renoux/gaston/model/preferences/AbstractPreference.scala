@@ -12,6 +12,6 @@ abstract class AbstractPreference[Scored] extends Preference {
   /** On a schedule, what are the elements to look at to now if it's working. */
   protected def elementsScored(schedule: Schedule): Iterable[Scored]
 
-  /** How to check if one of those elements is OK */
+  /** How to score a preference on one those elements. Does NOT apply the weight ! */
   protected def score(checked: Scored): Score
 }

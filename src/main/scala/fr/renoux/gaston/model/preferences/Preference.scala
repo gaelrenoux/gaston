@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model.{Schedule, Score}
+import fr.renoux.gaston.model.{Person, Schedule, Score}
 
 /* TODO scores could be cached. In the Schedule, have a set of ScheduleSot, scorable separately for most. And transformations usually alter only one slot at a time. */
 
@@ -9,6 +9,10 @@ import fr.renoux.gaston.model.{Schedule, Score}
   * #hashCode to allow deduplication.
   */
 trait Preference {
+
+  /* A preferences always references someone */
+  val person: Person
+
   /** Score you get each time you satisfy this constraint. Anti-preferences (stuff you would like no to happen) should
     * have a negative reward */
   def reward: Score

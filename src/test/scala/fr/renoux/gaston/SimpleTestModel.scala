@@ -2,7 +2,7 @@ package fr.renoux.gaston
 
 import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonsIncompatibilityAntiPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
@@ -98,7 +98,10 @@ class SimpleTestModel(implicit settings: Settings) {
     val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, settings.weakPreference)
     val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, settings.weakPreference)
 
-    val EnemiesHate = PersonsIncompatibilityAntiPreference(Persons.AllTurtles, Persons.AllEnemies, settings.strongPreference.negative)
+    val LeonardoHatesEnemies = PersonGroupAntiPreference(Leonardo, AllEnemies, settings.strongPreference.negative)
+    val RaphaelHatesEnemies = PersonGroupAntiPreference(Raphael, AllEnemies, settings.strongPreference.negative)
+    val DonatelloHatesEnemies = PersonGroupAntiPreference(Donatello, AllEnemies, settings.strongPreference.negative)
+    val MichelangeloHatesEnemies = PersonGroupAntiPreference(Michelangelo, AllEnemies, settings.strongPreference.negative)
 
     val All: Set[Preference] = Set(
       LeonardoLovesFighting,
@@ -125,9 +128,9 @@ class SimpleTestModel(implicit settings: Settings) {
 
     val Terrible = Schedule(
       Record(Morning, Leading, Set(Michelangelo, Rocksteady)),
-      Record(AfterNoon, Fighting, Set(Donatello, Rocksteady)),
+      Record(AfterNoon, Fighting, Set(Donatello)),
       Record(Evening, Machines, Set(Raphael, Bebop)),
-      Record(Night, Party, Set(Leonardo, Bebop))
+      Record(Night, Party, Set(Leonardo, Bebop, Rocksteady))
     )
 
     val Perfect = Schedule(

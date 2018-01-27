@@ -30,10 +30,10 @@ class PreferencesSpec extends FlatSpec with Matchers {
 
 
   behavior of "PersonsIncompatibilityAntiPreference"
-  it should "return a negative score when present" in {
-    EnemiesHate.score(Terrible).value should be <0.0
+  it should "return a negative score multiplied by the number of hated persons" in {
+    LeonardoHatesEnemies.score(Terrible).value should be (settings.strongPreference.value * (-2))
   }
   it should "return zero when not present" in {
-    EnemiesHate.score(Perfect).value should be(0)
+    LeonardoHatesEnemies.score(Perfect).value should be(0)
   }
 }

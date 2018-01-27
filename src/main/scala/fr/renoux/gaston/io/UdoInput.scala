@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import fr.renoux.gaston.Settings
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonsIncompatibilityAntiPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonGroupAntiPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Score, Slot, Topic}
 import pureconfig.error.ConfigReaderFailures
@@ -52,10 +52,10 @@ object UdoInput extends Input {
 
     val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++ numberConstraints
 
-    val incompatibilityPreferences = model.incompatibilites.getOrElse(Set()) map { case InputIncompatibility(ones, others, penalty) =>
-      val personOnes = ones.map(personsPerName)
-      val personOthers = others.map(personsPerName)
-      PersonsIncompatibilityAntiPreference(personOnes, personOthers, Score(-penalty))
+    val incompatibilityPreferences = model.incompatibilites.getOrElse(Set()) map { case InputIncompatibility(personName, groupNames, penalty) =>
+      val person = personsPerName(personName)
+      val group = groupNames.map(personsPerName)
+      PersonGroupAntiPreference(person, group, Score(-penalty))
     }
 
     val personPreferences = model.preferences.getOrElse(Set()) flatMap { case InputPreference(p, strongs, weaks) =>
@@ -106,8 +106,8 @@ object UdoInput extends Input {
                                )
 
   private case class InputIncompatibility(
-                                           ones: Set[String],
-                                           others: Set[String],
+                                           person: String,
+                                           group: Set[String],
                                            penalty: Double
                                          )
 

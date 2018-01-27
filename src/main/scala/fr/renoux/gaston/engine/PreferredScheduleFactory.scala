@@ -1,6 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.Settings
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Schedule, Score, Slot}
 import fr.renoux.gaston.util.RandomImplicits._
@@ -12,7 +13,7 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by satisfying preferences.
   */
-class PreferredScheduleFactory(problem: Problem) {
+class PreferredScheduleFactory(problem: Problem)(implicit settings: Settings) {
 
   private val log = Logger[PreferredScheduleFactory]
 

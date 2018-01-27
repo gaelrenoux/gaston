@@ -3,7 +3,7 @@ package fr.renoux.gaston
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonsIncompatibilityAntiPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 import fr.renoux.gaston.util.RandomImplicits._
@@ -63,7 +63,7 @@ class ComplexTestModel(seed: Long)(implicit settings: Settings) {
     } yield PersonTopicPreference(p, t, str)
     val Incompatibilities: Set[Preference] = Set {
       val p = random.pick(Persons.All, 3)
-      PersonsIncompatibilityAntiPreference(Set(p.head), p.tail.toSet, -settings.strongPreference)
+      PersonGroupAntiPreference(p.head, p.tail.toSet, -settings.strongPreference)
     }
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"), Topic("sigma"), Score(100))

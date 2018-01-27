@@ -13,7 +13,6 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 
   import SimpleTestModel.Constraints._
-  import SimpleTestModel.Preferences._
   import SimpleTestModel.Solutions._
 
 
@@ -47,14 +46,6 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   }
   it should "return zero when respected" in {
     LeonardoNotInTheNight.countBroken(Perfect) should be(0)
-  }
-
-  behavior of "Preferences"
-  it should "return weight when satisfied once" in {
-    LeonardoLovesFighting.score(Perfect) should be(settings.strongPreference)
-  }
-  it should "return zero when not satisfied" in {
-    LeonardoLovesFighting.score(Terrible) should be(Score.Zero)
   }
 
 }

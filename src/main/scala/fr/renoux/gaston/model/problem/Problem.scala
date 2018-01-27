@@ -3,8 +3,9 @@ package fr.renoux.gaston.model.problem
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
-import fr.renoux.gaston.util.Opt
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.Opt
+import fr.renoux.gaston.{ScoringStrategy, Settings}
 
 /**
   * A problem to solve. A schedule solves a problem.
@@ -60,7 +61,7 @@ case class Problem(
   lazy val personsPerSlot: Map[Slot, Set[Person]] = personSlotsPossibilities.map(_.swap).groupToMap
 
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
-    *  are mandatory). */
+    * are mandatory). */
   lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
     val couples = for {
       topic1 <- topics
@@ -72,7 +73,7 @@ case class Problem(
   }
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
-    *  is missing). */
+    * is missing). */
   lazy val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slots
@@ -103,9 +104,15 @@ case class Problem(
   def isSolvedBy(solution: Schedule): Boolean = constraints.forall { c => c.isRespected(solution) }
 
   /** Returns the score. */
-  def score(solution: Schedule): Score = {
-    val individualScores = preferences.toSeq.map(_.score(solution))
-    individualScores.sum
+  def score(solution: Schedule)(implicit settings: Settings): Score = {
+    val individualScores = preferences.toSeq.map(p => p -> p.score(solution))
+
+    val scoresByPerson = individualScores.groupBy(_._1.person) mapValues (_.map(_._2).sum)
+
+    settings.scoringStrategy match {
+      case ScoringStrategy.MiniMax => scoresByPerson map { case (p, s) => s / p.weight } min
+      case ScoringStrategy.Sum => scoresByPerson map { case (p, s) => s * p.weight } sum
+    }
   }
 
   lazy val toFormattedString: String = {
