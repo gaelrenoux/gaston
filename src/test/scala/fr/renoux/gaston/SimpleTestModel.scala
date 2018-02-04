@@ -1,5 +1,6 @@
 package fr.renoux.gaston
 
+import fr.renoux.gaston.io.InputSettings
 import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
@@ -9,7 +10,7 @@ import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 /**
   * Created by gael on 07/05/17.
   */
-class SimpleTestModel(implicit settings: Settings) {
+class SimpleTestModel(implicit settings: InputSettings) {
 
   object Persons {
     val Leonardo = Person("Leonardo")
@@ -146,5 +147,5 @@ class SimpleTestModel(implicit settings: Settings) {
 
 
 object SimpleTestModel {
-  def apply(implicit settings: Settings): SimpleTestModel = new SimpleTestModel
+  def apply(implicit settings: InputSettings): SimpleTestModel = new SimpleTestModel
 }

@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.io.InputSettings
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
@@ -14,7 +15,7 @@ import scala.util.Random
 /**
   * Created by gael on 07/05/17.
   */
-class ComplexTestModel(seed: Long)(implicit settings: Settings) {
+class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
 
   private val log = Logger(classOf[ComplexTestModel])
 
@@ -83,5 +84,5 @@ class ComplexTestModel(seed: Long)(implicit settings: Settings) {
 object ComplexTestModel {
   private val cache = mutable.Map[Long, ComplexTestModel]()
 
-  def apply(seed: Long)(implicit settings: Settings): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
+  def apply(seed: Long)(implicit settings: InputSettings): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
 }

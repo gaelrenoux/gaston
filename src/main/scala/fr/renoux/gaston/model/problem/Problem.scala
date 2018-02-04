@@ -5,7 +5,6 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.Opt
-import fr.renoux.gaston.{ScoringStrategy, Settings}
 
 /**
   * A problem to solve. A schedule solves a problem.
@@ -102,18 +101,6 @@ case class Problem(
 
   /** @return true if the schedule respects all constraints */
   def isSolvedBy(solution: Schedule): Boolean = constraints.forall { c => c.isRespected(solution) }
-
-  /** Returns the score. */
-  def score(solution: Schedule)(implicit settings: Settings): Score = {
-    val individualScores = preferences.toSeq.map(p => p -> p.score(solution))
-
-    val scoresByPerson = individualScores.groupBy(_._1.person) mapValues (_.map(_._2).sum)
-
-    settings.scoringStrategy match {
-      case ScoringStrategy.MiniMax => scoresByPerson map { case (p, s) => s / p.weight } min
-      case ScoringStrategy.Sum => scoresByPerson map { case (p, s) => s * p.weight } sum
-    }
-  }
 
   lazy val toFormattedString: String = {
     this.toString

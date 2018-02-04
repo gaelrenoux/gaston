@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.io.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
@@ -17,15 +18,14 @@ object UdoConTestModel {
 
   implicit val random: Random = new Random(0L)
 
-  val Settings: Settings = fr.renoux.gaston.Settings(
+  val Settings = InputSettings(
     weakPreference = Score(1),
     strongPreference = Score(5),
-    incompatibilityPreference = Score(50),
-    scoringStrategy = ScoringStrategy.MiniMax
+    incompatibilityAntiPreference = Score(-50)
   )
 
   object Persons {
-    private val nicknames = Set("Mangon", "Sammael99", "Zeben", "Kamiseito", "Kersa", "Tolkraft", "Cryoban", "Paradoks", "Paiji", "Isidore", "Gabzeta", "Highlandjul", "Orféo", "Rolapin", "Ozen", "Bashar", "Selpoivre", "Chestel", "Jorune", "Aude", "Killerklown", "Najael", "Eugénie", "Julian", "Goat", "Boojum", "Udo Femi")
+    private val nicknames = Set("Mangon", "Sammael99", "Zeben", "Kamiseito", "Kersa", "Tolkraft", "Cryoban", "Paradoks", "Paiji", "Isidore", "Gabzeta", "Highlandjul", "Orfeo", "Rolapin", "Ozen", "Bashar", "Selpoivre", "Chestel", "Jorune", "Aude", "Killerklown", "Najael", "Eugénie", "Julian", "Goat", "Boojum", "Udo Femi")
     val All: Set[Person] = nicknames map {
       case n if n.head == 'A' || n.head == 'B' => Person(n, Weight(2))
       case n => Person(n, Weight(1))
@@ -57,7 +57,7 @@ object UdoConTestModel {
         PersonTopicObligation(topic = Topic("Skyrealms of Jorune Revival"), person = Persons.byName("Sammael99")),
         PersonTopicObligation(topic = Topic("Wurm : Rouge massacre"), person = Persons.byName("Gabzeta")),
         PersonTopicObligation(topic = Topic("Psi*run"), person = Persons.byName("Paradoks")),
-        PersonTopicObligation(topic = Topic("Coriolis: Third horizon"), person = Persons.byName("Killerklown ")),
+        PersonTopicObligation(topic = Topic("Coriolis: Third horizon"), person = Persons.byName("Killerklown")),
         PersonTopicObligation(topic = Topic("Mexican Death trip"), person = Persons.byName("Ozen")),
         PersonTopicObligation(topic = Topic("Meute"), person = Persons.byName("Jorune")),
         PersonTopicObligation(topic = Topic("Les Derniers"), person = Persons.byName("Tolkraft")),
@@ -80,9 +80,9 @@ object UdoConTestModel {
       Set(PersonTopicObligation(topic = Topic("Burning Wheel"), person = Persons.byName("Udo Femi")),
         PersonTopicObligation(topic = Topic("end of line"), person = Persons.byName("Julian")),
         PersonTopicObligation(topic = Topic("Aux Marches du Pouvoir"), person = Persons.byName("Paradoks")),
-        PersonTopicObligation(topic = Topic("DCC Funnel - Ferme des Célébrités"), person = Persons.byName("Samael99")),
+        PersonTopicObligation(topic = Topic("DCC Funnel - Ferme des Célébrités"), person = Persons.byName("Sammael99")),
         PersonTopicObligation(topic = Topic("Tortues Ninja (Fate)"), person = Persons.byName("Boojum")),
-        PersonTopicObligation(topic = Topic("Héroïques"), person = Persons.byName("KamiSeiTo"))
+        PersonTopicObligation(topic = Topic("Héroïques"), person = Persons.byName("Kamiseito"))
       )
 
     val SelectedInterdictions: Set[Constraint] =

@@ -1,16 +1,16 @@
 package fr.renoux.gaston.model
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.Input
+import fr.renoux.gaston.io.{InputLoader, InputSettings}
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by gael on 07/05/17.
   */
 class PreferencesSpec extends FlatSpec with Matchers {
-  val log = Logger[PreferencesSpec]
-  implicit val settings = Input.fromClassPath._2
-  val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
+  private val log = Logger[PreferencesSpec]
+  private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
+  private val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 
   import SimpleTestModel.Preferences._
   import SimpleTestModel.Solutions._
@@ -31,7 +31,7 @@ class PreferencesSpec extends FlatSpec with Matchers {
 
   behavior of "PersonsIncompatibilityAntiPreference"
   it should "return a negative score multiplied by the number of hated persons" in {
-    LeonardoHatesEnemies.score(Terrible).value should be (settings.strongPreference.value * (-2))
+    LeonardoHatesEnemies.score(Terrible).value should be(settings.strongPreference.value * (-2))
   }
   it should "return zero when not present" in {
     LeonardoHatesEnemies.score(Perfect).value should be(0)

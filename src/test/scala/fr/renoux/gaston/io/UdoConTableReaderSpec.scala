@@ -2,8 +2,8 @@ package fr.renoux.gaston.io
 
 import java.io.File
 
-import fr.renoux.gaston.io.Input.{InputRoot, from, fromPath, getClass}
 import fr.renoux.gaston.io.UdoConTableReader.Parameters
+import fr.renoux.gaston.model.Score
 import org.scalatest.{FlatSpec, Matchers}
 import pureconfig.loadConfigFromFiles
 
@@ -15,7 +15,12 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     personsStartingIndex = 4,
     topicsIndex = 0,
     maxPlayersIndex = 2,
-    minPlayersIndex = None
+    minPlayersIndex = None,
+    settings = InputSettings(
+      weakPreference = Score(1),
+      strongPreference = Score(5),
+      incompatibilityAntiPreference = Score(-50)
+    )
   ))
 
   behavior of "read"
@@ -32,10 +37,10 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
   it should "be rendered correctly" in {
     val table = Source.fromResource("udocon-table.csv").mkString
     val input = reader.read(table)
-    val rendered = Input.render(input)
-    val evaluated = Input.fromString(rendered)
+    val rendered = InputLoader.render(input)
 
-    val expected = Input.fromClassPath("udocon-application.conf")
+    val evaluated = InputLoader.fromString(rendered).forceToInput
+    val expected = InputLoader.fromClassPath("udocon-application.conf").forceToInput
 
     evaluated should be(expected)
   }

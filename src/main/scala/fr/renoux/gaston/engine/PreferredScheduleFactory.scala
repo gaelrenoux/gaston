@@ -1,7 +1,6 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.Settings
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Schedule, Score, Slot}
 import fr.renoux.gaston.util.RandomImplicits._
@@ -13,19 +12,30 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by satisfying preferences.
   */
-class PreferredScheduleFactory(problem: Problem)(implicit settings: Settings) {
+class PreferredScheduleFactory(problem: Problem) {
 
   private val log = Logger[PreferredScheduleFactory]
 
+  /** Score a solution for the current problem: equal to the minimum score. Personal scores are divided by the person's
+    * weight before comparison. The total score comes only as a tie breaker. */
+  final def score(solution: Schedule): Score = {
+    val individualScores = problem.preferences.toSeq.map(p => p -> p.score(solution))
+    val scoresByPerson = individualScores.groupBy(_._1.person) mapValues (_.map(_._2).sum)
+
+    val weightedScoresByPerson = scoresByPerson map { case (p, s) => s / p.weight }
+
+    weightedScoresByPerson.min * 1000 + weightedScoresByPerson.sum
+  }
+
   /** Use random swaps trying to always improve the solution. Pretty fast, but no garantee to have a perfect solution. */
   @tailrec
-  final def simpleRandomizedAmelioration(schedule: Schedule, score: Score, rounds: Int = 10000)(implicit rand: Random): Schedule = if (rounds == 0) schedule else {
+  final def simpleRandomizedAmelioration(schedule: Schedule, previousScore: Score, rounds: Int = 10000)(implicit rand: Random): Schedule = if (rounds == 0) schedule else {
 
     val candidate = randomSwap(schedule)
-    val candidateScore = problem.score(candidate)
+    val candidateScore = score(candidate)
 
-    if (candidateScore.value >= score.value) simpleRandomizedAmelioration(candidate, candidateScore, rounds - 1)
-    else simpleRandomizedAmelioration(schedule, score, rounds - 1)
+    if (candidateScore.value >= previousScore.value) simpleRandomizedAmelioration(candidate, candidateScore, rounds - 1)
+    else simpleRandomizedAmelioration(schedule, previousScore, rounds - 1)
   }
 
   @tailrec
@@ -64,20 +74,20 @@ class PreferredScheduleFactory(problem: Problem)(implicit settings: Settings) {
   /** Systematically explores all swaps. Not perfect because it only swaps, it does not explore more. Slower than the randomized method. */
   @tailrec
   final def systematicAmelioration(schedule: Schedule, score: Score, maxRounds: Int = 1000, slots: Queue[Slot] = Queue(problem.slots.toSeq: _*)): Schedule =
-    if (maxRounds == 0) {
-      log.debug("Stopping systematic amelioration because max number of rounds was reached")
-      schedule
-    } else if (slots.isEmpty) {
-      log.debug("Stopping systematic amelioration because all slots are perfect")
-      schedule
-    } else {
-        val (slot, slotsTail) = slots.dequeue
-        val (candidate, candidateScore) = bestSwapOnSlot(schedule, slot)
-        if (candidateScore.value > score.value)
-          systematicAmelioration(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot))
-        else
-          systematicAmelioration(schedule, score, maxRounds - 1, slotsTail)
-    }
+  if (maxRounds == 0) {
+    log.debug("Stopping systematic amelioration because max number of rounds was reached")
+    schedule
+  } else if (slots.isEmpty) {
+    log.debug("Stopping systematic amelioration because all slots are perfect")
+    schedule
+  } else {
+    val (slot, slotsTail) = slots.dequeue
+    val (candidate, candidateScore) = bestSwapOnSlot(schedule, slot)
+    if (candidateScore.value > score.value)
+      systematicAmelioration(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot))
+    else
+      systematicAmelioration(schedule, score, maxRounds - 1, slotsTail)
+  }
 
   /** Returns the best possible swap on a specific slot */
   private def bestSwapOnSlot(schedule: Schedule, slot: Slot): (Schedule, Score) = {
@@ -99,7 +109,7 @@ class PreferredScheduleFactory(problem: Problem)(implicit settings: Settings) {
       else None */
     }
 
-    val bestCandidate = swappedSchedules map { s => (s, problem.score(s)) } maxBy (_._2)
+    val bestCandidate = swappedSchedules map { s => (s, score(s)) } maxBy (_._2)
     bestCandidate
   }
 }

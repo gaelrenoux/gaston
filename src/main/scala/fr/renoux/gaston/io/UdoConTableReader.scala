@@ -1,8 +1,6 @@
 package fr.renoux.gaston.io
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.Settings
-import fr.renoux.gaston.io.Input.{InputPerson, InputPreference, InputTopic}
 import fr.renoux.gaston.io.UdoConTableReader.Parameters
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.CollectionImplicits._
@@ -15,18 +13,12 @@ class UdoConTableReader(params: Parameters) {
 
   private val log = Logger(UdoConTableReader.getClass)
 
-  def read(table: String): Input.InputRoot = {
+  def read(table: String): InputRoot = {
     val cells: Seq[Seq[String]] = table.split("\n", -1).filterNot(_.isEmpty) map (_.split("\t", -1).map(_.trim).toSeq) toSeq
 
     log.debug(s"Cells:\n${cells.mkString("\n")}")
     val cellsFirstLine = cells.head
     val cellsWithoutFirstLine = cells.tail
-
-    val settings = Settings(
-      weakPreference = Score(1),
-      strongPreference = Score(5),
-      incompatibilityPreference = Score(-50)
-    )
 
     val slots = Set("D1-afternoon", "D1-evening", "D2-afternoon", "D2-evening", "D3-afternoon")
 
@@ -67,7 +59,7 @@ class UdoConTableReader(params: Parameters) {
     }
 
     val persons = choices.foldLeft(personsWithoutWeight) {
-      case (currentPersons, ('gamemaster, personName, topicName)) => currentPersons replace {
+      case (currentPersons, ('gamemaster, personName, _)) => currentPersons replace {
         case person if person.name == personName => person.copy(weight = Some(params.gamemasterWeight))
       }
       case (currentPersons, _) => currentPersons
@@ -101,9 +93,9 @@ class UdoConTableReader(params: Parameters) {
 
     log.debug(s"Preferences: $preferences")
 
-    Input.InputRoot(
-      Input.InputModel(
-        settings = settings,
+    InputRoot(
+      InputModel(
+        settings = params.settings,
         slots = slots,
         persons = persons,
         topics = topics,
@@ -131,7 +123,9 @@ object UdoConTableReader {
                          maxPlayersIndex: Int,
 
                          /* Weight given to any gamemaster */
-                         gamemasterWeight: Double = 1.5
+                         gamemasterWeight: Double = 1.5,
+
+                         settings: InputSettings
                        )
 
 }
