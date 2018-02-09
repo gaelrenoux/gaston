@@ -119,6 +119,7 @@ class SimpleTestModel(implicit settings: Settings) {
     import Topics._
 
     val Terrible = Schedule(
+      Problems.Complete.parallelization,
       Record(Morning, Leading, Set(Michelangelo)),
       Record(AfterNoon, Fighting, Set(Donatello)),
       Record(Evening, Machines, Set(Raphael)),
@@ -126,6 +127,7 @@ class SimpleTestModel(implicit settings: Settings) {
     )
 
     val Perfect = Schedule(
+      Problems.Complete.parallelization,
       Record(Morning, Leading, Set(Leonardo, Donatello, Raphael)),
       Record(AfterNoon, Fighting, Set(Raphael, Leonardo, Michelangelo)),
       Record(Evening, Machines, Set(Donatello, Michelangelo, Leonardo)),

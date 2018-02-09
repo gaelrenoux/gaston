@@ -82,6 +82,13 @@ case class Problem(
     couples.groupToMap
   }
 
+  /** For each slots, the topics that must happen in that slot. */
+  lazy val forcedTopicsPerSlot: Map[Slot, Set[Topic]] = {
+    constraints collect {
+      case TopicForcedSlot(topic, slot) => slot -> topic
+    } groupBy (_._1) mapValues (_ map (_._2))
+  }
+
   /** Maximum number of topics we must have during the same slot */
   lazy val parallelization: Int = (topics.size.toDouble / slots.size).ceil.toInt
 

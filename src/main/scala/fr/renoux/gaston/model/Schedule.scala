@@ -4,6 +4,7 @@ package fr.renoux.gaston.model
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
+                     parallelization: Int,
                      records: Set[Schedule.Record]
                    ) {
 
@@ -20,10 +21,10 @@ case class Schedule(
     val cumulatedRecords = records ++ addedRecords
     val mergedMap = cumulatedRecords groupBy (t => (t.slot, t.topic)) mapValues (_.flatMap(_.persons))
     val mergedRecords = mergedMap.toSet map Record.fromTuple2
-    Schedule(mergedRecords)
+    copy(records = mergedRecords)
   }
 
-  def addPersonToTopic(person: Person, topic: Topic) = Schedule {
+  def addPersonToTopic(person: Person, topic: Topic) = copy(records = {
     if (topic.name == "gamma") {
       val count = records.find(_.topic.name == "gamma").map(_.persons.size).getOrElse(0)
       if (count > 11)
@@ -33,6 +34,15 @@ case class Schedule(
     records map {
       case Record(s, t, ps) if t == topic => Record(s, t, ps + person)
       case r => r
+    }
+  })
+
+  /** The schedule makes sense. No person on multiple topics at the same time. */
+  lazy val isSound: Boolean = {
+    records.groupBy(_.slot).values forall { records =>
+      val persons = records.toSeq.flatMap(_.persons.toSeq)
+      val countPerPerson = persons.groupBy(identity).mapValues(_.size).filter(_._2 > 1)
+      countPerPerson.isEmpty
     }
   }
 
@@ -59,7 +69,9 @@ object Schedule {
   object Record {
     def fromTuple(tuple: (Slot, Topic, Set[Person])) = Record(tuple._1, tuple._2, tuple._3)
     def fromTuple2(tuple: ((Slot, Topic), Set[Person])) = Record(tuple._1._1, tuple._1._2, tuple._2)
+
+    def apply(slot: Slot, topic: Topic, persons: Person*): Record = apply(slot, topic, persons.toSet)
   }
 
-  def apply(schedule: Record*): Schedule = new Schedule(schedule.toSet)
+  def apply(parallelization: Int, schedule: Record*): Schedule = new Schedule(parallelization, schedule.toSet)
 }
