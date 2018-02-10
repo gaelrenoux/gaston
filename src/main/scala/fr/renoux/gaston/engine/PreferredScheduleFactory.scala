@@ -67,7 +67,7 @@ class PreferredScheduleFactory(problem: Problem) {
       val newR2 = r2.copy(persons = r2.persons - p2 + p1)
 
       log.trace(s"Swapping ${p1.name} and ${p2.name} on slot ${slot.name}")
-      schedule.copy(schedule.records - r1 - r2 + newR1 + newR2)
+      schedule.copy(records = schedule.records - r1 - r2 + newR1 + newR2)
     }
   }
 
@@ -104,11 +104,19 @@ class PreferredScheduleFactory(problem: Problem) {
     } yield {
       val newR1 = r1.copy(persons = r1.persons - p1 + p2)
       val newR2 = r2.copy(persons = r2.persons - p2 + p1)
-      schedule.copy(schedule.records - r1 - r2 + newR1 + newR2)
+      schedule.copy(records = schedule.records - r1 - r2 + newR1 + newR2)
       /* if (p1 == Person("fatima") && p2 == Person("adam")) Some(schedule.copy(schedule.records - r1 - r2 + newR1 + newR2))
       else None */
     }
 
+    if (swappedSchedules.isEmpty) {
+      throw new IllegalStateException(
+        s"""No swapped schedule is possible !
+           |$slot
+           |$schedule
+           |$problem
+        """.stripMargin)
+    }
     val bestCandidate = swappedSchedules map { s => (s, score(s)) } maxBy (_._2)
     bestCandidate
   }

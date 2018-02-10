@@ -38,7 +38,8 @@ class UdoConTableReader(params: Parameters) {
         mandatory = Some(Set()),
         forbidden = Some(Set()),
         min = min.toIntOption,
-        max = max.toIntOption
+        max = max.toIntOption,
+        forcedSlot = None
       )
     }
 

@@ -27,7 +27,9 @@ object PureConfigTranscriber extends ToValidationOps {
 
     val numberConstraints = getNumberConstraints(input, maps)
 
-    val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++ numberConstraints
+    val forcedSlotConstraints = getForcedTopicConstraints(input, maps)
+
+    val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++ numberConstraints ++ forcedSlotConstraints
 
     val incompatibilityPreferences = getIncompatibilityPreferences(input, maps)
 
@@ -52,26 +54,30 @@ object PureConfigTranscriber extends ToValidationOps {
   }
 
   private def getInterdictionConstraints(input: InputModel, maps: Maps) = {
-    input.topics flatMap { umt =>
-      val topic = maps.topicsPerName(umt.name)
-      umt.forbidden.getOrElse(Set()).map(maps.personsPerName).map(PersonTopicInterdiction(_, topic))
+    input.topics flatMap { inTopic =>
+      inTopic.forbidden.getOrElse(Set()).map(maps.personsPerName).map(PersonTopicInterdiction(_, maps.topicsPerName(inTopic.name)))
     }
   }
 
   private def getObligationConstraints(input: InputModel, maps: Maps) = {
-    input.topics flatMap { umt =>
-      val topic = maps.topicsPerName(umt.name)
-      umt.mandatory.getOrElse(Set()).map(maps.personsPerName).map(PersonTopicObligation(_, topic))
+    input.topics flatMap { inTopic =>
+      inTopic.mandatory.getOrElse(Set()).map(maps.personsPerName).map(PersonTopicObligation(_, maps.topicsPerName(inTopic.name)))
     }
   }
 
   private def getNumberConstraints(input: InputModel, maps: Maps) = {
-    input.topics flatMap { umt =>
-      if (umt.min.isEmpty && umt.max.isEmpty) None
+    input.topics flatMap { inTopic =>
+      if (inTopic.min.isEmpty && inTopic.max.isEmpty) None
       else {
-        val topic = maps.topicsPerName(umt.name)
-        Some(TopicNeedsNumberOfPersons(topic, umt.min, umt.max))
+        val topic = maps.topicsPerName(inTopic.name)
+        Some(TopicNeedsNumberOfPersons(topic, inTopic.min, inTopic.max))
       }
+    }
+  }
+
+  private def getForcedTopicConstraints(input: InputModel, maps: Maps) = {
+    input.topics flatMap { inTopic =>
+      inTopic.forcedSlot.map(maps.slotsPerName).map(TopicForcedSlot(maps.topicsPerName(inTopic.name), _))
     }
   }
 

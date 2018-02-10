@@ -41,7 +41,7 @@ object UdoConTestModel {
   }
 
   object Slots {
-    private val slotNames = Set("13 AM", "13 Soir", "14 AM", "14 Soir", "15 AM")
+    private val slotNames = Set("D1-afternoon", "D1-evening", "D2-afternoon", "D2-evening", "D3-afternoon")
     val All: Set[Slot] = slotNames map Slot
   }
 

@@ -25,7 +25,7 @@ class ConstrainedScheduleFactory(val problem: Problem) {
   private def makePartialSchedule(implicit random: Random): Option[Schedule] = {
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
-    backtrackAssignTopicsToSlots(Schedule())(slots, 0, topics)
+    backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(slots, 0, topics)
   }
 
 
@@ -59,16 +59,11 @@ class ConstrainedScheduleFactory(val problem: Problem) {
       val candidate = partialSchedule.copy(records = partialSchedule.records + record) // generate a new candidate with this record
 
       val solution =
-        if (problem.isAcceptablePartial(candidate)) {
+        if (candidate.isSound && problem.isAcceptablePartial(candidate)) {
           log.trace(s"Candidate is acceptable: $candidate")
           val newSlotTopicsCount = (currentSlotTopicsCount + 1) % problem.parallelization // add one topic to current slot, go back to zero if we reach limit
           val newSlotsLeft = if (newSlotTopicsCount == 0) slotsLeft.tail else slotsLeft // if limit was reached, go to next slot
-
-          /* If going to next slot, time to integrate all passed topics back into the process.
-           * If not, there's no way it's going to work better with one more topic (schedule is even more constrained). */
-          val (newTopicsLeft, newTopicsPassed) = if (newSlotTopicsCount == 0) (topicsPassed ::: nextTopics, Nil) else (nextTopics, topicsPassed)
-
-          backtrackAssignTopicsToSlots(candidate)(newSlotsLeft, newSlotTopicsCount, newTopicsLeft, newTopicsPassed)
+          backtrackAssignTopicsToSlots(candidate)(newSlotsLeft, newSlotTopicsCount, nextTopics ::: topicsPassed, Nil)
 
         } else {
           log.trace(s"Candidate is not acceptable: $candidate")
