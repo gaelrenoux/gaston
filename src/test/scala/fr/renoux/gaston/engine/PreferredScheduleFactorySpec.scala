@@ -2,6 +2,7 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.io.{InputLoader, InputSettings}
+import fr.renoux.gaston.model.Schedule
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
@@ -70,7 +71,7 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
 
 
   "systematicAmelioration" should "work a valid schedule (on a real-life model)" in {
-    var bestScore = Double.NegativeInfinity
+    var (bestSchedule, bestScore) = (Schedule(0), Double.NegativeInfinity)
     for (seed <- 0L until 5L) {
       implicit val random = new Random(0L)
 
@@ -81,18 +82,22 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
 
       val Some(initialSolution) = csFactory.makeSchedule
       val initialScore = psFactory.score(initialSolution)
-      log.info(s"Temporary solution (score $initialScore): $initialSolution")
+      log.info(s"Temporary solution (score $initialScore): ${initialSolution.toFormattedString}")
 
       val finalSolution = psFactory.systematicAmelioration(initialSolution, initialScore, 100)
       val finalScore = psFactory.score(finalSolution)
-      log.info(s"Solution (score $finalScore): $finalSolution")
+      log.info(s"Solution (score $finalScore): ${finalSolution.toFormattedString}")
 
       problem.isSolvedBy(finalSolution) should be(true)
       finalScore should be > initialScore
 
-      bestScore = math.max(bestScore, finalScore.value)
+      if (finalScore.value > bestScore) {
+        bestScore = finalScore.value
+        bestSchedule = finalSolution
+      }
     }
 
     log.info(s"Bestest score was $bestScore")
+    log.info(s"Bestest schedule was ${bestSchedule.toFormattedString}")
   }
 }

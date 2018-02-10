@@ -22,14 +22,14 @@ class DispatchSpec extends FlatSpec with Matchers {
 
   behavior of "Dispatch.equallyWithMaxes"
   it should "dispatch all elements according to maxes" in {
-    Dispatch.equallyWithMaxes(Seq(2, 8, 8))(TestList) should be((List(
+    Dispatch.equallyWithMaxes(Seq(2, 8, 8).map(Some(_)))(TestList) should be((List(
       List("adam", "brigit"),
       List("cedric", "daniel", "edward", "fatima", "george"),
       List("hermione", "isidore", "jennifer", "kevin")
     ), Nil))
   }
   it should "have a remainder if it can't put everything" in {
-    Dispatch.equallyWithMaxes(Seq(2, 3, 2))(TestList) should be((List(
+    Dispatch.equallyWithMaxes(Seq(2, 3, 2).map(Some(_)))(TestList) should be((List(
       List("adam", "brigit"),
       List("cedric", "daniel", "edward"),
       List("fatima", "george")

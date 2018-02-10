@@ -15,7 +15,12 @@ class InputSpec extends FlatSpec with Matchers {
 
   "conversion" should "work" in {
     val problem = InputLoader.fromClassPath.forceToModel
-    problem should be (UdoConTestModel.Problems.Complete)
+    problem.slots should be (UdoConTestModel.Problems.Simplified.slots)
+    problem.topics should be (UdoConTestModel.Problems.Simplified.topics)
+    problem.persons should be (UdoConTestModel.Problems.Simplified.persons)
+    problem.constraints should be (UdoConTestModel.Problems.Simplified.constraints)
+    problem.preferences should be (UdoConTestModel.Problems.Simplified.preferences)
+    problem should be (UdoConTestModel.Problems.Simplified)
   }
 
 }

@@ -83,7 +83,7 @@ object PureConfigTranscriber extends ToValidationOps {
 
   private def getIncompatibilityPreferences(input: InputModel, maps: Maps) = {
     input.persons.collect {
-      case ip if ip.incompatible.isDefined =>
+      case ip if ip.incompatible.getOrElse(Set()).nonEmpty =>
         val person = maps.personsPerName(ip.name)
         val group = ip.incompatible.get.map(maps.personsPerName)
         PersonGroupAntiPreference(person, group, input.settings.incompatibilityAntiPreference)

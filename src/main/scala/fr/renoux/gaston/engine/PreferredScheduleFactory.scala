@@ -82,7 +82,7 @@ class PreferredScheduleFactory(problem: Problem) {
     schedule
   } else {
     val (slot, slotsTail) = slots.dequeue
-    val (candidate, candidateScore) = bestSwapOnSlot(schedule, slot)
+    val (candidate, candidateScore) = bestSwapOnSlot(schedule, slot).getOrElse(schedule, score)
     if (candidateScore.value > score.value)
       systematicAmelioration(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot))
     else
@@ -90,7 +90,8 @@ class PreferredScheduleFactory(problem: Problem) {
   }
 
   /** Returns the best possible swap on a specific slot */
-  private def bestSwapOnSlot(schedule: Schedule, slot: Slot): (Schedule, Score) = {
+  private def bestSwapOnSlot(schedule: Schedule, slot: Slot): Option[(Schedule, Score)] = {
+    //TODO fint best swap OR simple move !! Sometimes a simple move is possible and better...
     val topics = schedule.topicsPerSlot(slot)
     val records = schedule.records.filter(_.slot == slot)
 
@@ -109,15 +110,7 @@ class PreferredScheduleFactory(problem: Problem) {
       else None */
     }
 
-    if (swappedSchedules.isEmpty) {
-      throw new IllegalStateException(
-        s"""No swapped schedule is possible !
-           |$slot
-           |$schedule
-           |$problem
-        """.stripMargin)
-    }
-    val bestCandidate = swappedSchedules map { s => (s, score(s)) } maxBy (_._2)
-    bestCandidate
+    if (swappedSchedules.nonEmpty) Some(swappedSchedules map { s => (s, score(s)) } maxBy (_._2))
+    else None
   }
 }

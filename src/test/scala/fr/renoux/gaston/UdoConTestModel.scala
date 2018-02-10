@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.io.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.Preference
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 
 import scala.util.Random
@@ -25,11 +25,8 @@ object UdoConTestModel {
   )
 
   object Persons {
-    private val nicknames = Set("Mangon", "Sammael99", "Zeben", "Kamiseito", "Kersa", "Tolkraft", "Cryoban", "Paradoks", "Paiji", "Isidore", "Gabzeta", "Highlandjul", "Orfeo", "Rolapin", "Ozen", "Bashar", "Selpoivre", "Chestel", "Jorune", "Aude", "Killerklown", "Najael", "Eugénie", "Julian", "Goat", "Boojum", "Udo Femi")
-    val All: Set[Person] = nicknames map {
-      case n if n.head == 'A' || n.head == 'B' => Person(n, Weight(2))
-      case n => Person(n, Weight(1))
-    }
+    //private val nicknames = Set("Mangon", "Sammael99", "Zeben", "Kamiseito", "Kersa", "Tolkraft", "Cryoban", "Paradoks", "Paiji", "Isidore", "Gabzeta", "Highlandjul", "Orfeo", "Rolapin", "Ozen", "Bashar", "Selpoivre", "Chestel", "Jorune", "Aude", "Killerklown", "Najael", "Eugénie", "Julian", "Goat", "Boojum", "Udo Femi")
+    val All: Set[Person] = Set(Person("Najael", Weight(1.0)), Person("Sammael99", Weight(1.5)), Person("Jorune", Weight(1.5)), Person("Paradoks", Weight(1.5)), Person("Chestel", Weight(1.0)), Person("Eugénie", Weight(1.5)), Person("Zeben", Weight(1.5)), Person("Orfeo", Weight(1.5)), Person("Kersa", Weight(1.0)), Person("Selpoivre", Weight(1.5)), Person("Kamiseito", Weight(1.0)), Person("Highlandjul", Weight(1.5)), Person("Gabzeta", Weight(1.5)), Person("Isidore", Weight(1.0)), Person("Paiji", Weight(1.0)), Person("Cryoban", Weight(1.5)), Person("Bashar", Weight(1.0)), Person("Killerklown", Weight(1.5)), Person("Goat", Weight(1.5)), Person("Tolkraft", Weight(1.5)), Person("Aude", Weight(1.0)), Person("Udo Femi", Weight(1.5)), Person("Ozen", Weight(1.5)), Person("Rolapin", Weight(1.5)), Person("Mangon", Weight(1.0)), Person("Julian", Weight(1.5)), Person("Boojum", Weight(1.5)))
     val byName: Map[String, Person] = All.map(p => p.name -> p).toMap
   }
 
@@ -38,6 +35,7 @@ object UdoConTestModel {
     private val additionalTopicNames = Set("Burning Wheel", "end of line", "Aux Marches du Pouvoir", "DCC Funnel - Ferme des Célébrités", "Tortues Ninja (Fate)", "Héroïques")
     val Selected: Set[Topic] = topicNames map Topic
     val All: Set[Topic] = Selected ++ (additionalTopicNames map Topic)
+    val byName: Map[String, Topic] = All.map(p => p.name -> p).toMap
   }
 
   object Slots {
@@ -86,8 +84,7 @@ object UdoConTestModel {
       )
 
     val SelectedInterdictions: Set[Constraint] =
-      Set(PersonTopicInterdiction(topic = Topic("Le Retour de Soth"), person = Persons.byName("Tolkraft")),
-        PersonTopicInterdiction(topic = Topic("Le Retour de Soth"), person = Persons.byName("Selpoivre"))
+      Set(PersonTopicInterdiction(topic = Topic("Le Retour de Soth"), person = Persons.byName("Tolkraft"))
       )
 
     val AllInterdictions: Set[Constraint] = SelectedInterdictions ++
@@ -96,41 +93,30 @@ object UdoConTestModel {
     val Absences: Set[Constraint] = Set()
 
     val SelectedNumbers: Set[Constraint] =
-      Set(TopicNeedsNumberOfPersons(Topic("Agôn"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("DC comics - Darkest night"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Les Schtroumpfs"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Shadow of the Demon Lord"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Delta Green - Scénario original"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Blades in the Dark"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Skyrealms of Jorune Revival"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Wurm : Rouge massacre"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Psi*run"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Coriolis: Third horizon"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Mexican Death trip"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Meute"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Les Derniers"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Chiens de guerre"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Tales from the Loop"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Donjon & Cie"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("P.U.N.C.H Unit - Katanga 1960"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Delta Green - Pennsylvania '99"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Inflorenza (ambiance Patient 13)"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("KPDP dans le Dodécaèdre"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Summer camp - classe de neige"), min = 3, max = 6),
-        TopicNeedsNumberOfPersons(Topic("Dieux Ennemis"), min = 3, max = 6),
-        TopicNeedsNumberOfPersons(Topic("Wastburg"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Black Mirror"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Le Retour de Soth"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Godbound - l'appel"), min = 3, max = 4)
+      Set(TopicNeedsNumberOfPersons(Topic("Agôn"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("DC comics - Darkest night"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("Shadow of the Demon Lord"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Delta Green - Scénario original"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("Psi*run"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Meute"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("Les Derniers"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("P.U.N.C.H Unit - Katanga 1960"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Delta Green - Pennsylvania '99"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Inflorenza (ambiance Patient 13)"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Summer camp - classe de neige"), max = 6),
+        TopicNeedsNumberOfPersons(Topic("Dieux Ennemis"), max = 6),
+        TopicNeedsNumberOfPersons(Topic("Black Mirror"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Le Retour de Soth"), max = 4),
+        TopicNeedsNumberOfPersons(Topic("Godbound - l'appel"), max = 4)
       )
 
     val AllNumbers: Set[Constraint] = SelectedNumbers ++
-      Set(TopicNeedsNumberOfPersons(Topic("Burning Wheel"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("end of line"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Aux Marches du Pouvoir"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("DCC Funnel - Ferme des Célébrités"), min = 3, max = 5),
+      Set(TopicNeedsNumberOfPersons(Topic("Burning Wheel"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("end of line"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("Aux Marches du Pouvoir"), max = 5),
+        TopicNeedsNumberOfPersons(Topic("DCC Funnel - Ferme des Célébrités"), max = 5),
         TopicNeedsNumberOfPersons(Topic("Tortues Ninja (Fate)"), min = 4, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Héroïques"), min = 3, max = 5)
+        TopicNeedsNumberOfPersons(Topic("Héroïques"), max = 5)
       )
 
     val Selected: Set[Constraint] = SelectedObligations ++ SelectedInterdictions ++ Absences ++ SelectedNumbers
@@ -138,8 +124,253 @@ object UdoConTestModel {
   }
 
   object Preferences {
-    val Selected: Set[Preference] = Set()
-    val All: Set[Preference] = Set()
+    private val preferenceTriplets = Set(
+      ("Aude",           "Delta Green - Pennsylvania '99",            1.0),
+      ("Aude",           "Delta Green - Scénario original",           1.0),
+      ("Aude",           "Donjon & Cie",                              5.0),
+      ("Aude",           "Godbound - l'appel",                        1.0),
+      ("Aude",           "Inflorenza (ambiance Patient 13)",          1.0),
+      ("Aude",           "Les Schtroumpfs",                           1.0),
+      ("Aude",           "Mexican Death trip",                        1.0),
+      ("Aude",           "Shadow of the Demon Lord",                  1.0),
+      ("Aude",           "Tales from the Loop",                       5.0),
+      ("Aude",           "Wastburg",                                  5.0),
+      ("Aude",           "Wurm : Rouge massacre",                     1.0),
+      ("Bashar",         "Agôn",                                      5.0),
+      ("Bashar",         "DC comics - Darkest night",                 1.0),
+      ("Bashar",         "Delta Green - Pennsylvania '99",            1.0),
+      ("Bashar",         "Delta Green - Scénario original",           1.0),
+      ("Bashar",         "Dieux Ennemis",                             1.0),
+      ("Bashar",         "Godbound - l'appel",                        1.0),
+      ("Bashar",         "Le Retour de Soth",                         1.0),
+      ("Bashar",         "P.U.N.C.H Unit - Katanga 1960",             1.0),
+      ("Bashar",         "Psi*run",                                   1.0),
+      ("Bashar",         "Tales from the Loop",                       5.0),
+      ("Boojum",         "Black Mirror",                              5.0),
+      ("Boojum",         "DC comics - Darkest night",                 1.0),
+      ("Boojum",         "Donjon & Cie",                              5.0),
+      ("Boojum",         "Godbound - l'appel",                        1.0),
+      ("Boojum",         "KPDP dans le Dodécaèdre",                   1.0),
+      ("Boojum",         "Mexican Death trip",                        1.0),
+      ("Boojum",         "Shadow of the Demon Lord",                  1.0),
+      ("Boojum",         "Tales from the Loop",                       5.0),
+      ("Chestel",        "DC comics - Darkest night",                 5.0),
+      ("Chestel",        "Delta Green - Scénario original",           1.0),
+      ("Chestel",        "Inflorenza (ambiance Patient 13)",          5.0),
+      ("Chestel",        "Le Retour de Soth",                         1.0),
+      ("Chestel",        "Les Derniers",                              1.0),
+      ("Chestel",        "Skyrealms of Jorune Revival",               5.0),
+      ("Chestel",        "Summer camp - classe de neige",             1.0),
+      ("Chestel",        "Tales from the Loop",                       1.0),
+      ("Cryoban",        "Blades in the Dark",                        1.0),
+      ("Cryoban",        "Coriolis: Third horizon",                   1.0),
+      ("Cryoban",        "DC comics - Darkest night",                 5.0),
+      ("Cryoban",        "Donjon & Cie",                              1.0),
+      ("Cryoban",        "Les Schtroumpfs",                           1.0),
+      ("Cryoban",        "Meute",                                     5.0),
+      ("Cryoban",        "Wastburg",                                  5.0),
+      ("Cryoban",        "Wurm : Rouge massacre",                     1.0),
+      ("Eugénie",        "Chiens de guerre",                          5.0),
+      ("Eugénie",        "Delta Green - Scénario original",           1.0),
+      ("Eugénie",        "KPDP dans le Dodécaèdre",                   5.0),
+      ("Eugénie",        "Psi*run",                                   1.0),
+      ("Eugénie",        "Tales from the Loop",                       1.0),
+      ("Eugénie",        "Wastburg",                                  1.0),
+      ("Gabzeta",        "Black Mirror",                              1.0),
+      ("Gabzeta",        "Coriolis: Third horizon",                   1.0),
+      ("Gabzeta",        "Donjon & Cie",                              1.0),
+      ("Gabzeta",        "Godbound - l'appel",                        1.0),
+      ("Gabzeta",        "Inflorenza (ambiance Patient 13)",          1.0),
+      ("Gabzeta",        "KPDP dans le Dodécaèdre",                   1.0),
+      ("Gabzeta",        "Le Retour de Soth",                         1.0),
+      ("Gabzeta",        "Les Schtroumpfs",                           5.0),
+      ("Gabzeta",        "Meute",                                     5.0),
+      ("Gabzeta",        "Mexican Death trip",                        1.0),
+      ("Gabzeta",        "Shadow of the Demon Lord",                  1.0),
+      ("Gabzeta",        "Summer camp - classe de neige",             1.0),
+      ("Gabzeta",        "Tales from the Loop",                       1.0),
+      ("Gabzeta",        "Wastburg",                                  5.0),
+      ("Goat",           "Blades in the Dark",                        5.0),
+      ("Goat",           "Dieux Ennemis",                             1.0),
+      ("Goat",           "Godbound - l'appel",                        5.0),
+      ("Goat",           "Shadow of the Demon Lord",                  5.0),
+      ("Highlandjul",    "Black Mirror",                              1.0),
+      ("Highlandjul",    "Blades in the Dark",                        1.0),
+      ("Highlandjul",    "DC comics - Darkest night",                 1.0),
+      ("Highlandjul",    "Donjon & Cie",                              5.0),
+      ("Highlandjul",    "Inflorenza (ambiance Patient 13)",          1.0),
+      ("Highlandjul",    "Les Derniers",                              1.0),
+      ("Highlandjul",    "Meute",                                     5.0),
+      ("Highlandjul",    "Summer camp - classe de neige",             1.0),
+      ("Highlandjul",    "Wastburg",                                  1.0),
+      ("Isidore",        "Blades in the Dark",                        1.0),
+      ("Isidore",        "Chiens de guerre",                          5.0),
+      ("Isidore",        "Delta Green - Pennsylvania '99",            1.0),
+      ("Isidore",        "Dieux Ennemis",                             1.0),
+      ("Isidore",        "Donjon & Cie",                              1.0),
+      ("Isidore",        "Le Retour de Soth",                         1.0),
+      ("Isidore",        "Les Schtroumpfs",                           1.0),
+      ("Isidore",        "Meute",                                     1.0),
+      ("Isidore",        "Psi*run",                                   1.0),
+      ("Isidore",        "Skyrealms of Jorune Revival",               5.0),
+      ("Isidore",        "Tales from the Loop",                       5.0),
+      ("Jorune",         "Black Mirror",                              5.0),
+      ("Jorune",         "Chiens de guerre",                          1.0),
+      ("Jorune",         "DC comics - Darkest night",                 5.0),
+      ("Jorune",         "Donjon & Cie",                              1.0),
+      ("Jorune",         "Godbound - l'appel",                        1.0),
+      ("Jorune",         "Les Derniers",                              1.0),
+      ("Jorune",         "Les Schtroumpfs",                           1.0),
+      ("Jorune",         "Shadow of the Demon Lord",                  1.0),
+      ("Jorune",         "Skyrealms of Jorune Revival",               5.0),
+      ("Jorune",         "Wurm : Rouge massacre",                     1.0),
+      ("Julian",         "Blades in the Dark",                        1.0),
+      ("Julian",         "Coriolis: Third horizon",                   1.0),
+      ("Julian",         "DC comics - Darkest night",                 1.0),
+      ("Julian",         "Donjon & Cie",                              1.0),
+      ("Julian",         "Les Derniers",                              1.0),
+      ("Julian",         "Psi*run",                                   1.0),
+      ("Kamiseito",      "Agôn",                                      5.0),
+      ("Kamiseito",      "Dieux Ennemis",                             1.0),
+      ("Kamiseito",      "Donjon & Cie",                              1.0),
+      ("Kamiseito",      "Les Derniers",                              5.0),
+      ("Kamiseito",      "Meute",                                     1.0),
+      ("Kamiseito",      "Mexican Death trip",                        1.0),
+      ("Kamiseito",      "P.U.N.C.H Unit - Katanga 1960",             1.0),
+      ("Kamiseito",      "Tales from the Loop",                       5.0),
+      ("Kersa",          "Chiens de guerre",                          1.0),
+      ("Kersa",          "Inflorenza (ambiance Patient 13)",          1.0),
+      ("Kersa",          "KPDP dans le Dodécaèdre",                   1.0),
+      ("Kersa",          "Le Retour de Soth",                         1.0),
+      ("Kersa",          "Les Derniers",                              5.0),
+      ("Kersa",          "Meute",                                     1.0),
+      ("Kersa",          "P.U.N.C.H Unit - Katanga 1960",             5.0),
+      ("Kersa",          "Psi*run",                                   1.0),
+      ("Kersa",          "Wastburg",                                  5.0),
+      ("Killerklown",    "Black Mirror",                              1.0),
+      ("Killerklown",    "Blades in the Dark",                        1.0),
+      ("Killerklown",    "Chiens de guerre",                          1.0),
+      ("Killerklown",    "Delta Green - Pennsylvania '99",            1.0),
+      ("Killerklown",    "Donjon & Cie",                              1.0),
+      ("Killerklown",    "KPDP dans le Dodécaèdre",                   1.0),
+      ("Killerklown",    "Le Retour de Soth",                         1.0),
+      ("Killerklown",    "Meute",                                     5.0),
+      ("Killerklown",    "Mexican Death trip",                        1.0),
+      ("Killerklown",    "P.U.N.C.H Unit - Katanga 1960",             1.0),
+      ("Killerklown",    "Skyrealms of Jorune Revival",               1.0),
+      ("Killerklown",    "Tales from the Loop",                       5.0),
+      ("Killerklown",    "Wastburg",                                  1.0),
+      ("Mangon",         "Chiens de guerre",                          1.0),
+      ("Mangon",         "Delta Green - Pennsylvania '99",            1.0),
+      ("Mangon",         "Donjon & Cie",                              5.0),
+      ("Mangon",         "P.U.N.C.H Unit - Katanga 1960",             1.0),
+      ("Mangon",         "Skyrealms of Jorune Revival",               5.0),
+      ("Najael",         "Blades in the Dark",                        1.0),
+      ("Najael",         "Coriolis: Third horizon",                   1.0),
+      ("Najael",         "Delta Green - Scénario original",           1.0),
+      ("Najael",         "Donjon & Cie",                              1.0),
+      ("Najael",         "KPDP dans le Dodécaèdre",                   5.0),
+      ("Najael",         "Mexican Death trip",                        5.0),
+      ("Najael",         "Tales from the Loop",                       5.0),
+      ("Najael",         "Wastburg",                                  1.0),
+      ("Orfeo",          "Blades in the Dark",                        5.0),
+      ("Orfeo",          "Chiens de guerre",                          1.0),
+      ("Orfeo",          "Coriolis: Third horizon",                   1.0),
+      ("Orfeo",          "Inflorenza (ambiance Patient 13)",          5.0),
+      ("Orfeo",          "KPDP dans le Dodécaèdre",                   1.0),
+      ("Orfeo",          "Mexican Death trip",                        1.0),
+      ("Orfeo",          "Shadow of the Demon Lord",                  1.0),
+      ("Orfeo",          "Wurm : Rouge massacre",                     1.0),
+      ("Ozen",           "Agôn",                                      5.0),
+      ("Ozen",           "Black Mirror",                              5.0),
+      ("Ozen",           "Dieux Ennemis",                             1.0),
+      ("Ozen",           "Donjon & Cie",                              1.0),
+      ("Ozen",           "Les Derniers",                              1.0),
+      ("Ozen",           "Psi*run",                                   5.0),
+      ("Paiji",          "Blades in the Dark",                        1.0),
+      ("Paiji",          "Coriolis: Third horizon",                   1.0),
+      ("Paiji",          "Delta Green - Pennsylvania '99",            5.0),
+      ("Paiji",          "Donjon & Cie",                              1.0),
+      ("Paiji",          "Godbound - l'appel",                        1.0),
+      ("Paiji",          "KPDP dans le Dodécaèdre",                   5.0),
+      ("Paiji",          "Les Derniers",                              1.0),
+      ("Paiji",          "P.U.N.C.H Unit - Katanga 1960",             1.0),
+      ("Paiji",          "Shadow of the Demon Lord",                  1.0),
+      ("Paiji",          "Skyrealms of Jorune Revival",               5.0),
+      ("Paiji",          "Wastburg",                                  1.0),
+      ("Paradoks",       "Blades in the Dark",                        5.0),
+      ("Paradoks",       "Coriolis: Third horizon",                   1.0),
+      ("Paradoks",       "Godbound - l'appel",                        1.0),
+      ("Paradoks",       "Inflorenza (ambiance Patient 13)",          5.0),
+      ("Paradoks",       "Les Derniers",                              1.0),
+      ("Paradoks",       "Mexican Death trip",                        5.0),
+      ("Paradoks",       "Tales from the Loop",                       1.0),
+      ("Paradoks",       "Wastburg",                                  1.0),
+      ("Paradoks",       "Wurm : Rouge massacre",                     1.0),
+      ("Rolapin",        "Coriolis: Third horizon",                   1.0),
+      ("Rolapin",        "Delta Green - Pennsylvania '99",            1.0),
+      ("Rolapin",        "Godbound - l'appel",                        1.0),
+      ("Rolapin",        "Mexican Death trip",                        5.0),
+      ("Rolapin",        "P.U.N.C.H Unit - Katanga 1960",             1.0),
+      ("Rolapin",        "Psi*run",                                   1.0),
+      ("Rolapin",        "Shadow of the Demon Lord",                  5.0),
+      ("Rolapin",        "Skyrealms of Jorune Revival",               1.0),
+      ("Rolapin",        "Summer camp - classe de neige",             1.0),
+      ("Rolapin",        "Tales from the Loop",                       1.0),
+      ("Rolapin",        "Wastburg",                                  1.0),
+      ("Sammael99",      "Coriolis: Third horizon",                   5.0),
+      ("Sammael99",      "Delta Green - Scénario original",           1.0),
+      ("Sammael99",      "Dieux Ennemis",                             1.0),
+      ("Sammael99",      "Godbound - l'appel",                        5.0),
+      ("Sammael99",      "Les Schtroumpfs",                           1.0),
+      ("Sammael99",      "Meute",                                     5.0),
+      ("Sammael99",      "Summer camp - classe de neige",             1.0),
+      ("Sammael99",      "Wastburg",                                  1.0),
+      ("Sammael99",      "Wurm : Rouge massacre",                     1.0),
+      ("Selpoivre",      "Black Mirror",                              1.0),
+      ("Selpoivre",      "Blades in the Dark",                        1.0),
+      ("Selpoivre",      "Coriolis: Third horizon",                   1.0),
+      ("Selpoivre",      "Donjon & Cie",                              1.0),
+      ("Selpoivre",      "Inflorenza (ambiance Patient 13)",          1.0),
+      ("Selpoivre",      "Les Derniers",                              1.0),
+      ("Selpoivre",      "Meute",                                     1.0),
+      ("Selpoivre",      "Mexican Death trip",                        1.0),
+      ("Selpoivre",      "Tales from the Loop",                       5.0),
+      ("Selpoivre",      "Wastburg",                                  5.0),
+      ("Selpoivre",      "Wurm : Rouge massacre",                     1.0),
+      ("Tolkraft",       "Chiens de guerre",                          1.0),
+      ("Tolkraft",       "Delta Green - Pennsylvania '99",            5.0),
+      ("Tolkraft",       "Donjon & Cie",                              1.0),
+      ("Tolkraft",       "Inflorenza (ambiance Patient 13)",          1.0),
+      ("Tolkraft",       "Meute",                                     1.0),
+      ("Tolkraft",       "Mexican Death trip",                        1.0),
+      ("Tolkraft",       "Shadow of the Demon Lord",                  1.0),
+      ("Tolkraft",       "Wastburg",                                  5.0),
+      ("Zeben",          "Agôn",                                      1.0),
+      ("Zeben",          "Blades in the Dark",                        5.0),
+      ("Zeben",          "KPDP dans le Dodécaèdre",                   5.0),
+      ("Zeben",          "Meute",                                     1.0),
+      ("Zeben",          "Psi*run",                                   1.0),
+      ("Zeben",          "Tales from the Loop",                       5.0),
+      ("Zeben",          "Wastburg",                                  1.0),
+      ("Udo Femi",       "Agôn",                                      1.0),
+      ("Udo Femi",       "Black Mirror",                              5.0),
+      ("Udo Femi",       "Blades in the Dark",                        5.0),
+      ("Udo Femi",       "Delta Green - Scénario original",           1.0),
+      ("Udo Femi",       "Donjon & Cie",                              1.0),
+      ("Udo Femi",       "KPDP dans le Dodécaèdre",                   1.0),
+      ("Udo Femi",       "Le Retour de Soth",                         1.0),
+      ("Udo Femi",       "Les Schtroumpfs",                           1.0),
+      ("Udo Femi",       "Shadow of the Demon Lord",                  1.0),
+      ("Udo Femi",       "Skyrealms of Jorune Revival",               5.0),
+      ("Udo Femi",       "Summer camp - classe de neige",             1.0)
+    )
+
+    val Selected: Set[Preference] = preferenceTriplets map { case (pName, tName, scoreValue) =>
+        PersonTopicPreference(Persons.byName(pName), Topics.byName(tName), Score(scoreValue))
+    }
+
+    val All: Set[Preference] = Selected
   }
 
   object Problems {
