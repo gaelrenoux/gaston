@@ -1,10 +1,14 @@
 package fr.renoux.gaston.engine
 
+import java.security.MessageDigest
+
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
 import scala.annotation.tailrec
+import scala.collection.immutable.Queue
+import scala.collection.mutable
 import scala.util.Random
 
 /**
@@ -12,44 +16,61 @@ import scala.util.Random
   */
 class ConstrainedScheduleFactory(val problem: Problem) {
 
+  type MD5 = Array[Byte]
+  private val candidateCache = mutable.Set[MD5]()
+
   private val log = Logger[ConstrainedScheduleFactory]
 
 
   /** Returns a Schedule satisfying all constraints, based on given random. Returns None if such a schedule cannot be
     *  constructed. */
-  def makeSchedule(implicit random: Random): Option[Schedule] = makePartialSchedule flatMap completePartialSchedule
-
-
-  /** Returns a Schedule satisfying all constraints except number constraints, based on given random. Returns None if
-    * such a schedule cannot be constructed. */
-  private def makePartialSchedule(implicit random: Random): Option[Schedule] = {
+  def makeSchedule(implicit random: Random): Option[Schedule] = {
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
-    backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(slots, 0, topics)
+    backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(Queue(slots: _*), topics)(completePartialSchedule)
+  }
+
+  /** Commodity function, mainly for testing purposes */
+  def makePartialSchedule(implicit random: Random): Option[Schedule] = {
+    val slots = random.shuffle(problem.slots.toList)
+    val topics = random.shuffle(problem.topics.toList)
+    backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(Queue(slots: _*), topics)(Some(_))
   }
 
 
+  private def md5(str: String): MD5 = MessageDigest.getInstance("MD5").digest(str.getBytes)
+
   /**
-    * Uses backtracking to construct a partial schedule with all topics assigned to slots, and mandatory people assigned to their topics.
+    * Uses backtracking to construct a partial schedule with all topics assigned to slots, and mandatory people assigned to their topics. Then apply the post-treatment to have a complete schedule.
     *
-    * @param partialSchedule        Partial schedule we are starting from
-    * @param slotsLeft              All slots we haven't handled yet
-    * @param currentSlotTopicsCount Number of topics in the current slot (the head of slotsLeft)
-    * @param topicsLeft             Topics we have to handle. The head is the current topic.
-    * @param topicsPassed           Topics we have to handle but were already deemed unacceptable for the current solution
+    * @param partialSchedule Partial schedule we are starting from
+    * @param slotsLeft       All slots on which we can still add some stuff, ordered by priority (we do a round-robin). Head is the current slot.
+    * @param topicsLeft      Topics we can try for the current slot.
+    * @param topicsPassed    Topics that won't work for the current slot, but may work for ulterior slots.
+    * @param postTreatment   Post treatment to apply on the produced Schedule. If it returns none, the schedule was not acceptable so keep on backtracking.
     * @return Some schedule that fits.
     */
   private def backtrackAssignTopicsToSlots(partialSchedule: Schedule)
-                                          (slotsLeft: List[Slot], currentSlotTopicsCount: Int, topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil): Option[Schedule] = {
-    if (topicsLeft.isEmpty && topicsPassed.isEmpty) {
-      log.debug("Finishing backtrackAssignTopicsToSlots because we have no more topics")
-      Some(partialSchedule) // we have integrated all topics
+                                          (slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil)
+                                          (postTreatment: Schedule => Option[Schedule]): Option[Schedule] = {
+    val scheduleMd5 = md5(partialSchedule.toString)
+    if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
+
+    if (slotsLeft.isEmpty) {
+      log.trace("All slots are satisfied and as much topics as possible have been assigned, apply postTreatment to see if solution is acceptable")
+      postTreatment(partialSchedule)
+
     } else if (topicsLeft.isEmpty) {
-      log.trace("Hit a dead end")
-      None // some topics were deemed unacceptable, and we have no more topics left : no solution
-    } else if (slotsLeft.isEmpty) {
-      log.debug("Finishing backtrackAssignTopicsToSlots because we have no more slots")
-      Some(partialSchedule) // some topics are left but we have no more slots
+      /* No topic available for the current slot. If the current slot is not satisfied, we fail because there is no way to satisfy the current slot at this point. */
+      if (maxPersonsOnSlot(partialSchedule, slotsLeft.head) < problem.personsCount) {
+        log.trace("Fail because no topic available for current slot and it is not satisfied yet")
+        None
+      } else {
+        /* go on without the current slot */
+        log.trace("Go on without current clot because no topic available for it and it is already satisfied")
+        backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft.tail, topicsLeft ::: topicsPassed)(postTreatment)
+      }
+
     } else {
       val currentSlot = slotsLeft.head
       val currentTopic = topicsLeft.head
@@ -58,25 +79,23 @@ class ConstrainedScheduleFactory(val problem: Problem) {
       val record = Schedule.Record(currentSlot, currentTopic, problem.mandatoryPersonsPerTopic(currentTopic)) //new record we want to try
       val candidate = partialSchedule.copy(records = partialSchedule.records + record) // generate a new candidate with this record
 
-      val solution =
-        if (candidate.isSound && problem.isAcceptablePartial(candidate)) {
-          log.trace(s"Candidate is acceptable: $candidate")
-          val newSlotTopicsCount = (currentSlotTopicsCount + 1) % problem.parallelization // add one topic to current slot, go back to zero if we reach limit
-          val newSlotsLeft = if (newSlotTopicsCount == 0) slotsLeft.tail else slotsLeft // if limit was reached, go to next slot
-          backtrackAssignTopicsToSlots(candidate)(newSlotsLeft, newSlotTopicsCount, nextTopics ::: topicsPassed, Nil)
+      val possibleSchedule =
+        if (candidate.isSound && problem.isAcceptablePartial(candidate) && minPersonsOnSlot(candidate, currentSlot) <= problem.personsCount) {
+          log.trace(s"Go on with acceptable candidate and next slot: $candidate")
+          backtrackAssignTopicsToSlots(candidate)(slotsLeft.tail :+ currentSlot, nextTopics ::: topicsPassed, Nil)(postTreatment)
+        } else None
 
-        } else {
-          log.trace(s"Candidate is not acceptable: $candidate")
-          None
-        }
-
-      solution orElse {
-        log.trace(s"Backtracking from: $candidate")
-        /* candidate was not acceptable, or went into a dead end. Let's try with next topic */
-        backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft, currentSlotTopicsCount, nextTopics, currentTopic :: topicsPassed)
+      possibleSchedule orElse {
+        /* candidate is not acceptable or lead to a failure, try again with next topic */
+        log.trace(s"Go on with new topic for current slot as the candidate is not OK")
+        backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft, nextTopics, currentTopic :: topicsPassed)(postTreatment)
       }
     }
   }
+
+  private def minPersonsOnSlot(candidate: Schedule, slot: Slot) = candidate.topicsPerSlot.getOrElse(slot, Set()).toSeq.map(problem.minNumberPerTopic.getOrElse(_, 0)).sum
+
+  private def maxPersonsOnSlot(candidate: Schedule, slot: Slot) = candidate.topicsPerSlot.getOrElse(slot, Set()).toSeq.map(problem.maxNumberPerTopic.getOrElse(_, problem.persons.size)).sum
 
 
   /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
@@ -130,11 +149,11 @@ class ConstrainedScheduleFactory(val problem: Problem) {
   /**
     * Assign persons to a list of topics.
     *
-    * @param partialSchedule   Partial schedule from which we start
-    * @param topicsNeedingMin  Topics to which we need to add people to reach the min number of persons
-    * @param topicsOpenToMax   Topics to which we can add people up to the the max number of persons
-    * @param personsLeft       Persons that need to be assigned to topics
-    * @param personsSkipped Persons that needs to be assigned to topics but which have been skipped for the head of the topic list
+    * @param partialSchedule        Partial schedule from which we start
+    * @param topicsNeedingMin       Topics to which we need to add people to reach the min number of persons
+    * @param topicsOpenToMax        Topics to which we can add people up to the the max number of persons
+    * @param personsLeft            Persons that need to be assigned to topics
+    * @param personsSkipped         Persons that needs to be assigned to topics but which have been skipped for the head of the topic list
     * @param topicsOpenToMaxDelayed Topics that have there minimum value and which have been delayed
     * @return None if no schedule is possible, Some(schedule) if possible
     */

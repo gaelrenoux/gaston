@@ -17,6 +17,8 @@ case class Problem(
                     preferences: Set[Preference]
                   ) {
 
+  lazy val personsCount = persons.size
+
   /** For each topic, which persons are mandatory */
   lazy val mandatoryPersonsPerTopic: Map[Topic, Set[Person]] = {
 
@@ -101,6 +103,8 @@ case class Problem(
   lazy val maxNumberPerTopic: Map[Topic, Int] = constraints.collect {
     case TopicNeedsNumberOfPersons(t, _, Opt(Some(max))) => (t, max)
   } toMap
+
+  lazy val preferenceScoreValues: Set[Score] = preferences.map(_.reward)
 
   /* @return true if the partialSchedule respects all constraints applicable to partial schedules  */
   def isAcceptablePartial(candidate: Schedule): Boolean =

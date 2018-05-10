@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-case class Score(value: Double) extends AnyVal {
+case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
   def +(s: Score) = Score(value + s.value)
   def +(i: Int) = Score(value + i)
@@ -13,6 +13,8 @@ case class Score(value: Double) extends AnyVal {
   def /(w: Weight) = Score(value / w.value)
 
   def negative = Score(-value)
+
+  override def compare(that: Score): Int = this.value.compare(that.value)
 }
 
 object Score {

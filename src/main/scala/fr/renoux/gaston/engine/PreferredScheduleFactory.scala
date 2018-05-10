@@ -12,20 +12,9 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by satisfying preferences.
   */
-class PreferredScheduleFactory(problem: Problem) {
+class PreferredScheduleFactory(problem: Problem) extends Scoring(problem) {
 
   private val log = Logger[PreferredScheduleFactory]
-
-  /** Score a solution for the current problem: equal to the minimum score. Personal scores are divided by the person's
-    * weight before comparison. The total score comes only as a tie breaker. */
-  final def score(solution: Schedule): Score = {
-    val individualScores = problem.preferences.toSeq.map(p => p -> p.score(solution))
-    val scoresByPerson = individualScores.groupBy(_._1.person) mapValues (_.map(_._2).sum)
-
-    val weightedScoresByPerson = scoresByPerson map { case (p, s) => s / p.weight }
-
-    weightedScoresByPerson.min * 1000 + weightedScoresByPerson.sum
-  }
 
   /** Use random swaps trying to always improve the solution. Pretty fast, but no garantee to have a perfect solution. */
   @tailrec

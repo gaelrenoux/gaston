@@ -15,6 +15,7 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
   private val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
 
+
   "simpleAmelioration" should "work a valid random schedule (on a complex model)" in {
     import ComplexTestModel._
     var bestScore = Double.NegativeInfinity
