@@ -66,12 +66,11 @@ object PureConfigTranscriber extends ToValidationOps {
   }
 
   private def getNumberConstraints(input: InputModel, maps: Maps) = {
-    input.topics flatMap { inTopic =>
-      if (inTopic.min.isEmpty && inTopic.max.isEmpty) None
-      else {
-        val topic = maps.topicsPerName(inTopic.name)
-        Some(TopicNeedsNumberOfPersons(topic, inTopic.min, inTopic.max))
-      }
+    input.topics map { inTopic =>
+      val topic = maps.topicsPerName(inTopic.name)
+      val min = inTopic.min.getOrElse(input.settings.defaultMin)
+      val max = inTopic.max.getOrElse(input.settings.defaultMax)
+      TopicNeedsNumberOfPersons(topic, min, max)
     }
   }
 

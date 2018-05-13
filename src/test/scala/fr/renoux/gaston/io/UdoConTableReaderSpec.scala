@@ -19,7 +19,9 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     settings = InputSettings(
       weakPreference = Score(1),
       strongPreference = Score(5),
-      incompatibilityAntiPreference = Score(-50)
+      incompatibilityAntiPreference = Score(-50),
+      defaultMin = 3,
+      defaultMax = 5
     )
   ))
 

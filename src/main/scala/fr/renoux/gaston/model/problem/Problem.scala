@@ -4,7 +4,6 @@ import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.Preference
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.Opt
 
 /**
   * A problem to solve. A schedule solves a problem.
@@ -96,15 +95,18 @@ case class Problem(
 
   /** The min number of persons for each topic that has a min number of persons */
   lazy val minNumberPerTopic: Map[Topic, Int] = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, Opt(Some(min)), _) => (t, min)
+    case TopicNeedsNumberOfPersons(t, min, _) => (t, min)
   } toMap
 
   /** The max number of persons for each topic that has a max number of persons */
   lazy val maxNumberPerTopic: Map[Topic, Int] = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, _, Opt(Some(max))) => (t, max)
+    case TopicNeedsNumberOfPersons(t, _, max) => (t, max)
   } toMap
 
   lazy val preferenceScoreValues: Set[Score] = preferences.map(_.reward)
+
+  lazy val preferencesPerPerson: Map[Person, Set[Preference]] = preferences.groupBy(_.person)
+
 
   /* @return true if the partialSchedule respects all constraints applicable to partial schedules  */
   def isAcceptablePartial(candidate: Schedule): Boolean =

@@ -19,7 +19,9 @@ case class InputModel(
 case class InputSettings(
                           weakPreference: Score,
                           strongPreference: Score,
-                          incompatibilityAntiPreference: Score
+                          incompatibilityAntiPreference: Score,
+                          defaultMin: Int,
+                          defaultMax: Int
                         )
 
 case class InputPreference(

@@ -1,6 +1,5 @@
 package fr.renoux.gaston.model
 
-import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.io.{InputLoader, InputSettings}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -8,7 +7,6 @@ import org.scalatest.{FlatSpec, Matchers}
   * Created by gael on 07/05/17.
   */
 class PreferencesSpec extends FlatSpec with Matchers {
-  private val log = Logger[PreferencesSpec]
   private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
   private val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 

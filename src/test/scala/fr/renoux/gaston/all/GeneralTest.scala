@@ -3,11 +3,11 @@ package fr.renoux.gaston.all
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, PreferredScheduleFactory}
 import fr.renoux.gaston.io.{InputLoader, InputSettings}
-import fr.renoux.gaston.model.{Person, Schedule, Score, Topic}
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
+import fr.renoux.gaston.model.{Person, Schedule, Score}
+import fr.renoux.gaston.util.MapImplicits._
 import org.scalatest.{FlatSpec, Matchers}
 
-import fr.renoux.gaston.util.MapImplicits._
 import scala.util.Random
 
 /**
@@ -16,7 +16,6 @@ import scala.util.Random
 class GeneralTest extends FlatSpec with Matchers {
   private val log = Logger[GeneralTest]
   private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
-  private val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
 
   "Gaston" should "produce a good schedule on a real-life model" in {
     val problem = InputLoader.fromClassPath("udocon-application.conf").forceToModel

@@ -1,6 +1,5 @@
 package fr.renoux.gaston.util
 
-import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
@@ -42,6 +41,7 @@ object Dispatch {
 
 
     /** Dispatches the value in the slots, trying to have values as equal as possible with the max being respected.
+      *
       * @return the repartition, and the remainder (if a complete repartition was not possible) */
     def apply(total: Int): (Seq[Int], Int) = {
       val possibleTotal = math.min(total, maxTotal)
