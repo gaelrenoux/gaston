@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model.{Person, Schedule, Topic}
 
 /**
-  * Min and max number of persons on a topic.
+  * Min and max number of persons on a topic. Remember it includes everyone, even mandatory persons !
   */
 case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends AbstractConstraint[(Topic, Set[Person])] {
 

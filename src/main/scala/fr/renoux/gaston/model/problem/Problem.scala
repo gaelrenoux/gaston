@@ -60,6 +60,9 @@ case class Problem(
   /** For each slot, the available persons */
   lazy val personsPerSlot: Map[Slot, Set[Person]] = personSlotsPossibilities.map(_.swap).groupToMap
 
+  /** For each slot, the number of available persons */
+  lazy val personsCountPerSlot: Map[Slot, Int] = personsPerSlot map { case (s, ps) => s -> ps.size}
+
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
     * are mandatory). */
   lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {

@@ -2,6 +2,7 @@ package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.io.InputSettings
+import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
@@ -96,42 +97,42 @@ object UdoConTestModel {
 
     val SelectedNumbers: Set[Constraint] =
       Set(
-        TopicNeedsNumberOfPersons(Topic("Agôn"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("DC comics - Darkest night"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Les Schtroumpfs"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Shadow of the Demon Lord"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Delta Green - Scénario original"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Blades in the Dark"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Skyrealms of Jorune Revival"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Wurm : Rouge massacre"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Psi*run"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Coriolis: Third horizon"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Mexican Death trip"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Meute"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Les Derniers"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Chiens de guerre"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Tales from the Loop"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Donjon & Cie"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("P.U.N.C.H Unit - Katanga 1960"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Delta Green - Pennsylvania '99"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Inflorenza (ambiance Patient 13)"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("KPDP dans le Dodécaèdre"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Summer camp - classe de neige"), min = 3, max = 6),
-        TopicNeedsNumberOfPersons(Topic("Dieux Ennemis"), min = 3, max = 6),
-        TopicNeedsNumberOfPersons(Topic("Wastburg"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Black Mirror"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Le Retour de Soth"), min = 3, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Godbound - l'appel"), min = 3, max = 4)
+        TopicNeedsNumberOfPersons(Topic("Agôn"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("DC comics - Darkest night"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Les Schtroumpfs"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Shadow of the Demon Lord"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Delta Green - Scénario original"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Blades in the Dark"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Skyrealms of Jorune Revival"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Wurm : Rouge massacre"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Psi*run"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Coriolis: Third horizon"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Mexican Death trip"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Meute"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Les Derniers"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Chiens de guerre"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Tales from the Loop"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Donjon & Cie"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("P.U.N.C.H Unit - Katanga 1960"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Delta Green - Pennsylvania '99"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Inflorenza (ambiance Patient 13)"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("KPDP dans le Dodécaèdre"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Summer camp - classe de neige"), min = 4, max = 7),
+        TopicNeedsNumberOfPersons(Topic("Dieux Ennemis"), min = 4, max = 7),
+        TopicNeedsNumberOfPersons(Topic("Wastburg"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Black Mirror"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Le Retour de Soth"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Godbound - l'appel"), min = 4, max = 5)
       )
 
     val AllNumbers: Set[Constraint] = SelectedNumbers ++
       Set(
-        TopicNeedsNumberOfPersons(Topic("Burning Wheel"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("end of line"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Aux Marches du Pouvoir"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("DCC Funnel - Ferme des Célébrités"), min = 3, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Tortues Ninja (Fate)"), min = 4, max = 4),
-        TopicNeedsNumberOfPersons(Topic("Héroïques"), min = 3, max = 5)
+        TopicNeedsNumberOfPersons(Topic("Burning Wheel"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("end of line"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Aux Marches du Pouvoir"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("DCC Funnel - Ferme des Célébrités"), min = 4, max = 6),
+        TopicNeedsNumberOfPersons(Topic("Tortues Ninja (Fate)"), min = 5, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Héroïques"), min = 4, max = 6)
       )
 
     val Selected: Set[Constraint] = SelectedObligations ++ SelectedInterdictions ++ Absences ++ SelectedNumbers
@@ -399,6 +400,38 @@ object UdoConTestModel {
       log.debug(s"Complete problem is $p")
       p
     }
+  }
+
+  object Solutions {
+    import Persons.byName
+    val Actual = Schedule(5,
+      Record(Slot("D1-afternoon"), Topic("Agôn"),                             Set[Person]( byName("Mangon"), byName("Kamiseito"), byName("Highlandjul"), byName("Ozen"), byName("Bashar")) ),
+      Record(Slot("D1-afternoon"), Topic("DC comics - Darkest night"),        Set[Person]( byName("Cryoban"), byName("Selpoivre"), byName("Chestel"), byName("Jorune"), byName("Boojum")) ),
+      Record(Slot("D1-afternoon"), Topic("Les Schtroumpfs"),                  Set[Person]( byName("Paradoks"), byName("Isidore"), byName("Gabzeta"), byName("Aude"), byName("Julian")) ),
+      Record(Slot("D1-afternoon"), Topic("Shadow of the Demon Lord"),         Set[Person]( byName("Zeben"), byName("Paiji"), byName("Orfeo"), byName("Rolapin"), byName("Goat"), byName("Udo Femi")) ),
+      Record(Slot("D1-afternoon"), Topic("Delta Green - Scénario original"),  Set[Person]( byName("Sammael99"), byName("Kersa"), byName("Tolkraft"), byName("Killerklown"), byName("Najael"), byName("Eugénie")) ),
+      Record(Slot("D1-evening"), Topic("Blades in the Dark"),                 Set[Person]( byName("Zeben"), byName("Highlandjul"), byName("Orfeo"), byName("Rolapin"), byName("Goat"), byName("Udo Femi")) ),
+      Record(Slot("D1-evening"), Topic("Skyrealms of Jorune Revival"),        Set[Person]( byName("Mangon"), byName("Sammael99"), byName("Paiji"), byName("Isidore"), byName("Chestel"), byName("Jorune")) ),
+      Record(Slot("D1-evening"), Topic("Wurm : Rouge massacre"),              Set[Person]( byName("Kamiseito"), byName("Cryoban"), byName("Gabzeta"), byName("Selpoivre"), byName("Aude")) ),
+      Record(Slot("D1-evening"), Topic("Psi*run"),                            Set[Person]( byName("Kersa"), byName("Paradoks"), byName("Ozen"), byName("Bashar"), byName("Eugénie")) ),
+      Record(Slot("D1-evening"), Topic("Coriolis: Third horizon"),            Set[Person]( byName("Tolkraft"), byName("Killerklown"), byName("Najael"), byName("Julian"), byName("Boojum")) ),
+      Record(Slot("D2-afternoon"), Topic("Mexican Death trip"),               Set[Person]( byName("Paradoks"), byName("Rolapin"), byName("Ozen"), byName("Najael"), byName("Julian")) ),
+      Record(Slot("D2-afternoon"), Topic("Meute"),                            Set[Person]( byName("Sammael99"), byName("Cryoban"), byName("Gabzeta"), byName("Highlandjul"), byName("Jorune"), byName("Killerklown")) ),
+      Record(Slot("D2-afternoon"), Topic("Les Derniers"),                     Set[Person]( byName("Kamiseito"), byName("Kersa"), byName("Tolkraft"), byName("Paiji"), byName("Chestel")) ),
+      Record(Slot("D2-afternoon"), Topic("Chiens de guerre"),                 Set[Person]( byName("Mangon"), byName("Isidore"), byName("Orfeo"), byName("Eugénie"), byName("Goat")) ),
+      Record(Slot("D2-afternoon"), Topic("Tales from the Loop"),              Set[Person]( byName("Zeben"), byName("Bashar"), byName("Selpoivre"), byName("Aude"), byName("Boojum"), byName("Udo Femi")) ),
+      Record(Slot("D2-evening"), Topic("Donjon & Cie"),                       Set[Person]( byName("Mangon"), byName("Sammael99"), byName("Highlandjul"), byName("Aude"), byName("Julian"), byName("Boojum")) ),
+      Record(Slot("D2-evening"), Topic("P.U.N.C.H Unit - Katanga 1960"),      Set[Person]( byName("Kamiseito"), byName("Kersa"), byName("Cryoban"), byName("Bashar"), byName("Killerklown")) ),
+      Record(Slot("D2-evening"), Topic("Delta Green - Pennsylvania '99"),     Set[Person]( byName("Tolkraft"), byName("Paiji"), byName("Rolapin"), byName("Isidore"), byName("Selpoivre"), byName("Jorune")) ),
+      Record(Slot("D2-evening"), Topic("Inflorenza (ambiance Patient 13)"),   Set[Person]( byName("Paradoks"), byName("Gabzeta"), byName("Orfeo"), byName("Chestel"), byName("Eugénie")) ),
+      Record(Slot("D2-evening"), Topic("KPDP dans le Dodécaèdre"),            Set[Person]( byName("Zeben"), byName("Ozen"), byName("Najael"), byName("Goat"), byName("Udo Femi")) ),
+      Record(Slot("D3-afternoon"), Topic("Summer camp - classe de neige"),    Set[Person]( byName("Paradoks"), byName("Chestel"), byName("Eugénie"), byName("Julian")) ),
+      Record(Slot("D3-afternoon"), Topic("Dieux Ennemis"),                    Set[Person]( byName("Zeben"), byName("Kamiseito"), byName("Highlandjul"), byName("Bashar")) ),
+      Record(Slot("D3-afternoon"), Topic("Wastburg"),                         Set[Person]( byName("Kersa"), byName("Tolkraft"), byName("Gabzeta"), byName("Selpoivre"), byName("Aude"), byName("Goat")) ),
+      Record(Slot("D3-afternoon"), Topic("Black Mirror"),                     Set[Person]( byName("Mangon"), byName("Orfeo"), byName("Jorune"), byName("Udo Femi")) ),
+      Record(Slot("D3-afternoon"), Topic("Le Retour de Soth"),                Set[Person]( byName("Isidore"), byName("Killerklown"), byName("Najael"), byName("Boojum")) ),
+      Record(Slot("D3-afternoon"), Topic("Godbound - l'appel"),               Set[Person]( byName("Sammael99"), byName("Cryoban"), byName("Paiji"), byName("Rolapin")) )
+    )
   }
 
 }

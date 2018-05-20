@@ -18,6 +18,7 @@ class ConstrainedScheduleFactory(val problem: Problem) {
 
   type MD5 = Array[Byte]
   private val candidateCache = mutable.Set[MD5]()
+  private var count = 0
 
   private val log = Logger[ConstrainedScheduleFactory]
 
@@ -55,6 +56,9 @@ class ConstrainedScheduleFactory(val problem: Problem) {
                                           (postTreatment: Schedule => Option[Schedule]): Option[Schedule] = {
     val scheduleMd5 = md5(partialSchedule.toString)
     if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
+    if (count % 10000 == 0) log.info(s"Tried $count combinations")
+    log.trace(s"Tried $count combinations")
+    count += 1
 
     if (slotsLeft.isEmpty) {
       log.trace("All slots are satisfied and as much topics as possible have been assigned, apply postTreatment to see if solution is acceptable")
@@ -142,7 +146,18 @@ class ConstrainedScheduleFactory(val problem: Problem) {
         completeForSlots(slotsTail, newSchedule)
     }
 
-    completeForSlots(problem.slots.toList, Some(partialSchedule))
+    /* check wether it's possible to make it work first */
+    partialSchedule.topicsPerSlot find { case (slot, topics) =>
+      val min = topics.toSeq.map(problem.minNumberPerTopic(_)).sum
+      val max = topics.toSeq.map(problem.maxNumberPerTopic(_)).sum
+      val pCount = problem.personsCountPerSlot(slot)
+      pCount < min || pCount > max
+    } match {
+      case None => completeForSlots(problem.slots.toList, Some(partialSchedule))
+      case Some((slot, _)) =>
+        log.trace(s"Impossible to fill slot $slot")
+        None
+    }
   }
 
 

@@ -36,20 +36,23 @@ class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers with Private
   }
 
 
-
   behavior of "makeSchedule"
 
   it should "work out a schedule when there is one (on a simple model)" in {
     val factory = new ConstrainedScheduleFactory(SimpleTestModel.Problems.Complete)
     val solution = factory.makeSchedule(random)
-    log.info(s"Solution: $solution")
+    solution foreach { s =>
+      log.info(s"Solution: ${s.toFormattedString}")
+    }
     solution.isDefined should be(true)
   }
 
   it should "work out a schedule when there is one (on a complex model)" in {
     val factory = new ConstrainedScheduleFactory(ComplexTestModel.Problems.Complete)
     val solution = factory.makeSchedule(random)
-    log.info(s"Solution: $solution")
+    solution foreach { s =>
+      log.info(s"Solution: ${s.toFormattedString}")
+    }
     solution.isDefined should be(true)
   }
 

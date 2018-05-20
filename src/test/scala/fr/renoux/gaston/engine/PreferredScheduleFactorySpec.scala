@@ -3,6 +3,7 @@ package fr.renoux.gaston.engine
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.io.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.Schedule
+import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
@@ -24,13 +25,13 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
       log.info(s"Seed: $seed")
 
       val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
-      val psFactory = new PreferredScheduleFactory(Problems.Complete)
+      val psFactory = new RandomScheduleImprover(Problems.Complete)
 
       val Some(initialSolution) = csFactory.makeSchedule
       val initialScore = psFactory.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
-      val finalSolution = psFactory.simpleRandomizedAmelioration(initialSolution, initialScore, 1000)
+      val finalSolution = psFactory.improve(initialSolution, initialScore, 1000)
       val finalScore = psFactory.score(finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
@@ -51,13 +52,13 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
       log.info(s"Seed: $seed")
 
       val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
-      val psFactory = new PreferredScheduleFactory(Problems.Complete)
+      val psFactory = new SystematicScheduleImprover(Problems.Complete)
 
       val Some(initialSolution) = csFactory.makeSchedule
       val initialScore = psFactory.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
-      val finalSolution = psFactory.systematicAmelioration(initialSolution, initialScore, 100)
+      val finalSolution = psFactory.improve(initialSolution, initialScore, 100)
       val finalScore = psFactory.score(finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
@@ -73,19 +74,29 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
 
   "systematicAmelioration" should "work a valid schedule (on a real-life model)" in {
     var (bestSchedule, bestScore) = (Schedule(0), Double.NegativeInfinity)
-    for (seed <- 0L until 5L) {
+    for (seed <- 0L until 1L) {
       implicit val random = new Random(0L)
 
-      val problem = InputLoader.fromClassPath("udocon-application.conf").forceToModel
+      val problem = InputLoader.fromClassPath("application.conf").forceToModel
+      val problematicConstraints = problem.constraints collect {
+        case c@TopicNeedsNumberOfPersons(_, _, max) if max < 6 => c
+      }
+      log.info("problematicConstraints:\n" + problematicConstraints.mkString("\n"))
+      /* val problem = oldProblem.copy(
+        constraints = oldProblem.constraints map {
+          case TopicNeedsNumberOfPersons(t, min, max) => TopicNeedsNumberOfPersons(t , min, math.max(max, 6))
+          case c => c
+        }
+      ) */
 
       val csFactory = new ConstrainedScheduleFactory(problem)
-      val psFactory = new PreferredScheduleFactory(problem)
+      val psFactory = new SystematicScheduleImprover(problem)
 
       val Some(initialSolution) = csFactory.makeSchedule
       val initialScore = psFactory.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): ${initialSolution.toFormattedString}")
 
-      val finalSolution = psFactory.systematicAmelioration(initialSolution, initialScore, 100)
+      val finalSolution = psFactory.improve(initialSolution, initialScore, 100)
       val finalScore = psFactory.score(finalSolution)
       log.info(s"Solution (score $finalScore): ${finalSolution.toFormattedString}")
 

@@ -30,7 +30,7 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     val table = Source.fromResource("udocon-table.csv").mkString
     val input = reader.read(table)
 
-    val file = new File(getClass.getResource("/udocon-application.conf").getPath)
+    val file = new File(getClass.getResource("/application.conf").getPath)
     val expected = loadConfigFromFiles[InputRoot](Seq(file.toPath)).right.get
 
     input should be(expected)
@@ -42,7 +42,7 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     val rendered = InputLoader.render(input)
 
     val evaluated = InputLoader.fromString(rendered).forceToInput
-    val expected = InputLoader.fromClassPath("udocon-application.conf").forceToInput
+    val expected = InputLoader.fromClassPath("application.conf").forceToInput
 
     evaluated should be(expected)
   }

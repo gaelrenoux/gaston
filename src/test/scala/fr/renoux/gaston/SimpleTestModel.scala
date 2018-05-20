@@ -63,6 +63,10 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val MichelangeloNotInTheMorning = PersonAbsence(Michelangelo, Morning)
 
     val FightingNeedsTwoToFourPersons = TopicNeedsNumberOfPersons(Fighting, min = 2, max = 4)
+    val MachinesNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Machines, min = 0, max = 10)
+    val PartyNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Party, min = 0, max = 10)
+    val LeadingNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Leading, min = 0, max = 10)
+    val CookingNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Cooking, min = 0, max = 10)
 
     val All: Set[Constraint] = Set(
       LeonardoLeads,
@@ -80,7 +84,11 @@ class SimpleTestModel(implicit settings: InputSettings) {
       DonatelloInTheAfterNoon,
       MichelangeloNotInTheMorning,
 
-      FightingNeedsTwoToFourPersons
+      FightingNeedsTwoToFourPersons,
+      MachinesNeedsAnyNumberOfPersons,
+      PartyNeedsAnyNumberOfPersons,
+      LeadingNeedsAnyNumberOfPersons,
+      CookingNeedsAnyNumberOfPersons
     )
   }
 

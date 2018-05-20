@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+import java.text.DecimalFormat
+
 case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
   def +(s: Score) = Score(value + s.value)
@@ -15,9 +17,13 @@ case class Score(value: Double) extends AnyVal with Ordered[Score] {
   def negative = Score(-value)
 
   override def compare(that: Score): Int = this.value.compare(that.value)
+
+  def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
 }
 
 object Score {
+
+  private val TwoDecimalsFormat = new DecimalFormat("#.00")
 
   val Zero = Score(0)
 
