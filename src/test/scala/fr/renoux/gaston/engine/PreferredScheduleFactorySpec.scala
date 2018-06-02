@@ -20,7 +20,7 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   "simpleAmelioration" should "work a valid random schedule (on a complex model)" in {
     import ComplexTestModel._
     var bestScore = Double.NegativeInfinity
-    for (seed <- 0L until 5L) {
+    for (seed <- 0L until 1L) {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
@@ -47,7 +47,7 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   "systematicAmelioration" should "work a valid schedule (on a complex model)" in {
     import ComplexTestModel._
     var bestScore = Double.NegativeInfinity
-    for (seed <- 0L until 5L) {
+    for (seed <- 0L until 1L) {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
@@ -82,12 +82,6 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
         case c@TopicNeedsNumberOfPersons(_, _, max) if max < 6 => c
       }
       log.info("problematicConstraints:\n" + problematicConstraints.mkString("\n"))
-      /* val problem = oldProblem.copy(
-        constraints = oldProblem.constraints map {
-          case TopicNeedsNumberOfPersons(t, min, max) => TopicNeedsNumberOfPersons(t , min, math.max(max, 6))
-          case c => c
-        }
-      ) */
 
       val csFactory = new ConstrainedScheduleFactory(problem)
       val psFactory = new SystematicScheduleImprover(problem)

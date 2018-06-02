@@ -5,14 +5,17 @@ import java.nio.file.{Path, Paths}
 import scopt.Read
 
 import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.util.Random
 
 case class CommandLine(
                         inputFile: Path = Paths.get(""),
                         udoConTableFile: Option[Path] = None,
-                        createSchedule: Boolean = true,
-                        outputSettings: Boolean = false,
+                        generateInput: Boolean = false,
                         continuousOutput: Boolean = true,
-                        maxDuration: Option[FiniteDuration] = None
+                        silent: Boolean = false,
+                        verbose: Boolean = false,
+                        maxDuration: Option[FiniteDuration] = None,
+                        seed: Long = Random.nextLong()
                       ) {
 
 }
@@ -34,19 +37,23 @@ object CommandLine {
       .action((path, in) => in.copy(udoConTableFile = Some(path)))
       .text("Import a table withe UdoCon wish-list format, use it to generate or complete the input file")
 
-    opt[Unit]('g', "generate-input").optional().valueName("<file>")
-      .action((_, in) => in.copy(createSchedule = false, outputSettings = true))
+    opt[Unit]('g', "generate-input").optional()
+      .action((_, in) => in.copy(generateInput = true))
       .text("Output only the generated input file, do not generate a schedule")
 
-    opt[Unit]('s', "silent").optional().valueName("<file>")
-      .action((_, in) => in.copy(createSchedule = false, outputSettings = true))
+    opt[Unit]('s', "silent").optional()
+      .action((_, in) => in.copy(silent = true))
       .text("Do not output regularly the best schedule found until now")
 
-    opt[Unit]('v', "verbose").optional().valueName("<file>")
-      .action((_, in) => in.copy(createSchedule = false, outputSettings = true))
+    opt[Unit]('v', "verbose").optional()
+      .action((_, in) => in.copy(verbose = true))
       .text("Display log messages during work")
 
-    opt[Duration]('d', "--duration").optional().valueName("<file>")
+    opt[Long]('e', "seed").optional().valueName("<number>")
+      .action((s, in) => in.copy(seed = s))
+      .text("Seed to use for randomization")
+
+    opt[Duration]('d', "duration").optional().valueName("<duration>")
       .action((dur, in) => in.copy(maxDuration = dur match {
         case fd: FiniteDuration => Some(fd)
         case _ => None

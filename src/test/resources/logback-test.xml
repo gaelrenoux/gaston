@@ -11,7 +11,7 @@
         </encoder>
     </appender>
 
-    <logger name="fr.renoux" level="info" />
+    <logger name="fr.renoux" level="debug" />
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

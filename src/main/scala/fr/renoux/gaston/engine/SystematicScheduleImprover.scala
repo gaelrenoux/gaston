@@ -22,10 +22,10 @@ class SystematicScheduleImprover(problem: Problem) extends ScheduleImprover(prob
   @tailrec
   private def systematicAmelioration(schedule: Schedule, score: Score, maxRounds: Int = 1000, slots: Queue[Slot] = Queue(problem.slots.toSeq: _*)): Schedule =
   if (maxRounds == 0) {
-    log.info("Stopping systematic amelioration because max number of rounds was reached")
+    log.debug("Stopping systematic amelioration because max number of rounds was reached")
     schedule
   } else if (slots.isEmpty) {
-    log.info(s"Stopping systematic amelioration because all slots are perfect ($maxRounds rounds left)")
+    log.debug(s"Stopping systematic amelioration because all slots are perfect ($maxRounds rounds left)")
     schedule
   } else {
     val (slot, slotsTail) = slots.dequeue

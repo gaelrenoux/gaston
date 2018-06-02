@@ -56,7 +56,7 @@ class ConstrainedScheduleFactory(val problem: Problem) {
                                           (postTreatment: Schedule => Option[Schedule]): Option[Schedule] = {
     val scheduleMd5 = md5(partialSchedule.toString)
     if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
-    if (count % 10000 == 0) log.info(s"Tried $count combinations")
+    if (count % 1000 == 0) log.debug(s"Tried $count combinations")
     log.trace(s"Tried $count combinations")
     count += 1
 

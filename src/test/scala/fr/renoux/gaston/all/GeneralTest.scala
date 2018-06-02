@@ -17,7 +17,7 @@ class GeneralTest extends FlatSpec with Matchers {
   private val log = Logger[GeneralTest]
   private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
 
-  "Gaston" should "produce a good schedule on a real-life model" in {
+  "Gaston" should "produce a good schedule on a real-life model" ignore {
     val problem = InputLoader.fromClassPath("application.conf").forceToModel
     log.info(s"Problem was read")
 

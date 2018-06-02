@@ -23,9 +23,11 @@ case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
 object Score {
 
-  private val TwoDecimalsFormat = new DecimalFormat("#.00")
+  private val TwoDecimalsFormat = new DecimalFormat("####.00")
 
   val Zero = Score(0)
+
+  val MinValue = Score(Double.MinValue)
 
   implicit object ScoreIsFractional extends Fractional[Score] {
     override def plus(x: Score, y: Score): Score = Score(x.value + y.value)
