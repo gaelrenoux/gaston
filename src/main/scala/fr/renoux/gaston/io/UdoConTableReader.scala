@@ -1,7 +1,6 @@
 package fr.renoux.gaston.io
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.UdoConTableReader.Parameters
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.StringImplicits._
@@ -9,9 +8,9 @@ import fr.renoux.gaston.util.StringImplicits._
 /**
   * Some stuff initialized from the normal JSON input, the rest is read from the table.
   */
-class UdoConTableReader(params: Parameters) {
+class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) {
 
-  private val log = Logger(UdoConTableReader.getClass)
+  private val log = Logger[UdoConTableReader]
 
   def read(table: String): InputRoot = {
     val cells: Seq[Seq[String]] = table.split("\n", -1).filterNot(_.isEmpty) map (_.split("\t", -1).map(_.trim).toSeq) toSeq
@@ -22,30 +21,30 @@ class UdoConTableReader(params: Parameters) {
 
     val slots = Set("D1-afternoon", "D1-evening", "D2-afternoon", "D2-evening", "D3-afternoon")
 
-    val personsWithoutWeight: Seq[InputPerson] = cellsFirstLine drop params.personsStartingIndex map { n =>
+    val personsWithoutWeight: Seq[InputPerson] = cellsFirstLine drop udoSettings.personsStartingIndex map { n =>
       InputPerson(n, Some(Weight.Default.value), incompatible = Some(Set()), absences = Some(Set()))
     }
 
     val topicsWithoutPersons = cellsWithoutFirstLine map { line =>
       (
-        line(params.topicsIndex),
-        line(params.maxPlayersIndex),
-        params.minPlayersIndex.map(line).getOrElse("")
+        line(udoSettings.topicsIndex),
+        line(udoSettings.maxPlayersIndex),
+        udoSettings.minPlayersIndex.map(line).getOrElse("")
       )
     } map { case (topicName, max, min) =>
       InputTopic(
         name = topicName,
         mandatory = Some(Set()),
         forbidden = Some(Set()),
-        min = min.toIntOption,
-        max = max.toIntOption,
+        min = min.toIntOption.map(_ + 1), //add the GM
+        max = max.toIntOption.map(_ + 1), //add the GM
         forcedSlot = None
       )
     }
 
     val choices = personsWithoutWeight.zipWithIndex flatMap { case (person, ix) =>
       log.debug(s"Choices for $person.name at index $ix")
-      val personColumnIndex = ix + params.personsStartingIndex
+      val personColumnIndex = ix + udoSettings.personsStartingIndex
       val personColumn = cellsWithoutFirstLine map { line =>
         if (line.lengthCompare(personColumnIndex) <= 0) "" else line(personColumnIndex).trim
       }
@@ -61,7 +60,7 @@ class UdoConTableReader(params: Parameters) {
 
     val persons = choices.foldLeft(personsWithoutWeight) {
       case (currentPersons, ('gamemaster, personName, _)) => currentPersons replace {
-        case person if person.name == personName => person.copy(weight = Some(params.gamemasterWeight))
+        case person if person.name == personName => person.copy(weight = Some(udoSettings.gamemasterWeight.value))
       }
       case (currentPersons, _) => currentPersons
     } toSet
@@ -96,7 +95,8 @@ class UdoConTableReader(params: Parameters) {
 
     InputRoot(
       InputModel(
-        settings = params.settings,
+        settings = settings,
+        udoSettings = Some(udoSettings),
         slots = slots,
         persons = persons,
         topics = topics,
@@ -104,29 +104,5 @@ class UdoConTableReader(params: Parameters) {
       )
     )
   }
-
-}
-
-object UdoConTableReader {
-
-  /* All column indices are zero-based */
-  case class Parameters(
-                         /* Column at which the persons start on the first line */
-                         personsStartingIndex: Int,
-
-                         /* Column for the topics */
-                         topicsIndex: Int,
-
-                         /* Column for the min number of persons on that topic */
-                         minPlayersIndex: Option[Int],
-
-                         /* Column for the max number of persons on that topic */
-                         maxPlayersIndex: Int,
-
-                         /* Weight given to any gamemaster */
-                         gamemasterWeight: Double = 1.5,
-
-                         settings: InputSettings
-                       )
 
 }

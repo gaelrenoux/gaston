@@ -4,12 +4,15 @@ import fr.renoux.gaston.model._
 
 /* TODO try without the Options, using default values */
 
+/* All line and column indices are zero-based */
+
 case class InputRoot(
                       gaston: InputModel
                     )
 
 case class InputModel(
                        settings: InputSettings,
+                       udoSettings: Option[InputUdoSettings],
                        slots: Set[String],
                        persons: Set[InputPerson],
                        topics: Set[InputTopic],
@@ -23,6 +26,19 @@ case class InputSettings(
                           defaultMin: Int,
                           defaultMax: Int
                         )
+
+case class InputUdoSettings(
+                             /* Column at which the persons start on the first line */
+                             personsStartingIndex: Int,
+                             /* Column for the topics */
+                             topicsIndex: Int,
+                             /* Column for the min number of persons on that topic */
+                             minPlayersIndex: Option[Int],
+                             /* Column for the max number of persons on that topic */
+                             maxPlayersIndex: Int,
+                             /* Weight given to any gamemaster */
+                             gamemasterWeight: Weight
+                           )
 
 case class InputPreference(
                             person: String,

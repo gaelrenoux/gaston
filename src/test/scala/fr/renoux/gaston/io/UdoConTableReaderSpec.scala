@@ -2,8 +2,8 @@ package fr.renoux.gaston.io
 
 import java.io.File
 
-import fr.renoux.gaston.io.UdoConTableReader.Parameters
-import fr.renoux.gaston.model.Score
+import ai.x.diff.DiffShow
+import fr.renoux.gaston.model.{Score, Weight}
 import org.scalatest.{FlatSpec, Matchers}
 import pureconfig.loadConfigFromFiles
 
@@ -11,28 +11,32 @@ import scala.io.Source
 
 class UdoConTableReaderSpec extends FlatSpec with Matchers {
 
-  val reader = new UdoConTableReader(Parameters(
+  val udoSettings = InputUdoSettings(
     personsStartingIndex = 4,
     topicsIndex = 0,
     maxPlayersIndex = 2,
     minPlayersIndex = None,
-    settings = InputSettings(
-      weakPreference = Score(1),
-      strongPreference = Score(5),
-      incompatibilityAntiPreference = Score(-50),
-      defaultMin = 3,
-      defaultMax = 5
-    )
-  ))
+    gamemasterWeight = Weight(1.5)
+  )
+
+  val settings = InputSettings(
+    weakPreference = Score(1),
+    strongPreference = Score(5),
+    incompatibilityAntiPreference = Score(-50),
+    defaultMin = 4,
+    defaultMax = 6
+  )
+
+  val reader = new UdoConTableReader(udoSettings, settings)
 
   behavior of "read"
   it should "read correctly" in {
     val table = Source.fromResource("udocon-table.csv").mkString
     val input = reader.read(table)
 
-    val file = new File(getClass.getResource("/application.conf").getPath)
-    val expected = loadConfigFromFiles[InputRoot](Seq(file.toPath)).right.get
+    val expected = InputLoader.fromClassPath("udocon-table-formatted.conf").forceToInput
 
+    println(DiffShow.diff[InputRoot](input, expected).string)
     input should be(expected)
   }
 
@@ -42,8 +46,9 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     val rendered = InputLoader.render(input)
 
     val evaluated = InputLoader.fromString(rendered).forceToInput
-    val expected = InputLoader.fromClassPath("application.conf").forceToInput
+    val expected = InputLoader.fromClassPath("udocon-table-formatted.conf").forceToInput
 
+    println(DiffShow.diff[InputRoot](input, expected).string)
     evaluated should be(expected)
   }
 

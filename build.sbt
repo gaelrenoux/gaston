@@ -30,5 +30,6 @@ libraryDependencies ++= Seq(
   "org.scalaz" %% "scalaz-core" % "7.2.19",
 
   //"org.scalactic" %% "scalactic" % "3.0.1",
+  "ai.x" %% "diff" % "2.0",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )

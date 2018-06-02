@@ -6,7 +6,6 @@ import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, SystematicScheduleIm
 import fr.renoux.gaston.io.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.{Person, Schedule, Score}
-import fr.renoux.gaston.util.MapImplicits._
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
@@ -85,10 +84,10 @@ class GeneralTest extends FlatSpec with Matchers {
     }
 
     val satisfiedPreferencesCountByPerson = satisfiedPreferencesByPerson.map { case (person, preferences) =>
-      person.name  -> (preferences.count(_._2), preferences.count(!_._2))
+      person.name -> (preferences.count(_._2), preferences.count(!_._2))
     }
     val satisfiedPreferencesCountByPersonLastYear = satisfiedPreferencesByPersonLastYear.map { case (person, preferences) =>
-      person.name  -> (preferences.count(_._2), preferences.count(!_._2))
+      person.name -> (preferences.count(_._2), preferences.count(!_._2))
     }
     val satisfiedPreferencesCountText = problem.persons map { p =>
       val name = p.name.padTo(8, ' ').take(8)

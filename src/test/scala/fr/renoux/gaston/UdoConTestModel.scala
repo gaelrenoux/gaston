@@ -90,17 +90,16 @@ object UdoConTestModel {
       Set(PersonTopicInterdiction(topic = Topic("Le Retour de Soth"), person = Persons.byName("Tolkraft"))
       )
 
-    val AllInterdictions: Set[Constraint] = SelectedInterdictions ++
-      Set()
+    val AllInterdictions: Set[Constraint] = SelectedInterdictions ++ Set()
 
-    val Absences: Set[Constraint] = Set()
+    val Absences: Set[Constraint] = Set(PersonAbsence(Persons.byName("Ozen"), Slot("D3-afternoon")))
 
     val SelectedNumbers: Set[Constraint] =
       Set(
         TopicNeedsNumberOfPersons(Topic("Agôn"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("DC comics - Darkest night"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Les Schtroumpfs"), min = 4, max = 6),
-        TopicNeedsNumberOfPersons(Topic("Shadow of the Demon Lord"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Shadow of the Demon Lord"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Delta Green - Scénario original"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Blades in the Dark"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Skyrealms of Jorune Revival"), min = 4, max = 6),
@@ -114,7 +113,7 @@ object UdoConTestModel {
         TopicNeedsNumberOfPersons(Topic("Tales from the Loop"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Donjon & Cie"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("P.U.N.C.H Unit - Katanga 1960"), min = 4, max = 5),
-        TopicNeedsNumberOfPersons(Topic("Delta Green - Pennsylvania '99"), min = 4, max = 5),
+        TopicNeedsNumberOfPersons(Topic("Delta Green - Pennsylvania '99"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Inflorenza (ambiance Patient 13)"), min = 4, max = 5),
         TopicNeedsNumberOfPersons(Topic("KPDP dans le Dodécaèdre"), min = 4, max = 6),
         TopicNeedsNumberOfPersons(Topic("Summer camp - classe de neige"), min = 4, max = 7),
