@@ -18,14 +18,14 @@ class SystematicScheduleImprover(problem: Problem) extends ScheduleImprover(prob
   override def improve(schedule: Schedule, initialScore: Score, rounds: Int = 1000)(implicit rand: Random): Schedule =
     systematicAmelioration(schedule, initialScore, rounds)
 
-  /** Systematically explores all swaps. Not perfect because it only swaps, it does not explore more. Slower than the randomized method. */
+  /** Systematically explores all swaps. Slower than the randomized method. */
   @tailrec
   private def systematicAmelioration(schedule: Schedule, score: Score, maxRounds: Int = 1000, slots: Queue[Slot] = Queue(problem.slots.toSeq: _*)): Schedule =
   if (maxRounds == 0) {
     log.info("Stopping systematic amelioration because max number of rounds was reached")
     schedule
   } else if (slots.isEmpty) {
-    log.info("Stopping systematic amelioration because all slots are perfect")
+    log.info(s"Stopping systematic amelioration because all slots are perfect ($maxRounds rounds left)")
     schedule
   } else {
     val (slot, slotsTail) = slots.dequeue
@@ -36,7 +36,7 @@ class SystematicScheduleImprover(problem: Problem) extends ScheduleImprover(prob
       systematicAmelioration(schedule, score, maxRounds - 1, slotsTail)
   }
 
-  /** Returns the best possible swap on a specific slot */
+  /** Returns the best possible move or swap on a specific slot */
   private def bestMoveOnSlot(schedule: Schedule, slot: Slot): Option[(Schedule, Score)] = {
     val topics = schedule.topicsPerSlot(slot)
     val records = schedule.records.filter(_.slot == slot)
