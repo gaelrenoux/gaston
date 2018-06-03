@@ -1,7 +1,7 @@
 import sbt.Keys._
 
 name := "gaston"
-version := "1.0-SNAPSHOT"
+version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.12.4"
 scalacOptions ++= Seq(
