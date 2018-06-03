@@ -8,10 +8,10 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.Random
 
 case class CommandLine(
-                        inputFile: Path = Paths.get(""),
+                        inputFile: Option[Path] = None,
                         udoConTableFile: Option[Path] = None,
+                        useSample: Boolean = false,
                         generateInput: Boolean = false,
-                        continuousOutput: Boolean = true,
                         silent: Boolean = false,
                         verbose: Boolean = false,
                         maxDuration: Option[FiniteDuration] = None,
@@ -29,9 +29,13 @@ object CommandLine {
   private val parser = new scopt.OptionParser[CommandLine]("gaston") {
     head("gaston", "0.1")
 
-    opt[Path]('f', "from").required().valueName("<file>")
-      .action((path, in) => in.copy(inputFile = path))
+    opt[Path]('f', "from").optional().valueName("<file>")
+      .action((path, in) => in.copy(inputFile = Some(path)))
       .text("The input file")
+
+    opt[Unit]('a', "from-sample").optional()
+      .action((path, in) => in.copy(useSample = true))
+      .text("Use a sample input")
 
     opt[Path]('u', "from-udo-table").optional().valueName("<file>")
       .action((path, in) => in.copy(udoConTableFile = Some(path)))
@@ -39,7 +43,7 @@ object CommandLine {
 
     opt[Unit]('g', "generate-input").optional()
       .action((_, in) => in.copy(generateInput = true))
-      .text("Output only the generated input file, do not generate a schedule")
+      .text("Output only the input file about to be used, do not generate a schedule")
 
     opt[Unit]('s', "silent").optional()
       .action((_, in) => in.copy(silent = true))

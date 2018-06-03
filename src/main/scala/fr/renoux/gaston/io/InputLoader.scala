@@ -34,7 +34,9 @@ class InputLoader {
       write(config)
       close()
     }
-    fromPath(file.toPath)
+    val r = fromPath(file.toPath)
+    file.deleteOnExit()
+    r
   }
 
   /** Render a configuration into a String. */
