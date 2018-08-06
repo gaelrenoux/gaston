@@ -14,11 +14,11 @@ abstract class AbstractConstraint[Checked] extends Constraint {
   override val isApplicableToPartialSolution: Boolean = true
 
   /** How many times is this constraint broken on the schedule */
-  override def countBroken(schedule: Schedule): Int = elementsChecked(schedule) filterNot check size
+  override def countBroken(schedule: Schedule): Int = elementsChecked(schedule).filterNot(check).size
 
   /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean = {
-    val bool = elementsChecked(schedule) forall check
+    val bool = elementsChecked(schedule).forall(check)
     if (!bool) log.debug(s"Constraint $this is broken on $schedule")
     bool
   }
