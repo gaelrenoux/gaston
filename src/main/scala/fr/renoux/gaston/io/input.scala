@@ -57,6 +57,7 @@ case class InputTopic(
                        name: String,
                        mandatory: Option[Set[String]],
                        forbidden: Option[Set[String]],
+                       linked: Option[Set[String]],
                        min: Option[Int],
                        max: Option[Int],
                        forcedSlot: Option[String]
