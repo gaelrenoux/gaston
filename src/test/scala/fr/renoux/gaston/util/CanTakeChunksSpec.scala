@@ -6,10 +6,10 @@ import org.scalatest.{FlatSpec, Matchers}
 /**
   * Created by gael on 07/05/17.
   */
-class CollectionImplicitsSpec extends FlatSpec with Matchers {
-  val log = Logger[CollectionImplicitsSpec]
+class CanTakeChunksSpec extends FlatSpec with Matchers {
+  val log = Logger[CanTakeChunksSpec]
 
-  import CollectionImplicits._
+  import CanTakeChunks._
 
   val TestList = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
 

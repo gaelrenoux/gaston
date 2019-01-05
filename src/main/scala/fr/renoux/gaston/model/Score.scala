@@ -2,16 +2,20 @@ package fr.renoux.gaston.model
 
 import java.text.DecimalFormat
 
+/** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
+  * when combining preferences. Negative preferences ("I'd rather not…") have a negative score when triggered. */
 case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
+  /** Adds two scores */
   def +(s: Score) = Score(value + s.value)
-  def +(i: Int) = Score(value + i)
-  def +(l: Long) = Score(value + l)
 
-  def *(w: Weight) = Score(value * w.value)
+  /** Multiply a score by a constant factor */
   def *(i: Int) = Score(value * i)
+
+  /** Multiply a score by a constant factor */
   def *(l: Long) = Score(value * l)
 
+  /** Divide a score by a weight */
   def /(w: Weight) = Score(value / w.value)
 
   def negative = Score(-value)
@@ -29,6 +33,7 @@ object Score {
 
   val MinValue = Score(Double.MinValue)
 
+  /** Implementation of the Fractional typeclass for Score */
   implicit object ScoreIsFractional extends Fractional[Score] {
     override def plus(x: Score, y: Score): Score = Score(x.value + y.value)
 

@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.{Person, Schedule, Score}
 import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.{Person, Schedule, Score}
 
 class Scoring(problem: Problem) {
 

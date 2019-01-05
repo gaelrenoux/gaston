@@ -1,11 +1,8 @@
 package fr.renoux.gaston.io
 
-import java.io.File
-
 import ai.x.diff.DiffShow
 import fr.renoux.gaston.model.{Score, Weight}
 import org.scalatest.{FlatSpec, Matchers}
-import pureconfig.loadConfigFromFiles
 
 import scala.io.Source
 

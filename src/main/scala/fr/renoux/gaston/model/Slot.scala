@@ -1,6 +1,4 @@
 package fr.renoux.gaston.model
 
-/**
-  * A slot in the schedule. The same people can't be twice on the same slot.
-  */
-case class Slot(name: String)
+/** A slot in the schedule. A person can only have one topic during a slot. */
+case class Slot(name: String) extends AnyVal

@@ -3,12 +3,12 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model.{Schedule, Slot, Topic}
 
 /**
-  * A person must be assigned to an instance of this topic.
+  * That topic must be on that slot.
   */
 case class TopicForcedSlot(topic: Topic, slot: Slot) extends AbstractConstraint[(Schedule, Slot, Set[Topic])] {
 
   override protected def elementsChecked(schedule: Schedule): Iterable[(Schedule, Slot, Set[Topic])] =
-    schedule.topicsPerSlot map {
+    schedule.topicsPerSlot.map {
       case (s, ts) => (schedule, s, ts)
     }
 

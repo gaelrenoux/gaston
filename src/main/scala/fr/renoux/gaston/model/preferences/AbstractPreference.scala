@@ -9,9 +9,9 @@ abstract class AbstractPreference[Scored] extends Preference {
 
   def score(schedule: Schedule): Score = elementsScored(schedule).map(score).sum
 
-  /** On a schedule, what are the elements to look at to now if it's working. */
+  /** On a schedule, the elements to check the preference on. */
   protected def elementsScored(schedule: Schedule): Iterable[Scored]
 
-  /** How to score a preference on one those elements. Does NOT apply the weight ! */
+  /** Score a preference on one those elements. Does NOT apply the weight ! */
   protected def score(checked: Scored): Score
 }

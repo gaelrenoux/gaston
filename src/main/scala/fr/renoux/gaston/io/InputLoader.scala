@@ -6,7 +6,6 @@ import java.nio.file.Path
 import fr.renoux.gaston.model.problem.Problem
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
-
 import scalaz.Validation.FlatMap._
 import scalaz.syntax.ToValidationOps
 import scalaz.syntax.apply._

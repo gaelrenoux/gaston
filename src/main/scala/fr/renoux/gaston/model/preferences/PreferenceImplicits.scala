@@ -2,10 +2,8 @@ package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model.{Person, Score, Topic}
 
-/**
-  * Created by gael on 07/05/17.
-  */
-object Implicits {
+
+object PreferenceImplicits {
 
   implicit class PreferencesOps(wrapped: Iterable[_ <: Preference]) {
 

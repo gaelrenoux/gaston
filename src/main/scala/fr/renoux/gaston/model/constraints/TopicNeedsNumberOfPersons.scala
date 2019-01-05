@@ -5,6 +5,7 @@ import fr.renoux.gaston.model.{Person, Schedule, Topic}
 /**
   * Min and max number of persons on a topic. Remember it includes everyone, even mandatory persons !
   */
+//TODO separate in min and max, to facilitate partial checking
 case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends AbstractConstraint[(Topic, Set[Person])] {
 
   override protected def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
@@ -13,10 +14,10 @@ case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends A
     topic != checked._1 || checkBetweenMinMax(checked._2.size)
   }
 
-  private def checkBetweenMinMax(value: Int) = value >= min && value <= max
+  private def checkBetweenMinMax(value: Int): Boolean = value >= min && value <= max
 
 
   /** If there's a minimum, you can't check a partial solution */
-  override val isApplicableToPartialSolution: Boolean = min == 0
+  override val isApplicableToPartialSchedule: Boolean = min == 0
 
 }

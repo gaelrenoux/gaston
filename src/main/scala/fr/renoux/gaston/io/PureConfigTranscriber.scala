@@ -4,7 +4,6 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Slot, Topic, Weight}
-
 import scalaz.ValidationNel
 import scalaz.syntax.ToValidationOps
 

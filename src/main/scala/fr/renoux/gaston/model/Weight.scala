@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+/** The higher the weight of a person, the more its preferences matter when calculating a score for a set of preferences
+  * involving multiple persons. */
 case class Weight(value: Double) extends AnyVal {
   def *(s: Score) = Score(value * s.value)
 }
@@ -8,10 +10,12 @@ object Weight {
 
   val Default = Weight(1.0)
 
+  /** Multiply all arguments weights (at least one) together */
   def combine(w: Weight, ws: Weight*): Weight = Weight(
     ws.map(_.value).foldLeft(w.value)(_ * _)
   )
 
+  /** Implementation of the Fractional typeclass for Weight */
   implicit object WeightIsFractional extends Fractional[Weight] {
     override def plus(x: Weight, y: Weight): Weight = Weight(x.value + y.value)
 
