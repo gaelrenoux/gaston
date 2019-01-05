@@ -21,6 +21,7 @@ object Main {
         else None.right
 
       explicitInputRoot <- commandLine.inputFile map {path =>
+        log.info(s"Loading from $path")
         InputLoader.fromPath(path).toInput.disjunction.map(Some(_))
       } getOrElse None.right
 
