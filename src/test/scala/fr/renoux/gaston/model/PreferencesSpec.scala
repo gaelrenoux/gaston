@@ -1,13 +1,13 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.io.{InputLoader, InputSettings}
+import fr.renoux.gaston.io.{PureConfigLoader, InputSettings}
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by gael on 07/05/17.
   */
 class PreferencesSpec extends FlatSpec with Matchers {
-  private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
+  private implicit val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
   private val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 
   import SimpleTestModel.Preferences._

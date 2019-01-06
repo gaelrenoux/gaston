@@ -5,34 +5,37 @@ import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopi
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Slot, Topic, Weight}
 import scalaz.ValidationNel
-import scalaz.syntax.ToValidationOps
+import scalaz.syntax.validation._
 
-object PureConfigTranscriber extends ToValidationOps {
+/** Converts the PureConfig input object to the Problem object. */
+object PureConfigTranscriber {
 
-    /** Load the real input from the user model */
+  /** Load the real input from the user model. */
   def transcribe(inputRoot: InputRoot): ValidationNel[String, Problem] = {
+    //TODO real validation !
     val input: InputModel = inputRoot.gaston
 
-    val slotsPerName = input.slots map { s => s -> Slot(s) } toMap
-    val topicsPerName = input.topics map { t => t.name -> Topic(t.name) } toMap
-    val personsPerName = input.persons map { p => p.name -> Person(p.name, p.weight.map(Weight(_)).getOrElse(Weight.Default)) } toMap
-    val maps = Maps(slotsPerName, topicsPerName, personsPerName)
+    val slotsPerName = input.slots.map { s => s -> Slot(s) }.toMap
+    val topicsPerName = input.topics.map { t => t.name -> Topic(t.name) }.toMap
+    val personsPerName = input.persons.map { p => p.name -> Person(p.name, Weight(p.weight)) }.toMap
+    val ctx = Context(slotsPerName, topicsPerName, personsPerName)
 
-    val absenceConstraints = getAbsenceConstraints(input, maps)
+    val absenceConstraints = getAbsenceConstraints(input, ctx)
 
-    val interdictionConstraints = getInterdictionConstraints(input, maps)
+    val interdictionConstraints = getInterdictionConstraints(input, ctx)
 
-    val obligationConstraints = getObligationConstraints(input, maps)
+    val obligationConstraints = getObligationConstraints(input, ctx)
 
-    val numberConstraints = getNumberConstraints(input, maps)
+    val numberConstraints = getNumberConstraints(input, ctx)
 
-    val forcedSlotConstraints = getForcedTopicConstraints(input, maps)
+    val forcedSlotConstraints = getForcedTopicConstraints(input, ctx)
 
-    val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++ numberConstraints ++ forcedSlotConstraints
+    val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++
+      numberConstraints ++ forcedSlotConstraints
 
-    val incompatibilityPreferences = getIncompatibilityPreferences(input, maps)
+    val incompatibilityPreferences = getGroupAntiPreferences(input, ctx)
 
-    val personPreferences = getPersonPreferences(input, maps)
+    val personPreferences = getTopicPreferences(input, ctx)
 
     val preferences = Set[Preference]() ++ incompatibilityPreferences ++ personPreferences
 
@@ -45,63 +48,57 @@ object PureConfigTranscriber extends ToValidationOps {
     ).success
   }
 
-  private def getAbsenceConstraints(input: InputModel, maps: Maps) = {
-    input.persons.collect {
-      case ip if ip.absences.isDefined =>
-        ip.absences.get map { s => PersonAbsence(maps.personsPerName(ip.name), maps.slotsPerName(s)) }
-    } flatten
-  }
-
-  private def getInterdictionConstraints(input: InputModel, maps: Maps) = {
-    input.topics flatMap { inTopic =>
-      inTopic.forbidden.getOrElse(Set()).map(maps.personsPerName).map(PersonTopicInterdiction(_, maps.topicsPerName(inTopic.name)))
+  private def getAbsenceConstraints(input: InputModel, ctx: Context): Set[PersonAbsence] =
+    input.persons.flatMap { ip =>
+      ip.absences.map(ctx.slotsPerName).map(PersonAbsence(ctx.personsPerName(ip.name), _))
     }
-  }
 
-  private def getObligationConstraints(input: InputModel, maps: Maps) = {
-    input.topics flatMap { inTopic =>
-      inTopic.mandatory.getOrElse(Set()).map(maps.personsPerName).map(PersonTopicObligation(_, maps.topicsPerName(inTopic.name)))
+  private def getInterdictionConstraints(input: InputModel, ctx: Context): Set[PersonTopicInterdiction] =
+    input.topics.flatMap { it =>
+      it.forbidden.map(ctx.personsPerName).map(PersonTopicInterdiction(_, ctx.topicsPerName(it.name)))
     }
-  }
 
-  private def getNumberConstraints(input: InputModel, maps: Maps) = {
+  private def getObligationConstraints(input: InputModel, ctx: Context): Set[PersonTopicObligation] =
+    input.topics.flatMap { it =>
+      it.mandatory.map(ctx.personsPerName).map(PersonTopicObligation(_, ctx.topicsPerName(it.name)))
+    }
+
+
+  private def getNumberConstraints(input: InputModel, ctx: Context): Set[TopicNeedsNumberOfPersons] =
     input.topics map { inTopic =>
-      val topic = maps.topicsPerName(inTopic.name)
+      val topic = ctx.topicsPerName(inTopic.name)
       val min = inTopic.min.getOrElse(input.settings.defaultMin)
       val max = inTopic.max.getOrElse(input.settings.defaultMax)
       TopicNeedsNumberOfPersons(topic, min, max)
     }
-  }
 
-  private def getForcedTopicConstraints(input: InputModel, maps: Maps) = {
+  private def getForcedTopicConstraints(input: InputModel, maps: Context): Set[TopicForcedSlot] =
     input.topics flatMap { inTopic =>
       inTopic.forcedSlot.map(maps.slotsPerName).map(TopicForcedSlot(maps.topicsPerName(inTopic.name), _))
     }
-  }
 
-  private def getIncompatibilityPreferences(input: InputModel, maps: Maps) = {
+  private def getGroupAntiPreferences(input: InputModel, ctx: Context): Set[PersonGroupAntiPreference] =
     input.persons.collect {
-      case ip if ip.incompatible.getOrElse(Set()).nonEmpty =>
-        val person = maps.personsPerName(ip.name)
-        val group = ip.incompatible.get.map(maps.personsPerName)
+      case ip if ip.incompatible.nonEmpty =>
+        val person = ctx.personsPerName(ip.name)
+        val group = ip.incompatible.map(ctx.personsPerName)
         PersonGroupAntiPreference(person, group, input.settings.incompatibilityAntiPreference)
     }
-  }
 
-  private def getPersonPreferences(input: InputModel, maps: Maps) = {
-    input.preferences.getOrElse(Set()) flatMap { case InputPreference(p, strongs, weaks) =>
-      val person = maps.personsPerName(p)
-      val all = strongs.getOrElse(Set()).map((_, input.settings.strongPreference)) ++ weaks.getOrElse(Set()).map((_, input.settings.weakPreference))
-      all map { case (t, reward) =>
-        PersonTopicPreference(person, maps.topicsPerName(t), reward)
+  private def getTopicPreferences(input: InputModel, ctx: Context): Set[PersonTopicPreference] = {
+    input.preferences.flatMap { case InputPreference(p, strongs, weaks) =>
+      val person = ctx.personsPerName(p)
+      val all = strongs.map((_, input.settings.strongPreference)) ++ weaks.map((_, input.settings.weakPreference))
+      all.map { case (t, reward) =>
+        PersonTopicPreference(person, ctx.topicsPerName(t), reward)
       }
     }
   }
 
-  private case class Maps(
-                           slotsPerName: Map[String, Slot],
-                           topicsPerName: Map[String, Topic],
-                           personsPerName: Map[String, Person]
-                         )
+  private case class Context(
+      slotsPerName: Map[String, Slot],
+      topicsPerName: Map[String, Topic],
+      personsPerName: Map[String, Person]
+  )
 
 }

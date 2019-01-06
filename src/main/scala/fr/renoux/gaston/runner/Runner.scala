@@ -15,13 +15,13 @@ import scala.concurrent.duration._
 import scala.util.Random
 
 class Runner(
-              settings: InputSettings,
-              problem: Problem,
-              maxDuration: Option[FiniteDuration] = None,
-              silent: Boolean = false,
-              verbose: Boolean = false,
-              seed: Long = Random.nextLong()
-            ) {
+    settings: InputSettings,
+    problem: Problem,
+    maxDuration: Option[FiniteDuration] = None,
+    silent: Boolean = false,
+    verbose: Boolean = false,
+    seed: Long = Random.nextLong()
+) {
 
 
   private val log = Logger[Runner]
@@ -36,11 +36,10 @@ class Runner(
 
   private val LogFrequenceMillis = (20 seconds).toMillis
 
-  private val enhancerIterations = 10000
-
   private val DecimalFormat = new DecimalFormat("000.00")
 
 
+  /** Produces a schedule and the associated score */
   def run(): (Schedule, Score) = {
     val (schedule, score) = runRecursive(Instant.now(), 0, Schedule(0), Score.MinValue)
     /* Print final result if needed */
@@ -48,27 +47,35 @@ class Runner(
     (schedule, score)
   }
 
+  /** Recursive run: if it still has time, produces a schedule then invokes itself again . */
   @tailrec
-  private def runRecursive(lastLog: Instant, count: Long, currentSchedule: Schedule, currentScore: Score): (Schedule, Score) = {
+  private def runRecursive(
+      lastLog: Instant, count: Long, currentSchedule: Schedule, currentScore: Score
+  ): (Schedule, Score) = {
     val now = Instant.now()
 
+    /* If time's out, stop now */
     if (timeout.exists(_ isBefore now)) {
       log.info(s"We have tried $count schedules ! It is time to stop !")
       (currentSchedule, currentScore)
+
     } else {
-      val newLastLog = if (now isBefore lastLog.plusMillis(LogFrequenceMillis)) lastLog else {
+      /* If the last log is old enough, render the current best schedule */
+      val newLastLog = if (now isAfter lastLog.plusMillis(LogFrequenceMillis)) {
         render(currentSchedule, currentScore)
         log.info(s"We have tried $count schedules !")
         Instant.now()
-      }
+      } else lastLog
 
+      /* Run once then recurse */
       val (schedule, score) = runOnce()
-      if (score > currentScore) runRecursive(newLastLog, count +1, schedule, score)
-      else runRecursive(newLastLog, count +1, currentSchedule, currentScore)
+      if (score > currentScore) runRecursive(newLastLog, count + 1, schedule, score)
+      else runRecursive(newLastLog, count + 1, currentSchedule, currentScore)
     }
   }
 
-  def runOnce() = {
+  /** Produces a schedule and its score */
+  def runOnce(): (Schedule, Score) = {
     val Some(initialSolution) = csFactory.makeSchedule
     val initialScore = psFactory.score(initialSolution)
 
@@ -78,10 +85,9 @@ class Runner(
     (finalSolution, finalScore)
   }
 
+  /** Renders the schedule to the user */
   def render(schedule: Schedule, score: Score): Unit = {
-    log.info(s"Schedule is \n${
-      schedule.toFormattedString
-    }\n")
+    log.info(s"Schedule is \n${schedule.toFormattedString}\n")
     log.info(s"Schedule score is $score")
 
     val weightedScoresByPerson = psFactory.weightedScoresByPerson(schedule)

@@ -22,7 +22,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     val slots = Set("D1-afternoon", "D1-evening", "D2-afternoon", "D2-evening", "D3-afternoon")
 
     val personsWithoutWeight: Seq[InputPerson] = cellsFirstLine drop udoSettings.personsStartingIndex map { n =>
-      InputPerson(n, Some(Weight.Default.value), incompatible = Some(Set()), absences = Some(Set()))
+      InputPerson(n, Weight.Default.value, incompatible = Set(), absences = Set())
     }
 
     val topicsWithoutPersons = cellsWithoutFirstLine map { line =>
@@ -34,9 +34,9 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     } map { case (topicName, max, min) =>
       InputTopic(
         name = topicName,
-        mandatory = Some(Set()),
-        forbidden = Some(Set()),
-        linked = None, //TODO should be some Set
+        mandatory = Set(),
+        forbidden = Set(),
+        linked = Set(),
         min = min.toIntOption.map(_ + 1), //add the GM
         max = max.toIntOption.map(_ + 1), //add the GM
         forcedSlot = None
@@ -61,7 +61,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
 
     val persons = choices.foldLeft(personsWithoutWeight) {
       case (currentPersons, ('gamemaster, personName, _)) => currentPersons replace {
-        case person if person.name == personName => person.copy(weight = Some(udoSettings.gamemasterWeight.value))
+        case person if person.name == personName => person.copy(weight = udoSettings.gamemasterWeight.value)
       }
       case (currentPersons, _) => currentPersons
     } toSet
@@ -70,24 +70,24 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
 
     val topics = choices.foldLeft(topicsWithoutPersons) {
       case (currentTopics, ('gamemaster, personName, topicName)) => currentTopics replace {
-        case topic if topic.name == topicName => topic.copy(mandatory = Some(topic.mandatory.getOrElse(Set()) + personName))
+        case topic if topic.name == topicName => topic.copy(mandatory = topic.mandatory + personName)
       }
       case (currentTopics, ('forbidden, personName, topicName)) => currentTopics replace {
-        case topic if topic.name == topicName => topic.copy(forbidden = Some(topic.forbidden.getOrElse(Set()) + personName))
+        case topic if topic.name == topicName => topic.copy(forbidden = topic.forbidden + personName)
       }
       case (currentTopics, _) => currentTopics
     } toSet
 
     log.debug(s"Topics: $topics")
 
-    val emptyPreferences = personsWithoutWeight map { p => InputPreference(p.name, Some(Set()), Some(Set())) }
+    val emptyPreferences = personsWithoutWeight map { p => InputPreference(p.name, Set(), Set()) }
 
     val preferences = choices.foldLeft(emptyPreferences) {
       case (currentPreferences, ('weak, personName, topicName)) => currentPreferences replace {
-        case pref if pref.person == personName => pref.copy(weak = Some(pref.weak.getOrElse(Set()) + topicName))
+        case pref if pref.person == personName => pref.copy(weak = pref.weak + topicName)
       }
       case (currentPreferences, ('strong, personName, topicName)) => currentPreferences replace {
-        case pref if pref.person == personName => pref.copy(strong = Some(pref.strong.getOrElse(Set()) + topicName))
+        case pref if pref.person == personName => pref.copy(strong = pref.strong + topicName)
       }
       case (currentPreferences, _) => currentPreferences
     } toSet
@@ -101,7 +101,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
         slots = slots,
         persons = persons,
         topics = topics,
-        preferences = Some(preferences)
+        preferences = preferences
       )
     )
   }

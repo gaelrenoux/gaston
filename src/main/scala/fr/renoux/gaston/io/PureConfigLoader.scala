@@ -11,10 +11,14 @@ import scalaz.syntax.ToValidationOps
 import scalaz.syntax.apply._
 import scalaz.{Failure, NonEmptyList, Success, ValidationNel}
 
+/** Load the PureConfig input object from the configuration files. */
+class PureConfigLoader {
+  //TODO handle exceptions
 
-class InputLoader {
+  import PureConfigLoader._
 
-  import InputLoader._
+  /* Do not delete the pureconfig.generic.auto._ import even though IntelliJ marks is as unused */
+  import pureconfig.generic.auto._
 
   def fromPath(files: Path*) = new Result(loadConfigFromFiles[InputRoot](files))
 
@@ -45,7 +49,7 @@ class InputLoader {
 
 }
 
-object InputLoader extends InputLoader with ToValidationOps {
+object PureConfigLoader extends PureConfigLoader with ToValidationOps {
 
   class Result(wrapped: Either[ConfigReaderFailures, InputRoot]) {
 
@@ -60,13 +64,19 @@ object InputLoader extends InputLoader with ToValidationOps {
     def toInputAndModel[A]: ValidationNel[String, (InputRoot, Problem)] = (toInput |@| toModel) ((_, _))
 
     def forceToInput: InputRoot = toInput match {
-      case Failure(failures) => throw new IllegalStateException(s"Could not parse configuration:\n${failures.list.toList.mkString("\n")}")
+      case Failure(failures) => throw new IllegalStateException(s"Could not parse configuration:\n${
+        failures.list.toList.mkString("\n")
+      }")
       case Success(res) => res
     }
 
     def forceToModel: Problem = wrapped.right.map(PureConfigTranscriber.transcribe) match {
-      case Left(failures) => throw new IllegalStateException(s"Could not parse configuration:\n${failures.toList.mkString("\n")}")
-      case Right(Failure(failures)) => throw new IllegalStateException(s"Could not convert configuration to model:\n${failures.list.toList.mkString("\n")}")
+      case Left(failures) => throw new IllegalStateException(s"Could not parse configuration:\n${
+        failures.toList.mkString("\n")
+      }")
+      case Right(Failure(failures)) => throw new IllegalStateException(s"Could not convert configuration to model:\n${
+        failures.list.toList.mkString("\n")
+      }")
       case Right(Success(res)) => res
     }
 

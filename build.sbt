@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.7",
 
   "com.typesafe" % "config" % "1.3.1",
-  "com.github.pureconfig" %% "pureconfig" % "0.8.0",
+  "com.github.pureconfig" %% "pureconfig" % "0.10.1",
   "com.github.scopt" %% "scopt" % "3.7.0",
 
   "org.scalaz" %% "scalaz-core" % "7.2.19",

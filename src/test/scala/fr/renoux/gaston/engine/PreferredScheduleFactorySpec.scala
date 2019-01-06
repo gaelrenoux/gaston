@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.{InputLoader, InputSettings}
+import fr.renoux.gaston.io.{PureConfigLoader, InputSettings}
 import fr.renoux.gaston.model.Schedule
 import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
 import org.scalatest.{FlatSpec, Matchers}
@@ -13,7 +13,7 @@ import scala.util.Random
   */
 class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
   private val log = Logger[PreferredScheduleFactorySpec]
-  private implicit val settings: InputSettings = InputLoader.fromClassPath.forceToInput.gaston.settings
+  private implicit val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
   private val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
 
 
@@ -77,7 +77,7 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
     for (seed <- 0L until 1L) {
       implicit val random = new Random(0L)
 
-      val problem = InputLoader.fromClassPath("application.conf").forceToModel
+      val problem = PureConfigLoader.fromClassPath("application.conf").forceToModel
       val problematicConstraints = problem.constraints collect {
         case c@TopicNeedsNumberOfPersons(_, _, max) if max < 6 => c
       }
