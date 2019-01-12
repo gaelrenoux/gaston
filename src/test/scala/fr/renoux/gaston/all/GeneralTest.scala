@@ -2,7 +2,7 @@ package fr.renoux.gaston.all
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.UdoConTestModel
-import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, Scoring, SystematicScheduleImprover}
+import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, Scorer, SystematicScheduleImprover}
 import fr.renoux.gaston.io.{InputSettings, PureConfigLoader}
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.{Person, Schedule, Score}
@@ -24,8 +24,9 @@ class GeneralTest extends FlatSpec with Matchers {
     var bestSchedule = Schedule(0)
     var bestScore = Double.NegativeInfinity
 
+    val scorer = new Scorer(problem)
     val csFactory = new ConstrainedScheduleFactory(problem)
-    val psFactory = new SystematicScheduleImprover(problem)
+    val psFactory = new SystematicScheduleImprover(problem, scorer)
 
     val lastYear = UdoConTestModel.Solutions.Actual
     log.info(s"Was solved last year: " + problem.isSolvedBy(lastYear))
@@ -37,11 +38,11 @@ class GeneralTest extends FlatSpec with Matchers {
       log.info(s"Starting to create solution for seed $seed")
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = psFactory.score(initialSolution)
+      val initialScore = scorer.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): ${initialSolution.toFormattedString}")
 
       val finalSolution = psFactory.improve(initialSolution, initialScore, 10000)
-      val finalScore = psFactory.score(finalSolution)
+      val finalScore = scorer.score(finalSolution)
       log.info(s"Solution (score $finalScore): ${finalSolution.toFormattedString}")
 
       problem.isSolvedBy(finalSolution) should be(true)
@@ -53,13 +54,13 @@ class GeneralTest extends FlatSpec with Matchers {
       }
     }
 
-    val Scoring.Detail(_, minForBestScore, sumForBestScore) = psFactory.scoreDetailed(bestSchedule)
-    val Scoring.Detail(scoreLastYear, minForScoreLastYear, sumForScoreLastYear) = psFactory.scoreDetailed(lastYear)
+    val Scorer.Detail(_, minForBestScore, sumForBestScore) = scorer.scoreDetailed(bestSchedule)
+    val Scorer.Detail(scoreLastYear, minForScoreLastYear, sumForScoreLastYear) = scorer.scoreDetailed(lastYear)
     log.info(s"Bestest score was $bestScore (min was ${minForBestScore.value} and sum was ${sumForBestScore.value}) " +
       s"(actual schedule applied last year scored at ${scoreLastYear.value}, with min ${minForScoreLastYear.value} and sum ${sumForScoreLastYear.value})")
 
-    val weightedScoresByPerson = psFactory.weightedScoresByPerson(bestSchedule)
-    val weightedScoresByPersonLastYear = psFactory.weightedScoresByPerson(lastYear)
+    val weightedScoresByPerson = scorer.weightedScoresByPerson(bestSchedule)
+    val weightedScoresByPersonLastYear = scorer.weightedScoresByPerson(lastYear)
     val weightedScoresText = problem.persons map { p =>
       val name = p.name.padTo(8, ' ').take(8)
       val ps = weightedScoresByPerson(p)

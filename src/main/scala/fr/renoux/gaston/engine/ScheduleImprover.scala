@@ -8,8 +8,9 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by satisfying preferences.
   */
-abstract class ScheduleImprover(problem: Problem) extends Scoring(problem) {
+trait ScheduleImprover {
+  val problem: Problem
+  //val scorer: Scorer
 
   def improve(schedule: Schedule, initialScore: Score, rounds: Int = 10000)(implicit rand: Random): Schedule
-
 }

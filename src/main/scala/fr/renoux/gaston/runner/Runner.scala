@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 import java.time.Instant
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, SystematicScheduleImprover}
+import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, Scorer, SystematicScheduleImprover}
 import fr.renoux.gaston.io.InputSettings
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.problem.Problem
@@ -26,9 +26,9 @@ class Runner(
 
   private val log = Logger[Runner]
 
-
+  val scorer = new Scorer(problem)
   val csFactory = new ConstrainedScheduleFactory(problem)
-  val psFactory = new SystematicScheduleImprover(problem)
+  val psFactory = new SystematicScheduleImprover(problem, scorer)
 
   val timeout: Option[Instant] = maxDuration.map(d => Instant.now().plusSeconds(d.toSeconds))
 
@@ -77,10 +77,10 @@ class Runner(
   /** Produces a schedule and its score */
   def runOnce(): (Schedule, Score) = {
     val Some(initialSolution) = csFactory.makeSchedule
-    val initialScore = psFactory.score(initialSolution)
+    val initialScore = scorer.score(initialSolution)
 
     val finalSolution = psFactory.improve(initialSolution, initialScore, 10000)
-    val finalScore = psFactory.score(finalSolution)
+    val finalScore = scorer.score(finalSolution)
 
     (finalSolution, finalScore)
   }
@@ -90,7 +90,7 @@ class Runner(
     log.info(s"Schedule is \n${schedule.toFormattedString}\n")
     log.info(s"Schedule score is $score")
 
-    val weightedScoresByPerson = psFactory.weightedScoresByPerson(schedule)
+    val weightedScoresByPerson = scorer.weightedScoresByPerson(schedule)
 
     /* For each person, preferences (strongs are marked with true) */
     val preferencesByPerson: Map[Person, Set[(PersonTopicPreference, Boolean)]] = problem.preferences collect {

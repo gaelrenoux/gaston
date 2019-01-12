@@ -24,15 +24,16 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
+      val scorer = new Scorer(Problems.Complete)
       val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
-      val psFactory = new RandomScheduleImprover(Problems.Complete)
+      val psFactory = new RandomScheduleImprover(Problems.Complete, scorer)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = psFactory.score(initialSolution)
+      val initialScore = scorer.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
       val finalSolution = psFactory.improve(initialSolution, initialScore, 1000)
-      val finalScore = psFactory.score(finalSolution)
+      val finalScore = scorer.score(finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
       Problems.Complete.isSolvedBy(finalSolution) should be(true)
@@ -51,15 +52,16 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
+      val scorer = new Scorer(Problems.Complete)
       val csFactory = new ConstrainedScheduleFactory(Problems.Complete)
-      val psFactory = new SystematicScheduleImprover(Problems.Complete)
+      val psFactory = new SystematicScheduleImprover(Problems.Complete, scorer)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = psFactory.score(initialSolution)
+      val initialScore = scorer.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
       val finalSolution = psFactory.improve(initialSolution, initialScore, 100)
-      val finalScore = psFactory.score(finalSolution)
+      val finalScore = scorer.score(finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
       Problems.Complete.isSolvedBy(finalSolution) should be(true)
@@ -83,15 +85,16 @@ class PreferredScheduleFactorySpec extends FlatSpec with Matchers {
       }
       log.info("problematicConstraints:\n" + problematicConstraints.mkString("\n"))
 
+      val scorer = new Scorer(problem)
       val csFactory = new ConstrainedScheduleFactory(problem)
-      val psFactory = new SystematicScheduleImprover(problem)
+      val psFactory = new SystematicScheduleImprover(problem, scorer)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = psFactory.score(initialSolution)
+      val initialScore = scorer.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): ${initialSolution.toFormattedString}")
 
       val finalSolution = psFactory.improve(initialSolution, initialScore, 100)
-      val finalScore = psFactory.score(finalSolution)
+      val finalScore = scorer.score(finalSolution)
       log.info(s"Solution (score $finalScore): ${finalSolution.toFormattedString}")
 
       problem.isSolvedBy(finalSolution) should be(true)

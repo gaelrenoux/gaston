@@ -11,7 +11,7 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by satisfying preferences.
   */
-class RandomScheduleImprover(problem: Problem) extends ScheduleImprover(problem) {
+class RandomScheduleImprover(val problem: Problem, val scorer: Scorer) extends ScheduleImprover {
 
   private val log = Logger[RandomScheduleImprover]
 
@@ -23,7 +23,7 @@ class RandomScheduleImprover(problem: Problem) extends ScheduleImprover(problem)
   private def simpleRandomizedAmelioration(schedule: Schedule, previousScore: Score, rounds: Int = 10000)(implicit rand: Random): Schedule = if (rounds == 0) schedule else {
 
     val candidate = randomSwap(schedule)
-    val candidateScore = score(candidate)
+    val candidateScore = scorer.score(candidate)
 
     if (candidateScore.value >= previousScore.value) simpleRandomizedAmelioration(candidate, candidateScore, rounds - 1)
     else simpleRandomizedAmelioration(schedule, previousScore, rounds - 1)

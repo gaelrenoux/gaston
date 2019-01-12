@@ -10,12 +10,12 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by satisfying preferences.
   */
-class HeuristicScheduleImprover(problem: Problem) extends ScheduleImprover(problem) {
+class HeuristicScheduleImprover(val problem: Problem, val scorer: Scorer) extends ScheduleImprover {
 
   private val log = Logger[HeuristicScheduleImprover]
 
   override def improve(schedule: Schedule, initialScore: Score, rounds: Int = 10000)(implicit rand: Random): Schedule = {
-    val scoreByPerson = weightedScoresByPerson(schedule)
+    val scoreByPerson = scorer.weightedScoresByPerson(schedule)
     heuristicAmelioration(schedule, scoreByPerson, rounds)
   }
 
@@ -34,7 +34,7 @@ class HeuristicScheduleImprover(problem: Problem) extends ScheduleImprover(probl
 
       val (candidate, candidateScore) = bestMoveForPerson(schedule, personToImprove).getOrElse(schedule, score)
       if (candidateScore.value > score.value)
-        heuristicAmelioration(candidate, weightedScoresByPerson(candidate), maxRounds - 1)
+        heuristicAmelioration(candidate, scorer.weightedScoresByPerson(candidate), maxRounds - 1)
       else
         heuristicAmelioration(schedule, scoreByPerson, maxRounds - 1)
     }
