@@ -6,15 +6,13 @@ import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
 
 import scala.util.Random
 
-/**
-  * Created by gael on 07/05/17.
-  */
+
 class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers with PrivateMethodTester {
-  val log = Logger[ConstrainedScheduleFactorySpec]
+  private val log = Logger[ConstrainedScheduleFactorySpec]
   implicit val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
   val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
-  val random = new Random(0L)
+  private val random = new Random(0L)
 
   assert(SimpleTestModel.Problems.Complete.isSolvedBy(SimpleTestModel.Solutions.Perfect))
 

@@ -6,11 +6,12 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
   * Improves an existing Schedule by satisfying preferences. At each step, explores systematically all possible moves
-  * and swaps, and applies the best one. Only works on two-person swaps. It can get too slow with too many persons.
+  * and swaps, and applies the first one that imnproves the schedule. Should be less sensible to the number of persons
+  * than SystematicScheduleImprover, but it will be slower to converge to an optimum.
   */
-class SystematicScheduleImprover(val problem: Problem, val scorer: Scorer) extends AbstractScheduleImprover {
+class GreedyScheduleImprover(val problem: Problem, val scorer: Scorer) extends AbstractScheduleImprover {
 
-  /** Returns the best possible move or swap on a specific slot */
+  /** Returns the first move or swap it finds that makes the schedule better */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)
     ] = {
     val topics = schedule.topicsPerSlot(slot)
@@ -21,8 +22,8 @@ class SystematicScheduleImprover(val problem: Problem, val scorer: Scorer) exten
 
     /* All schedules on which we swapped two persons */
     val swappedSchedules = for {
-      r1 <- records
-      r2 <- records - r1
+      r1 <- records.view
+      r2 <- (records - r1).view
       p1 <- movableFromTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
       p2 <- movableFromTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)
     } yield {
@@ -33,8 +34,9 @@ class SystematicScheduleImprover(val problem: Problem, val scorer: Scorer) exten
 
     /* All schedules on which we moved one person from one topic to another */
     val movedSchedules = for {
-      r1 <- records.filter { r => problem.minNumberPerTopic.getOrElse(r.topic, 0) < r.persons.size }
-      r2 <- (records - r1).filter { r => problem.maxNumberPerTopic.getOrElse(r.topic, Int.MaxValue) > r.persons.size }
+      r1 <- records.view.filter { r => problem.minNumberPerTopic.getOrElse(r.topic, 0) < r.persons.size }
+      r2 <- (records - r1).view
+        .filter { r => problem.maxNumberPerTopic.getOrElse(r.topic, Int.MaxValue) > r.persons.size }
       p1 <- movableFromTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
     } yield {
       val newR1 = r1.copy(persons = r1.persons - p1)
@@ -44,12 +46,7 @@ class SystematicScheduleImprover(val problem: Problem, val scorer: Scorer) exten
 
     val allNewSchedules = swappedSchedules ++ movedSchedules
     val scoredSchedules = allNewSchedules.zipWith(scorer.score)
-
-    if (scoredSchedules.isEmpty) None else {
-      val candidateAndScore = scoredSchedules.maxBy(_._2)
-      if (candidateAndScore._2 > currentScore) Some(candidateAndScore) else None
-    }
+    scoredSchedules.dropWhile(_._2 <= currentScore).headOption
   }
 
 }
-
