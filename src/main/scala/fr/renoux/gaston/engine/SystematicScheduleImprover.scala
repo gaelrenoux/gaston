@@ -76,7 +76,7 @@ class SystematicScheduleImprover(val problem: Problem, val scorer: Scorer) exten
     }
 
     val allNewSchedules = swappedSchedules ++ movedSchedules
-    if (swappedSchedules.nonEmpty) Some(swappedSchedules.zipWith(scorer.score).maxBy(_._2))
+    if (allNewSchedules.nonEmpty) Some(allNewSchedules.zipWith(scorer.score).maxBy(_._2))
     else None
   }
 
