@@ -1,6 +1,5 @@
 package fr.renoux.gaston.util
 
-import com.typesafe.scalalogging.Logger
 import org.scalatest.{FlatSpec, Matchers}
 
 class CollectionImplicitsSpec extends FlatSpec with Matchers {

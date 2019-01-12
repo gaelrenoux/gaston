@@ -1,4 +1,4 @@
-package fr.renoux.gaston.all
+package fr.renoux.gaston.benchmarks
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.UdoConTestModel
@@ -10,9 +10,6 @@ import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
 
-/**
-  * Created by gael on 07/05/17.
-  */
 class GeneralTest extends FlatSpec with Matchers {
   private val log = Logger[GeneralTest]
   private implicit val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
@@ -96,6 +93,7 @@ class GeneralTest extends FlatSpec with Matchers {
     } mkString "\n"
     log.info(s"\nFor each person, how many strong and weak constraints are satisfied:\n$satisfiedPreferencesCountText")
 
-    log.info(s"Bestest schedule was ${bestSchedule.toFormattedString}")
+    log.info(s"Bestest schedule was scored $bestScore and was: ${bestSchedule.toFormattedString}")
+    bestScore should be > 2000.0
   }
 }

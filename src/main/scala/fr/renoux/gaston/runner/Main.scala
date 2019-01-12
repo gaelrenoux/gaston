@@ -19,7 +19,7 @@ object Main {
     val commandLine: CommandLine = CommandLine.parse(args)
     log.info(s"Commande line is: $commandLine")
 
-    run(commandLine).recover { case msg =>
+    val _ = run(commandLine).recover { case msg =>
       log.info("Failed to run.\n" + msg.list.toList.mkString("\n"))
     }
   }
@@ -40,7 +40,7 @@ object Main {
       )
 
       log.info(s"Starting to run !")
-      runner.run()
+      val _ = runner.run()
     }
   }
 

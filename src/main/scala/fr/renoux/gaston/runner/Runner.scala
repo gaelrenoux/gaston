@@ -38,12 +38,11 @@ class Runner(
 
   private val DecimalFormat = new DecimalFormat("000.00")
 
-
   /** Produces a schedule and the associated score */
   def run(): (Schedule, Score) = {
     val (schedule, score) = runRecursive(Instant.now(), 0, Schedule(0), Score.MinValue)
     /* Print final result if needed */
-    render(schedule, score)
+    render(schedule, score, force = true)
     (schedule, score)
   }
 
@@ -63,7 +62,7 @@ class Runner(
       /* If the last log is old enough, render the current best schedule */
       val newLastLog = if (now isAfter lastLog.plusMillis(LogFrequenceMillis)) {
         render(currentSchedule, currentScore)
-        log.info(s"We have tried $count schedules !")
+        if (!silent) log.info(s"We have tried $count schedules !")
         Instant.now()
       } else lastLog
 
@@ -86,7 +85,7 @@ class Runner(
   }
 
   /** Renders the schedule to the user */
-  def render(schedule: Schedule, score: Score): Unit = {
+  def render(schedule: Schedule, score: Score, force: Boolean = false): Unit = if (force || !silent) {
     log.info(s"Schedule is \n${schedule.toFormattedString}\n")
     log.info(s"Schedule score is $score")
 
