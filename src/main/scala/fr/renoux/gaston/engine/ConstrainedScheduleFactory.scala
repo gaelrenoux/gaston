@@ -14,10 +14,11 @@ import scala.util.Random
 /**
   * Uses backtracking to create a solution satisfying all constraints. Does not take preferences into account.
   */
-class ConstrainedScheduleFactory(val problem: Problem) {
+class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = false) {
 
   type MD5 = Array[Byte]
   private val candidateCache = mutable.Set[MD5]()
+
   private var count = 0
 
   private val log = Logger[ConstrainedScheduleFactory]
@@ -38,7 +39,6 @@ class ConstrainedScheduleFactory(val problem: Problem) {
     backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(Queue(slots: _*), topics)(Some(_))
   }
 
-
   private def md5(str: String): MD5 = MessageDigest.getInstance("MD5").digest(str.getBytes)
 
   /**
@@ -54,8 +54,12 @@ class ConstrainedScheduleFactory(val problem: Problem) {
   private def backtrackAssignTopicsToSlots(partialSchedule: Schedule)
                                           (slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil)
                                           (postTreatment: Schedule => Option[Schedule]): Option[Schedule] = {
-    val scheduleMd5 = md5(partialSchedule.toString)
-    if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
+
+    if (debugMode) {
+      val scheduleMd5 = md5(partialSchedule.toString)
+      if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
+    }
+
     if (count % 1000 == 0) log.debug(s"Tried $count combinations")
     log.trace(s"Tried $count combinations")
     count += 1

@@ -14,15 +14,15 @@ case class Schedule(
   import fr.renoux.gaston.model.Schedule._
 
   lazy val slots: Set[Slot] = records.map(_.slot)
-  lazy val personsPerSlot: Map[Slot, Set[Person]] = records.groupBy(_.slot).mapValues { x => x.flatMap(_.persons) }
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValues { x => x.flatMap(_.persons) }
-  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValues { x => x.map(_.topic) }
-  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValues(_.size)
+  lazy val personsPerSlot: Map[Slot, Set[Person]] = records.groupBy(_.slot).mapValuesStrict { x => x.flatMap(_.persons) }
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
+  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValuesStrict { x => x.map(_.topic) }
+  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
 
   /** Merge more triplets into this schedule. */
   def merge(addedRecords: Set[Record]): Schedule = {
     val cumulatedRecords = records ++ addedRecords
-    val mergedMap = cumulatedRecords.groupBy(t => (t.slot, t.topic)).mapValues(_.flatMap(_.persons))
+    val mergedMap = cumulatedRecords.groupBy(t => (t.slot, t.topic)).mapValuesStrict(_.flatMap(_.persons))
     val mergedRecords = mergedMap.toSet.map(Record.fromTuple2)
     copy(records = mergedRecords)
   }

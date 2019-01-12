@@ -32,7 +32,7 @@ case class Problem(
 
     val topicsWithForbiddenPersons: Map[Topic, Set[Person]] = constraints.collect {
       case PersonTopicInterdiction(person, topic) => topic -> person
-    }.groupBy(_._1).mapValues(_.map(_._2))
+    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
 
     topics.map(_ -> Set[Person]()).toMap ++ topicsWithForbiddenPersons
   }
@@ -80,7 +80,7 @@ case class Problem(
   lazy val forcedTopicsPerSlot: Map[Slot, Set[Topic]] =
     constraints.collect {
       case TopicForcedSlot(topic, slot) => slot -> topic
-    }.groupBy(_._1).mapValues(_.map(_._2))
+    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
 
 
   /** Maximum number of topics we must have during the same slot */

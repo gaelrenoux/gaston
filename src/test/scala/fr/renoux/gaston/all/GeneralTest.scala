@@ -2,8 +2,8 @@ package fr.renoux.gaston.all
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.UdoConTestModel
-import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, SystematicScheduleImprover}
-import fr.renoux.gaston.io.{PureConfigLoader, InputSettings}
+import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, Scoring, SystematicScheduleImprover}
+import fr.renoux.gaston.io.{InputSettings, PureConfigLoader}
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.{Person, Schedule, Score}
 import org.scalatest.{FlatSpec, Matchers}
@@ -53,12 +53,10 @@ class GeneralTest extends FlatSpec with Matchers {
       }
     }
 
-    val minForBestScore = psFactory.scoreMinimumOnly(bestSchedule).value
-    val sumForBestScore = psFactory.scoreSumOnly(bestSchedule).value
-    val scoreLastYear = psFactory.score(lastYear)
-    val minForScoreLastYear = psFactory.scoreMinimumOnly(lastYear)
-    val sumForScoreLastYear = psFactory.scoreSumOnly(lastYear)
-    log.info(s"Bestest score was $bestScore (min was $minForBestScore and sum was $sumForBestScore) (actual schedule applied last year scored at $scoreLastYear, with min $minForScoreLastYear and sum $sumForScoreLastYear)")
+    val Scoring.Detail(_, minForBestScore, sumForBestScore) = psFactory.scoreDetailed(bestSchedule)
+    val Scoring.Detail(scoreLastYear, minForScoreLastYear, sumForScoreLastYear) = psFactory.scoreDetailed(lastYear)
+    log.info(s"Bestest score was $bestScore (min was ${minForBestScore.value} and sum was ${sumForBestScore.value}) " +
+      s"(actual schedule applied last year scored at ${scoreLastYear.value}, with min ${minForScoreLastYear.value} and sum ${sumForScoreLastYear.value})")
 
     val weightedScoresByPerson = psFactory.weightedScoresByPerson(bestSchedule)
     val weightedScoresByPersonLastYear = psFactory.weightedScoresByPerson(lastYear)

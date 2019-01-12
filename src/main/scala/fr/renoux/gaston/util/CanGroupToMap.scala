@@ -1,5 +1,7 @@
 package fr.renoux.gaston.util
 
+import fr.renoux.gaston.util.CollectionImplicits._
+
 /** Typeclass for collections than can be grouped to a Map */
 trait CanGroupToMap[A[_]] {
 
@@ -10,11 +12,11 @@ trait CanGroupToMap[A[_]] {
 object CanGroupToMap {
 
   implicit object SetCanGroupToMap$ extends CanGroupToMap[Set] {
-    override def groupToMap[B, C](a: Set[(B, C)]): Map[B, Set[C]] = a.groupBy(_._1).mapValues(_.map(_._2))
+    override def groupToMap[B, C](a: Set[(B, C)]): Map[B, Set[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
   }
 
   implicit object ListCanGroupToMap$ extends CanGroupToMap[List] {
-    override def groupToMap[B, C](a: List[(B, C)]): Map[B, List[C]] = a.groupBy(_._1).mapValues(_.map(_._2))
+    override def groupToMap[B, C](a: List[(B, C)]): Map[B, List[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
   }
 
   implicit class Ops[A[_], B, C](val wrapped: A[(B, C)]) extends AnyVal {
