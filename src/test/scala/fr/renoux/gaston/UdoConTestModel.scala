@@ -1,7 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.InputSettings
+import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._

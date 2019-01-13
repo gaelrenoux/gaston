@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.{PureConfigLoader, InputSettings}
+import fr.renoux.gaston.input.{PureConfigLoader, InputSettings}
 import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
 
 import scala.util.Random

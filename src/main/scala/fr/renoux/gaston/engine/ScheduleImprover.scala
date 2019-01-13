@@ -10,7 +10,6 @@ import scala.util.Random
   */
 trait ScheduleImprover {
   val problem: Problem
-  //val scorer: Scorer
 
   def improve(schedule: Schedule, initialScore: Score, rounds: Int = 10000)(implicit rand: Random): Schedule
 }

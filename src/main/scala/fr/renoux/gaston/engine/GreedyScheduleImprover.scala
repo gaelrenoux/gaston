@@ -9,7 +9,9 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * and swaps, and applies the first one that imnproves the schedule. Should be less sensible to the number of persons
   * than SystematicScheduleImprover, but it will be slower to converge to an optimum.
   */
-class GreedyScheduleImprover(val problem: Problem, val scorer: Scorer) extends AbstractScheduleImprover {
+class GreedyScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {
+
+  private val scorer = Scorer.of(problem)
 
   /** Returns the first move or swap it finds that makes the schedule better */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)

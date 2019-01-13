@@ -1,4 +1,4 @@
-package fr.renoux.gaston.io
+package fr.renoux.gaston.input
 
 import fr.renoux.gaston.model._
 

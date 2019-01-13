@@ -3,7 +3,7 @@ package fr.renoux.gaston.benchmarks
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.engine.{ConstrainedScheduleFactory, Scorer, SystematicScheduleImprover}
-import fr.renoux.gaston.io.PureConfigLoader
+import fr.renoux.gaston.input.PureConfigLoader
 import fr.renoux.gaston.model.Schedule
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -21,9 +21,9 @@ class OldBenchmark extends FlatSpec with Matchers {
     var bestSchedule = Schedule(0)
     var bestScore = Double.NegativeInfinity
 
-    val scorer = new Scorer(problem)
+    val scorer = Scorer.of(problem)
     val csFactory = new ConstrainedScheduleFactory(problem)
-    val psFactory = new SystematicScheduleImprover(problem, scorer)
+    val psFactory = new SystematicScheduleImprover(problem)
 
     val lastYear = UdoConTestModel.Solutions.Actual
     problem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))

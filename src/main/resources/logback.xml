@@ -3,6 +3,7 @@
 
     <property name="LOGS_PATH" value="/var/log/myapps/gaston" />
 
+    <!--
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>
@@ -10,6 +11,7 @@
             </pattern>
         </encoder>
     </appender>
+     STDOUT appender added programatically if needed -->
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_PATH}/debug.log</file>
@@ -28,7 +30,6 @@
     <logger name="fr.renoux" level="info" />
 
     <root level="info">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE" />
     </root>
 

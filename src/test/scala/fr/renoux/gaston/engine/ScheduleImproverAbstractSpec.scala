@@ -11,16 +11,16 @@ class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
 
   private val log = Logger(getClass)
 
-  def runWith(improverConstructor: (Problem, Scorer) => ScheduleImprover, problem: Problem, seeds: Traversable[Long]): (Schedule, Double) = {
+  def runWith(improverConstructor: Problem => ScheduleImprover, problem: Problem, seeds: Traversable[Long]): (Schedule, Double) = {
 
     var (bestSchedule, bestScore) = (Schedule(0), Double.NegativeInfinity)
     for (seed <- seeds) {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
-      val scorer = new Scorer(problem)
+      val scorer = Scorer.of(problem)
       val csFactory = new ConstrainedScheduleFactory(problem)
-      val improver = improverConstructor(problem, scorer)
+      val improver = improverConstructor(problem)
 
       val Some(initialSolution) = csFactory.makeSchedule
       val initialScore = scorer.score(initialSolution)

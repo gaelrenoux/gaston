@@ -5,7 +5,7 @@ import fr.renoux.gaston.model.{Person, Schedule, Score}
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /** Scoring utilities for a given Problem. */
-class Scorer(problem: Problem) {
+class Scorer private (problem: Problem) {
 
   /** Score that solution for the current problem. Returns a global score prioritizing the score of the least satisfied
     * person, with the total score as a tie breaker. Personal scores are divided by the person's weight before
@@ -51,5 +51,7 @@ class Scorer(problem: Problem) {
 object Scorer {
 
   case class Detail(global: Score, min: Score, sum: Score)
+
+  def of(problem: Problem) = new Scorer(problem)
 
 }

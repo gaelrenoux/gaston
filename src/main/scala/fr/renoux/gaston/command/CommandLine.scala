@@ -1,4 +1,4 @@
-package fr.renoux.gaston.runner
+package fr.renoux.gaston.command
 
 import java.nio.file.{Path, Paths}
 
@@ -13,7 +13,7 @@ case class CommandLine(
                         useSample: Boolean = false,
                         generateInput: Boolean = false,
                         silent: Boolean = false,
-                        verbose: Boolean = false,
+                        //verbose: Boolean = false,
                         maxDuration: Option[FiniteDuration] = None,
                         seed: Long = Random.nextLong()
                       ) {
@@ -49,9 +49,9 @@ object CommandLine {
       .action((_, in) => in.copy(silent = true))
       .text("Do not output regularly the best schedule found until now")
 
-    opt[Unit]('v', "verbose").optional()
-      .action((_, in) => in.copy(verbose = true))
-      .text("Display log messages during work")
+//    opt[Unit]('v', "verbose").optional()
+//      .action((_, in) => in.copy(verbose = true))
+//      .text("Display log messages during work")
 
     opt[Long]('e', "seed").optional().valueName("<number>")
       .action((s, in) => in.copy(seed = s))

@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.io.{PureConfigLoader, InputSettings}
+import fr.renoux.gaston.input.{PureConfigLoader, InputSettings}
 import org.scalatest.{FlatSpec, Matchers}
 
 /**

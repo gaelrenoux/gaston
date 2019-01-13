@@ -1,14 +1,16 @@
-package fr.renoux.gaston.runner
+package fr.renoux.gaston.command
 
 import java.nio.file.Path
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.{InputRoot, PureConfigLoader, PureConfigTranscriber, UdoConTableReader}
+import fr.renoux.gaston.engine.{Renderer, Runner}
+import fr.renoux.gaston.input._
 import scalaz._
 import scalaz.syntax.either._
 import scalaz.syntax.std.option._
 
 import scala.io.Source
+
 
 object Main {
   private val log = Logger("Main")
@@ -17,30 +19,36 @@ object Main {
   def main(args: Array[String]): Unit = {
 
     val commandLine: CommandLine = CommandLine.parse(args)
+    val output = new Output(commandLine.silent)
     log.info(s"Commande line is: $commandLine")
 
-    val _ = run(commandLine).recover { case msg =>
-      log.info("Failed to run.\n" + msg.list.toList.mkString("\n"))
+    val _ = run(commandLine, output).recover { case msg =>
+      output("Failed to run.\n" + msg.list.toList.mkString("\n"))
     }
   }
 
   /** Run the application with command line arguments */
-  private def run(commandLine: CommandLine): NonEmptyList[String] \/ Unit = for {
+  private def run(commandLine: CommandLine, output: Output): NonEmptyList[String] \/ Unit = for {
     inputRoot <- loadInput(commandLine)
     problem <- PureConfigTranscriber.transcribe(inputRoot).disjunction
   } yield {
-    if (commandLine.generateInput) render(inputRoot) else {
-      val runner = new Runner(
-        inputRoot.gaston.settings,
-        problem,
+    if (commandLine.generateInput) {
+      output("Input is: \n" + PureConfigLoader.render(inputRoot))
+    } else {
+      val renderer = new Renderer(inputRoot.gaston.settings, problem)
+      val runner = new Runner(problem, (schedule, score, count) => {
+        output(renderer.all(schedule, score))
+        output(s"We have tried $count schedules !")
+      })
+
+      output(s"Starting to run !")
+      val (schedule, score) = runner.run(
         commandLine.maxDuration,
-        silent = commandLine.silent,
-        verbose = commandLine.verbose,
         seed = commandLine.seed
       )
 
-      log.info(s"Starting to run !")
-      val _ = runner.run()
+      /* Print final result */
+      output(renderer.all(schedule, score))
     }
   }
 
@@ -72,11 +80,6 @@ object Main {
     table = Source.fromFile(path.toFile).mkString
     udoInput = udoReader.read(table)
   } yield Some(udoInput)
-
-  /** Render the input to the command line */
-  private def render(input: InputRoot): Unit = {
-    log.info("Input is: \n" + PureConfigLoader.render(input))
-  }
 
 
 }

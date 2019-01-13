@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.io.PureConfigLoader
+import fr.renoux.gaston.input.PureConfigLoader
 import org.scalatest.{FlatSpec, Matchers}
 
 /**

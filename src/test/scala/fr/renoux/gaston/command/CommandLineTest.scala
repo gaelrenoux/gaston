@@ -1,4 +1,4 @@
-package fr.renoux.gaston.runner
+package fr.renoux.gaston.command
 
 import java.nio.file.Paths
 

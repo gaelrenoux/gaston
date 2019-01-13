@@ -1,4 +1,4 @@
-package fr.renoux.gaston.io
+package fr.renoux.gaston.input
 
 import ai.x.diff.DiffShow
 import fr.renoux.gaston.model.{Score, Weight}

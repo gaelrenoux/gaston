@@ -1,6 +1,6 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.io.InputSettings
+import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}

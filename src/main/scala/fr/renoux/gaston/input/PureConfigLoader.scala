@@ -1,4 +1,4 @@
-package fr.renoux.gaston.io
+package fr.renoux.gaston.input
 
 import java.io.{File, PrintWriter}
 import java.nio.file.Path

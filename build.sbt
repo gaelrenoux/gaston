@@ -34,4 +34,4 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
-mainClass in assembly := Some("fr.renoux.gaston.runner.Main")
+mainClass in assembly := Some("fr.renoux.gaston.command.Main")
