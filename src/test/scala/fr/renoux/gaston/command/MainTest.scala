@@ -11,7 +11,8 @@ class MainTest extends FlatSpec with Matchers {
       "/home/gael/Temp/UdoCon/udocon_2018_settings.conf",
       "--from-udo-table",
       "/home/gael/Temp/UdoCon/udocon_2018_table.conf",
-      "--generate-input"
+      "--generate-input",
+      "--silent"
     ))
 
 

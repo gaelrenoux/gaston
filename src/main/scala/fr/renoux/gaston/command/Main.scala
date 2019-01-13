@@ -33,16 +33,16 @@ object Main {
     problem <- PureConfigTranscriber.transcribe(inputRoot).disjunction
   } yield {
     if (commandLine.generateInput) {
-      output("Input is: \n" + PureConfigLoader.render(inputRoot))
+      output("\n" + PureConfigLoader.render(inputRoot))
     } else {
       val renderer = new Renderer(inputRoot.gaston.settings, problem)
-      val runner = new Runner(problem, (schedule, score, count) => {
+      val runner = new Runner(problem, hook = (schedule, score, count) => {
         output(renderer.all(schedule, score))
         output(s"We have tried $count schedules !")
       })
 
       output(s"Starting to run !")
-      val (schedule, score) = runner.run(
+      val (schedule, score, count) = runner.run(
         commandLine.maxDuration,
         seed = commandLine.seed
       )

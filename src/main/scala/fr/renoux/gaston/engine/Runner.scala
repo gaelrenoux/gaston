@@ -13,6 +13,7 @@ import scala.util.Random
 /** Runs the whole schedule-searching stuff for a fixed amount of time. Can take hooks to do stuff at some frequency, like warn the user. */
 class Runner(
     problem: Problem,
+    improverConstructor: Problem => ScheduleImprover = new SystematicScheduleImprover(_),
     hook: (Schedule, Score, Long) => Unit = (_, _, _) => (),
     hookFrequency: FiniteDuration = 20.seconds
 ) {
@@ -21,7 +22,7 @@ class Runner(
 
   private val scorer = Scorer.of(problem)
   val csFactory = new ConstrainedScheduleFactory(problem)
-  val psFactory = new SystematicScheduleImprover(problem)
+  val psFactory = improverConstructor(problem)
 
   private val hookFrequencyMillis = hookFrequency.toMillis
 
@@ -29,14 +30,13 @@ class Runner(
   def run(
       maxDuration: Option[FiniteDuration] = None,
       seed: Long = Random.nextLong()
-  ): (Schedule, Score) = {
+  ): (Schedule, Score, Long) = {
     implicit val random: Random = new Random(seed)
 
     val now = Instant.now()
     val timeout: Option[Instant] = maxDuration.map(d => now.plusSeconds(d.toSeconds))
 
-    val (schedule, score) = runRecursive(now, timeout, 0, Schedule(0), Score.MinValue)
-    (schedule, score)
+    runRecursive(now, timeout, 0, Schedule(0), Score.MinValue)
   }
 
   /** Recursive run: if it still has time, produces a schedule then invokes itself again . */
@@ -47,13 +47,13 @@ class Runner(
       count: Long,
       currentSchedule: Schedule,
       currentScore: Score
-  )(implicit random: Random): (Schedule, Score) = {
+  )(implicit random: Random): (Schedule, Score, Long) = {
     val now = Instant.now()
 
     /* If time's out, stop now */
     if (timeout.exists(_ isBefore now)) {
       log.info(s"We have tried $count schedules ! It is time to stop !")
-      (currentSchedule, currentScore)
+      (currentSchedule, currentScore, count)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
@@ -74,7 +74,7 @@ class Runner(
     val Some(initialSolution) = csFactory.makeSchedule
     val initialScore = scorer.score(initialSolution)
 
-    val finalSolution = psFactory.improve(initialSolution, initialScore, 10000)
+    val finalSolution = psFactory.improve(initialSolution, initialScore)
     val finalScore = scorer.score(finalSolution)
 
     (finalSolution, finalScore)

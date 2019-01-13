@@ -22,8 +22,10 @@ class PureConfigLoader {
 
   def fromPath(files: Path*) = new Result(loadConfigFromFiles[InputRoot](files))
 
+  /** Loads from application.conf */
   def fromClassPath: Result = new Result(loadConfig[InputRoot])
 
+  /** Loads from a specifically-named file */
   def fromClassPath(path: String): Result = {
     val correctedPath = if (path.headOption.contains('/')) path else s"/$path"
     val absoluteFilePath = getClass.getResource(correctedPath).getPath
@@ -31,6 +33,7 @@ class PureConfigLoader {
     fromPath(absoluteFile.toPath)
   }
 
+  /** Loads from a String */
   def fromString(config: String): Result = {
     val file = File.createTempFile("gaston-input-", null)
     new PrintWriter(file) {

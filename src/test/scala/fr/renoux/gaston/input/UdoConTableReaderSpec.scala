@@ -33,7 +33,8 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
 
     val expected = PureConfigLoader.fromClassPath("udocon-table-formatted.conf").forceToInput
 
-    println(DiffShow.diff[InputRoot](input, expected).string)
+    val diff = DiffShow.diff[InputRoot](input, expected)
+    if (!diff.isIdentical) println(diff.string)
     input should be(expected)
   }
 
@@ -45,7 +46,8 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     val evaluated = PureConfigLoader.fromString(rendered).forceToInput
     val expected = PureConfigLoader.fromClassPath("udocon-table-formatted.conf").forceToInput
 
-    println(DiffShow.diff[InputRoot](input, expected).string)
+    val diff = DiffShow.diff[InputRoot](input, expected)
+    if (!diff.isIdentical) println(diff.string)
     evaluated should be(expected)
   }
 
