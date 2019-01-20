@@ -30,8 +30,10 @@ object PureConfigTranscriber {
 
     val forcedSlotConstraints = getForcedTopicConstraints(input, ctx)
 
+    val simultaneousTopicsConstraints = getSimultaneousTopicsConstraints(input, ctx)
+
     val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++
-      numberConstraints ++ forcedSlotConstraints
+      numberConstraints ++ forcedSlotConstraints ++ simultaneousTopicsConstraints
 
     val incompatibilityPreferences = getGroupAntiPreferences(input, ctx)
 
@@ -65,7 +67,7 @@ object PureConfigTranscriber {
 
 
   private def getNumberConstraints(input: InputModel, ctx: Context): Set[TopicNeedsNumberOfPersons] =
-    input.topics map { inTopic =>
+    input.topics.map { inTopic =>
       val topic = ctx.topicsPerName(inTopic.name)
       val min = inTopic.min.getOrElse(input.settings.defaultMin)
       val max = inTopic.max.getOrElse(input.settings.defaultMax)
@@ -73,8 +75,15 @@ object PureConfigTranscriber {
     }
 
   private def getForcedTopicConstraints(input: InputModel, maps: Context): Set[TopicForcedSlot] =
-    input.topics flatMap { inTopic =>
+    input.topics.flatMap { inTopic =>
       inTopic.forcedSlot.map(maps.slotsPerName).map(TopicForcedSlot(maps.topicsPerName(inTopic.name), _))
+    }
+
+  private def getSimultaneousTopicsConstraints(input: InputModel, ctx: Context): Set[SimultaneousTopics] =
+    input.topics.collect {
+      case inTopic if inTopic.simultaneous.nonEmpty =>
+        val fullSet = inTopic.simultaneous + inTopic.name
+        SimultaneousTopics(fullSet.map(ctx.topicsPerName))
     }
 
   private def getGroupAntiPreferences(input: InputModel, ctx: Context): Set[PersonGroupAntiPreference] =
@@ -96,9 +105,9 @@ object PureConfigTranscriber {
   }
 
   private case class Context(
-      slotsPerName: Map[String, Slot],
-      topicsPerName: Map[String, Topic],
-      personsPerName: Map[String, Person]
-  )
+                              slotsPerName: Map[String, Slot],
+                              topicsPerName: Map[String, Topic],
+                              personsPerName: Map[String, Person]
+                            )
 
 }

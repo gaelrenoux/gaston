@@ -57,7 +57,7 @@ case class InputTopic(
     name: String,
     mandatory: Set[String] = Set(),
     forbidden: Set[String] = Set(),
-    linked: Set[String] = Set(),
+    simultaneous: Set[String] = Set(),
     min: Option[Int],
     max: Option[Int],
     forcedSlot: Option[String]

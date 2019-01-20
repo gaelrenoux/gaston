@@ -46,9 +46,9 @@ class PureConfigLoader {
   }
 
   /** Render a configuration into a String. */
-  def render(input: InputRoot): String = ConfigWriter[InputRoot].to(input).render().split("\n") flatMap { line =>
+  def render(input: InputRoot): String = ConfigWriter[InputRoot].to(input).render().split("\n").flatMap { line =>
     if (line.trim.startsWith("#")) None else Some(line)
-  } mkString "\n"
+  }.mkString("\n")
 
 }
 

@@ -36,7 +36,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
         name = topicName,
         mandatory = Set(),
         forbidden = Set(),
-        linked = Set(),
+        simultaneous = Set(),
         min = min.toIntOption.map(_ + 1), //add the GM
         max = max.toIntOption.map(_ + 1), //add the GM
         forcedSlot = None

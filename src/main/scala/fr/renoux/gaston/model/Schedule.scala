@@ -7,9 +7,9 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-    parallelization: Int,
-    records: Set[Schedule.Record]
-) {
+                     parallelization: Int,
+                     records: Set[Schedule.Record]
+                   ) {
 
   import fr.renoux.gaston.model.Schedule._
 
@@ -26,6 +26,13 @@ case class Schedule(
     val mergedRecords = mergedMap.toSet.map(Record.fromTuple2)
     copy(records = mergedRecords)
   }
+
+  def ++(addedRecords: Set[Record]): Schedule = merge(addedRecords)
+
+  /** Merge more triplets into this schedule. */
+  def merge(that: Schedule): Schedule = merge(that.records)
+
+  def ++(that: Schedule): Schedule = merge(that.records)
 
   /** Adds a person to some topic already on schedule. Has no effect if the topic is not on schedule. */
   def addPersonToTopic(person: Person, topic: Topic): Schedule = copy(records = records.map {
@@ -77,4 +84,13 @@ object Schedule {
   }
 
   def apply(parallelization: Int, schedule: Record*): Schedule = new Schedule(parallelization, schedule.toSet)
+
+  def apply(parallelization: Int, personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]]) =
+    new Schedule(parallelization,
+      personsByTopicBySlot.flatMap {
+        case (slot, topicsPersons) => topicsPersons.map {
+          case (topic, persons) => Record(slot, topic, persons)
+        }
+      }.toSet
+    )
 }

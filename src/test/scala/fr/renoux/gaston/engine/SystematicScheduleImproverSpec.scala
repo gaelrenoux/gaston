@@ -12,7 +12,7 @@ class SystematicScheduleImproverSpec extends ScheduleImproverAbstractSpec {
   }
 
   it should "work a valid schedule (on a real-life model)" in {
-    val problem = PureConfigLoader.fromClassPath("udocon-2017.conf").forceToModel
+    val problem = PureConfigLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
     val (_, bestScore) = runWith(new SystematicScheduleImprover(_), problem, 0L until 1L)
     bestScore should be > 2200.0
   }

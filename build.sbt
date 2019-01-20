@@ -12,6 +12,7 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-language:higherKinds",
   "-language:existentials",
+  "-Xfatal-warnings",
   "-Ywarn-numeric-widen", // Warn when numerics are widened
   "-Ywarn-unused", // Warn when local and private vals, vars, defs, and types are are unused
   "-Ywarn-unused-import", // Warn when imports are unused

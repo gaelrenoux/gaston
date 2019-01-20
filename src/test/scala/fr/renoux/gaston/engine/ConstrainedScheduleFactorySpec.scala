@@ -14,7 +14,8 @@ class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers with Private
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
   private val random = new Random(0L)
 
-  assert(SimpleTestModel.Problems.Complete.isSolvedBy(SimpleTestModel.Solutions.Perfect))
+  println(SimpleTestModel.Problems.Complete.brokenConstraintsIn(SimpleTestModel.Solutions.Best))
+  assert(SimpleTestModel.Problems.Complete.isSolvedBy(SimpleTestModel.Solutions.Best))
 
 
   behavior of "makePartialSchedule"

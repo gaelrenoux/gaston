@@ -1,44 +1,45 @@
 package fr.renoux.gaston
 
 import fr.renoux.gaston.input.InputSettings
-import fr.renoux.gaston.model.Schedule.Record
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
-/**
-  * Created by gael on 07/05/17.
-  */
+/** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
 
   object Persons {
-    val Leonardo = Person("Leonardo")
-    val Raphael = Person("Raphael")
-    val Donatello = Person("Donatello")
-    val Michelangelo = Person("Michelangelo")
-    val Bebop = Person("Bebop")
-    val Rocksteady = Person("Rocksteady")
-    val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
-    val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
+    val Arthur = Person("Arthur")
+    val Bianca = Person("Bianca")
+    val Corwin = Person("Corwin")
+    val Daniela = Person("Daniela")
+    val Eric = Person("Eric")
+    val Fiona = Person("Fiona")
+    val Garion = Person("Garion")
+    val Hercule = Person("Hercule")
+    val Iago = Person("Iago")
+    val All: Set[Person] = Set(Arthur, Bianca, Corwin, Daniela, Eric, Fiona, Garion, Hercule, Iago)
   }
 
   object Topics {
-    val Leading = Topic("leading")
-    val Fighting = Topic("fighting")
-    val Machines = Topic("machines")
-    val Party = Topic("party")
-    val Cooking = Topic("cooking")
-    val All: Set[Topic] = Set(Leading, Fighting, Machines, Party, Cooking)
+    val Acting = Topic("Acting")
+    val Bathing = Topic("Bathing")
+    val Cooking = Topic("Cooking")
+    val Dancing = Topic("Dancing")
+    val Eating = Topic("Eating")
+    val Fighting = Topic("Fighting")
+    val Grinding = Topic("Grinding")
+    val Helping = Topic("Helping")
+    val Inking = Topic("Inking")
+    val All: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
   }
 
   object Slots {
     val Morning = Slot("morning")
     val AfterNoon = Slot("afternoon")
     val Evening = Slot("evening")
-    val Night = Slot("night")
-    val Noonish = Slot("noonish")
-    val All: Set[Slot] = Set(Morning, AfterNoon, Evening, Night, Noonish)
+    val All: Set[Slot] = Set(Morning, AfterNoon, Evening)
   }
 
   object Constraints {
@@ -47,49 +48,62 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Slots._
     import Topics._
 
-    val LeonardoLeads = PersonTopicObligation(Leonardo, Leading)
-    val RaphaelFights = PersonTopicObligation(Raphael, Fighting)
-    val DonatelloDoesMachines = PersonTopicObligation(Donatello, Machines)
-    val MichelangeloParties = PersonTopicObligation(Michelangelo, Party)
+    val AA = PersonTopicObligation(Arthur, Acting)
+    val BB = PersonTopicObligation(Bianca, Bathing)
+    val CC = PersonTopicObligation(Corwin, Cooking)
+    val DD = PersonTopicObligation(Daniela, Dancing)
+    val EE = PersonTopicObligation(Eric, Eating)
+    val FF = PersonTopicObligation(Fiona, Fighting)
+    val GG = PersonTopicObligation(Garion, Grinding)
+    val HH = PersonTopicObligation(Hercule, Helping)
+    val II = PersonTopicObligation(Iago, Inking)
 
-    val LeonardoDoesNotParty = PersonTopicInterdiction(Leonardo, Party)
-    val RaphealDoesNotDoMachines = PersonTopicInterdiction(Raphael, Machines)
-    val DonatelloDoesNotFight = PersonTopicInterdiction(Donatello, Fighting)
-    val MichelangeloDoesNotLead = PersonTopicInterdiction(Michelangelo, Leading)
+    val NotAI = PersonTopicInterdiction(Arthur, Inking)
+    val NotBA = PersonTopicInterdiction(Bianca, Acting)
+    val NotCB = PersonTopicInterdiction(Corwin, Bathing)
+    val NotDC = PersonTopicInterdiction(Daniela, Cooking)
+    val NotED = PersonTopicInterdiction(Eric, Dancing)
+    val NotFE = PersonTopicInterdiction(Fiona, Eating)
+    val NotGF = PersonTopicInterdiction(Garion, Fighting)
+    val NotHG = PersonTopicInterdiction(Hercule, Grinding)
+    val NotIH = PersonTopicInterdiction(Iago, Helping)
 
-    val LeonardoNotInTheNight = PersonAbsence(Leonardo, Night)
-    val RaphaelNotInTheEvening = PersonAbsence(Raphael, Evening)
-    val DonatelloInTheAfterNoon = PersonAbsence(Donatello, AfterNoon)
-    val MichelangeloNotInTheMorning = PersonAbsence(Michelangelo, Morning)
+    val EricNotInTheMorning = PersonAbsence(Eric, Morning)
+    val IagoNotInTheAfterNoon = PersonAbsence(Iago, AfterNoon)
+    val ArthurNotInTheEvening = PersonAbsence(Arthur, Evening)
 
-    val FightingNeedsTwoToFourPersons = TopicNeedsNumberOfPersons(Fighting, min = 2, max = 4)
-    val MachinesNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Machines, min = 0, max = 10)
-    val PartyNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Party, min = 0, max = 10)
-    val LeadingNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Leading, min = 0, max = 10)
-    val CookingNeedsAnyNumberOfPersons = TopicNeedsNumberOfPersons(Cooking, min = 0, max = 10)
+    val DefaultMinMaxes: Set[TopicNeedsNumberOfPersons] = Topics.All
+      .map(TopicNeedsNumberOfPersons(_, min = 2, max = 5))
+
+    val BathingAndEatingAreSimultaneous = SimultaneousTopics(Set(Bathing, Eating))
 
     val All: Set[Constraint] = Set(
-      LeonardoLeads,
-      RaphaelFights,
-      DonatelloDoesMachines,
-      MichelangeloParties,
+      AA,
+      BB,
+      CC,
+      DD,
+      EE,
+      FF,
+      GG,
+      HH,
+      II,
 
-      LeonardoDoesNotParty,
-      RaphealDoesNotDoMachines,
-      DonatelloDoesNotFight,
-      MichelangeloDoesNotLead,
+      NotAI,
+      NotBA,
+      NotCB,
+      NotDC,
+      NotED,
+      NotFE,
+      NotGF,
+      NotHG,
+      NotIH,
 
-      LeonardoNotInTheNight,
-      RaphaelNotInTheEvening,
-      DonatelloInTheAfterNoon,
-      MichelangeloNotInTheMorning,
+      EricNotInTheMorning,
+      IagoNotInTheAfterNoon,
+      ArthurNotInTheEvening,
 
-      FightingNeedsTwoToFourPersons,
-      MachinesNeedsAnyNumberOfPersons,
-      PartyNeedsAnyNumberOfPersons,
-      LeadingNeedsAnyNumberOfPersons,
-      CookingNeedsAnyNumberOfPersons
-    )
+      BathingAndEatingAreSimultaneous
+    ) ++ DefaultMinMaxes
   }
 
   object Preferences {
@@ -97,36 +111,37 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Persons._
     import Topics._
 
-    val LeonardoLovesFighting = PersonTopicPreference(Leonardo, Fighting, settings.strongPreference)
-    val RaphaelLovesPartying = PersonTopicPreference(Raphael, Party, settings.strongPreference)
-    val DonatelloLovesLeading = PersonTopicPreference(Donatello, Leading, settings.strongPreference)
-    val MichelangeloLovesMachines = PersonTopicPreference(Michelangelo, Machines, settings.strongPreference)
+    val AB = PersonTopicPreference(Arthur, Bathing, settings.strongPreference)
+    val BC = PersonTopicPreference(Bianca, Cooking, settings.strongPreference)
+    val CD = PersonTopicPreference(Corwin, Dancing, settings.strongPreference)
+    val DE = PersonTopicPreference(Daniela, Eating, settings.strongPreference)
+    val EF = PersonTopicPreference(Eric, Fighting, settings.strongPreference)
+    val FG = PersonTopicPreference(Fiona, Grinding, settings.strongPreference)
+    val GH = PersonTopicPreference(Garion, Helping, settings.strongPreference)
+    val HI = PersonTopicPreference(Hercule, Inking, settings.strongPreference)
+    val IA = PersonTopicPreference(Iago, Acting, settings.strongPreference)
 
-    val LeonardoLikesMachines = PersonTopicPreference(Leonardo, Machines, settings.weakPreference)
-    val RaphaelLikesLeading = PersonTopicPreference(Raphael, Leading, settings.weakPreference)
-    val DonatelloLikesPartying = PersonTopicPreference(Donatello, Party, settings.weakPreference)
-    val MichelangeloLikesFighting = PersonTopicPreference(Michelangelo, Fighting, settings.weakPreference)
+    val AC = PersonTopicPreference(Arthur, Cooking, settings.weakPreference)
+    val BD = PersonTopicPreference(Bianca, Dancing, settings.weakPreference)
+    val CE = PersonTopicPreference(Corwin, Eating, settings.weakPreference)
+    val DF = PersonTopicPreference(Daniela, Fighting, settings.weakPreference)
+    val EG = PersonTopicPreference(Eric, Grinding, settings.weakPreference)
+    val FH = PersonTopicPreference(Fiona, Helping, settings.weakPreference)
+    val GI = PersonTopicPreference(Garion, Inking, settings.weakPreference)
+    val HA = PersonTopicPreference(Hercule, Acting, settings.weakPreference)
+    val IB = PersonTopicPreference(Iago, Bathing, settings.weakPreference)
 
-    val LeonardoHatesEnemies = PersonGroupAntiPreference(Leonardo, AllEnemies, settings.strongPreference.negative)
-    val RaphaelHatesEnemies = PersonGroupAntiPreference(Raphael, AllEnemies, settings.strongPreference.negative)
-    val DonatelloHatesEnemies = PersonGroupAntiPreference(Donatello, AllEnemies, settings.strongPreference.negative)
-    val MichelangeloHatesEnemies = PersonGroupAntiPreference(Michelangelo, AllEnemies, settings.strongPreference.negative)
+    val ArthurHatesFionaAndDaniela = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela), settings.incompatibilityAntiPreference)
 
     val All: Set[Preference] = Set(
-      LeonardoLovesFighting,
-      RaphaelLovesPartying,
-      DonatelloLovesLeading,
-      MichelangeloLovesMachines,
-
-      LeonardoLikesMachines,
-      RaphaelLikesLeading,
-      DonatelloLikesPartying,
-      MichelangeloLikesFighting
+      AB, BC, CD, DE, EF, FG, GH, HI, IA,
+      AC, BD, CE, DF, EG, FH, GI, HA, IB,
+      ArthurHatesFionaAndDaniela
     )
   }
 
   object Problems {
-    val Complete = Problem(Slots.All, Topics.All, Persons.AllTurtles, Constraints.All, Preferences.All)
+    val Complete = Problem(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {
@@ -135,22 +150,24 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Slots._
     import Topics._
 
-    val Terrible = Schedule(
-      Problems.Complete.parallelization,
-      Record(Morning, Leading, Set(Michelangelo, Rocksteady)),
-      Record(AfterNoon, Fighting, Set(Donatello)),
-      Record(Evening, Machines, Set(Raphael, Bebop)),
-      Record(Night, Party, Set(Leonardo, Bebop, Rocksteady))
-    )
+    val Best = Schedule(3, Map(
+      Morning -> Map(
+        Acting -> Set(Arthur, Iago, Hercule),
+        Dancing -> Set(Daniela, Corwin, Bianca),
+        Grinding -> Set(Garion, Fiona)
+      ),
+      AfterNoon -> Map(
+        Bathing -> Set(Bianca, Arthur),
+        Eating -> Set(Eric, Daniela, Corwin),
+        Helping -> Set(Hercule, Garion, Fiona)
+      ),
+      Evening -> Map(
+        Cooking -> Set(Corwin, Bianca),
+        Fighting -> Set(Fiona, Eric, Daniela),
+        Inking -> Set(Iago, Hercule, Garion)
+      )
+    ))
 
-    val Perfect = Schedule(
-      Problems.Complete.parallelization,
-      Record(Morning, Leading, Set(Leonardo, Donatello, Raphael)),
-      Record(AfterNoon, Fighting, Set(Raphael, Leonardo, Michelangelo)),
-      Record(Evening, Machines, Set(Donatello, Michelangelo, Leonardo)),
-      Record(Night, Party, Set(Michelangelo, Raphael, Donatello)),
-      Record(Noonish, Cooking, Set(Leonardo, Raphael, Donatello, Michelangelo))
-    )
   }
 
 }

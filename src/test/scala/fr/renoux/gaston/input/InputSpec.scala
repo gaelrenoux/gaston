@@ -1,33 +1,29 @@
 package fr.renoux.gaston.input
 
-import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.model._
-import fr.renoux.gaston.model.constraints.{PersonTopicInterdiction, PersonTopicObligation, TopicNeedsNumberOfPersons}
+import fr.renoux.gaston.model.constraints.{PersonTopicInterdiction, PersonTopicObligation, SimultaneousTopics, TopicNeedsNumberOfPersons}
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
+import fr.renoux.gaston.model.problem.Problem
 import org.scalatest.{FlatSpec, Matchers}
 
 class InputSpec extends FlatSpec with Matchers {
 
-  behavior of "fromClassPath"
-  it should "load the input from the ClassPath" in {
-    val (input, problem) = PureConfigLoader.fromClassPath.forceToInputAndModel
-    input.gaston.settings.weakPreference should be(Score(1))
-    problem.persons.size should be > 0
+  "Loading from the classpath" should "load the default input when no name is given" in {
+    val (input, _) = PureConfigLoader.fromClassPath.forceToInputAndModel
+    input.gaston.settings.strongPreference should be(Score(5))
+    input.gaston.persons.size should be(3)
   }
 
-  "conversion" should "work" in {
-    val problem = PureConfigLoader.fromClassPath.forceToModel
-    problem.slots should be(UdoConTestModel.Problems.Simplified.slots)
-    problem.topics should be(UdoConTestModel.Problems.Simplified.topics)
-    problem.persons should be(UdoConTestModel.Problems.Simplified.persons)
-    problem.constraints should be(UdoConTestModel.Problems.Simplified.constraints)
-    problem.preferences should be(UdoConTestModel.Problems.Simplified.preferences)
-    problem should be(UdoConTestModel.Problems.Simplified)
+  it should "load an input with the correct name if asked" in {
+    val (input, _) = PureConfigLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
+    input.gaston.settings.strongPreference should be(Score(42))
+    input.gaston.persons.size should be(1)
   }
 
-  val minimalProblem = PureConfigLoader.fromClassPath("application-min.conf").forceToModel
 
-  "minimal configuration" should "contain the correct slots" in {
+  val minimalProblem: Problem = PureConfigLoader.fromClassPath.forceToModel
+
+  "Produced problem" should "contain the correct slots" in {
     minimalProblem.slots should be(Set(Slot("A"), Slot("B")))
   }
 
@@ -46,7 +42,8 @@ class InputSpec extends FlatSpec with Matchers {
       PersonTopicInterdiction(Person("laverne"), Topic("beta")),
       TopicNeedsNumberOfPersons(Topic("alpha"), 5, 5),
       TopicNeedsNumberOfPersons(Topic("gamma"), 4, 6),
-      TopicNeedsNumberOfPersons(Topic("beta"), 4, 5)
+      TopicNeedsNumberOfPersons(Topic("beta"), 4, 5),
+      SimultaneousTopics(Set(Topic("alpha"), Topic("beta")))
     ))
   }
 

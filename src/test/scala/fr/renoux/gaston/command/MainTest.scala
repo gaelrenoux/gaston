@@ -4,7 +4,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class MainTest extends FlatSpec with Matchers {
 
-  "Main" should "work" in {
+  "Main" should "work" ignore {
 
     Main.main(Array(
       "--from",

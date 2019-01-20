@@ -111,6 +111,9 @@ case class Problem(
   /** @return true if the schedule respects all constraints */
   def isSolvedBy(solution: Schedule): Boolean = constraints.forall(_.isRespected(solution))
 
+  /** @return Constraints broken by this schedule */
+  def brokenConstraintsIn(solution: Schedule): Set[Constraint] = constraints.filter(_.isBroken(solution))
+
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
     builder.append("  Slots:\n")

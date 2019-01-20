@@ -1,37 +1,57 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.input.{PureConfigLoader, InputSettings}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by gael on 07/05/17.
   */
 class PreferencesSpec extends FlatSpec with Matchers {
-  private implicit val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
-  private val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
 
-  import SimpleTestModel.Preferences._
-  import SimpleTestModel.Solutions._
+  import fr.renoux.gaston.MinimalTestModel.Persons._
+  import fr.renoux.gaston.MinimalTestModel.Slots._
+  import fr.renoux.gaston.MinimalTestModel.Topics._
+
+  def scheduled(s: Slot, t: Topic, ps: Person*) = Schedule(1, Map(s -> Map(t -> ps.toSet)))
 
 
   behavior of "PersonsTopicPreference"
-  it should "return the strong score when respected on a strong constraint" in {
-    LeonardoLovesFighting.score(Perfect) should be(settings.strongPreference)
+  val leonardoLovesFighting = PersonTopicPreference(Leonardo, Fighting, Score(42))
+
+  it should "return the score when respected" in {
+    leonardoLovesFighting.score(scheduled(Morning, Fighting, Leonardo, Raphael)
+    ) should be(Score(42))
   }
-  it should "return the weak score when respected on a weak constraint" in {
-    LeonardoLikesMachines.score(Perfect) should be(settings.weakPreference)
-  }
+
   it should "return zero when not respected" in {
-    LeonardoLovesFighting.score(Terrible).value should be(0)
-    LeonardoLikesMachines.score(Terrible).value should be(0)
+    leonardoLovesFighting.score(scheduled(Morning, Machines, Leonardo, Raphael)
+      ++ scheduled(Morning, Fighting, Donatello, Michelangelo)
+    ) should be(Score(0))
   }
 
 
   behavior of "PersonsIncompatibilityAntiPreference"
-  it should "return a negative score multiplied by the number of hated persons" in {
-    LeonardoHatesEnemies.score(Terrible).value should be(settings.strongPreference.value * (-2))
+  val LeonardoHatesEnemies = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady), Score(-150))
+
+  it should "return a negative score for just one hated person" in {
+    LeonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop)
+    ) should be(Score(-150))
   }
+
+  it should "return a negative score multiplied by the number of hated persons in the topic" in {
+    LeonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop, Rocksteady)
+    ) should be(Score(-150 * 2))
+  }
+
+  it should "sum negative scores on all topics" in {
+    LeonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop, Rocksteady)
+      ++ scheduled(AfterNoon, Machines, Leonardo, Donatello)
+      ++ scheduled(Evening, Party, Leonardo, Michelangelo, Rocksteady)
+    ) should be(Score(-150 * 3))
+  }
+
   it should "return zero when not present" in {
-    LeonardoHatesEnemies.score(Perfect).value should be(0)
+    LeonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael)
+    ) should be(Score.Zero)
   }
 }

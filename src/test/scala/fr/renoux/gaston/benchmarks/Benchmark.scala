@@ -11,7 +11,7 @@ import scala.concurrent.duration._
 class Benchmark extends FlatSpec with Matchers {
   private val log = Logger[Benchmark]
 
-  private val udoConProblem = PureConfigLoader.fromClassPath("udocon-2017.conf").forceToModel
+  private val udoConProblem = PureConfigLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
 
@@ -20,6 +20,8 @@ class Benchmark extends FlatSpec with Matchers {
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(1.minute), seed = 0L)
+
+    println(schedule.toFormattedString)
 
     udoConProblem.isSolvedBy(schedule) should be(true)
     score.value should be > 2900.0
@@ -33,7 +35,7 @@ class Benchmark extends FlatSpec with Matchers {
     val (schedule, score, count) = runner.run(Some(1.minute), seed = 0L)
 
     udoConProblem.isSolvedBy(schedule) should be(true)
-    println(s"Score is $")
+    println(s"Score is $score")
     score.value should be > 2900.0
     count should be > 20L
   }

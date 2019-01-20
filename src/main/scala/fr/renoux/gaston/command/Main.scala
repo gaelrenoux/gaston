@@ -42,7 +42,7 @@ object Main {
       })
 
       output(s"Starting to run !")
-      val (schedule, score, count) = runner.run(
+      val (schedule, score, _) = runner.run(
         commandLine.maxDuration,
         seed = commandLine.seed
       )
