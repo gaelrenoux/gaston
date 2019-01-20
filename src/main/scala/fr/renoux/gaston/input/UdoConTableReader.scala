@@ -13,7 +13,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
   private val log = Logger[UdoConTableReader]
 
   def read(table: String): InputRoot = {
-    val cells: Seq[Seq[String]] = table.split("\n", -1).filterNot(_.isEmpty) map (_.split("\t", -1).map(_.trim).toSeq) toSeq
+    val cells: Seq[Seq[String]] = table.split("\n", -1).filterNot(_.isEmpty).map(_.split("\t", -1).map(_.trim).toSeq).toSeq
 
     log.debug(s"Cells:\n${cells.mkString("\n")}")
     val cellsFirstLine = cells.head
@@ -60,37 +60,37 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     }
 
     val persons = choices.foldLeft(personsWithoutWeight) {
-      case (currentPersons, ('gamemaster, personName, _)) => currentPersons replace {
+      case (currentPersons, ('gamemaster, personName, _)) => currentPersons.replace {
         case person if person.name == personName => person.copy(weight = udoSettings.gamemasterWeight.value)
       }
       case (currentPersons, _) => currentPersons
-    } toSet
+    }.toSet
 
     log.debug(s"Persons: $persons")
 
     val topics = choices.foldLeft(topicsWithoutPersons) {
-      case (currentTopics, ('gamemaster, personName, topicName)) => currentTopics replace {
+      case (currentTopics, ('gamemaster, personName, topicName)) => currentTopics.replace {
         case topic if topic.name == topicName => topic.copy(mandatory = topic.mandatory + personName)
       }
-      case (currentTopics, ('forbidden, personName, topicName)) => currentTopics replace {
+      case (currentTopics, ('forbidden, personName, topicName)) => currentTopics.replace {
         case topic if topic.name == topicName => topic.copy(forbidden = topic.forbidden + personName)
       }
       case (currentTopics, _) => currentTopics
-    } toSet
+    }.toSet
 
     log.debug(s"Topics: $topics")
 
     val emptyPreferences = personsWithoutWeight map { p => InputPreference(p.name, Set(), Set()) }
 
     val preferences = choices.foldLeft(emptyPreferences) {
-      case (currentPreferences, ('weak, personName, topicName)) => currentPreferences replace {
+      case (currentPreferences, ('weak, personName, topicName)) => currentPreferences.replace {
         case pref if pref.person == personName => pref.copy(weak = pref.weak + topicName)
       }
-      case (currentPreferences, ('strong, personName, topicName)) => currentPreferences replace {
+      case (currentPreferences, ('strong, personName, topicName)) => currentPreferences.replace {
         case pref if pref.person == personName => pref.copy(strong = pref.strong + topicName)
       }
       case (currentPreferences, _) => currentPreferences
-    } toSet
+    }.toSet
 
     log.debug(s"Preferences: $preferences")
 

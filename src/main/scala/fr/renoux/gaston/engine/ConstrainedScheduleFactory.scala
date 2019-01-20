@@ -93,7 +93,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
           backtrackAssignTopicsToSlots(candidate)(slotsLeft.tail :+ currentSlot, nextTopics ::: topicsPassed, Nil)(postTreatment)
         } else None
 
-      possibleSchedule orElse {
+      possibleSchedule .orElse {
         /* candidate is not acceptable or lead to a failure, try again with next topic */
         log.trace(s"Go on with new topic for current slot as the candidate is not OK")
         backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft, nextTopics, currentTopic :: topicsPassed)(postTreatment)
@@ -134,13 +134,13 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
 
         Dispatch.equallyWithMaxes(topicsMinMaxCurrent.map(_._3)) */
 
-        val topicsWithValues = schedule.topicsPerSlot(slot) map { t =>
+        val topicsWithValues = schedule.topicsPerSlot(slot). map { t =>
           val min = problem.minNumberPerTopic.getOrElse(t, 0)
           val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
           val current = schedule.countPersonsPerTopic(t)
 
           ((t, min - current), (t, max - math.max(min, current)))
-        } unzip
+        } .unzip
 
         val topicsNeedingMin = topicsWithValues._1 filter (_._2 > 0)
         val topicsOpenToMax = topicsWithValues._2 filter (_._2 > 0)
@@ -151,7 +151,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
     }
 
     /* check wether it's possible to make it work first */
-    partialSchedule.topicsPerSlot find { case (slot, topics) =>
+    partialSchedule.topicsPerSlot. find { case (slot, topics) =>
       val min = topics.toSeq.map(problem.minNumberPerTopic(_)).sum
       val max = topics.toSeq.map(problem.maxNumberPerTopic(_)).sum
       val pCount = problem.personsCountPerSlot(slot)
