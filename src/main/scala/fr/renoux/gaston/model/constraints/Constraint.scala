@@ -10,8 +10,9 @@ import fr.renoux.gaston.model.Schedule
   */
 trait Constraint {
 
-  /** Should partial schedules be checked for this constraint ? */
-  val isApplicableToPartialSchedule: Boolean
+  /** Can we test a partial schedule ? Typically, false for counting min numbers (because it may be reached when we add
+    * more persons). */
+  val isApplicableToPartialSchedule: Boolean = true
 
   /** Indicates if the constraint is respected on the given schedule. */
   def isRespected(schedule: Schedule): Boolean

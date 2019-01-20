@@ -34,12 +34,8 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     } map { case (topicName, max, min) =>
       InputTopic(
         name = topicName,
-        mandatory = Set(),
-        forbidden = Set(),
-        simultaneous = Set(),
         min = min.toIntOption.map(_ + 1), //add the GM
-        max = max.toIntOption.map(_ + 1), //add the GM
-        forcedSlot = None
+        max = max.toIntOption.map(_ + 1) //add the GM
       )
     }
 

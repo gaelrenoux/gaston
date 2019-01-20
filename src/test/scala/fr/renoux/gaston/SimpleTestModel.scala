@@ -75,7 +75,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val DefaultMinMaxes: Set[TopicNeedsNumberOfPersons] = Topics.All
       .map(TopicNeedsNumberOfPersons(_, min = 2, max = 5))
 
-    val BathingAndEatingAreSimultaneous = SimultaneousTopics(Set(Bathing, Eating))
+    val BathingAndEatingAreSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
 
     val All: Set[Constraint] = Set(
       AA,

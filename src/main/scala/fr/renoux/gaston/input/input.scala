@@ -14,6 +14,7 @@ case class InputModel(
     slots: Set[String],
     persons: Set[InputPerson],
     topics: Set[InputTopic],
+    constraints: Option[InputGlobalConstraints] = None,
     preferences: Set[InputPreference] = Set()
 )
 
@@ -38,6 +39,20 @@ case class InputUdoSettings(
     gamemasterWeight: Weight
 )
 
+case class InputGlobalConstraints(
+    simultaneous: Set[InputSimultaneousConstraint] = Set(),
+    exclusive: Set[InputExclusiveConstraint] = Set()
+)
+
+case class InputSimultaneousConstraint(
+    topics: Set[String]
+)
+
+case class InputExclusiveConstraint(
+    topics: Set[String],
+    exemptions: Set[String]
+)
+
 case class InputPreference(
     person: String,
     strong: Set[String] = Set(),
@@ -55,8 +70,7 @@ case class InputTopic(
     name: String,
     mandatory: Set[String] = Set(),
     forbidden: Set[String] = Set(),
-    simultaneous: Set[String] = Set(),
     min: Option[Int],
     max: Option[Int],
-    forcedSlot: Option[String]
+    forcedSlot: Option[String] = None
 )

@@ -9,10 +9,6 @@ abstract class AbstractConstraint[Checked] extends Constraint {
 
   private val log = Logger[Constraint]
 
-  /** Can we test a partial schedule ? Typically, false for counting min numbers (because it may be reached when we add
-    * more persons). */
-  override val isApplicableToPartialSchedule: Boolean = true
-
   /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean = {
     val bool = elementsChecked(schedule).forall(check)

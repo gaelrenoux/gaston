@@ -12,7 +12,7 @@ object InputTranscriber {
 
   /** Load the real input from the user model. */
   def transcribe(inputRoot: InputRoot): ValidationNel[String, Problem] = {
-    //TODO real validation !
+    //TODO better validation !
     val input: InputModel = inputRoot.gaston
 
     val slotsPerName = input.slots.map { s => s -> Slot(s) }.toMap
@@ -32,8 +32,10 @@ object InputTranscriber {
 
     val simultaneousTopicsConstraints = getSimultaneousTopicsConstraints(input, ctx)
 
+    val exclusiveTopicsConstraints = getExclusiveTopicsConstraints(input, ctx)
+
     val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++
-      numberConstraints ++ forcedSlotConstraints ++ simultaneousTopicsConstraints
+      numberConstraints ++ forcedSlotConstraints ++ simultaneousTopicsConstraints ++ exclusiveTopicsConstraints
 
     val incompatibilityPreferences = getGroupAntiPreferences(input, ctx)
 
@@ -79,11 +81,14 @@ object InputTranscriber {
       inTopic.forcedSlot.map(maps.slotsPerName).map(TopicForcedSlot(maps.topicsPerName(inTopic.name), _))
     }
 
-  private def getSimultaneousTopicsConstraints(input: InputModel, ctx: Context): Set[SimultaneousTopics] =
-    input.topics.collect {
-      case inTopic if inTopic.simultaneous.nonEmpty =>
-        val fullSet = inTopic.simultaneous + inTopic.name
-        SimultaneousTopics(fullSet.map(ctx.topicsPerName))
+  private def getSimultaneousTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsSimultaneous] =
+    input.constraints.map(_.simultaneous).getOrElse(Set()).map { inConstraint =>
+      TopicsSimultaneous(inConstraint.topics.map(ctx.topicsPerName))
+    }
+
+  private def getExclusiveTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsExclusive] =
+    input.constraints.map(_.exclusive).getOrElse(Set()).map { inConstraint =>
+      TopicsExclusive(inConstraint.topics.map(ctx.topicsPerName), inConstraint.exemptions.map(ctx.personsPerName))
     }
 
   private def getGroupAntiPreferences(input: InputModel, ctx: Context): Set[PersonGroupAntiPreference] =
@@ -105,9 +110,9 @@ object InputTranscriber {
   }
 
   private case class Context(
-                              slotsPerName: Map[String, Slot],
-                              topicsPerName: Map[String, Topic],
-                              personsPerName: Map[String, Person]
-                            )
+      slotsPerName: Map[String, Slot],
+      topicsPerName: Map[String, Topic],
+      personsPerName: Map[String, Person]
+  )
 
 }

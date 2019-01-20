@@ -3,7 +3,7 @@ package fr.renoux.gaston.input
 import java.io.File
 
 import fr.renoux.gaston.model._
-import fr.renoux.gaston.model.constraints.{PersonTopicInterdiction, PersonTopicObligation, SimultaneousTopics, TopicNeedsNumberOfPersons}
+import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.problem.Problem
 import org.scalatest.{FlatSpec, Matchers}
@@ -54,7 +54,8 @@ class InputSpec extends FlatSpec with Matchers {
       TopicNeedsNumberOfPersons(Topic("alpha"), 5, 5),
       TopicNeedsNumberOfPersons(Topic("gamma"), 4, 6),
       TopicNeedsNumberOfPersons(Topic("beta"), 4, 5),
-      SimultaneousTopics(Set(Topic("alpha"), Topic("beta")))
+      TopicsSimultaneous(Set(Topic("alpha"), Topic("beta"))),
+      TopicsExclusive(Set(Topic("beta"), Topic("gamma")), Set(Person("laverne")))
     ))
   }
 
