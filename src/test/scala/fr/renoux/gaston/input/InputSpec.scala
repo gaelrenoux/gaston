@@ -1,5 +1,7 @@
 package fr.renoux.gaston.input
 
+import java.io.File
+
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints.{PersonTopicInterdiction, PersonTopicObligation, SimultaneousTopics, TopicNeedsNumberOfPersons}
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
@@ -8,20 +10,29 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class InputSpec extends FlatSpec with Matchers {
 
-  "Loading from the classpath" should "load the default input when no name is given" in {
-    val (input, _) = PureConfigLoader.fromClassPath.forceToInputAndModel
+  "Loading from default" should "load the default input when no name is given" in {
+    val (input, _) = PureConfigLoader.fromDefault.forceToInputAndModel
     input.gaston.settings.strongPreference should be(Score(5))
     input.gaston.persons.size should be(3)
   }
 
-  it should "load an input with the correct name if asked" in {
+  "Loading from the classpath" should "load the correct input" in {
     val (input, _) = PureConfigLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
     input.gaston.settings.strongPreference should be(Score(42))
     input.gaston.persons.size should be(1)
   }
 
+  "Loading from a file" should "load the correct input" in {
+    val stringPath = getClass.getResource("/named-configuration.conf").getPath
+    val path = new File(stringPath).toPath
 
-  val minimalProblem: Problem = PureConfigLoader.fromClassPath.forceToModel
+    val (input, _) = PureConfigLoader.fromPath(path).forceToInputAndModel
+    input.gaston.settings.strongPreference should be(Score(42))
+    input.gaston.persons.size should be(1)
+  }
+
+
+  val minimalProblem: Problem = PureConfigLoader.fromDefault.forceToModel
 
   "Produced problem" should "contain the correct slots" in {
     minimalProblem.slots should be(Set(Slot("A"), Slot("B")))

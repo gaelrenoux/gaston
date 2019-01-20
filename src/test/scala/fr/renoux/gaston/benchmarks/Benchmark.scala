@@ -16,12 +16,12 @@ class Benchmark extends FlatSpec with Matchers {
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
 
 
-  "Systematic improver" should "give a good score" in {
+  "Systematic improver" should "give a good score" ignore {
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(1.minute), seed = 0L)
 
-    println(schedule.toFormattedString)
+    log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
 
     udoConProblem.isSolvedBy(schedule) should be(true)
     score.value should be > 2900.0
@@ -29,7 +29,7 @@ class Benchmark extends FlatSpec with Matchers {
   }
 
 
-  "Greedy improver" should "give an okay score" in {
+  "Greedy improver" should "give an okay score" ignore {
 
     val runner = new Runner(udoConProblem, improverConstructor = new GreedyScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(1.minute), seed = 0L)

@@ -9,12 +9,11 @@ import scala.util.Random
 
 class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers with PrivateMethodTester {
   private val log = Logger[ConstrainedScheduleFactorySpec]
-  implicit val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
+  implicit val settings: InputSettings = PureConfigLoader.fromDefault.forceToInput.gaston.settings
   val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
   private val random = new Random(0L)
 
-  println(SimpleTestModel.Problems.Complete.brokenConstraintsIn(SimpleTestModel.Solutions.Best))
   assert(SimpleTestModel.Problems.Complete.isSolvedBy(SimpleTestModel.Solutions.Best))
 
 

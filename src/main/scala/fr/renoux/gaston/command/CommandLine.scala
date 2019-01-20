@@ -13,7 +13,7 @@ case class CommandLine(
                         useSample: Boolean = false,
                         generateInput: Boolean = false,
                         silent: Boolean = false,
-                        //verbose: Boolean = false,
+                        debug: Boolean = false,
                         maxDuration: Option[FiniteDuration] = None,
                         seed: Long = Random.nextLong()
                       ) {
@@ -31,31 +31,31 @@ object CommandLine {
 
     opt[Path]('f', "from").optional().valueName("<file>")
       .action((path, in) => in.copy(inputFile = Some(path)))
-      .text("The input file")
+      .text("Input file.")
 
-    opt[Unit]('a', "from-sample").optional()
+    opt[Unit]("from-sample").optional()
       .action((path, in) => in.copy(useSample = true))
-      .text("Use a sample input")
+      .text("Use a sample input.")
 
     opt[Path]('u', "from-udo-table").optional().valueName("<file>")
       .action((path, in) => in.copy(udoConTableFile = Some(path)))
-      .text("Import a table withe UdoCon wish-list format, use it to generate or complete the input file")
+      .text("Import a table withe UdoCon wish-list format, use it to generate or complete the input file.")
 
     opt[Unit]('g', "generate-input").optional()
       .action((_, in) => in.copy(generateInput = true))
-      .text("Output only the input file about to be used, do not generate a schedule")
+      .text("Output the input file. Do not generate a schedule.")
 
     opt[Unit]('s', "silent").optional()
       .action((_, in) => in.copy(silent = true))
-      .text("Do not output regularly the best schedule found until now")
+      .text("Do not output anything until the program terminates. If no duration is defined, the program will never output its result.")
 
-//    opt[Unit]('v', "verbose").optional()
-//      .action((_, in) => in.copy(verbose = true))
-//      .text("Display log messages during work")
+    opt[Unit]("debug").optional()
+      .action((_, in) => in.copy(debug = true))
+      .text("Debug mode: log debug messages. Bad for performances.")
 
-    opt[Long]('e', "seed").optional().valueName("<number>")
+    opt[Long]("seed").optional().valueName("<number>")
       .action((s, in) => in.copy(seed = s))
-      .text("Seed to use for randomization")
+      .text("Seed to use for randomization.")
 
     opt[Duration]('d', "duration").optional().valueName("<duration>")
       .action((dur, in) => in.copy(maxDuration = dur match {

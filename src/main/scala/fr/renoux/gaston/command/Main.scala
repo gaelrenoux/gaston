@@ -2,9 +2,11 @@ package fr.renoux.gaston.command
 
 import java.nio.file.Path
 
+import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.{Renderer, Runner}
 import fr.renoux.gaston.input._
+import org.slf4j.LoggerFactory
 import scalaz._
 import scalaz.syntax.either._
 import scalaz.syntax.std.option._
@@ -19,6 +21,9 @@ object Main {
   def main(args: Array[String]): Unit = {
 
     val commandLine: CommandLine = CommandLine.parse(args)
+    if (commandLine.debug) {
+      setDebugLogLevel()
+    }
     val output = new Output(commandLine.silent)
     log.info(s"Commande line is: $commandLine")
 
@@ -55,7 +60,7 @@ object Main {
   /** Load the requested input, according to the command lines arguments */
   private def loadInput(commandLine: CommandLine): NonEmptyList[String] \/ InputRoot = for {
     sampleInputRoot <-
-      if (commandLine.useSample) PureConfigLoader.fromClassPath.toInput.disjunction.map(Some(_))
+      if (commandLine.useSample) PureConfigLoader.fromClassPath("sample.conf").toInput.disjunction.map(Some(_))
       else None.right
 
     explicitInputRoot <-
@@ -80,6 +85,12 @@ object Main {
     table = Source.fromFile(path.toFile).mkString
     udoInput = udoReader.read(table)
   } yield Some(udoInput)
+
+  private def setDebugLogLevel(): Unit = {
+    val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+    val logger = loggerContext.getLogger("fr.renoux")
+    logger.setLevel(Level.DEBUG)
+  }
 
 
 }

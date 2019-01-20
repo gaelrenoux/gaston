@@ -5,7 +5,7 @@ import fr.renoux.gaston.input.{InputSettings, PureConfigLoader}
 class SystematicScheduleImproverSpec extends ScheduleImproverAbstractSpec {
 
   "Systematic improver" should "work a valid schedule (on a complex model)" in {
-    val settings: InputSettings = PureConfigLoader.fromClassPath.forceToInput.gaston.settings
+    val settings: InputSettings = PureConfigLoader.fromDefault.forceToInput.gaston.settings
     val complexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
     val (_, bestScore) = runWith(new SystematicScheduleImprover(_), complexTestModel.Problems.Complete, 0L until 1L)
     bestScore should be > 6300.0

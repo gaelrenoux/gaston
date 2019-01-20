@@ -3,6 +3,8 @@ package fr.renoux.gaston.input
 import java.io.{File, PrintWriter}
 import java.nio.file.Path
 
+import com.typesafe.config.ConfigFactory
+import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.problem.Problem
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
@@ -14,23 +16,26 @@ import scalaz.{Failure, NonEmptyList, Success, ValidationNel}
 /** Load the PureConfig input object from the configuration files. */
 class PureConfigLoader {
   //TODO handle exceptions
+  private val log = Logger[PureConfigLoader]
 
   import PureConfigLoader._
 
   /* Do not delete the pureconfig.generic.auto._ import even though IntelliJ marks is as unused */
   import pureconfig.generic.auto._
 
-  def fromPath(files: Path*) = new Result(loadConfigFromFiles[InputRoot](files))
+  /** Loads from application.conf (and reference.conf) */
+  def fromDefault: Result = new Result(loadConfig[InputRoot])
 
-  /** Loads from application.conf */
-  def fromClassPath: Result = new Result(loadConfig[InputRoot])
-
-  /** Loads from a specifically-named file */
+  /** Loads from a specifically-named file if the classpath. */
   def fromClassPath(path: String): Result = {
-    val correctedPath = if (path.headOption.contains('/')) path else s"/$path"
-    val absoluteFilePath = getClass.getResource(correctedPath).getPath
-    val absoluteFile = new File(absoluteFilePath)
-    fromPath(absoluteFile.toPath)
+    val tsConfig = ConfigFactory.load(path)
+    new Result(loadConfig[InputRoot](tsConfig))
+  }
+
+  /** Loads from defined files on the filesystem. */
+  def fromPath(files: Path*): Result = {
+    log.debug(s"Loading those files: ${files.mkString("; ")}")
+    new Result(loadConfigFromFiles[InputRoot](files, failOnReadError = true))
   }
 
   /** Loads from a String */
