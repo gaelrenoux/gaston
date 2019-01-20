@@ -14,10 +14,10 @@ case class Schedule(
   import fr.renoux.gaston.model.Schedule._
 
   lazy val slots: Set[Slot] = records.map(_.slot)
-  lazy val personsPerSlot: Map[Slot, Set[Person]] = records.groupBy(_.slot).mapValuesStrict { x => x.flatMap(_.persons) }
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
-  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValuesStrict { x => x.map(_.topic) }
-  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
+  lazy val personsPerSlot: Map[Slot, Set[Person]] = records.groupBy(_.slot).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
+  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValuesStrict { x => x.map(_.topic) }.withDefaultValue(Set())
+  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size).withDefaultValue(0)
 
   /** Merge more triplets into this schedule. */
   def merge(addedRecords: Set[Record]): Schedule = {

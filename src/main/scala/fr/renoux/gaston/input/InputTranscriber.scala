@@ -43,7 +43,11 @@ object InputTranscriber {
 
     val preferences = Set[Preference]() ++ incompatibilityPreferences ++ personPreferences
 
+    val parallelization = input.settings.parallelization.getOrElse(
+      (topicsPerName.size.toDouble / slotsPerName.size).ceil.toInt)
+
     Problem(
+      parallelization,
       slotsPerName.values.toSet,
       topicsPerName.values.toSet,
       personsPerName.values.toSet,

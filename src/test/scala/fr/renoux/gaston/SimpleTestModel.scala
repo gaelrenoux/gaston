@@ -141,7 +141,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
-    val Complete = Problem(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+    val Complete = Problem(3, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

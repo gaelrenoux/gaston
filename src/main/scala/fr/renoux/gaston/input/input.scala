@@ -19,6 +19,7 @@ case class InputModel(
 )
 
 case class InputSettings(
+    parallelization: Option[Int] = None,
     weakPreference: Score,
     strongPreference: Score,
     incompatibilityAntiPreference: Score,

@@ -15,14 +15,15 @@ class Runner(
     problem: Problem,
     improverConstructor: Problem => ScheduleImprover = new SystematicScheduleImprover(_),
     hook: (Schedule, Score, Long) => Unit = (_, _, _) => (),
-    hookFrequency: FiniteDuration = 20.seconds
+    hookFrequency: FiniteDuration = 20.seconds,
+    debugMode: Boolean = false
 ) {
 
   private val log = Logger[Runner]
 
   private val scorer = Scorer.of(problem)
-  val csFactory = new ConstrainedScheduleFactory(problem)
-  val psFactory = improverConstructor(problem)
+  private val csFactory = new ConstrainedScheduleFactory(problem, debugMode = debugMode)
+  private val psFactory = improverConstructor(problem)
 
   private val hookFrequencyMillis = hookFrequency.toMillis
 

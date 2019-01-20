@@ -28,22 +28,42 @@ object UdoConTestModel {
   )
 
   object Persons {
-    //private val nicknames = Set("Mangon", "Sammael99", "Zeben", "Kamiseito", "Kersa", "Tolkraft", "Cryoban", "Paradoks", "Paiji", "Isidore", "Gabzeta", "Highlandjul", "Orfeo", "Rolapin", "Ozen", "Bashar", "Selpoivre", "Chestel", "Jorune", "Aude", "Killerklown", "Najael", "Eugénie", "Julian", "Goat", "Boojum", "Udo Femi")
-    val All: Set[Person] = Set(Person("Najael", Weight(1.0)), Person("Sammael99", Weight(1.5)), Person("Jorune", Weight(1.5)), Person("Paradoks", Weight(1.5)), Person("Chestel", Weight(1.0)), Person("Eugénie", Weight(1.5)), Person("Zeben", Weight(1.5)), Person("Orfeo", Weight(1.5)), Person("Kersa", Weight(1.0)), Person("Selpoivre", Weight(1.5)), Person("Kamiseito", Weight(1.0)), Person("Highlandjul", Weight(1.5)), Person("Gabzeta", Weight(1.5)), Person("Isidore", Weight(1.0)), Person("Paiji", Weight(1.0)), Person("Cryoban", Weight(1.5)), Person("Bashar", Weight(1.0)), Person("Killerklown", Weight(1.5)), Person("Goat", Weight(1.5)), Person("Tolkraft", Weight(1.5)), Person("Aude", Weight(1.0)), Person("Udo Femi", Weight(1.5)), Person("Ozen", Weight(1.5)), Person("Rolapin", Weight(1.5)), Person("Mangon", Weight(1.0)), Person("Julian", Weight(1.5)), Person("Boojum", Weight(1.5)))
+    val All: Set[Person] = Set(
+      Person("Najael", Weight(1.0)), Person("Sammael99", Weight(1.5)), Person("Jorune", Weight(1.5)),
+      Person("Paradoks", Weight(1.5)), Person("Chestel", Weight(1.0)), Person("Eugénie", Weight(1.5)),
+      Person("Zeben", Weight(1.5)), Person("Orfeo", Weight(1.5)), Person("Kersa", Weight(1.0)),
+      Person("Selpoivre", Weight(1.5)), Person("Kamiseito", Weight(1.0)), Person("Highlandjul", Weight(1.5)),
+      Person("Gabzeta", Weight(1.5)), Person("Isidore", Weight(1.0)), Person("Paiji", Weight(1.0)),
+      Person("Cryoban", Weight(1.5)), Person("Bashar", Weight(1.0)), Person("Killerklown", Weight(1.5)),
+      Person("Goat", Weight(1.5)), Person("Tolkraft", Weight(1.5)), Person("Aude", Weight(1.0)),
+      Person("Udo Femi", Weight(1.5)), Person("Ozen", Weight(1.5)), Person("Rolapin", Weight(1.5)),
+      Person("Mangon", Weight(1.0)), Person("Julian", Weight(1.5)), Person("Boojum", Weight(1.5))
+    )
     val byName: Map[String, Person] = All.map(p => p.name -> p).toMap
   }
 
   object Topics {
-    private val topicNames = Set("Agôn", "DC comics - Darkest night", "Les Schtroumpfs", "Shadow of the Demon Lord", "Delta Green - Scénario original", "Blades in the Dark", "Skyrealms of Jorune Revival", "Wurm : Rouge massacre", "Psi*run", "Coriolis: Third horizon", "Mexican Death trip", "Meute", "Les Derniers", "Chiens de guerre", "Tales from the Loop", "Donjon & Cie", "P.U.N.C.H Unit - Katanga 1960", "Delta Green - Pennsylvania '99", "Inflorenza (ambiance Patient 13)", "KPDP dans le Dodécaèdre", "Summer camp - classe de neige", "Dieux Ennemis", "Wastburg", "Black Mirror", "Le Retour de Soth", "Godbound - l'appel")
-    private val additionalTopicNames = Set("Burning Wheel", "end of line", "Aux Marches du Pouvoir", "DCC Funnel - Ferme des Célébrités", "Tortues Ninja (Fate)", "Héroïques")
-    val Selected: Set[Topic] = topicNames map Topic
-    val All: Set[Topic] = Selected ++ (additionalTopicNames map Topic)
+    private val topicNames = Set(
+      "Agôn", "DC comics - Darkest night", "Les Schtroumpfs", "Shadow of the Demon Lord",
+      "Delta Green - Scénario original", "Blades in the Dark", "Skyrealms of Jorune Revival", "Wurm : Rouge massacre",
+      "Psi*run", "Coriolis: Third horizon", "Mexican Death trip", "Meute",
+      "Chiens de guerre", "Tales from the Loop", "Donjon & Cie", "Inflorenza (ambiance Patient 13)",
+      "P.U.N.C.H Unit - Katanga 1960", "Delta Green - Pennsylvania '99", "Les Derniers", "KPDP dans le Dodécaèdre",
+      "Summer camp - classe de neige", "Dieux Ennemis", "Wastburg", "Black Mirror",
+      "Le Retour de Soth", "Godbound - l'appel"
+    )
+    private val additionalTopicNames = Set(
+      "Burning Wheel", "end of line", "Aux Marches du Pouvoir", "DCC Funnel - Ferme des Célébrités",
+      "Tortues Ninja (Fate)", "Héroïques"
+    )
+    val Selected: Set[Topic] = topicNames.map(Topic)
+    val All: Set[Topic] = Selected ++ additionalTopicNames.map(Topic)
     val byName: Map[String, Topic] = All.map(p => p.name -> p).toMap
   }
 
   object Slots {
     private val slotNames = Set("D1-afternoon", "D1-evening", "D2-afternoon", "D2-evening", "D3-afternoon")
-    val All: Set[Slot] = slotNames map Slot
+    val All: Set[Slot] = slotNames.map(Slot)
   }
 
   object Constraints {
@@ -390,46 +410,74 @@ object UdoConTestModel {
 
   object Problems {
     val Simplified = {
-      val p = Problem(Slots.All, Topics.Selected, Persons.All, Constraints.Selected, Preferences.Selected)
+      val p = Problem(5, Slots.All, Topics.Selected, Persons.All, Constraints.Selected, Preferences.Selected)
       log.debug(s"Simplified problem is $p")
       p
     }
     val Complete = {
-      val p = Problem(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = Problem(5, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.debug(s"Complete problem is $p")
       p
     }
   }
 
   object Solutions {
+
     import Persons.byName
+
     val Actual = Schedule(5,
-      Record(Slot("D1-afternoon"), Topic("Agôn"),                             Set[Person]( byName("Mangon"), byName("Kamiseito"), byName("Highlandjul"), byName("Ozen"), byName("Bashar")) ),
-      Record(Slot("D1-afternoon"), Topic("DC comics - Darkest night"),        Set[Person]( byName("Cryoban"), byName("Selpoivre"), byName("Chestel"), byName("Jorune"), byName("Boojum")) ),
-      Record(Slot("D1-afternoon"), Topic("Les Schtroumpfs"),                  Set[Person]( byName("Paradoks"), byName("Isidore"), byName("Gabzeta"), byName("Aude"), byName("Julian")) ),
-      Record(Slot("D1-afternoon"), Topic("Shadow of the Demon Lord"),         Set[Person]( byName("Zeben"), byName("Paiji"), byName("Orfeo"), byName("Rolapin"), byName("Goat"), byName("Udo Femi")) ),
-      Record(Slot("D1-afternoon"), Topic("Delta Green - Scénario original"),  Set[Person]( byName("Sammael99"), byName("Kersa"), byName("Tolkraft"), byName("Killerklown"), byName("Najael"), byName("Eugénie")) ),
-      Record(Slot("D1-evening"), Topic("Blades in the Dark"),                 Set[Person]( byName("Zeben"), byName("Highlandjul"), byName("Orfeo"), byName("Rolapin"), byName("Goat"), byName("Udo Femi")) ),
-      Record(Slot("D1-evening"), Topic("Skyrealms of Jorune Revival"),        Set[Person]( byName("Mangon"), byName("Sammael99"), byName("Paiji"), byName("Isidore"), byName("Chestel"), byName("Jorune")) ),
-      Record(Slot("D1-evening"), Topic("Wurm : Rouge massacre"),              Set[Person]( byName("Kamiseito"), byName("Cryoban"), byName("Gabzeta"), byName("Selpoivre"), byName("Aude")) ),
-      Record(Slot("D1-evening"), Topic("Psi*run"),                            Set[Person]( byName("Kersa"), byName("Paradoks"), byName("Ozen"), byName("Bashar"), byName("Eugénie")) ),
-      Record(Slot("D1-evening"), Topic("Coriolis: Third horizon"),            Set[Person]( byName("Tolkraft"), byName("Killerklown"), byName("Najael"), byName("Julian"), byName("Boojum")) ),
-      Record(Slot("D2-afternoon"), Topic("Mexican Death trip"),               Set[Person]( byName("Paradoks"), byName("Rolapin"), byName("Ozen"), byName("Najael"), byName("Julian")) ),
-      Record(Slot("D2-afternoon"), Topic("Meute"),                            Set[Person]( byName("Sammael99"), byName("Cryoban"), byName("Gabzeta"), byName("Highlandjul"), byName("Jorune"), byName("Killerklown")) ),
-      Record(Slot("D2-afternoon"), Topic("Les Derniers"),                     Set[Person]( byName("Kamiseito"), byName("Kersa"), byName("Tolkraft"), byName("Paiji"), byName("Chestel")) ),
-      Record(Slot("D2-afternoon"), Topic("Chiens de guerre"),                 Set[Person]( byName("Mangon"), byName("Isidore"), byName("Orfeo"), byName("Eugénie"), byName("Goat")) ),
-      Record(Slot("D2-afternoon"), Topic("Tales from the Loop"),              Set[Person]( byName("Zeben"), byName("Bashar"), byName("Selpoivre"), byName("Aude"), byName("Boojum"), byName("Udo Femi")) ),
-      Record(Slot("D2-evening"), Topic("Donjon & Cie"),                       Set[Person]( byName("Mangon"), byName("Sammael99"), byName("Highlandjul"), byName("Aude"), byName("Julian"), byName("Boojum")) ),
-      Record(Slot("D2-evening"), Topic("P.U.N.C.H Unit - Katanga 1960"),      Set[Person]( byName("Kamiseito"), byName("Kersa"), byName("Cryoban"), byName("Bashar"), byName("Killerklown")) ),
-      Record(Slot("D2-evening"), Topic("Delta Green - Pennsylvania '99"),     Set[Person]( byName("Tolkraft"), byName("Paiji"), byName("Rolapin"), byName("Isidore"), byName("Selpoivre"), byName("Jorune")) ),
-      Record(Slot("D2-evening"), Topic("Inflorenza (ambiance Patient 13)"),   Set[Person]( byName("Paradoks"), byName("Gabzeta"), byName("Orfeo"), byName("Chestel"), byName("Eugénie")) ),
-      Record(Slot("D2-evening"), Topic("KPDP dans le Dodécaèdre"),            Set[Person]( byName("Zeben"), byName("Ozen"), byName("Najael"), byName("Goat"), byName("Udo Femi")) ),
-      Record(Slot("D3-afternoon"), Topic("Summer camp - classe de neige"),    Set[Person]( byName("Paradoks"), byName("Chestel"), byName("Eugénie"), byName("Julian")) ),
-      Record(Slot("D3-afternoon"), Topic("Dieux Ennemis"),                    Set[Person]( byName("Zeben"), byName("Kamiseito"), byName("Highlandjul"), byName("Bashar")) ),
-      Record(Slot("D3-afternoon"), Topic("Wastburg"),                         Set[Person]( byName("Kersa"), byName("Tolkraft"), byName("Gabzeta"), byName("Selpoivre"), byName("Aude"), byName("Goat")) ),
-      Record(Slot("D3-afternoon"), Topic("Black Mirror"),                     Set[Person]( byName("Mangon"), byName("Orfeo"), byName("Jorune"), byName("Udo Femi")) ),
-      Record(Slot("D3-afternoon"), Topic("Le Retour de Soth"),                Set[Person]( byName("Isidore"), byName("Killerklown"), byName("Najael"), byName("Boojum")) ),
-      Record(Slot("D3-afternoon"), Topic("Godbound - l'appel"),               Set[Person]( byName("Sammael99"), byName("Cryoban"), byName("Paiji"), byName("Rolapin")) )
+      Record(Slot("D1-afternoon"), Topic("Agôn"), Set[Person](byName("Mangon"), byName("Kamiseito"), byName
+      ("Highlandjul"), byName("Ozen"), byName("Bashar"))),
+      Record(Slot("D1-afternoon"), Topic("DC comics - Darkest night"), Set[Person](byName("Cryoban"), byName
+      ("Selpoivre"), byName("Chestel"), byName("Jorune"), byName("Boojum"))),
+      Record(Slot("D1-afternoon"), Topic("Les Schtroumpfs"), Set[Person](byName("Paradoks"), byName("Isidore"),
+        byName("Gabzeta"), byName("Aude"), byName("Julian"))),
+      Record(Slot("D1-afternoon"), Topic("Shadow of the Demon Lord"), Set[Person](byName("Zeben"), byName("Paiji"),
+        byName("Orfeo"), byName("Rolapin"), byName("Goat"), byName("Udo Femi"))),
+      Record(Slot("D1-afternoon"), Topic("Delta Green - Scénario original"), Set[Person](byName("Sammael99"), byName
+      ("Kersa"), byName("Tolkraft"), byName("Killerklown"), byName("Najael"), byName("Eugénie"))),
+      Record(Slot("D1-evening"), Topic("Blades in the Dark"), Set[Person](byName("Zeben"), byName("Highlandjul"),
+        byName("Orfeo"), byName("Rolapin"), byName("Goat"), byName("Udo Femi"))),
+      Record(Slot("D1-evening"), Topic("Skyrealms of Jorune Revival"), Set[Person](byName("Mangon"), byName
+      ("Sammael99"), byName("Paiji"), byName("Isidore"), byName("Chestel"), byName("Jorune"))),
+      Record(Slot("D1-evening"), Topic("Wurm : Rouge massacre"), Set[Person](byName("Kamiseito"), byName("Cryoban"),
+        byName("Gabzeta"), byName("Selpoivre"), byName("Aude"))),
+      Record(Slot("D1-evening"), Topic("Psi*run"), Set[Person](byName("Kersa"), byName("Paradoks"), byName("Ozen"),
+        byName("Bashar"), byName("Eugénie"))),
+      Record(Slot("D1-evening"), Topic("Coriolis: Third horizon"), Set[Person](byName("Tolkraft"), byName
+      ("Killerklown"), byName("Najael"), byName("Julian"), byName("Boojum"))),
+      Record(Slot("D2-afternoon"), Topic("Mexican Death trip"), Set[Person](byName("Paradoks"), byName("Rolapin"),
+        byName("Ozen"), byName("Najael"), byName("Julian"))),
+      Record(Slot("D2-afternoon"), Topic("Meute"), Set[Person](byName("Sammael99"), byName("Cryoban"), byName
+      ("Gabzeta"), byName("Highlandjul"), byName("Jorune"), byName("Killerklown"))),
+      Record(Slot("D2-afternoon"), Topic("Les Derniers"), Set[Person](byName("Kamiseito"), byName("Kersa"), byName
+      ("Tolkraft"), byName("Paiji"), byName("Chestel"))),
+      Record(Slot("D2-afternoon"), Topic("Chiens de guerre"), Set[Person](byName("Mangon"), byName("Isidore"), byName
+      ("Orfeo"), byName("Eugénie"), byName("Goat"))),
+      Record(Slot("D2-afternoon"), Topic("Tales from the Loop"), Set[Person](byName("Zeben"), byName("Bashar"),
+        byName("Selpoivre"), byName("Aude"), byName("Boojum"), byName("Udo Femi"))),
+      Record(Slot("D2-evening"), Topic("Donjon & Cie"), Set[Person](byName("Mangon"), byName("Sammael99"), byName
+      ("Highlandjul"), byName("Aude"), byName("Julian"), byName("Boojum"))),
+      Record(Slot("D2-evening"), Topic("P.U.N.C.H Unit - Katanga 1960"), Set[Person](byName("Kamiseito"), byName
+      ("Kersa"), byName("Cryoban"), byName("Bashar"), byName("Killerklown"))),
+      Record(Slot("D2-evening"), Topic("Delta Green - Pennsylvania '99"), Set[Person](byName("Tolkraft"), byName
+      ("Paiji"), byName("Rolapin"), byName("Isidore"), byName("Selpoivre"), byName("Jorune"))),
+      Record(Slot("D2-evening"), Topic("Inflorenza (ambiance Patient 13)"), Set[Person](byName("Paradoks"), byName
+      ("Gabzeta"), byName("Orfeo"), byName("Chestel"), byName("Eugénie"))),
+      Record(Slot("D2-evening"), Topic("KPDP dans le Dodécaèdre"), Set[Person](byName("Zeben"), byName("Ozen"),
+        byName("Najael"), byName("Goat"), byName("Udo Femi"))),
+      Record(Slot("D3-afternoon"), Topic("Summer camp - classe de neige"), Set[Person](byName("Paradoks"), byName
+      ("Chestel"), byName("Eugénie"), byName("Julian"))),
+      Record(Slot("D3-afternoon"), Topic("Dieux Ennemis"), Set[Person](byName("Zeben"), byName("Kamiseito"), byName
+      ("Highlandjul"), byName("Bashar"))),
+      Record(Slot("D3-afternoon"), Topic("Wastburg"), Set[Person](byName("Kersa"), byName("Tolkraft"), byName
+      ("Gabzeta"), byName("Selpoivre"), byName("Aude"), byName("Goat"))),
+      Record(Slot("D3-afternoon"), Topic("Black Mirror"), Set[Person](byName("Mangon"), byName("Orfeo"), byName
+      ("Jorune"), byName("Udo Femi"))),
+      Record(Slot("D3-afternoon"), Topic("Le Retour de Soth"), Set[Person](byName("Isidore"), byName("Killerklown"),
+        byName("Najael"), byName("Boojum"))),
+      Record(Slot("D3-afternoon"), Topic("Godbound - l'appel"), Set[Person](byName("Sammael99"), byName("Cryoban"),
+        byName("Paiji"), byName("Rolapin")))
     )
   }
 

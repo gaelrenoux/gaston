@@ -8,6 +8,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
 case class Problem(
+    parallelization: Int,
     slots: Set[Slot],
     topics: Set[Topic],
     persons: Set[Person],
@@ -81,11 +82,6 @@ case class Problem(
     constraints.collect {
       case TopicForcedSlot(topic, slot) => slot -> topic
     }.groupBy(_._1).mapValuesStrict(_.map(_._2))
-
-
-  /** Maximum number of topics we must have during the same slot */
-  //TODO should be fixed, maybe ?
-  lazy val parallelization: Int = (topics.size.toDouble / slots.size).ceil.toInt
 
   /** The min number of persons for each topic that has a min number of persons */
   lazy val minNumberPerTopic: Map[Topic, Int] = constraints.collect {

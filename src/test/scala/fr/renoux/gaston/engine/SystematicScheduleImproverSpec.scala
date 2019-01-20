@@ -8,12 +8,12 @@ class SystematicScheduleImproverSpec extends ScheduleImproverAbstractSpec {
     val settings: InputSettings = InputLoader.fromDefault.forceToInput.gaston.settings
     val complexTestModel = fr.renoux.gaston.ComplexTestModel(42L)(settings)
     val (_, bestScore) = runWith(new SystematicScheduleImprover(_), complexTestModel.Problems.Complete, 0L until 1L)
-    bestScore should be > 6300.0
+    bestScore should be >= 6300.0
   }
 
   it should "work a valid schedule (on a real-life model)" in {
     val problem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
     val (_, bestScore) = runWith(new SystematicScheduleImprover(_), problem, 0L until 1L)
-    bestScore should be > 2200.0
+    bestScore should be >= 2200.0
   }
 }

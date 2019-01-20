@@ -19,37 +19,42 @@ class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
 
   private val log = Logger(classOf[ComplexTestModel])
 
-  implicit val random = new Random(seed)
+  implicit val random: Random = new Random(seed)
 
   object Persons {
-    val All: Set[Person] = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott", "tia", "umar", "valencia", "xavier", "yu", "zelda").map(Person(_))
+    val All: Set[Person] = Set("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione",
+      "isidore", "jennifer", "kevin", "laura", "mike", "natacha", "oliver", "priscilla", "quentin", "rui", "scott",
+      "tia", "umar", "valencia", "xavier", "yu", "zelda").map(Person(_))
   }
 
   object Topics {
-    private val topicNames = Set("alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu", "nu", "ksi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "khi", "psi", "omega")
-    val All: Set[Topic] = topicNames map Topic
+    private val topicNames = Set("alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota",
+      "kappa", "lambda", "mu", "nu", "ksi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "khi", "psi",
+      "omega")
+    val All: Set[Topic] = topicNames.map(Topic)
   }
 
   object Slots {
     private val slotNames = Set("d1 am", "d1 pm", "d2 am", "d2 pm", "d3 am", "d3 pm")
-    val All: Set[Slot] = slotNames map Slot
+    val All: Set[Slot] = slotNames.map(Slot)
   }
 
   object Constraints {
 
     val Obligations: Set[Constraint] = for (t <- Topics.All) yield PersonTopicObligation(random.pick(Persons.All), t)
 
-    val Interdictions: Set[Constraint] = (for (t <- random.pick(Topics.All, 5); p <- random.pick(Persons.All, 2)) yield PersonTopicInterdiction(p, t)).toSet
+    val Interdictions: Set[Constraint] = (for (t <- random.pick(Topics.All, 5); p <- random.pick(Persons.All, 2))
+      yield PersonTopicInterdiction(p, t)).toSet
 
     val Absences: Set[Constraint] = (
-      (random.pick(Persons.All, 5) map (PersonAbsence(_, Slot("d1 am")))) ++
-        (random.pick(Persons.All, 5) map (PersonAbsence(_, Slot("d3 pm"))))
+      random.pick(Persons.All, 5).map(PersonAbsence(_, Slot("d1 am"))) ++
+        random.pick(Persons.All, 5).map(PersonAbsence(_, Slot("d3 pm")))
       ).toSet
 
     val Numbers: Set[Constraint] = {
-      val initial: Set[Constraint] = Topics.All map (TopicNeedsNumberOfPersons(_, min = 4, max = 12))
+      val initial: Set[Constraint] = Topics.All.map(TopicNeedsNumberOfPersons(_, min = 4, max = 12))
       val toRemove = random.pick(initial, 2)
-      val toAdd = toRemove map { case TopicNeedsNumberOfPersons(t, min, _) => TopicNeedsNumberOfPersons(t, min, 4) }
+      val toAdd = toRemove .map { case TopicNeedsNumberOfPersons(t, min, _) => TopicNeedsNumberOfPersons(t, min, 4) }
       initial -- toRemove ++ toAdd
     }
 
@@ -67,12 +72,13 @@ class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
       PersonGroupAntiPreference(p.head, p.tail.toSet, -settings.strongPreference)
     }
 
-    val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"), Topic("sigma"), Score(100))
+    val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"),
+    // Topic("sigma"), Score(100))
   }
 
   object Problems {
-    val Complete = {
-      val p = Problem(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+    val Complete: Problem = {
+      val p = Problem(4, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }
@@ -84,5 +90,6 @@ class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
 object ComplexTestModel {
   private val cache = mutable.Map[Long, ComplexTestModel]()
 
-  def apply(seed: Long)(implicit settings: InputSettings): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
+  def apply(seed: Long)(implicit settings: InputSettings): ComplexTestModel = cache.getOrElseUpdate(seed, new
+      ComplexTestModel(seed))
 }

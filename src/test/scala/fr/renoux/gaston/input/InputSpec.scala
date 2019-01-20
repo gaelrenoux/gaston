@@ -34,6 +34,10 @@ class InputSpec extends FlatSpec with Matchers {
 
   val minimalProblem: Problem = InputLoader.fromDefault.forceToModel
 
+  "Produced problem" should "contain the correct parallelization" in {
+    minimalProblem.parallelization should be(2)
+  }
+
   "Produced problem" should "contain the correct slots" in {
     minimalProblem.slots should be(Set(Slot("A"), Slot("B")))
   }
