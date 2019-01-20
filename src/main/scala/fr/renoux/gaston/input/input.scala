@@ -2,8 +2,6 @@ package fr.renoux.gaston.input
 
 import fr.renoux.gaston.model._
 
-/* TODO try without the Options, using default values */
-
 /* All line and column indices are zero-based */
 
 case class InputRoot(

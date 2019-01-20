@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.input.{PureConfigLoader, InputSettings}
+import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
 
 import scala.util.Random
@@ -9,7 +9,7 @@ import scala.util.Random
 
 class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers with PrivateMethodTester {
   private val log = Logger[ConstrainedScheduleFactorySpec]
-  implicit val settings: InputSettings = PureConfigLoader.fromDefault.forceToInput.gaston.settings
+  implicit val settings: InputSettings = InputLoader.fromDefault.forceToInput.gaston.settings
   val SimpleTestModel = fr.renoux.gaston.SimpleTestModel(settings)
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
   private val random = new Random(0L)

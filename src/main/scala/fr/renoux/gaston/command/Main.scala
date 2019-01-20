@@ -35,10 +35,10 @@ object Main {
   /** Run the application with command line arguments */
   private def run(commandLine: CommandLine, output: Output): NonEmptyList[String] \/ Unit = for {
     inputRoot <- loadInput(commandLine)
-    problem <- PureConfigTranscriber.transcribe(inputRoot).disjunction
+    problem <- InputTranscriber.transcribe(inputRoot).disjunction
   } yield {
     if (commandLine.generateInput) {
-      output("\n" + PureConfigLoader.render(inputRoot))
+      output("\n" + InputLoader.render(inputRoot))
     } else {
       val renderer = new Renderer(inputRoot.gaston.settings, problem)
       val runner = new Runner(problem, hook = (schedule, score, count) => {
@@ -60,13 +60,13 @@ object Main {
   /** Load the requested input, according to the command lines arguments */
   private def loadInput(commandLine: CommandLine): NonEmptyList[String] \/ InputRoot = for {
     sampleInputRoot <-
-      if (commandLine.useSample) PureConfigLoader.fromClassPath("sample.conf").toInput.disjunction.map(Some(_))
+      if (commandLine.useSample) InputLoader.fromClassPath("sample.conf").toInput.disjunction.map(Some(_))
       else None.right
 
     explicitInputRoot <-
       commandLine.inputFile.map { path =>
         log.info(s"Loading from $path")
-        PureConfigLoader.fromPath(path).toInput.disjunction.map(Some(_))
+        InputLoader.fromPath(path).toInput.disjunction.map(Some(_))
       }.getOrElse(None.right)
 
     initialInputRoot <-

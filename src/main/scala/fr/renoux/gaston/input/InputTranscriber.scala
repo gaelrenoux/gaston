@@ -7,8 +7,8 @@ import fr.renoux.gaston.model.{Person, Slot, Topic, Weight}
 import scalaz.ValidationNel
 import scalaz.syntax.validation._
 
-/** Converts the PureConfig input object to the Problem object. */
-object PureConfigTranscriber {
+/** Converts the Input object to the Problem object. */
+object InputTranscriber {
 
   /** Load the real input from the user model. */
   def transcribe(inputRoot: InputRoot): ValidationNel[String, Problem] = {

@@ -11,13 +11,13 @@ import org.scalatest.{FlatSpec, Matchers}
 class InputSpec extends FlatSpec with Matchers {
 
   "Loading from default" should "load the default input when no name is given" in {
-    val (input, _) = PureConfigLoader.fromDefault.forceToInputAndModel
+    val (input, _) = InputLoader.fromDefault.forceToInputAndModel
     input.gaston.settings.strongPreference should be(Score(5))
     input.gaston.persons.size should be(3)
   }
 
   "Loading from the classpath" should "load the correct input" in {
-    val (input, _) = PureConfigLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
+    val (input, _) = InputLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
     input.gaston.settings.strongPreference should be(Score(42))
     input.gaston.persons.size should be(1)
   }
@@ -26,13 +26,13 @@ class InputSpec extends FlatSpec with Matchers {
     val stringPath = getClass.getResource("/named-configuration.conf").getPath
     val path = new File(stringPath).toPath
 
-    val (input, _) = PureConfigLoader.fromPath(path).forceToInputAndModel
+    val (input, _) = InputLoader.fromPath(path).forceToInputAndModel
     input.gaston.settings.strongPreference should be(Score(42))
     input.gaston.persons.size should be(1)
   }
 
 
-  val minimalProblem: Problem = PureConfigLoader.fromDefault.forceToModel
+  val minimalProblem: Problem = InputLoader.fromDefault.forceToModel
 
   "Produced problem" should "contain the correct slots" in {
     minimalProblem.slots should be(Set(Slot("A"), Slot("B")))

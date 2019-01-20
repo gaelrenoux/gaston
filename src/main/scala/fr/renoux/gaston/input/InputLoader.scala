@@ -9,16 +9,15 @@ import fr.renoux.gaston.model.problem.Problem
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
 import scalaz.Validation.FlatMap._
-import scalaz.syntax.ToValidationOps
-import scalaz.syntax.apply._
+import scalaz.syntax.all._
 import scalaz.{Failure, NonEmptyList, Success, ValidationNel}
 
-/** Load the PureConfig input object from the configuration files. */
-class PureConfigLoader {
-  //TODO handle exceptions
-  private val log = Logger[PureConfigLoader]
 
-  import PureConfigLoader._
+/** Load the PureConfig input object from the configuration files. */
+object InputLoader {
+
+  //TODO handle exceptions
+  private val log = Logger[InputLoader.type]
 
   /* Do not delete the pureconfig.generic.auto._ import even though IntelliJ marks is as unused */
   import pureconfig.generic.auto._
@@ -55,11 +54,8 @@ class PureConfigLoader {
     if (line.trim.startsWith("#")) None else Some(line)
   }.mkString("\n")
 
-}
-
-object PureConfigLoader extends PureConfigLoader with ToValidationOps {
-
-  class Result(wrapped: Either[ConfigReaderFailures, InputRoot]) {
+  /** Result of the InputLoader: either a list of failures, or a input root. */
+  class Result private[InputLoader](wrapped: Either[ConfigReaderFailures, InputRoot]) {
 
     lazy val toInput: ValidationNel[String, InputRoot] = wrapped match {
       case Left(failures) => NonEmptyList(failures.head, failures.tail: _*).map(_.toString).failure
@@ -67,7 +63,7 @@ object PureConfigLoader extends PureConfigLoader with ToValidationOps {
     }
 
     def toModel: ValidationNel[String, Problem] =
-      toInput flatMap PureConfigTranscriber.transcribe
+      toInput.flatMap(InputTranscriber.transcribe)
 
     def toInputAndModel[A]: ValidationNel[String, (InputRoot, Problem)] = (toInput |@| toModel) ((_, _))
 
@@ -78,7 +74,7 @@ object PureConfigLoader extends PureConfigLoader with ToValidationOps {
       case Success(res) => res
     }
 
-    def forceToModel: Problem = wrapped.right.map(PureConfigTranscriber.transcribe) match {
+    def forceToModel: Problem = wrapped.right.map(InputTranscriber.transcribe) match {
       case Left(failures) => throw new IllegalStateException(s"Could not parse configuration:\n${
         failures.toList.mkString("\n")
       }")
