@@ -19,9 +19,10 @@ object UdoConTestModel {
 
   implicit val random: Random = new Random(0L)
 
+  val strongPreference = Score(5)
+  val weakPreference = Score(1)
+
   val Settings = InputSettings(
-    weakPreference = Score(1),
-    strongPreference = Score(5),
     incompatibilityAntiPreference = Score(-50),
     defaultMin = 3,
     defaultMax = 5

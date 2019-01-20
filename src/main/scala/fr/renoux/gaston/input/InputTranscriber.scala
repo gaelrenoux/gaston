@@ -3,7 +3,7 @@ package fr.renoux.gaston.input
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Slot, Topic, Weight}
+import fr.renoux.gaston.model.{Person, Slot, Topic}
 import scalaz.ValidationNel
 import scalaz.syntax.validation._
 
@@ -17,7 +17,7 @@ object InputTranscriber {
 
     val slotsPerName = input.slots.map { s => s -> Slot(s) }.toMap
     val topicsPerName = input.topics.map { t => t.name -> Topic(t.name) }.toMap
-    val personsPerName = input.persons.map { p => p.name -> Person(p.name, Weight(p.weight)) }.toMap
+    val personsPerName = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
 
     val absenceConstraints = getAbsenceConstraints(input, ctx)
@@ -39,9 +39,9 @@ object InputTranscriber {
 
     val incompatibilityPreferences = getGroupAntiPreferences(input, ctx)
 
-    val personPreferences = getTopicPreferences(input, ctx)
+    val personTopicPreferences = getPersonTopicPreferences(input, ctx)
 
-    val preferences = Set[Preference]() ++ incompatibilityPreferences ++ personPreferences
+    val preferences = Set[Preference]() ++ incompatibilityPreferences ++ personTopicPreferences
 
     val parallelization = input.settings.parallelization.getOrElse(
       (topicsPerName.size.toDouble / slotsPerName.size).ceil.toInt)
@@ -62,15 +62,21 @@ object InputTranscriber {
     }
 
   private def getInterdictionConstraints(input: InputModel, ctx: Context): Set[PersonTopicInterdiction] =
-    input.topics.flatMap { it =>
-      it.forbidden.map(ctx.personsPerName).map(PersonTopicInterdiction(_, ctx.topicsPerName(it.name)))
-    }
+    for {
+      ip <- input.persons
+      person = ctx.personsPerName(ip.name)
+      topicName <- ip.forbidden
+      topic = ctx.topicsPerName(topicName)
+    } yield PersonTopicInterdiction(person, topic)
+
 
   private def getObligationConstraints(input: InputModel, ctx: Context): Set[PersonTopicObligation] =
-    input.topics.flatMap { it =>
-      it.mandatory.map(ctx.personsPerName).map(PersonTopicObligation(_, ctx.topicsPerName(it.name)))
-    }
-
+    for {
+      ip <- input.persons
+      person = ctx.personsPerName(ip.name)
+      topicName <- ip.mandatory
+      topic = ctx.topicsPerName(topicName)
+    } yield PersonTopicObligation(person, topic)
 
   private def getNumberConstraints(input: InputModel, ctx: Context): Set[TopicNeedsNumberOfPersons] =
     input.topics.map { inTopic =>
@@ -103,15 +109,15 @@ object InputTranscriber {
         PersonGroupAntiPreference(person, group, input.settings.incompatibilityAntiPreference)
     }
 
-  private def getTopicPreferences(input: InputModel, ctx: Context): Set[PersonTopicPreference] = {
-    input.preferences.flatMap { case InputPreference(p, strongs, weaks) =>
-      val person = ctx.personsPerName(p)
-      val all = strongs.map((_, input.settings.strongPreference)) ++ weaks.map((_, input.settings.weakPreference))
-      all.map { case (t, reward) =>
-        PersonTopicPreference(person, ctx.topicsPerName(t), reward)
-      }
-    }
-  }
+  private def getPersonTopicPreferences(input: InputModel, ctx: Context): Set[PersonTopicPreference] =
+    for {
+      inPerson <- input.persons
+      person = ctx.personsPerName(inPerson.name)
+      inWishes <- inPerson.wishes
+      topicName <- inWishes.topics
+      topic = ctx.topicsPerName(topicName)
+    } yield PersonTopicPreference(person, topic, inWishes.value)
+
 
   private case class Context(
       slotsPerName: Map[String, Slot],

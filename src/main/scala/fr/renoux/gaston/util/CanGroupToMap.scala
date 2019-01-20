@@ -19,6 +19,10 @@ object CanGroupToMap {
     override def groupToMap[B, C](a: List[(B, C)]): Map[B, List[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
   }
 
+  implicit object SeqCanGroupToMap$ extends CanGroupToMap[Seq] {
+    override def groupToMap[B, C](a: Seq[(B, C)]): Map[B, Seq[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
+  }
+
   implicit class Ops[A[_], B, C](val wrapped: A[(B, C)]) extends AnyVal {
     /** Converts a collection of couples to a map. */
     def groupToMap(implicit gtm: CanGroupToMap[A]): Map[B, A[C]] = gtm.groupToMap(wrapped)

@@ -1,12 +1,11 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Slot, Topic}
+import fr.renoux.gaston.model.{Person, Score, Slot, Topic}
 import fr.renoux.gaston.util.RandomImplicits._
 
 import scala.collection.mutable
@@ -15,9 +14,12 @@ import scala.util.Random
 /**
   * Created by gael on 07/05/17.
   */
-class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
+class ComplexTestModel(seed: Long) {
 
   private val log = Logger(classOf[ComplexTestModel])
+
+  private val strongPreference = Score(5)
+  private val weakPreference = Score(1)
 
   implicit val random: Random = new Random(seed)
 
@@ -65,11 +67,11 @@ class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
     val PersonTopics: Set[Preference] = for {
       p <- Persons.All
       (t, i) <- random.pick(Topics.All, 9).zipWithIndex
-      str = if (i < 3) settings.strongPreference else settings.weakPreference
+      str = if (i < 3) strongPreference else weakPreference
     } yield PersonTopicPreference(p, t, str)
     val Incompatibilities: Set[Preference] = Set {
       val p = random.pick(Persons.All, 3)
-      PersonGroupAntiPreference(p.head, p.tail.toSet, -settings.strongPreference)
+      PersonGroupAntiPreference(p.head, p.tail.toSet, -strongPreference)
     }
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"),
@@ -90,6 +92,5 @@ class ComplexTestModel(seed: Long)(implicit settings: InputSettings) {
 object ComplexTestModel {
   private val cache = mutable.Map[Long, ComplexTestModel]()
 
-  def apply(seed: Long)(implicit settings: InputSettings): ComplexTestModel = cache.getOrElseUpdate(seed, new
-      ComplexTestModel(seed))
+  def apply(seed: Long): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
 }

@@ -4,10 +4,13 @@ import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
 import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
+import fr.renoux.gaston.model._
 
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
+
+  private val strongPreference = Score(5)
+  private val weakPreference = Score(1)
 
   object Persons {
     val Arthur = Person("Arthur")
@@ -111,25 +114,25 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Persons._
     import Topics._
 
-    val AB = PersonTopicPreference(Arthur, Bathing, settings.strongPreference)
-    val BC = PersonTopicPreference(Bianca, Cooking, settings.strongPreference)
-    val CD = PersonTopicPreference(Corwin, Dancing, settings.strongPreference)
-    val DE = PersonTopicPreference(Daniela, Eating, settings.strongPreference)
-    val EF = PersonTopicPreference(Eric, Fighting, settings.strongPreference)
-    val FG = PersonTopicPreference(Fiona, Grinding, settings.strongPreference)
-    val GH = PersonTopicPreference(Garion, Helping, settings.strongPreference)
-    val HI = PersonTopicPreference(Hercule, Inking, settings.strongPreference)
-    val IA = PersonTopicPreference(Iago, Acting, settings.strongPreference)
+    val AB = PersonTopicPreference(Arthur, Bathing, strongPreference)
+    val BC = PersonTopicPreference(Bianca, Cooking, strongPreference)
+    val CD = PersonTopicPreference(Corwin, Dancing, strongPreference)
+    val DE = PersonTopicPreference(Daniela, Eating, strongPreference)
+    val EF = PersonTopicPreference(Eric, Fighting, strongPreference)
+    val FG = PersonTopicPreference(Fiona, Grinding, strongPreference)
+    val GH = PersonTopicPreference(Garion, Helping, strongPreference)
+    val HI = PersonTopicPreference(Hercule, Inking, strongPreference)
+    val IA = PersonTopicPreference(Iago, Acting, strongPreference)
 
-    val AC = PersonTopicPreference(Arthur, Cooking, settings.weakPreference)
-    val BD = PersonTopicPreference(Bianca, Dancing, settings.weakPreference)
-    val CE = PersonTopicPreference(Corwin, Eating, settings.weakPreference)
-    val DF = PersonTopicPreference(Daniela, Fighting, settings.weakPreference)
-    val EG = PersonTopicPreference(Eric, Grinding, settings.weakPreference)
-    val FH = PersonTopicPreference(Fiona, Helping, settings.weakPreference)
-    val GI = PersonTopicPreference(Garion, Inking, settings.weakPreference)
-    val HA = PersonTopicPreference(Hercule, Acting, settings.weakPreference)
-    val IB = PersonTopicPreference(Iago, Bathing, settings.weakPreference)
+    val AC = PersonTopicPreference(Arthur, Cooking, weakPreference)
+    val BD = PersonTopicPreference(Bianca, Dancing, weakPreference)
+    val CE = PersonTopicPreference(Corwin, Eating, weakPreference)
+    val DF = PersonTopicPreference(Daniela, Fighting, weakPreference)
+    val EG = PersonTopicPreference(Eric, Grinding, weakPreference)
+    val FH = PersonTopicPreference(Fiona, Helping, weakPreference)
+    val GI = PersonTopicPreference(Garion, Inking, weakPreference)
+    val HA = PersonTopicPreference(Hercule, Acting, weakPreference)
+    val IB = PersonTopicPreference(Iago, Bathing, weakPreference)
 
     val ArthurHatesFionaAndDaniela = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela), settings.incompatibilityAntiPreference)
 

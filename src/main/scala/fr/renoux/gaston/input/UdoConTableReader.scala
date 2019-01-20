@@ -1,14 +1,17 @@
 package fr.renoux.gaston.input
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.Weight
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.StringImplicits._
+import fr.renoux.gaston.util.CanGroupToMap._
 
 /**
   * Some stuff initialized from the normal JSON input, the rest is read from the table.
   */
 class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) {
+
+  import UdoConTableReader._
 
   private val log = Logger[UdoConTableReader]
 
@@ -16,90 +19,90 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     val cells: Seq[Seq[String]] = table.split("\n", -1).filterNot(_.isEmpty).map(_.split("\t", -1).map(_.trim).toSeq).toSeq
 
     log.debug(s"Cells:\n${cells.mkString("\n")}")
-    val cellsFirstLine = cells.head
-    val cellsWithoutFirstLine = cells.tail
+    val cellsFirstRow = cells.head
+    val cellsWithoutFirstRow = cells.tail
+    //TODO better parameterize the line for starting topics
 
-    val slots = Set("D1-afternoon", "D1-evening", "D2-afternoon", "D2-evening", "D3-afternoon")
+    val slots: Set[String] = Set[String]() //no Slot to start
 
-    val personsWithoutWeight: Seq[InputPerson] = cellsFirstLine drop udoSettings.personsStartingIndex map { n =>
-      InputPerson(n, Weight.Default.value, incompatible = Set(), absences = Set())
-    }
+    /* Keep the order to zip with the choices later */
+    val topicsSeq: Seq[InputTopic] =
+      cellsWithoutFirstRow.map { row =>
+        val topicName = row(udoSettings.topicsIndex)
+        val max = row(udoSettings.maxPlayersIndex)
+        val min = udoSettings.minPlayersIndex.map(row).getOrElse("")
 
-    val topicsWithoutPersons = cellsWithoutFirstLine map { line =>
-      (
-        line(udoSettings.topicsIndex),
-        line(udoSettings.maxPlayersIndex),
-        udoSettings.minPlayersIndex.map(line).getOrElse("")
+        InputTopic(
+          name = topicName,
+          min = min.toIntOption.map(_ + 1), //add the GM
+          max = max.toIntOption.map(_ + 1) //add the GM
+        )
+      }
+
+    log.debug(s"Topics: $topicsSeq")
+
+    val namedPersons: Seq[InputPerson] = cellsFirstRow.drop(udoSettings.personsStartingIndex).map(InputPerson(_))
+
+    val personChoices: Map[InputPerson, Map[TopicStatus, Set[InputTopic]]] =
+      namedPersons.zipWithIndex.map { case (person, ix) =>
+        val personColumnIndex = ix + udoSettings.personsStartingIndex
+        log.debug(s"Choices for $person.name at index $personColumnIndex")
+
+        val personColumn = cellsWithoutFirstRow.map { row =>
+          if (row.length <= personColumnIndex) "" else row(personColumnIndex).trim
+        }
+
+        val statusTopics: Seq[(TopicStatus, InputTopic)] = topicsSeq.zip(personColumn).flatMap {
+          case (topic, "MJ") => Some((Mandatory, topic))
+          case (topic, "0") => Some((Forbidden, topic))
+          case (topic, "1") => Some((Weak, topic))
+          case (topic, "2") => Some((Strong, topic))
+          case (_, "") => None
+          case (topic, x) => log.warn(s"Unknown entry $x for person ${person.name} and topic ${topic.name}"); None
+        }
+
+        person -> statusTopics.groupToMap.mapValuesStrict(_.toSet).withDefaultValue(Set())
+      }.toMap
+
+    val persons = personChoices.map { case (person, choices) =>
+      val wishes =  choices.collect {
+        case (Strong, ts) => InputPersonWishes(udoSettings.strongWishValue, ts.map(_.name))
+        case (Weak, ts) => InputPersonWishes(udoSettings.weakWishValue, ts.map(_.name))
+      }.toSet
+
+      person.copy(
+        weight = if (choices.contains(Mandatory)) udoSettings.gamemasterWeight else Weight.Default,
+        mandatory = choices(Mandatory).map(_.name),
+        forbidden = choices(Forbidden).map(_.name),
+        wishes = wishes
       )
-    } map { case (topicName, max, min) =>
-      InputTopic(
-        name = topicName,
-        min = min.toIntOption.map(_ + 1), //add the GM
-        max = max.toIntOption.map(_ + 1) //add the GM
-      )
     }
-
-    val choices = personsWithoutWeight.zipWithIndex flatMap { case (person, ix) =>
-      log.debug(s"Choices for $person.name at index $ix")
-      val personColumnIndex = ix + udoSettings.personsStartingIndex
-      val personColumn = cellsWithoutFirstLine map { line =>
-        if (line.lengthCompare(personColumnIndex) <= 0) "" else line(personColumnIndex).trim
-      }
-      topicsWithoutPersons zip personColumn flatMap {
-        case (topic, "MJ") => Some(('gamemaster, person.name, topic.name))
-        case (topic, "0") => Some(('forbidden, person.name, topic.name))
-        case (topic, "1") => Some(('weak, person.name, topic.name))
-        case (topic, "2") => Some(('strong, person.name, topic.name))
-        case (_, "") => None
-        case (topic, x) => log.warn(s"Unknown entry $x for person ${person.name} and topic ${topic.name}"); None
-      }
-    }
-
-    val persons = choices.foldLeft(personsWithoutWeight) {
-      case (currentPersons, ('gamemaster, personName, _)) => currentPersons.replace {
-        case person if person.name == personName => person.copy(weight = udoSettings.gamemasterWeight.value)
-      }
-      case (currentPersons, _) => currentPersons
-    }.toSet
 
     log.debug(s"Persons: $persons")
-
-    val topics = choices.foldLeft(topicsWithoutPersons) {
-      case (currentTopics, ('gamemaster, personName, topicName)) => currentTopics.replace {
-        case topic if topic.name == topicName => topic.copy(mandatory = topic.mandatory + personName)
-      }
-      case (currentTopics, ('forbidden, personName, topicName)) => currentTopics.replace {
-        case topic if topic.name == topicName => topic.copy(forbidden = topic.forbidden + personName)
-      }
-      case (currentTopics, _) => currentTopics
-    }.toSet
-
-    log.debug(s"Topics: $topics")
-
-    val emptyPreferences = personsWithoutWeight map { p => InputPreference(p.name, Set(), Set()) }
-
-    val preferences = choices.foldLeft(emptyPreferences) {
-      case (currentPreferences, ('weak, personName, topicName)) => currentPreferences.replace {
-        case pref if pref.person == personName => pref.copy(weak = pref.weak + topicName)
-      }
-      case (currentPreferences, ('strong, personName, topicName)) => currentPreferences.replace {
-        case pref if pref.person == personName => pref.copy(strong = pref.strong + topicName)
-      }
-      case (currentPreferences, _) => currentPreferences
-    }.toSet
-
-    log.debug(s"Preferences: $preferences")
 
     InputRoot(
       InputModel(
         settings = settings,
         udoSettings = Some(udoSettings),
         slots = slots,
-        persons = persons,
-        topics = topics,
-        preferences = preferences
+        persons = persons.toSet,
+        topics = topicsSeq.toSet
       )
     )
   }
+
+}
+
+object UdoConTableReader {
+
+  sealed trait TopicStatus
+
+  case object Mandatory extends TopicStatus
+
+  case object Strong extends TopicStatus
+
+  case object Weak extends TopicStatus
+
+  case object Forbidden extends TopicStatus
 
 }

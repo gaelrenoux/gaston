@@ -9,6 +9,8 @@ import scala.io.Source
 class UdoConTableReaderSpec extends FlatSpec with Matchers {
 
   val udoSettings = InputUdoSettings(
+    weakWishValue = Score(1),
+    strongWishValue = Score(5),
     personsStartingIndex = 4,
     topicsIndex = 0,
     maxPlayersIndex = 2,
@@ -17,8 +19,6 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
   )
 
   val settings = InputSettings(
-    weakPreference = Score(1),
-    strongPreference = Score(5),
     incompatibilityAntiPreference = Score(-50),
     defaultMin = 4,
     defaultMax = 6
@@ -33,7 +33,15 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
 
     val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").forceToInput
 
-    val diff = DiffShow.diff[InputRoot](input, expected)
+    /* Check a small one first, easier to debug */
+    val ib = input.gaston.persons.find(_.name == "Boojum")
+    val eb = expected.gaston.persons.find(_.name == "Boojum")
+    val smallDiff = DiffShow.diff(ib, eb)
+    if (!smallDiff.isIdentical) println(smallDiff.string)
+    ib should be(eb)
+
+    /* Check all */
+    val diff = DiffShow.diff(input, expected)
     if (!diff.isIdentical) println(diff.string)
     input should be(expected)
   }

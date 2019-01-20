@@ -14,14 +14,11 @@ case class InputModel(
     slots: Set[String],
     persons: Set[InputPerson],
     topics: Set[InputTopic],
-    constraints: Option[InputGlobalConstraints] = None,
-    preferences: Set[InputPreference] = Set()
+    constraints: Option[InputGlobalConstraints] = None
 )
 
 case class InputSettings(
     parallelization: Option[Int] = None,
-    weakPreference: Score,
-    strongPreference: Score,
     incompatibilityAntiPreference: Score,
     defaultMin: Int,
     defaultMax: Int
@@ -37,7 +34,33 @@ case class InputUdoSettings(
     /* Column for the max number of persons on that topic */
     maxPlayersIndex: Int,
     /* Weight given to any gamemaster */
-    gamemasterWeight: Weight
+    gamemasterWeight: Weight,
+    /* Score given to a strong wish */
+    strongWishValue: Score,
+    /* Score given to a weak wish */
+    weakWishValue: Score
+)
+
+case class InputPerson(
+    name: String,
+    weight: Weight = Weight.Default,
+    absences: Set[String] = Set(),
+    mandatory: Set[String] = Set(),
+    forbidden: Set[String] = Set(),
+    incompatible: Set[String] = Set(),
+    wishes: Set[InputPersonWishes] = Set()
+)
+
+case class InputPersonWishes(
+    value: Score,
+    topics: Set[String] = Set()
+)
+
+case class InputTopic(
+    name: String,
+    min: Option[Int],
+    max: Option[Int],
+    forcedSlot: Option[String] = None
 )
 
 case class InputGlobalConstraints(
@@ -51,27 +74,5 @@ case class InputSimultaneousConstraint(
 
 case class InputExclusiveConstraint(
     topics: Set[String],
-    exemptions: Set[String]
-)
-
-case class InputPreference(
-    person: String,
-    strong: Set[String] = Set(),
-    weak: Set[String] = Set()
-)
-
-case class InputPerson(
-    name: String,
-    weight: Double = Weight.Default.value,
-    incompatible: Set[String] = Set(),
-    absences: Set[String] = Set()
-)
-
-case class InputTopic(
-    name: String,
-    mandatory: Set[String] = Set(),
-    forbidden: Set[String] = Set(),
-    min: Option[Int],
-    max: Option[Int],
-    forcedSlot: Option[String] = None
+    exemptions: Set[String] = Set()
 )

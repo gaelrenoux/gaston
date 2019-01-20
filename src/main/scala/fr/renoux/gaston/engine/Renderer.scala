@@ -16,11 +16,12 @@ class Renderer(
 
   private val ScoreDecimalFormat = new DecimalFormat("000.00")
 
-  /** For each person, preferences (strongs are marked with true) */
-  val preferencesByPerson: Map[Person, Set[(PersonTopicPreference, Boolean)]] = problem.preferences.collect {
-    case p@PersonTopicPreference(_, _, settings.strongPreference) => (p, true)
-    case p@PersonTopicPreference(_, _, settings.weakPreference) => (p, false)
-  }.groupBy(_._1.person)
+  private val ShortScoreDecimalFormat = new DecimalFormat("000")
+
+  /** For each person, preferences */
+  val preferencesByPerson: Map[Person, Set[PersonTopicPreference]] = problem.preferences.collect {
+    case p: PersonTopicPreference => p
+  }.groupBy(_.person)
 
   /** Formats the schedule and analysis to a pretty String */
   def all(schedule: Schedule, score: Score): String =
@@ -31,24 +32,24 @@ class Renderer(
   def personsSatisfaction(schedule: Schedule): String = {
     val weightedScoresByPerson: Map[Person, Score] = scorer.weightedScoresByPerson(schedule)
 
-    val summaryByPerson: Map[String, (Score, Int, Int)] = preferencesByPerson.map {
+    /* For each name, weighted score and descending list of satisfied rewards */
+    val summaryByPerson: Seq[(String, Double, Seq[Double])] = preferencesByPerson.map {
       case (person, preferences) =>
-        val satisfied = preferences.filter(_._1.score(schedule) > Score.Zero)
-        person.name -> (weightedScoresByPerson(person), satisfied.count(_._2), satisfied.count(!_._2))
-    }
+        val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
+        (person.name, weightedScoresByPerson(person).value, satisfied)
+    }.toSeq
 
-    val summariesFromBestToWorse = summaryByPerson.toSeq.sortBy(_._2._1).reverse
+    val summariesFromBestToWorse = summaryByPerson.sortBy(_._2).reverse
 
-    val summaryTextBody = summariesFromBestToWorse.map { case (name, (s, strong, weak)) =>
+    val summaryTextBody = summariesFromBestToWorse.map { case (name, score, satisfied) =>
       val nameTxt = name.padTo(8, ' ').take(8)
-      val scoreTxt = ScoreDecimalFormat.format(s.value)
-      val strongTxt = f"$strong%2d"
-      val weakTxt = f"$weak%2d"
-      s"$nameTxt    $scoreTxt    $strongTxt  $weakTxt"
+      val scoreTxt = ScoreDecimalFormat.format(score)
+      val satisfiedTxt = satisfied.map(ShortScoreDecimalFormat.format).mkString(" ")
+      s"$nameTxt    $scoreTxt    ($satisfiedTxt)"
     }.mkString("\n")
 
     /* Adds a title line */
-    s"Person      Score     Str Weak\n$summaryTextBody"
+    s"Person      Score     (Detail)\n$summaryTextBody"
   }
 
 }

@@ -12,23 +12,26 @@ class InputSpec extends FlatSpec with Matchers {
 
   "Loading from default" should "load the default input when no name is given" in {
     val (input, _) = InputLoader.fromDefault.forceToInputAndModel
-    input.gaston.settings.strongPreference should be(Score(5))
+    input.gaston.settings.incompatibilityAntiPreference should be(Score(-50))
     input.gaston.persons.size should be(3)
   }
 
   "Loading from the classpath" should "load the correct input" in {
     val (input, _) = InputLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
-    input.gaston.settings.strongPreference should be(Score(42))
+    input.gaston.settings.incompatibilityAntiPreference should be(Score(-42))
     input.gaston.persons.size should be(1)
   }
 
   "Loading from a file" should "load the correct input" in {
     val stringPath = getClass.getResource("/named-configuration.conf").getPath
     val path = new File(stringPath).toPath
-
     val (input, _) = InputLoader.fromPath(path).forceToInputAndModel
-    input.gaston.settings.strongPreference should be(Score(42))
+    input.gaston.settings.incompatibilityAntiPreference should be(Score(-42))
     input.gaston.persons.size should be(1)
+  }
+
+  "Checking the sample" should "work" in {
+    InputLoader.fromClassPath("sample.conf").forceToInputAndModel
   }
 
 
@@ -66,7 +69,8 @@ class InputSpec extends FlatSpec with Matchers {
   it should "contain the correct preferences" in {
     minimalProblem.preferences should be(Set(
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("alpha"), Score(5.0)),
-      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(1.0))
+      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(1.0)),
+      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("gamma"), Score(1.0))
     ))
   }
 
