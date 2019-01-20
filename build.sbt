@@ -41,18 +41,17 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
 
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.5.0",
-  "ch.qos.logback" % "logback-classic" % "1.1.7",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
 
-  "com.typesafe" % "config" % "1.3.1",
+  "com.typesafe" % "config" % "1.3.3",
   "com.github.pureconfig" %% "pureconfig" % "0.10.1",
-  "com.github.scopt" %% "scopt" % "3.7.0",
+  "com.github.scopt" %% "scopt" % "3.7.1",
 
-  "org.scalaz" %% "scalaz-core" % "7.2.19",
-
-  //"org.scalactic" %% "scalactic" % "3.0.1",
-  "ai.x" %% "diff" % "2.0",
-  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
+  "org.scalaz" %% "scalaz-core" % "7.2.27",
+  
+  "ai.x" %% "diff" % "2.0.1",
+  "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")
