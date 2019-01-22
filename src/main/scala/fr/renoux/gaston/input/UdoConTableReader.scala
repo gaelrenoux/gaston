@@ -28,14 +28,14 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     /* Keep the order to zip with the choices later */
     val topicsSeq: Seq[InputTopic] =
       cellsWithoutFirstRow.map { row =>
-        val topicName = row(udoSettings.topicsIndex)
-        val max = row(udoSettings.maxPlayersIndex)
-        val min = udoSettings.minPlayersIndex.map(row).getOrElse("")
+        val topicName: String = row(udoSettings.topicsIndex)
+        val max: Option[Int] = row(udoSettings.maxPlayersIndex).toIntOption.map(_ + 1) //add the GM
+        val min: Option[Int] = udoSettings.minPlayersIndex.map(row).flatMap(_.toIntOption).map(_ + 1) //add the GM
 
         InputTopic(
           name = topicName,
-          min = min.toIntOption.map(_ + 1), //add the GM
-          max = max.toIntOption.map(_ + 1) //add the GM
+          min = min.filterNot(_ == settings.defaultMin),
+          max = max.filterNot(_ == settings.defaultMax)
         )
       }
 
