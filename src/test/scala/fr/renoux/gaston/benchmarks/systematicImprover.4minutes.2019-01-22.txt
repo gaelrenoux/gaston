@@ -1,0 +1,659 @@
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 10 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 21 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 32 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 43 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 53 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 63 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 74 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 85 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 95 schedules !
+
+Schedule:
+  D1-afternoon:
+    KPDP dans le Dodécaèdre: Eugénie, Kamiseito, Kersa, Najael, Orfeo, Ozen
+    Le Retour de Soth: Bashar, Boojum, Killerklown, Paradoks
+    Shadow of the Demon Lord: Highlandjul, Julian, Rolapin, Udo Femi, Zeben
+    Skyrealms of Jorune Revival: Chestel, Isidore, Jorune, Mangon, Paiji, Sammael99
+    Wastburg: Aude, Cryoban, Gabzeta, Goat, Selpoivre, Tolkraft
+  D1-evening:
+    Delta Green - Pennsylvania '99: Bashar, Killerklown, Paiji, Selpoivre
+    Delta Green - Scénario original: Chestel, Cryoban, Eugénie, Kersa, Tolkraft, Udo Femi
+    Dieux Ennemis: Goat, Highlandjul, Isidore, Kamiseito, Zeben
+    Donjon & Cie: Aude, Boojum, Jorune, Julian, Mangon, Sammael99
+    Mexican Death trip: Gabzeta, Najael, Orfeo, Ozen, Paradoks, Rolapin
+  D2-afternoon:
+    Black Mirror: Boojum, Goat, Orfeo, Ozen, Udo Femi
+    DC comics - Darkest night: Bashar, Chestel, Cryoban, Eugénie, Mangon, Selpoivre
+    Les Derniers: Julian, Kamiseito, Kersa, Najael, Paiji, Tolkraft
+    Meute: Gabzeta, Highlandjul, Isidore, Jorune, Killerklown, Sammael99
+    Summer camp - classe de neige: Aude, Paradoks, Rolapin, Zeben
+  D2-evening:
+    Agôn: Bashar, Highlandjul, Kamiseito, Sammael99
+    Chiens de guerre: Goat, Jorune, Mangon, Tolkraft
+    Inflorenza (ambiance Patient 13): Chestel, Eugénie, Gabzeta, Orfeo, Selpoivre
+    P.U.N.C.H Unit - Katanga 1960: Cryoban, Kersa, Killerklown, Paiji
+    Psi*run: Julian, Ozen, Paradoks, Rolapin
+    Tales from the Loop: Aude, Boojum, Isidore, Najael, Udo Femi, Zeben
+  D3-afternoon:
+    Blades in the Dark: Goat, Highlandjul, Paradoks, Rolapin, Udo Femi, Zeben
+    Coriolis: Third horizon: Killerklown, Najael, Orfeo, Paiji, Selpoivre
+    Godbound - l'appel: Bashar, Boojum, Cryoban, Kamiseito, Sammael99
+    Les Schtroumpfs: Chestel, Eugénie, Isidore, Julian, Mangon
+    Wurm : Rouge massacre: Aude, Gabzeta, Jorune, Kersa, Tolkraft
+
+Schedule score is Score(246869.25546622006)
+
+Person      Score     (Detail)
+Mangon      846.15    (385 385 077)
+Chestel     800.00    (250 250 250 050)
+Najael      800.00    (250 250 250 050)
+Aude        695.65    (217 217 217 043)
+Isidore     565.22    (217 217 043 043 043)
+Paiji       565.22    (217 217 043 043 043)
+Kamiseit    550.00    (250 250 050)
+Boojum      533.33    (250 250 250 050)
+Kersa       523.81    (238 238 048)
+Bashar      500.00    (278 056 056 056 056)
+Rolapin     421.05    (263 263 053 053)
+Ozen        370.37    (278 278)
+Zeben       350.88    (263 263)
+Udo Femi    347.83    (217 217 043 043)
+Cryoban     333.33    (250 250)
+Julian      333.33    (167 167 167)
+Orfeo       333.33    (312 062 062 062)
+Paradoks    317.46    (238 238)
+Sammael9    317.46    (238 238)
+Gabzeta     307.69    (192 192 038 038)
+Eugénie     285.71    (357 071)
+Killerkl    253.97    (238 048 048 048)
+Goat        250.00    (312 062)
+Tolkraft    250.00    (312 062)
+Selpoivr    245.61    (263 053 053)
+Jorune      242.42    (227 045 045 045)
+Highland    235.29    (294 059)
+
+We have tried 105 schedules !

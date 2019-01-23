@@ -10,6 +10,9 @@ import scalaz.syntax.validation._
 /** Converts the Input object to the Problem object. */
 object InputTranscriber {
 
+  /** What score should a person have if all its preferences are satisfied ? */
+  private val personTotalScore: Double = 1000.0
+
   /** Load the real input from the user model. */
   def transcribe(inputRoot: InputRoot): ValidationNel[String, Problem] = {
     //TODO better validation !
@@ -109,14 +112,19 @@ object InputTranscriber {
         PersonGroupAntiPreference(person, group, input.settings.incompatibilityAntiPreference)
     }
 
+  /** Person wishes are scaled so that everyone has the same maximum score. This avoids the problem where someone puts
+    * few preferences or with low value only, where he would always stay "unhappy" and therefore privileged when
+    * improving the schedule. */
   private def getPersonTopicPreferences(input: InputModel, ctx: Context): Set[PersonTopicPreference] =
     for {
       inPerson <- input.persons
       person = ctx.personsPerName(inPerson.name)
+      totalInputScore = inPerson.wishes.map(iw => iw.value.value * iw.topics.size).sum
+      scoreFactor = personTotalScore / totalInputScore
       inWishes <- inPerson.wishes
       topicName <- inWishes.topics
       topic = ctx.topicsPerName(topicName)
-    } yield PersonTopicPreference(person, topic, inWishes.value)
+    } yield PersonTopicPreference(person, topic, inWishes.value * scoreFactor)
 
 
   private case class Context(

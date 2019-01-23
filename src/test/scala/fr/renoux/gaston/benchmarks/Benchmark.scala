@@ -14,29 +14,31 @@ class Benchmark extends FlatSpec with Matchers {
   private val udoConProblem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
+  private val duration = 2.minutes
 
 
   "Systematic improver" should "give a good score" ignore {
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
-    val (schedule, score, count) = runner.run(Some(1.minute), seed = 0L)
+    val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
 
     log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
 
+    println(s"$score after $count iterations")
     udoConProblem.isSolvedBy(schedule) should be(true)
-    score.value should be > 2900.0
-    count should be > 20L
+    score.value should be > 500.0
+    count should be > 50L
   }
 
 
   "Greedy improver" should "give an okay score" ignore {
 
     val runner = new Runner(udoConProblem, improverConstructor = new GreedyScheduleImprover(_))
-    val (schedule, score, count) = runner.run(Some(1.minute), seed = 0L)
+    val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
 
+    println(s"$score after $count iterations")
     udoConProblem.isSolvedBy(schedule) should be(true)
-    println(s"Score is $score")
-    score.value should be > 2900.0
-    count should be > 20L
+    score.value should be > 500.0
+    count should be > 100L
   }
 }

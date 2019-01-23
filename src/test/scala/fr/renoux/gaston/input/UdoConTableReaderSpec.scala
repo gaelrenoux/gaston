@@ -19,7 +19,7 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
   )
 
   val settings = InputSettings(
-    incompatibilityAntiPreference = Score(-50),
+    incompatibilityAntiPreference = Score(-1000),
     defaultMin = 4,
     defaultMax = 6
   )

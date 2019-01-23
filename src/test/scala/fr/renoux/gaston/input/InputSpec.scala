@@ -12,13 +12,13 @@ class InputSpec extends FlatSpec with Matchers {
 
   "Loading from default" should "load the default input when no name is given" in {
     val (input, _) = InputLoader.fromDefault.forceToInputAndModel
-    input.gaston.settings.incompatibilityAntiPreference should be(Score(-50))
+    input.gaston.settings.incompatibilityAntiPreference should be(Score(-1000))
     input.gaston.persons.size should be(3)
   }
 
   "Loading from the classpath" should "load the correct input" in {
     val (input, _) = InputLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
-    input.gaston.settings.incompatibilityAntiPreference should be(Score(-42))
+    input.gaston.settings.incompatibilityAntiPreference should be(Score(-1042))
     input.gaston.persons.size should be(1)
   }
 
@@ -26,7 +26,7 @@ class InputSpec extends FlatSpec with Matchers {
     val stringPath = getClass.getResource("/named-configuration.conf").getPath
     val path = new File(stringPath).toPath
     val (input, _) = InputLoader.fromPath(path).forceToInputAndModel
-    input.gaston.settings.incompatibilityAntiPreference should be(Score(-42))
+    input.gaston.settings.incompatibilityAntiPreference should be(Score(-1042))
     input.gaston.persons.size should be(1)
   }
 
@@ -67,10 +67,11 @@ class InputSpec extends FlatSpec with Matchers {
   }
 
   it should "contain the correct preferences" in {
+    val scalingFactor: Double = 1000.0 / 7
     minimalProblem.preferences should be(Set(
-      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("alpha"), Score(5.0)),
-      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(1.0)),
-      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("gamma"), Score(1.0))
+      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("alpha"), Score(scalingFactor * 5.0)),
+      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(scalingFactor * 1.0)),
+      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("gamma"), Score(scalingFactor * 1.0))
     ))
   }
 

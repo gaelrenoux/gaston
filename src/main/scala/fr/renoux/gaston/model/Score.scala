@@ -15,6 +15,9 @@ case class Score(value: Double) extends AnyVal with Ordered[Score] {
   /** Multiply a score by a constant factor */
   def *(l: Long) = Score(value * l)
 
+  /** Multiply a score by a constant factor */
+  def *(d: Double) = Score(value * d)
+
   /** Divide a score by a weight */
   def /(w: Weight) = Score(value / w.value)
 
