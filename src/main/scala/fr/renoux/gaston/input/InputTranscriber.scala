@@ -91,7 +91,10 @@ object InputTranscriber {
 
   private def getForcedTopicConstraints(input: InputModel, maps: Context): Set[TopicForcedSlot] =
     input.topics.flatMap { inTopic =>
-      inTopic.forcedSlot.map(maps.slotsPerName).map(TopicForcedSlot(maps.topicsPerName(inTopic.name), _))
+      inTopic.slots.map { slots =>
+        val ss = slots.map(maps.slotsPerName)
+        TopicForcedSlot(maps.topicsPerName(inTopic.name), ss)
+      }
     }
 
   private def getSimultaneousTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsSimultaneous] =

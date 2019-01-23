@@ -61,8 +61,9 @@ class InputSpec extends FlatSpec with Matchers {
       TopicNeedsNumberOfPersons(Topic("alpha"), 5, 5),
       TopicNeedsNumberOfPersons(Topic("gamma"), 4, 6),
       TopicNeedsNumberOfPersons(Topic("beta"), 4, 5),
+      TopicForcedSlot(Topic("beta"), Set(Slot("A"))),
       TopicsSimultaneous(Set(Topic("alpha"), Topic("beta"))),
-      TopicsExclusive(Set(Topic("beta"), Topic("gamma")), Set(Person("laverne")))
+      TopicsExclusive(Set(Topic("beta"), Topic("gamma")), Set(Person("laverne"))),
     ))
   }
 

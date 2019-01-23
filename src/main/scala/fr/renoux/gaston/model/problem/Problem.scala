@@ -86,10 +86,10 @@ case class Problem(
     couples.groupToMap
   }
 
-  /** For each slots, the topics that must happen in that slot. */
+  /** For each slots, the topics that must happen in that slot. Handles only topics with just one possible slot. */
   lazy val forcedTopicsPerSlot: Map[Slot, Set[Topic]] =
     constraints.collect {
-      case TopicForcedSlot(topic, slot) => slot -> topic
+      case TopicForcedSlot(topic, slotSet) if slotSet.size == 1 => slotSet.head -> topic
     }.groupBy(_._1).mapValuesStrict(_.map(_._2))
 
   /** The min number of persons for each topic that has a min number of persons */

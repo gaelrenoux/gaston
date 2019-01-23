@@ -41,6 +41,13 @@ case class InputUdoSettings(
     weakWishValue: Score
 )
 
+case class InputTopic(
+    name: String,
+    min: Option[Int],
+    max: Option[Int],
+    slots: Option[Set[String]] = None
+)
+
 case class InputPerson(
     name: String,
     weight: Weight = Weight.Default,
@@ -54,13 +61,6 @@ case class InputPerson(
 case class InputPersonWishes(
     value: Score,
     topics: Set[String] = Set()
-)
-
-case class InputTopic(
-    name: String,
-    min: Option[Int],
-    max: Option[Int],
-    forcedSlot: Option[String] = None
 )
 
 case class InputGlobalConstraints(
