@@ -6,7 +6,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
   * Improves an existing Schedule by satisfying preferences. At each step, explores systematically all possible moves
-  * and swaps, and applies the first one that imnproves the schedule. Should be less sensible to the number of persons
+  * and swaps, and applies the first one that improves the schedule. Should be less sensible to the number of persons
   * than SystematicScheduleImprover, but it will be slower to converge to an optimum.
   */
 class GreedyScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {

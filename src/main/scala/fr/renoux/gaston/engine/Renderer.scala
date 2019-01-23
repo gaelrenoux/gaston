@@ -32,20 +32,22 @@ class Renderer(
   def personsSatisfaction(schedule: Schedule): String = {
     val weightedScoresByPerson: Map[Person, Score] = scorer.weightedScoresByPerson(schedule)
 
-    /* For each name, weighted score and descending list of satisfied rewards */
-    val summaryByPerson: Seq[(String, Double, Seq[Double])] = preferencesByPerson.map {
+    /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
+    val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.map {
       case (person, preferences) =>
         val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
-        (person.name, weightedScoresByPerson(person).value, satisfied)
+        val mandatoryCount = problem.mandatoryTopicsPerPerson(person).size
+        (person.name, weightedScoresByPerson(person).value, satisfied, mandatoryCount)
     }.toSeq
 
     val summariesFromBestToWorse = summaryByPerson.sortBy(_._2).reverse
 
-    val summaryTextBody = summariesFromBestToWorse.map { case (name, score, satisfied) =>
+    val summaryTextBody = summariesFromBestToWorse.map { case (name, score, satisfied, mandatoryCount) =>
       val nameTxt = name.padTo(8, ' ').take(8)
       val scoreTxt = ScoreDecimalFormat.format(score)
       val satisfiedTxt = satisfied.map(ShortScoreDecimalFormat.format).mkString(" ")
-      s"$nameTxt    $scoreTxt    ($satisfiedTxt)"
+      val mandatoryTxt = " MND" * mandatoryCount
+      s"$nameTxt    $scoreTxt    ($satisfiedTxt$mandatoryTxt)"
     }.mkString("\n")
 
     /* Adds a title line */

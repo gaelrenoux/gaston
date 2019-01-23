@@ -28,6 +28,15 @@ case class Problem(
     topics.map(_ -> Set[Person]()).toMap ++ topicsWithMandatoryPersons
   }
 
+  lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] = {
+
+    val personsWithMandatoryTopics: Map[Person, Set[Topic]] = constraints.collect {
+      case PersonTopicObligation(person, topic) => person -> topic
+    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
+
+    persons.map(_ -> Set[Topic]()).toMap ++ personsWithMandatoryTopics
+  }
+
   /** For each topic, which persons are forbidden */
   lazy val forbiddenPersonsPerTopic: Map[Topic, Set[Person]] = {
 
