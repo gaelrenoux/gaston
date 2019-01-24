@@ -46,7 +46,7 @@ class Benchmark extends FlatSpec with Matchers {
     count should be > 100L
   }
 
-  "Compare improvers on various schedules" should "work" in {
+  "Compare improvers on various schedules" should "work" ignore {
 
     val seedFormat = new DecimalFormat("000")
     val scoreFormat = new DecimalFormat("0000")
