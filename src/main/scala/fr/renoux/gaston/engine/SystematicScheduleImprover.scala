@@ -6,7 +6,8 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
   * Improves an existing Schedule by satisfying preferences. At each step, explores systematically all possible moves
-  * and swaps, and applies the best one. Only works on two-person swaps. It can get too slow with too many persons.
+  * and swaps, and applies the best one. Only works on two-person swaps. It is slow, as the same move will be examined
+  * many times.
   */
 class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {
 

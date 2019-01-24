@@ -13,7 +13,7 @@ import scala.util.Random
 /** Runs the whole schedule-searching stuff for a fixed amount of time. Can take hooks to do stuff at some frequency, like warn the user. */
 class Runner(
     problem: Problem,
-    improverConstructor: Problem => ScheduleImprover = new SystematicScheduleImprover(_),
+    improverConstructor: Problem => ScheduleImprover = new FastScheduleImprover(_),
     hook: (Schedule, Score, Long) => Unit = (_, _, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
     debugMode: Boolean = false
