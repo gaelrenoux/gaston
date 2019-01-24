@@ -3,6 +3,7 @@ package fr.renoux.gaston.engine
 import java.security.MessageDigest
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
@@ -245,9 +246,51 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
         }
     }
 
+  /** Upper limit of the number of possible schedules */
+  def upperLimit: BigInt = {
+    val maxTopicsPerSlot = problem.parallelization
+    val personsPerTopic = problem.constraints.collect {
+      case TopicNeedsNumberOfPersons(_, _, max) => max
+    }.max
+    val minTopicsPerSlot = (problem.persons.size.toDouble / personsPerTopic).ceil.toInt
+
+    ConstrainedScheduleFactory.upperLimit(
+      slots = problem.slots.size,
+      topics = problem.topics.size,
+      minTopicsPerSlot = minTopicsPerSlot,
+      maxTopicsPerSlot = maxTopicsPerSlot
+    )
+  }
+
 }
 
 object ConstrainedScheduleFactory {
+
+  def upperLimit(slots: BigInt, topics: BigInt, minTopicsPerSlot: BigInt, maxTopicsPerSlot: BigInt): BigInt = {
+
+    @tailrec
+    def fact(n: BigInt, acc: BigInt = 1): BigInt = if (n <= 1) acc else fact(n - 1, acc * n)
+
+    def comb(n: BigInt, k: BigInt): BigInt = fact(n) / fact(k) / fact(n - k)
+
+    def recCount(slots: BigInt, topics: BigInt): BigInt = {
+      if (slots * minTopicsPerSlot > topics) {
+        0
+
+      } else if (slots == 1) {
+        val max = maxTopicsPerSlot.min(topics)
+        val r = (minTopicsPerSlot to max).map(comb(topics, _)).sum
+        r
+
+      } else {
+        val r = (minTopicsPerSlot to maxTopicsPerSlot).map(n => comb(topics, n) * recCount(slots - 1, topics - n)).sum
+        r
+      }
+    }
+
+    recCount(slots, topics)
+  }
+
 
   /** Counting people on a certain topic */
   private case class PersonsCount(
