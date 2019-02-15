@@ -5,7 +5,6 @@ import java.io.File
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
-import fr.renoux.gaston.model.problem.Problem
 import org.scalatest.{FlatSpec, Matchers}
 
 class InputSpec extends FlatSpec with Matchers {

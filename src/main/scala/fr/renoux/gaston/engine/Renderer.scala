@@ -4,8 +4,7 @@ import java.text.DecimalFormat
 
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
-import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Schedule, Score}
+import fr.renoux.gaston.model.{Person, Problem, Schedule, Score}
 
 class Renderer(
     val settings: InputSettings,

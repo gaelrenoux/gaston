@@ -1,8 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.Schedule
-import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.{Problem, Schedule}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random

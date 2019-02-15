@@ -21,7 +21,7 @@ class Benchmark extends FlatSpec with Matchers {
   private val duration = 10.minutes
 
 
-  "Systematic imprNover" should "give a good score" ignore {
+  "Systematic improver" should "give a good score" ignore {
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(duration), seed = 0L)

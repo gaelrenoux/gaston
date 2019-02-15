@@ -1,7 +1,6 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Schedule, Score}
+import fr.renoux.gaston.model.{Person, Problem, Schedule, Score}
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /** Scoring utilities for a given Problem. */
@@ -26,7 +25,7 @@ object Scorer {
   }
 
   private def globalScore(weightedScores: Seq[Score]): Score = Score(
-    weightedScores.sorted.foldRight(0.0){ case (s, acc) => s.value + (acc / RankFactor) }
+    weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
   )
 
   /** Score for each person, regardless of its weight. */

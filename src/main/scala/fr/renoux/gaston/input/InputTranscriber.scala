@@ -1,9 +1,9 @@
 package fr.renoux.gaston.input
 
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.problem.ProblemImpl
 import scalaz.ValidationNel
 import scalaz.syntax.validation._
 
@@ -49,7 +49,7 @@ object InputTranscriber {
     val parallelization = input.settings.parallelization.getOrElse(
       (topicsPerName.size.toDouble / slotsPerName.size).ceil.toInt)
 
-    Problem(
+    new ProblemImpl(
       parallelization,
       slotsPerName.values.toSet,
       topicsPerName.values.toSet,

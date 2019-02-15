@@ -3,7 +3,7 @@ package fr.renoux.gaston
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.problem.ProblemImpl
 import fr.renoux.gaston.model._
 
 /** 9 persons, 9 topics, 3 slots */
@@ -144,7 +144,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
-    val Complete = Problem(3, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+    val Complete = new ProblemImpl(3, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

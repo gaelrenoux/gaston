@@ -5,7 +5,7 @@ import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
-import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.problem.ProblemImpl
 
 import scala.util.Random
 
@@ -566,7 +566,7 @@ object UdoConTestModel {
 
   object Problems {
     val Complete: Problem = {
-      val p = Problem(5, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = new ProblemImpl(5, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.debug(s"Complete problem is $p")
       p
     }

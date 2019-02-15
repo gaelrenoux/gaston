@@ -6,14 +6,14 @@ import fr.renoux.gaston.util.CanGroupToMap._
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
-case class Problem(
-    parallelization: Int,
-    slots: Set[Slot],
-    topics: Set[Topic],
-    persons: Set[Person],
-    constraints: Set[Constraint],
-    preferences: Set[Preference]
-) {
+class ProblemImpl(
+    val parallelization: Int,
+    val slots: Set[Slot],
+    val topics: Set[Topic],
+    val persons: Set[Person],
+    val constraints: Set[Constraint],
+    val preferences: Set[Preference]
+) extends Problem {
 
   lazy val personsCount: Int = persons.size
 

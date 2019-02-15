@@ -3,8 +3,7 @@ package fr.renoux.gaston.engine
 import java.time.Instant
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Schedule, Score}
+import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
@@ -79,6 +78,5 @@ class Runner(
 
     (finalSolution, finalScore)
   }
-
 
 }

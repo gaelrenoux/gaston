@@ -5,7 +5,7 @@ import java.nio.file.Path
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.Problem
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
 import scalaz.Validation.FlatMap._

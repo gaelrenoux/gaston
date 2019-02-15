@@ -1,7 +1,6 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Schedule, Score, Slot}
+import fr.renoux.gaston.model.{Problem, Schedule, Score, Slot}
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /**

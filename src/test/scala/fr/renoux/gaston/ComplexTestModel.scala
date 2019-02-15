@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.problem.ProblemImpl
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.RandomImplicits._
 
@@ -80,7 +80,7 @@ class ComplexTestModel(seed: Long) {
 
   object Problems {
     val Complete: Problem = {
-      val p = Problem(4, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = new ProblemImpl(4, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }

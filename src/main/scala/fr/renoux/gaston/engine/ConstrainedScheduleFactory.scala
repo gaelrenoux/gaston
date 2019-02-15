@@ -4,7 +4,7 @@ import java.security.MessageDigest
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
-import fr.renoux.gaston.model.problem.Problem
+import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
 
 import scala.annotation.tailrec
