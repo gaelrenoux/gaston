@@ -21,7 +21,6 @@ class Runner(
 
   private val log = Logger[Runner]
 
-  private val scorer = Scorer.of(problem)
   private val csFactory = new ConstrainedScheduleFactory(problem, debugMode = debugMode)
   private val psFactory = improverConstructor(problem)
 
@@ -73,10 +72,10 @@ class Runner(
   /** Produces a schedule and its score */
   def runOnce()(implicit random: Random): (Schedule, Score) = {
     val Some(initialSolution) = csFactory.makeSchedule
-    val initialScore = scorer.score(initialSolution)
+    val initialScore = Scorer.score(problem, initialSolution)
 
     val finalSolution = psFactory.improve(initialSolution, initialScore)
-    val finalScore = scorer.score(finalSolution)
+    val finalScore = Scorer.score(problem, finalSolution)
 
     (finalSolution, finalScore)
   }

@@ -12,8 +12,6 @@ import fr.renoux.gaston.util.CollectionImplicits._
   */
 class FastScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {
 
-  private val scorer = Scorer.of(problem)
-
   /** Returns the first move or swap it finds that makes the schedule better */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)
     ] = {
@@ -48,7 +46,7 @@ class FastScheduleImprover(val problem: Problem) extends AbstractScheduleImprove
     }
 
     val allNewSchedules = swappedSchedules ++ movedSchedules
-    val scoredSchedules = allNewSchedules.zipWith(scorer.score)
+    val scoredSchedules = allNewSchedules.zipWith(Scorer.score(problem, _))
     scoredSchedules.dropWhile(_._2 <= currentScore).headOption
   }
 

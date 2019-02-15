@@ -11,8 +11,6 @@ import fr.renoux.gaston.util.CollectionImplicits._
   */
 class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {
 
-  private val scorer = Scorer.of(problem)
-
   /** Returns the best possible move or swap on a specific slot */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)
     ] = {
@@ -46,7 +44,7 @@ class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleI
     }
 
     val allNewSchedules = swappedSchedules ++ movedSchedules
-    val scoredSchedules = allNewSchedules.zipWith(scorer.score)
+    val scoredSchedules = allNewSchedules.zipWith(Scorer.score(problem, _))
 
     if (scoredSchedules.isEmpty) None else {
       val candidateAndScore = scoredSchedules.maxBy(_._2)

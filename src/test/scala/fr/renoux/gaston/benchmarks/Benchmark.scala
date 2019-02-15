@@ -21,7 +21,7 @@ class Benchmark extends FlatSpec with Matchers {
   private val duration = 10.minutes
 
 
-  "Systematic improver" should "give a good score" ignore {
+  "Systematic imprNover" should "give a good score" ignore {
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
@@ -54,7 +54,6 @@ class Benchmark extends FlatSpec with Matchers {
     def format(score: Score, duration: Long) =
       s"${durationFormat.format(duration)} ms   ${scoreFormat.format(score.value.round)}"
 
-    val scorer = Scorer.of(udoConProblem)
     val csFactory = new ConstrainedScheduleFactory(udoConProblem)
     val systematicImprover = new SystematicScheduleImprover(udoConProblem)
     val fastImprover = new FastScheduleImprover(udoConProblem)
@@ -64,17 +63,17 @@ class Benchmark extends FlatSpec with Matchers {
       implicit val rand: Random = new Random(seed)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = scorer.score(initialSolution)
+      val initialScore = Scorer.score(udoConProblem, initialSolution)
 
       val sysStart = System.currentTimeMillis()
       val sysSolution = systematicImprover.improve(initialSolution, initialScore)
       val sysDuration = System.currentTimeMillis() - sysStart
-      val sysScore = scorer.score(sysSolution)
+      val sysScore = Scorer.score(udoConProblem, sysSolution)
 
       val fstStart = System.currentTimeMillis()
       val fstSolution = fastImprover.improve(initialSolution, initialScore)
       val fstDuration = System.currentTimeMillis() - fstStart
-      val fstScore = scorer.score(fstSolution)
+      val fstScore = Scorer.score(udoConProblem, fstSolution)
 
       val txt = s"${seedFormat.format(seed.toLong)}    ${format(sysScore, sysDuration)}    ${format(fstScore, fstDuration)}"
       if (fstScore.value.round == sysScore.value.round) println(txt)

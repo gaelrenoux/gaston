@@ -12,8 +12,6 @@ class Renderer(
     val problem: Problem
 ) {
 
-  private val scorer = Scorer.of(problem)
-
   private val ScoreDecimalFormat = new DecimalFormat("000.00")
 
   private val ShortScoreDecimalFormat = new DecimalFormat("000")
@@ -30,7 +28,7 @@ class Renderer(
 
   /** Display the persons' scores for that schedule */
   def personsSatisfaction(schedule: Schedule): String = {
-    val weightedScoresByPerson: Map[Person, Score] = scorer.weightedScoresByPerson(schedule)
+    val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(problem, schedule)
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
     val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.map {

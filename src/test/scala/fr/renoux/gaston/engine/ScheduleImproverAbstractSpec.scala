@@ -18,16 +18,15 @@ class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")
 
-      val scorer = Scorer.of(problem)
       val csFactory = new ConstrainedScheduleFactory(problem)
       val improver = improverConstructor(problem)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = scorer.score(initialSolution)
+      val initialScore = Scorer.score(problem, initialSolution)
       log.info(s"Temporary solution (score $initialScore): $initialSolution")
 
       val finalSolution = improver.improve(initialSolution, initialScore, 100)
-      val finalScore = scorer.score(finalSolution)
+      val finalScore = Scorer.score(problem, finalSolution)
       log.info(s"Solution (score $finalScore): $finalSolution")
 
       problem.isSolvedBy(finalSolution) should be(true)
