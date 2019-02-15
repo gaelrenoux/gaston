@@ -14,16 +14,19 @@ abstract class AbstractScheduleImprover extends ScheduleImprover {
 
   /** Main method. Returned an improved schedule, either because it can't be perfected any more or because the limit
     * number of rounds has been reached. */
-  override def improve(schedule: Schedule, initialScore: Score, rounds: Int = 1000)(implicit rand: Random): Schedule =
+  override def improve(schedule: Schedule, initialScore: Score, rounds: Int = 1000)(implicit rand: Random): Schedule = {
+    log.debug("Improving new schedule")
     recImprove(schedule, initialScore, rounds)
+  }
 
-  /** Recursive method improving the schedule. Works on slots in a round-robin. */
+  /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one. */
   @tailrec
   private def recImprove(
       schedule: Schedule,
       score: Score,
       maxRounds: Int,
-      slots: Queue[Slot] = Queue(problem.slots.toSeq: _*)
+      slots: Queue[Slot] = Queue(problem.slots.toSeq: _*),
+      slotRoundsLimit: Int = 1000
   ): Schedule =
     if (maxRounds == 0) {
       log.debug("Stopping improvement because max number of rounds was reached")
@@ -36,12 +39,18 @@ abstract class AbstractScheduleImprover extends ScheduleImprover {
     } else {
       val (slot, slotsTail) = slots.dequeue
       val (candidate, candidateScore) = getMoveOnSlot(schedule, score, slot).getOrElse(schedule, score)
-      if (candidateScore.value > score.value) {
-        /* The slot was perfected, go on on the next slot and we'll go back to this one later */
-        recImprove(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot))
-      } else {
+      if (candidateScore.value <= score.value) {
+        log.trace(s"    Removing slot with rounds limit at $slotRoundsLimit")
         /* The slot can't be perfected any more, go on to the next slot and no need to go back to this one */
         recImprove(schedule, score, maxRounds - 1, slotsTail)
+      } else  {
+        /* The slot was perfected! If there are rounds left stay on the same slot, otherwise move to the next one */
+        if (slotRoundsLimit > 0) {
+          recImprove(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot), slotRoundsLimit - 1)
+        } else {
+          log.trace(s"    Round limit reached, going on to next slot")
+          recImprove(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot))
+        }
       }
     }
 
