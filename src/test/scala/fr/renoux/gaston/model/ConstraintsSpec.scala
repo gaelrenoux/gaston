@@ -10,7 +10,7 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   import fr.renoux.gaston.MinimalTestModel.Slots._
   import fr.renoux.gaston.MinimalTestModel.Topics._
 
-  def scheduled(s: Slot, t: Topic, ps: Person*) = Schedule(Map(s -> Map(t -> ps.toSet)))
+  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
 
 
   behavior of "TopicNeedsNumberOfPersons"

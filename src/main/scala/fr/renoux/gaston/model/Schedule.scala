@@ -84,7 +84,7 @@ object Schedule {
 
   val empty: Schedule = Schedule()
 
-  def apply(schedule: Record*): Schedule = new Schedule(schedule.toSet)
+  def apply(schedule: Seq[Record]*): Schedule = new Schedule(schedule.flatten.toSet)
 
   def apply(personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]]) =
     new Schedule(
