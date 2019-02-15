@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model.constraints
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.Schedule
+import fr.renoux.gaston.model.{Constraint, Schedule}
 
 /** Abstract class for constraints providing a basis for how to check things. Checked is an object that can be checked
   * individually, obtained by aggregating some stuff from the schedule. */

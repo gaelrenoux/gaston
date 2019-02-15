@@ -3,7 +3,7 @@ package fr.renoux.gaston
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.problem.Problem
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.RandomImplicits._

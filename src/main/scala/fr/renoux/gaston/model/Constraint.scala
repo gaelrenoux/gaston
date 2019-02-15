@@ -1,8 +1,4 @@
-package fr.renoux.gaston.model.constraints
-
-import fr.renoux.gaston.model.Schedule
-
-/* TODO scores could be cached. In the Schedule, have a set of ScheduleSot, scorable separately for most. And transformations usually alter only one slot at a time. */
+package fr.renoux.gaston.model
 
 /**
   * Mandatory constraint on the solution. Constraints should implement [[equals()]] and [[hashCode()]] to allow
@@ -20,4 +16,3 @@ trait Constraint {
   /** Obviously, the opposite of isRespected. */
   def isBroken(schedule: Schedule): Boolean = !isRespected(schedule)
 }
-

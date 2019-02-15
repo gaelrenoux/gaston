@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model.constraints
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.{Person, Schedule, Topic}
+import fr.renoux.gaston.model.{Constraint, Person, Schedule, Topic}
 
 import scala.collection.mutable
 

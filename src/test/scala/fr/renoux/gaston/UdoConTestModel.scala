@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, Preference}
+import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.problem.Problem
 
 import scala.util.Random

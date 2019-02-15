@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model.{Schedule, Score}
+import fr.renoux.gaston.model.{Preference, Schedule, Score}
 
 /**
   * Abstract class for preferences providing a basis for how to score things. Scored is an object that can be checked

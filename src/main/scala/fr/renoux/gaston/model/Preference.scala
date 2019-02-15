@@ -1,6 +1,4 @@
-package fr.renoux.gaston.model.preferences
-
-import fr.renoux.gaston.model.{Person, Schedule, Score}
+package fr.renoux.gaston.model
 
 /* TODO scores could be cached. In the Schedule, have a set of ScheduleSot, scorable separately for most. And transformations usually alter only one slot at a time. */
 

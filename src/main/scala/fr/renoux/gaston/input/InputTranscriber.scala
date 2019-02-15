@@ -1,9 +1,9 @@
 package fr.renoux.gaston.input
 
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, Preference}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.problem.Problem
-import fr.renoux.gaston.model.{Person, Slot, Topic}
+import fr.renoux.gaston.model._
 import scalaz.ValidationNel
 import scalaz.syntax.validation._
 

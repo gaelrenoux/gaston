@@ -1,8 +1,7 @@
 package fr.renoux.gaston.model.problem
 
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.Preference
 import fr.renoux.gaston.util.CanGroupToMap._
 import fr.renoux.gaston.util.CollectionImplicits._
 
