@@ -1,5 +1,7 @@
 package fr.renoux.gaston.util
 
+import scalaz.Scalaz._
+
 import scala.collection.TraversableLike
 import scala.collection.generic.CanBuildFrom
 
@@ -16,7 +18,23 @@ object CollectionImplicits {
 
   }
 
+  implicit class TraversableEitherOps[A, B, R](val wrapped: TraversableLike[Either[A, B], R]) extends AnyVal {
+
+    def unzipEither[ThatA, ThatB](implicit af: CanBuildFrom[R, A, ThatA], bf: CanBuildFrom[R, B, ThatB]): (ThatA, ThatB) = {
+      val lefts: ThatA = wrapped.collect {
+        case Left(a) => a
+      }
+      val rights: ThatB = wrapped.collect {
+        case Right(b) => b
+      }
+      (lefts, rights)
+    }
+
+  }
+
   implicit class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
+
+    def updatedWith(k: K)(f: V => V): Map[K, V] = wrapped.alter(k)(_.map(f))
 
     def toFormattedString: String = wrapped.map { case (key, value) =>
       s"$key: $value"
@@ -26,6 +44,5 @@ object CollectionImplicits {
     def mapValuesStrict[V1](f: V => V1): Map[K, V1] = wrapped.map { case (k, v) => k -> f(v) }
 
   }
-
 
 }
