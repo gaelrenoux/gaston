@@ -13,7 +13,7 @@ class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
 
   def runWith(improverConstructor: Problem => ScheduleImprover, problem: Problem, seeds: Traversable[Long]): (Schedule, Double) = {
 
-    var (bestSchedule, bestScore) = (Schedule(0), Double.NegativeInfinity)
+    var (bestSchedule, bestScore) = (Schedule.empty, Double.NegativeInfinity)
     for (seed <- seeds) {
       implicit val random: Random = new Random(seed)
       log.info(s"Seed: $seed")

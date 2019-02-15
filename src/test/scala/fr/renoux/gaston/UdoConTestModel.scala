@@ -426,7 +426,7 @@ object UdoConTestModel {
 
     import Persons.byName
 
-    val Actual = Schedule(5,
+    val Actual = Schedule(
       Record(Slot("D1-afternoon"), Topic("Agôn"), Set[Person](byName("Mangon"), byName("Kamiseito"), byName
       ("Highlandjul"), byName("Ozen"), byName("Bashar"))),
       Record(Slot("D1-afternoon"), Topic("DC comics - Darkest night"), Set[Person](byName("Cryoban"), byName

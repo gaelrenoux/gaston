@@ -153,7 +153,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Slots._
     import Topics._
 
-    val Best = Schedule(3, Map(
+    val Best = Schedule(Map(
       Morning -> Map(
         Acting -> Set(Arthur, Iago, Hercule),
         Dancing -> Set(Daniela, Corwin, Bianca),

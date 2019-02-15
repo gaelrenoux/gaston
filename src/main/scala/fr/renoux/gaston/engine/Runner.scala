@@ -37,7 +37,7 @@ class Runner(
     val now = Instant.now()
     val timeout: Option[Instant] = maxDuration.map(d => now.plusSeconds(d.toSeconds))
 
-    runRecursive(now, timeout, 0, Schedule(0), Score.MinValue)
+    runRecursive(now, timeout, 0, Schedule.empty, Score.MinValue)
   }
 
   /** Recursive run: if it still has time, produces a schedule then invokes itself again . */

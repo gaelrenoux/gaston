@@ -7,7 +7,6 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-                     parallelization: Int,
                      records: Set[Schedule.Record]
                    ) {
 
@@ -83,10 +82,12 @@ object Schedule {
     def apply(slot: Slot, topic: Topic, persons: Person*): Record = apply(slot, topic, persons.toSet)
   }
 
-  def apply(parallelization: Int, schedule: Record*): Schedule = new Schedule(parallelization, schedule.toSet)
+  val empty: Schedule = Schedule()
 
-  def apply(parallelization: Int, personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]]) =
-    new Schedule(parallelization,
+  def apply(schedule: Record*): Schedule = new Schedule(schedule.toSet)
+
+  def apply(personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]]) =
+    new Schedule(
       personsByTopicBySlot.flatMap {
         case (slot, topicsPersons) => topicsPersons.map {
           case (topic, persons) => Record(slot, topic, persons)

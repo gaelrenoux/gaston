@@ -30,14 +30,14 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
   def makeSchedule(implicit random: Random): Option[Schedule] = {
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
-    backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(Queue(slots: _*), topics)(completePartialSchedule)
+    backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)(completePartialSchedule)
   }
 
   /** Commodity function, mainly for testing purposes */
   def makePartialSchedule(implicit random: Random): Option[Schedule] = {
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
-    backtrackAssignTopicsToSlots(Schedule(problem.parallelization))(Queue(slots: _*), topics)(Some(_))
+    backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)(Some(_))
   }
 
   private def md5(str: String): MD5 = MessageDigest.getInstance("MD5").digest(str.getBytes)
