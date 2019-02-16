@@ -15,14 +15,15 @@ case class Schedule(
   import fr.renoux.gaston.model.Schedule._
 
   lazy val slots: Set[Slot] = records.map(_.slot)
-  lazy val personsPerSlot: Map[Slot, Set[Person]] = records.groupBy(_.slot).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
+  lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
+  lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
-  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValuesStrict { x => x.map(_.topic) }.withDefaultValue(Set())
+  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = recordsPerSlot.mapValuesStrict { x => x.map(_.topic) }.withDefaultValue(Set())
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size).withDefaultValue(0)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
 
-  def onSlot(slot: Slot): Set[Record] = records.filter(_.slot == slot)
+  def on(slot: Slot): Set[Record] = records.filter(_.slot == slot)
 
   /** Update the records from the schedule. */
   def updateRecords(f: Set[Schedule.Record] => Set[Schedule.Record]): Schedule = copy(records = f(records))

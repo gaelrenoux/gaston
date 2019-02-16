@@ -13,18 +13,21 @@ class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleI
   /** Returns the best possible move or swap on a specific slot */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)
     ] = {
+    val records = schedule.on(slot)
     val topics = schedule.topicsPerSlot(slot)
-    val records = schedule.onSlot(slot)
 
-    val movableFromTopic =
+    val optionalOnTopic =
       topics.zipWith { t => schedule.personsPerTopic(t) -- problem.mandatoryPersonsPerTopic(t) }.toMap
+
+    val topicsWithEnough = records.filter { r => problem.minNumberPerTopic(r.topic) < r.persons.size }
+    val topicsWithNotTooMuch = records.filter { r => problem.maxNumberPerTopic(r.topic) > r.persons.size }
 
     /* All schedules on which we swapped two persons */
     val swappedSchedules = for {
       r1 <- records
       r2 <- records - r1
-      p1 <- movableFromTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
-      p2 <- movableFromTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)
+      p1 <- optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
+      p2 <- optionalOnTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)
     } yield {
       val newR1 = r1.copy(persons = r1.persons - p1 + p2)
       val newR2 = r2.copy(persons = r2.persons - p2 + p1)
@@ -33,9 +36,9 @@ class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleI
 
     /* All schedules on which we moved one person from one topic to another */
     val movedSchedules = for {
-      r1 <- records.filter { r => problem.minNumberPerTopic.getOrElse(r.topic, 0) < r.persons.size }
-      r2 <- (records - r1).filter { r => problem.maxNumberPerTopic.getOrElse(r.topic, Int.MaxValue) > r.persons.size }
-      p1 <- movableFromTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
+      r1 <- topicsWithEnough
+      r2 <- topicsWithNotTooMuch - r1
+      p1 <- optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
     } yield {
       val newR1 = r1.copy(persons = r1.persons - p1)
       val newR2 = r2.copy(persons = r2.persons + p1)
