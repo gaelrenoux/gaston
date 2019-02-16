@@ -14,19 +14,19 @@ class FastScheduleImprover(val problem: Problem) extends AbstractScheduleImprove
   /** Returns the first move or swap it finds that makes the schedule better */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot)
   : Option[(Schedule, Score)] = {
-    val records = schedule.on(slot)
-    val topics = schedule.topicsPerSlot(slot)
+    val slotSchedule = schedule.on(slot)
+    val topics = slotSchedule.topics
 
     val optionalOnTopic =
       topics.zipWith { t => schedule.personsPerTopic(t) -- problem.mandatoryPersonsPerTopic(t) }.toMap
 
-    val topicsWithEnough = records.filter { r => problem.minNumberPerTopic(r.topic) < r.persons.size }
-    val topicsWithNotTooMuch = records.filter { r => problem.maxNumberPerTopic(r.topic) > r.persons.size }
+    val topicsWithEnough = slotSchedule.records.filter { r => problem.minNumberPerTopic(r.topic) < r.persons.size }
+    val topicsWithNotTooMuch = slotSchedule.records.filter { r => problem.maxNumberPerTopic(r.topic) > r.persons.size }
 
     /* All schedules on which we swapped two persons */
     val swappedSchedules = for {
-      r1 <- records.view
-      r2 <- (records - r1).view
+      r1 <- slotSchedule.records.view
+      r2 <- (slotSchedule.records - r1).view
       p1 <- optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
       p2 <- optionalOnTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)
     } yield schedule.swapPersons((r1, p1), (r2, p2))

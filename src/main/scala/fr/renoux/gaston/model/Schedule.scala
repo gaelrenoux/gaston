@@ -17,6 +17,8 @@ case class Schedule(
 
   lazy val slots: Set[Slot] = records.map(_.slot)
   lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
+  lazy val slotSchedulesMap = slots.zipWith(SlotSchedule(this, _)).toMap
+  lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = recordsPerSlot.mapValuesStrict { x => x.map(_.topic) }.withDefaultValue(Set())
@@ -24,7 +26,8 @@ case class Schedule(
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
 
-  def on(slot: Slot): Set[Record] = records.filter(_.slot == slot)
+  /** Get the SlotSchedule for a specific Slot */
+  def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot)
 
   /** Update the records from the schedule. */
   def updateRecords(f: Set[Schedule.Record] => Set[Schedule.Record]): Schedule = copy(records = f(records))
