@@ -63,17 +63,17 @@ class Benchmark extends FlatSpec with Matchers {
       implicit val rand: Random = new Random(seed)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = Scorer.score(udoConProblem, initialSolution)
+      val initialScore = Scorer.score(initialSolution)
 
       val sysStart = System.currentTimeMillis()
       val sysSolution = systematicImprover.improve(initialSolution, initialScore)
       val sysDuration = System.currentTimeMillis() - sysStart
-      val sysScore = Scorer.score(udoConProblem, sysSolution)
+      val sysScore = Scorer.score(sysSolution)
 
       val fstStart = System.currentTimeMillis()
       val fstSolution = fastImprover.improve(initialSolution, initialScore)
       val fstDuration = System.currentTimeMillis() - fstStart
-      val fstScore = Scorer.score(udoConProblem, fstSolution)
+      val fstScore = Scorer.score(fstSolution)
 
       val txt = s"${seedFormat.format(seed.toLong)}    ${format(sysScore, sysDuration)}    ${format(fstScore, fstDuration)}"
       if (fstScore.value.round == sysScore.value.round) println(txt)

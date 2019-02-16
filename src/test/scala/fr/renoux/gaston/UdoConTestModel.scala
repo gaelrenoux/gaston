@@ -578,6 +578,8 @@ object UdoConTestModel {
     import Topics._
     import Slots._
 
+    private implicit val problem: Problem = Problems.Complete
+
     val Actual: Schedule = Schedule(
       D1Afternoon (
         Agon(Mangon, Kamiseito, Highlandjul, Ozen, Bashar),

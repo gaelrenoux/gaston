@@ -1,6 +1,6 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.input.InputSettings
+import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.problem.ProblemImpl
@@ -153,29 +153,29 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Slots._
     import Topics._
 
-    val Best = Schedule(Map(
-      Morning -> Map(
-        Acting -> Set(Arthur, Iago, Hercule),
-        Dancing -> Set(Daniela, Corwin, Bianca),
-        Grinding -> Set(Garion, Fiona)
+    private implicit val problem: Problem = Problems.Complete
+
+    val Best = Schedule(
+      Morning(
+        Acting(Arthur, Iago, Hercule),
+        Dancing(Daniela, Corwin, Bianca),
+        Grinding(Garion, Fiona)
       ),
-      AfterNoon -> Map(
-        Bathing -> Set(Bianca, Arthur),
-        Eating -> Set(Eric, Daniela, Corwin),
-        Helping -> Set(Hercule, Garion, Fiona)
+      AfterNoon(
+        Bathing(Bianca, Arthur),
+        Eating(Eric, Daniela, Corwin),
+        Helping(Hercule, Garion, Fiona)
       ),
-      Evening -> Map(
-        Cooking -> Set(Corwin, Bianca),
-        Fighting -> Set(Fiona, Eric, Daniela),
-        Inking -> Set(Iago, Hercule, Garion)
+      Evening(
+        Cooking(Corwin, Bianca),
+        Fighting(Fiona, Eric, Daniela),
+        Inking(Iago, Hercule, Garion)
       )
-    ))
+    )
 
   }
 
 }
 
 
-object SimpleTestModel {
-  def apply(implicit settings: InputSettings): SimpleTestModel = new SimpleTestModel
-}
+object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.forceToInput.gaston.settings)

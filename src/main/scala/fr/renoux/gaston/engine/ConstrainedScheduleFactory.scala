@@ -4,8 +4,7 @@ import java.security.MessageDigest
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
-import fr.renoux.gaston.model.Problem
-import fr.renoux.gaston.model.{Person, Schedule, Slot, Topic}
+import fr.renoux.gaston.model._
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -16,6 +15,8 @@ import scala.util.Random
   * Uses backtracking to create a solution satisfying all constraints. Does not take preferences into account.
   */
 class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = false) {
+
+  private implicit val _: Problem = problem
 
   type MD5 = Array[Byte]
   private val candidateCache = mutable.Set[MD5]()

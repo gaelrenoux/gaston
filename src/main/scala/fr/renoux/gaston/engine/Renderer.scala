@@ -27,7 +27,7 @@ class Renderer(
 
   /** Display the persons' scores for that schedule */
   def personsSatisfaction(schedule: Schedule): String = {
-    val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(problem, schedule)
+    val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(schedule)
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
     val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.map {

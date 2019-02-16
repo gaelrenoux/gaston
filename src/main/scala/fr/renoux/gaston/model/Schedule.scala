@@ -7,8 +7,10 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-                     records: Set[Schedule.Record]
-                   ) {
+    records: Set[Schedule.Record]
+)(implicit
+    val problem: Problem
+) {
 
   import fr.renoux.gaston.model.Schedule._
 
@@ -17,6 +19,9 @@ case class Schedule(
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValuesStrict { x => x.map(_.topic) }.withDefaultValue(Set())
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size).withDefaultValue(0)
+
+  /** Update the records from the schedule. */
+  def updateRecords(f: Set[Schedule.Record] => Set[Schedule.Record]): Schedule = copy(records = f(records))
 
   /** Merge more triplets into this schedule. */
   def merge(addedRecords: Set[Record]): Schedule = {
@@ -82,11 +87,11 @@ object Schedule {
     def apply(slot: Slot, topic: Topic, persons: Person*): Record = apply(slot, topic, persons.toSet)
   }
 
-  val empty: Schedule = Schedule()
+  def empty(implicit problem: Problem): Schedule = Schedule()
 
-  def apply(schedule: Seq[Record]*): Schedule = new Schedule(schedule.flatten.toSet)
+  def apply(schedule: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(schedule.flatten.toSet)
 
-  def apply(personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]]) =
+  def apply(personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]])(implicit problem: Problem) =
     new Schedule(
       personsByTopicBySlot.flatMap {
         case (slot, topicsPersons) => topicsPersons.map {

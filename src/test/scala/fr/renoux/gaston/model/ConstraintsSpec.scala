@@ -7,8 +7,11 @@ import org.scalatest.{FlatSpec, Matchers}
 class ConstraintsSpec extends FlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._
+  import fr.renoux.gaston.MinimalTestModel.Problems._
   import fr.renoux.gaston.MinimalTestModel.Slots._
   import fr.renoux.gaston.MinimalTestModel.Topics._
+
+  implicit val problem: Problem = Minimal
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
 

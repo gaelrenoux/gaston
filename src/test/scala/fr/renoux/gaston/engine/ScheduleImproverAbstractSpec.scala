@@ -6,11 +6,13 @@ import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.Random
 
-class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
+abstract class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
 
   private val log = Logger(getClass)
 
   def runWith(improverConstructor: Problem => ScheduleImprover, problem: Problem, seeds: Traversable[Long]): (Schedule, Double) = {
+
+    implicit val _: Problem = problem
 
     var (bestSchedule, bestScore) = (Schedule.empty, Double.NegativeInfinity)
     for (seed <- seeds) {
@@ -21,12 +23,13 @@ class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
       val improver = improverConstructor(problem)
 
       val Some(initialSolution) = csFactory.makeSchedule
-      val initialScore = Scorer.score(problem, initialSolution)
-      log.info(s"Temporary solution (score $initialScore): $initialSolution")
+      val initialScore = Scorer.score(initialSolution)
+      log.info(s"Temporary solution (score $initialScore): ${initialSolution.toFormattedString}")
+      problem.isSolvedBy(initialSolution) should be(true)
 
       val finalSolution = improver.improve(initialSolution, initialScore, 100)
-      val finalScore = Scorer.score(problem, finalSolution)
-      log.info(s"Solution (score $finalScore): $finalSolution")
+      val finalScore = Scorer.score(finalSolution)
+      log.info(s"Solution (score $finalScore): ${finalSolution.toFormattedString}")
 
       problem.isSolvedBy(finalSolution) should be(true)
       finalScore should be > initialScore

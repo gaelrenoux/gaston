@@ -1,5 +1,6 @@
 package fr.renoux.gaston
 
+import fr.renoux.gaston.model.problem.ProblemImpl
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 
 
@@ -15,6 +16,7 @@ object MinimalTestModel {
 
     val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
     val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
+    val All: Set[Person] = AllTurtles ++ AllEnemies
   }
 
   object Topics {
@@ -33,6 +35,10 @@ object MinimalTestModel {
     val Night = Slot("night")
 
     val All: Set[Slot] = Set(Morning, AfterNoon, Evening, Night)
+  }
+
+  object Problems {
+    val Minimal = new ProblemImpl(4, Slots.All, Topics.All, Persons.All, Set(), Set())
   }
 
 }

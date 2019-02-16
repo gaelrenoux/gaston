@@ -11,6 +11,9 @@ class PreferencesSpec extends FlatSpec with Matchers {
   import fr.renoux.gaston.MinimalTestModel.Persons._
   import fr.renoux.gaston.MinimalTestModel.Slots._
   import fr.renoux.gaston.MinimalTestModel.Topics._
+  import fr.renoux.gaston.MinimalTestModel.Problems._
+
+  implicit val problem: Problem = Minimal
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
 

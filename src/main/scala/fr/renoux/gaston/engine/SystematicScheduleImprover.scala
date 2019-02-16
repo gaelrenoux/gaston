@@ -28,7 +28,7 @@ class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleI
     } yield {
       val newR1 = r1.copy(persons = r1.persons - p1 + p2)
       val newR2 = r2.copy(persons = r2.persons - p2 + p1)
-      schedule.copy(records = schedule.records - r1 - r2 + newR1 + newR2)
+      schedule.updateRecords(_ - r1 - r2 + newR1 + newR2)
     }
 
     /* All schedules on which we moved one person from one topic to another */
@@ -39,11 +39,11 @@ class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleI
     } yield {
       val newR1 = r1.copy(persons = r1.persons - p1)
       val newR2 = r2.copy(persons = r2.persons + p1)
-      schedule.copy(records = schedule.records - r1 - r2 + newR1 + newR2)
+      schedule.updateRecords(_ - r1 - r2 + newR1 + newR2)
     }
 
     val allNewSchedules = swappedSchedules ++ movedSchedules
-    val scoredSchedules = allNewSchedules.zipWith(Scorer.score(problem, _))
+    val scoredSchedules = allNewSchedules.zipWith(Scorer.score)
 
     if (scoredSchedules.isEmpty) None else {
       val candidateAndScore = scoredSchedules.maxBy(_._2)
