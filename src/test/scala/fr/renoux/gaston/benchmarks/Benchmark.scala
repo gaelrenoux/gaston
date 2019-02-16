@@ -18,7 +18,7 @@ class Benchmark extends FlatSpec with Matchers {
   private val udoConProblem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
-  private val duration = 1.minutes
+  private val duration = 2.minutes
 
 
   "Systematic improver" should "give a good score" ignore {
@@ -43,7 +43,7 @@ class Benchmark extends FlatSpec with Matchers {
     println(s"$score after $count iterations")
     schedule.isSolution should be(true)
     score.value should be > 500.0
-    count should be > 100L
+    count should be > 125L
   }
 
   "Compare improvers on various schedules" should "work" ignore {
