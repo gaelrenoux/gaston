@@ -13,8 +13,8 @@ class FastScheduleImproverSpec extends ScheduleImproverAbstractSpec {
 
   it should "work a valid schedule (on a real-life model)" in {
     val problem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
-    val (_, bestScore) = runWith(new FastScheduleImprover(_), problem, 0L until 1L)
-    bestScore should be >= 330.0
+    val (_, bestScore) = runWith(new FastScheduleImprover(_), problem, 4L until 5L)
+    bestScore should be >= 300.0
   }
 
 }
