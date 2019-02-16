@@ -11,18 +11,15 @@ case class PersonGroupAntiPreference(
     person: Person,
     group: Set[Person],
     reward: Score
-) extends AbstractPreference[Set[Person]] with Preference.Anti {
+) extends Preference.Anti {
 
-  /** Elements to score are the group of persons containing the current person, independently of the slots and topics */
-  override protected def elementsScored(schedule: Schedule): Iterable[Set[Person]] =
-  //toSeq is needed: we do not want to deduplicate identical groups!
-    schedule.records.filter(_.persons(person)).toSeq.map(_.persons)
-
-  /** To score a group: count the number of unwanted persons */
-  override protected def score(scored: Set[Person]): Score = {
-    val count = group.intersect(scored).size
-    if (count == 0) Score.Zero
-    else reward * count
+  def score(schedule: Schedule): Score = {
+    schedule.records.foldLeft(Score.Zero) {
+      case (sum, r) if r.persons.contains(person) =>
+        val intersection = r.persons.intersect(group).size
+        if (intersection == 0) sum else sum + (reward * intersection)
+      case (sum, _) => sum
+    }
   }
 
 }
