@@ -3,11 +3,11 @@ package fr.renoux.gaston.model
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /**
-  * A schedule is a set of triplets matching topics to slots, and having people attached to the topics.
+  * A schedule is an association of people, to topics, to slots.
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-    records: Set[Schedule.Record]
+    val records: Set[Schedule.Record]
 )(implicit
     val problem: Problem
 ) {
@@ -19,6 +19,10 @@ case class Schedule(
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }.withDefaultValue(Set())
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = records.groupBy(_.slot).mapValuesStrict { x => x.map(_.topic) }.withDefaultValue(Set())
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size).withDefaultValue(0)
+  lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
+  lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
+
+  def onSlot(slot: Slot): Set[Record] = records.filter(_.slot == slot)
 
   /** Update the records from the schedule. */
   def updateRecords(f: Set[Schedule.Record] => Set[Schedule.Record]): Schedule = copy(records = f(records))
@@ -33,17 +37,16 @@ case class Schedule(
 
   def ++(addedRecords: Set[Record]): Schedule = merge(addedRecords)
 
-  /** Merge more triplets into this schedule. */
+  /** Merge with another schedule's content. */
   def merge(that: Schedule): Schedule = merge(that.records)
 
   def ++(that: Schedule): Schedule = merge(that.records)
 
-  /** Adds a person to some topic already on schedule. Has no effect if the topic is not on schedule. */
-  def addPersonToTopic(person: Person, topic: Topic): Schedule = copy(records = records.map {
+  /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */
+  def addPersonToExistingTopic(topic: Topic, person: Person): Schedule = updateRecords(_.map {
     case Record(s, t, ps) if t == topic => Record(s, t, ps + person)
     case r => r
-  }
-  )
+  })
 
   /** The schedule makes sense. No person on multiple topics at the same time. */
   lazy val isSound: Boolean = {
@@ -53,6 +56,29 @@ case class Schedule(
     }
   }
 
+  /** Score for each person, regardless of its weight. */
+  lazy val unweightedScoresByPerson: Map[Person, Score] = {
+    val individualScores = problem.preferences.toSeq.map(p => p -> p.score(this))
+    individualScores.groupBy(_._1.person).mapValuesStrict(_.map(_._2).sum)
+  }
+
+  /**
+    * Partial Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to partial schedules
+    */
+  lazy val isPartialSolution: Boolean = {
+    problem.constraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
+  }
+
+  /** @return true if this respects all constraints */
+  lazy val isSolution: Boolean = {
+    problem.constraints.forall(_.isRespected(this))
+  }
+
+  /** @return Constraints broken by this schedule */
+  lazy val brokenConstraints: Set[Constraint] = problem.constraints.filter(_.isBroken(this))
+
+  /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
 
@@ -87,6 +113,7 @@ object Schedule {
     def apply(slot: Slot, topic: Topic, persons: Person*): Record = apply(slot, topic, persons.toSet)
   }
 
+  /** Empty schedule for a problem */
   def empty(implicit problem: Problem): Schedule = Schedule()
 
   def apply(schedule: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(schedule.flatten.toSet)

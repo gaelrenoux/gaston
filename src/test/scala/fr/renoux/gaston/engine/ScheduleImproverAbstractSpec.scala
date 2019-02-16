@@ -25,13 +25,13 @@ abstract class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
       val Some(initialSolution) = csFactory.makeSchedule
       val initialScore = Scorer.score(initialSolution)
       log.info(s"Temporary solution (score $initialScore): ${initialSolution.toFormattedString}")
-      problem.isSolvedBy(initialSolution) should be(true)
+      initialSolution.isSolution should be(true)
 
       val finalSolution = improver.improve(initialSolution, initialScore, 100)
       val finalScore = Scorer.score(finalSolution)
       log.info(s"Solution (score $finalScore): ${finalSolution.toFormattedString}")
 
-      problem.isSolvedBy(finalSolution) should be(true)
+      finalSolution.isSolution should be(true)
       finalScore should be > initialScore
 
       if (finalScore.value > bestScore) {

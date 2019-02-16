@@ -15,7 +15,7 @@ class FastScheduleImprover(val problem: Problem) extends AbstractScheduleImprove
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)
     ] = {
     val topics = schedule.topicsPerSlot(slot)
-    val records = schedule.records.filter(_.slot == slot)
+    val records = schedule.onSlot(slot)
 
     val movableFromTopic =
       topics.zipWith { t => schedule.personsPerTopic(t) -- problem.mandatoryPersonsPerTopic(t) }.toMap

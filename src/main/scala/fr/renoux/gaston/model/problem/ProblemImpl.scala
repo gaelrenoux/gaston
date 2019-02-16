@@ -104,20 +104,6 @@ class ProblemImpl(
   /** For everyone, its preferences */
   lazy val preferencesPerPerson: Map[Person, Set[Preference]] = preferences.groupBy(_.person)
 
-
-  /**
-    * Partial Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
-    *
-    * @return true if the partialSchedule respects all constraints applicable to partial schedules  */
-  def isAcceptablePartial(candidate: Schedule): Boolean =
-    constraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(candidate) }
-
-  /** @return true if the schedule respects all constraints */
-  def isSolvedBy(solution: Schedule): Boolean = constraints.forall(_.isRespected(solution))
-
-  /** @return Constraints broken by this schedule */
-  def brokenConstraintsIn(solution: Schedule): Set[Constraint] = constraints.filter(_.isBroken(solution))
-
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
     builder.append("  Slots:\n")

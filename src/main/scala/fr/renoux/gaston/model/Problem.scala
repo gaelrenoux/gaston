@@ -25,9 +25,4 @@ trait Problem {
 
   val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
 
-  def brokenConstraintsIn(solution: Schedule): Set[Constraint]
-
-  def isAcceptablePartial(candidate: Schedule): Boolean
-
-  def isSolvedBy(solution: Schedule): Boolean
 }

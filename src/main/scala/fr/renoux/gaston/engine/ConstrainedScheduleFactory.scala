@@ -99,10 +99,10 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
         val nextTopics = topicsLeft.tail
 
         val record = Schedule.Record(currentSlot, currentTopic, problem.mandatoryPersonsPerTopic(currentTopic)) //new record we want to try
-        val candidate = partialSchedule.copy(records = partialSchedule.records + record) // generate a new candidate with this record
+        val candidate = partialSchedule.updateRecords(_ + record) // generate a new candidate with this record
 
         val possibleSchedule =
-          if (candidate.isSound && problem.isAcceptablePartial(candidate) && minPersonsOnSlot(candidate, currentSlot) <= problem.personsCount) {
+          if (candidate.isSound && candidate.isPartialSolution && minPersonsOnSlot(candidate, currentSlot) <= problem.personsCount) {
             log.trace(s"Go on with acceptable candidate and next slot: $candidate")
             backtrackAssignTopicsToSlots(candidate)(slotsLeft.tail :+ currentSlot, nextTopics ::: topicsPassed, Nil)(postTreatment)
           } else None
@@ -220,7 +220,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
         log.trace("Current topic has not reached min number");
         {
           /* Add current person and try to go on, with the same topic is we need more persons, or on the next topic */
-          val newSchedule = partialSchedule.addPersonToTopic(person, topic)
+          val newSchedule = partialSchedule.addPersonToExistingTopic(topic, person)
           if (count == 1) backtrackAssignPersonsToTopics(newSchedule)(ttail, topicsOpenToMax, ptail ++ personsSkipped, Nil, topicsOpenToMaxDelayed)
           else backtrackAssignPersonsToTopics(newSchedule)((topic, count - 1) :: ttail, topicsOpenToMax, ptail, personsSkipped, topicsOpenToMaxDelayed)
         } orElse {
@@ -237,7 +237,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
         log.trace("Current topic has not reached max number");
         {
           /* Add current person and try to go on, with the next topic (current topic goes at the end if we can have more persons) */
-          val newSchedule = partialSchedule.addPersonToTopic(person, topic)
+          val newSchedule = partialSchedule.addPersonToExistingTopic(topic, person)
           if (count == 1) backtrackAssignPersonsToTopics(newSchedule)(Nil, ttail, ptail ++ personsSkipped, Nil, topicsOpenToMaxDelayed)
           else backtrackAssignPersonsToTopics(newSchedule)(Nil, ttail, ptail ++ personsSkipped, Nil, (topic, count - 1) :: topicsOpenToMaxDelayed)
         } orElse {
