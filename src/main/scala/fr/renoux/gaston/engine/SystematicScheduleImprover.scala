@@ -28,22 +28,14 @@ class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleI
       r2 <- records - r1
       p1 <- optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
       p2 <- optionalOnTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)
-    } yield {
-      val newR1 = r1.copy(persons = r1.persons - p1 + p2)
-      val newR2 = r2.copy(persons = r2.persons - p2 + p1)
-      schedule.updateRecords(_ - r1 - r2 + newR1 + newR2)
-    }
+    } yield schedule.swapPersons((r1, p1), (r2, p2))
 
     /* All schedules on which we moved one person from one topic to another */
     val movedSchedules = for {
       r1 <- topicsWithEnough
       r2 <- topicsWithNotTooMuch - r1
-      p1 <- optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
-    } yield {
-      val newR1 = r1.copy(persons = r1.persons - p1)
-      val newR2 = r2.copy(persons = r2.persons + p1)
-      schedule.updateRecords(_ - r1 - r2 + newR1 + newR2)
-    }
+      p <- optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)
+    } yield schedule.movePerson(r1, r2, p)
 
     val allNewSchedules = swappedSchedules ++ movedSchedules
     val scoredSchedules = allNewSchedules.zipWith(Scorer.score)

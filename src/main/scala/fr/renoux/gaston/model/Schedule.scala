@@ -7,10 +7,11 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-    val records: Set[Schedule.Record]
+    records: Set[Schedule.Record]
 )(implicit
     val problem: Problem
 ) {
+
 
   import fr.renoux.gaston.model.Schedule._
 
@@ -48,6 +49,24 @@ case class Schedule(
     case Record(s, t, ps) if t == topic => Record(s, t, ps + person)
     case r => r
   })
+
+  /** Swap two persons. Persons are in couple with there current record, not the target record. */
+  def swapPersons(rp1: (Record, Person), rp2: (Record, Person)): Schedule = updateRecords { records =>
+    val (r1, p1) = rp1
+    val (r2, p2) = rp2
+    assert(r1.slot == r2.slot)
+    val newR1 = r1.copy(persons = r1.persons - p1 + p2)
+    val newR2 = r2.copy(persons = r2.persons - p2 + p1)
+    records - r1 - r2 + newR1 + newR2
+  }
+
+  /** Move a person from some record to another one. */
+  def movePerson(source: Record, destination: Record, person: Person): Schedule = updateRecords { records =>
+    assert(source.slot == destination.slot)
+    val newSource = source.copy(persons = source.persons - person)
+    val newDest = destination.copy(persons = destination.persons + person)
+    records - source - destination + newSource + newDest
+  }
 
   /** The schedule makes sense. No person on multiple topics at the same time. */
   lazy val isSound: Boolean = {
