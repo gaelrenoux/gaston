@@ -11,7 +11,7 @@ case class PersonGroupAntiPreference(
     person: Person,
     group: Set[Person],
     reward: Score
-) extends AbstractPreference[Set[Person]] with AntiPreference {
+) extends AbstractPreference[Set[Person]] with Preference.Anti {
 
   /** Elements to score are the group of persons containing the current person, independently of the slots and topics */
   override protected def elementsScored(schedule: Schedule): Iterable[Set[Person]] =

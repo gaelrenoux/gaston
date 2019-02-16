@@ -19,6 +19,10 @@ trait Preference {
   def score(schedule: Schedule): Score
 }
 
-trait AntiPreference extends Preference {
-  assert(reward.value <= 0, s"AntiPreference $this should have a negative reward")
+object Preference {
+
+  trait Anti extends Preference {
+    assert(reward.value <= 0, s"AntiPreference $this should have a negative reward")
+  }
+
 }
