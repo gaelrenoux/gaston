@@ -5,7 +5,7 @@ import fr.renoux.gaston.model.{Constraint, Person, Schedule, Topic}
 
 import scala.collection.mutable
 
-/** No person (outside of the persons explicitely exempted from this rule) can be on more than one of the topics inside that list. */
+/** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list. */
 case class TopicsExclusive(topics: Set[Topic], exemptions: Set[Person] = Set()) extends Constraint {
 
   private val log = Logger[Constraint]
