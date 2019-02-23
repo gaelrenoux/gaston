@@ -95,6 +95,49 @@ class ScheduleSpec extends FlatSpec with Matchers {
     ))
   }
 
+  "add" should "add someone to an existing slot and topic" in {
+    Simple.add(Record(Morning, Acting, Set(Eric, Fiona))) should be(Schedule(
+      Morning(
+        Acting(Arthur, Bianca, Eric, Fiona),
+        Cooking(Corwin, Daniela)
+      ),
+      AfterNoon(
+        Bathing(Arthur, Bianca),
+        Dancing(Corwin, Daniela)
+      )
+    ))
+  }
+
+  it should "create a new topic if needed" in {
+    Simple.add(Record(Morning, Eating, Set(Eric, Fiona))) should be(Schedule(
+      Morning(
+        Acting(Arthur, Bianca),
+        Cooking(Corwin, Daniela),
+        Eating(Eric, Fiona)
+      ),
+      AfterNoon(
+        Bathing(Arthur, Bianca),
+        Dancing(Corwin, Daniela)
+      )
+    ))
+  }
+
+  it should "create a new slot if needed" in {
+    Simple.add(Record(Evening, Eating, Set(Eric, Fiona))) should be(Schedule(
+      Morning(
+        Acting(Arthur, Bianca),
+        Cooking(Corwin, Daniela)
+      ),
+      AfterNoon(
+        Bathing(Arthur, Bianca),
+        Dancing(Corwin, Daniela)
+      ),
+      Evening (
+        Eating(Eric, Fiona)
+      )
+    ))
+  }
+
   "merge" should "work with two schedules" in {
     val simple2 = Schedule(
       AfterNoon(
@@ -157,6 +200,19 @@ class ScheduleSpec extends FlatSpec with Matchers {
       Morning(
         Acting(Arthur, Bianca),
         Cooking(Arthur, Daniela)
+      )
+    ).isSound should be(false)
+  }
+
+  it should "reject a schedule with the same topic several times" in {
+    Schedule(
+      Morning(
+        Acting(Arthur),
+        Cooking(Corwin)
+      ),
+      AfterNoon(
+        Acting(Corwin),
+        Bathing(Arthur)
       )
     ).isSound should be(false)
   }

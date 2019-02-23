@@ -69,12 +69,17 @@ case class Schedule(
     records - source - destination + newSource + newDest
   }
 
-  /** The schedule makes sense. No person on multiple topics at the same time. */
+  /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
-    records.groupBy(_.slot).values.forall { records =>
+    val noUbiquity = recordsPerSlot.values.forall { records =>
       val persons = records.toSeq.flatMap(_.persons.toSeq) //toSeq to keep duplicates, we're looking for them
       persons.size == persons.toSet.size
     }
+    val noDuplicates = {
+      val topicsSeq = topicsPerSlot.values.flatten
+      topicsSeq.size == topicsSeq.toSet.size
+    }
+    noUbiquity && noDuplicates
   }
 
   /** Score for each person, regardless of its weight. */
