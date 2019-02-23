@@ -15,12 +15,10 @@ case class PersonGroupAntiPreference(
 
   /** Specific implementation, faster than the default */
   override def score(schedule: Schedule): Score = {
-    schedule.records.foldLeft(Score.Zero) {
-      case (sum, r) if r.persons.contains(person) =>
-        val intersection = r.persons.intersect(group).size
-        if (intersection == 0) sum else sum + (reward * intersection)
-      case (sum, _) => sum
-    }
+    schedule.personGroups.filter(_.contains(person)).map { groupWithPerson =>
+      val count = group.intersect(groupWithPerson).size
+      if (count == 0) Score.Zero else reward * count
+    }.sum
   }
 
   override def scoreSlot(schedule: SlotSchedule): Score = {
@@ -29,4 +27,5 @@ case class PersonGroupAntiPreference(
       if (count == 0) Score.Zero else reward * count
     }.sum
   }
+
 }
