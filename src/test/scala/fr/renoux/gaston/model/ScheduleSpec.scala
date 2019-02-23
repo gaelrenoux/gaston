@@ -132,7 +132,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
         Bathing(Arthur, Bianca),
         Dancing(Corwin, Daniela)
       ),
-      Evening (
+      Evening(
         Eating(Eric, Fiona)
       )
     ))
@@ -179,7 +179,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
         Acting(Arthur, Bianca, Eric),
         Cooking(Corwin, Daniela)
       ),
-      AfterNoon (
+      AfterNoon(
         Bathing(Arthur, Bianca),
         Dancing(Corwin, Daniela)
       )
@@ -188,6 +188,59 @@ class ScheduleSpec extends FlatSpec with Matchers {
 
   it should "not do anything with a non-existing topic" in {
     Simple.addPersonToExistingTopic(Grinding, Eric) should be(Simple)
+  }
+
+  "swapPersons" should "swap two persons on the same slot" in {
+    Simple.swapPersons(Morning, Acting -> Arthur, Cooking -> Daniela) should be(Schedule(
+      Morning(
+        Acting(Daniela, Bianca),
+        Cooking(Corwin, Arthur)
+      ),
+      AfterNoon(
+        Bathing(Arthur, Bianca),
+        Dancing(Corwin, Daniela)
+      )
+    ))
+  }
+  /*
+    it should "not do anything if the topics are missing" in {
+      Simple.swapPersons(Morning, Grinding -> Arthur, Cooking -> Daniela) should be (Simple)
+    }
+
+    it should "not do anything if the topics are wrong" in {
+      Simple.swapPersons(Morning, Cooking -> Arthur, Cooking -> Daniela) should be (Simple)
+    }
+
+  it should "not do anything if the slot is missing" in {
+    Simple.swapPersons(Evening, Acting -> Arthur, Cooking -> Daniela) should be(Simple)
+  }
+  */
+
+  "movePerson" should "move a person from a source topic to a destination topic" in {
+    Simple.movePerson(Morning, Acting, Cooking, Arthur) should be(Schedule(
+      Morning(
+        Acting(Bianca),
+        Cooking(Corwin, Daniela, Arthur)
+      ),
+      AfterNoon(
+        Bathing(Arthur, Bianca),
+        Dancing(Corwin, Daniela)
+      )
+    ))
+  }
+
+  /*
+  it should "not do anything if the topics are missing" in {
+    Simple.movePerson(Morning, Acting, Grinding, Arthur) should be (Simple)
+    Simple.movePerson(Morning, Grinding, Cooking, Arthur) should be (Simple)
+  }
+
+  it should "not do anything if the topics are wrong" in {
+    Simple.movePerson(Morning, Cooking, Acting, Arthur) should be(Simple)
+  }*/
+
+  it should "not do anything if the slot is missing" in {
+    Simple.movePerson(Evening, Acting, Cooking, Arthur) should be(Simple)
   }
 
   "isSound" should "validate a correct schedule" in {

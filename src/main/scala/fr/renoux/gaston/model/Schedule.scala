@@ -18,6 +18,7 @@ case class Schedule(
   lazy val records: Set[Record] = wrapped
   lazy val slots: Set[Slot] = records.map(_.slot)
   lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
+  lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
   lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = slots.zipWith(SlotSchedule(this, _)).toMap
   lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
@@ -51,22 +52,24 @@ case class Schedule(
     case r => r
   })
 
-  /** Swap two persons on a slot. Persons are in couple with there current record. */
-  def swapPersons(rp1: (Record, Person), rp2: (Record, Person)): Schedule = updateRecords { records =>
-    val (r1, p1) = rp1
-    val (r2, p2) = rp2
-    assert(r1.slot == r2.slot)
+  /** Swap two persons on a slot. Persons are in couple with there current topic. */
+  def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule = updateRecords { records =>
+    val (t1, p1) = tp1
+    val (t2, p2) = tp2
+    val r1 = recordsPerSlotPerTopic(slot)(t1).head
+    val r2 = recordsPerSlotPerTopic(slot)(t2).head
     val newR1 = r1.copy(persons = r1.persons - p1 + p2)
     val newR2 = r2.copy(persons = r2.persons - p2 + p1)
     records - r1 - r2 + newR1 + newR2
   }
 
-  /** Move a person from some record to another one. */
-  def movePerson(source: Record, destination: Record, person: Person): Schedule = updateRecords { records =>
-    assert(source.slot == destination.slot)
-    val newSource = source.copy(persons = source.persons - person)
-    val newDest = destination.copy(persons = destination.persons + person)
-    records - source - destination + newSource + newDest
+  /** Move a person on some slot, from some topic to another one. */
+  def movePerson(slot: Slot, source: Topic, destination: Topic, person: Person): Schedule = updateRecords { records =>
+    val sourceRecord = recordsPerSlotPerTopic(slot)(source).head
+    val destinationRecord = recordsPerSlotPerTopic(slot)(destination).head
+    val newSourceRecord = sourceRecord.copy(persons = sourceRecord.persons - person)
+    val newDestinationRecord = destinationRecord.copy(persons = destinationRecord.persons + person)
+    records - sourceRecord - destinationRecord + newSourceRecord + newDestinationRecord
   }
 
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
