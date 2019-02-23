@@ -7,17 +7,14 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-    records: Set[Schedule.Record]
+    records: Set[Record]
 )(implicit
     val problem: Problem
 ) {
 
-
-  import fr.renoux.gaston.model.Schedule._
-
   lazy val slots: Set[Slot] = records.map(_.slot)
   lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
-  lazy val slotSchedulesMap = slots.zipWith(SlotSchedule(this, _)).toMap
+  lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = slots.zipWith(SlotSchedule(this, _)).toMap
   lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
@@ -30,7 +27,7 @@ case class Schedule(
   def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot)
 
   /** Update the records from the schedule. */
-  def updateRecords(f: Set[Schedule.Record] => Set[Schedule.Record]): Schedule = copy(records = f(records))
+  def updateRecords(f: Set[Record] => Set[Record]): Schedule = copy(records = f(records))
 
   /** Merge more triplets into this schedule. */
   def merge(addedRecords: Set[Record]): Schedule = {
@@ -124,17 +121,6 @@ case class Schedule(
 }
 
 object Schedule {
-
-  /** A Record is a triplet of slot, topic and assigned persons */
-  case class Record(slot: Slot, topic: Topic, persons: Set[Person])
-
-  object Record {
-    def fromTuple(tuple: (Slot, Topic, Set[Person])) = Record(tuple._1, tuple._2, tuple._3)
-
-    def fromTuple2(tuple: ((Slot, Topic), Set[Person])) = Record(tuple._1._1, tuple._1._2, tuple._2)
-
-    def apply(slot: Slot, topic: Topic, persons: Person*): Record = apply(slot, topic, persons.toSet)
-  }
 
   /** Empty schedule for a problem */
   def empty(implicit problem: Problem): Schedule = Schedule()

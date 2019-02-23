@@ -4,6 +4,6 @@ package fr.renoux.gaston.model
 case class Slot(name: String) extends AnyVal {
 
   /** To facilitate writing schedules */
-  def apply(records: (Topic, Set[Person])*): Seq[Schedule.Record] =
-    records.map(r => Schedule.Record(this, r._1, r._2))
+  def apply(records: (Topic, Set[Person])*): Seq[Record] =
+    records.map(r => Record(this, r._1, r._2))
 }

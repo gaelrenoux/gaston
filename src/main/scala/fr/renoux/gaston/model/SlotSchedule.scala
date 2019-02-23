@@ -7,7 +7,7 @@ case class SlotSchedule(
     schedule: Schedule,
     slot: Slot
 ) {
-  lazy val records: Set[Schedule.Record] = schedule.records.filter(_.slot == slot)
+  lazy val records: Set[Record] = schedule.records.filter(_.slot == slot)
   lazy val topics: Set[Topic] = schedule.topicsPerSlot(slot)
   lazy val persons: Set[Person] = records.flatMap(_.persons)
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
