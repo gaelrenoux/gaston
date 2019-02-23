@@ -99,7 +99,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
         val nextTopics = topicsLeft.tail
 
         val record = Record(currentSlot, currentTopic, problem.mandatoryPersonsPerTopic(currentTopic)) //new record we want to try
-        val candidate = partialSchedule.updateRecords(_ + record) // generate a new candidate with this record
+        val candidate = partialSchedule + record // generate a new candidate with this record
 
         val possibleSchedule =
           if (candidate.isSound && candidate.isPartialSolution && minPersonsOnSlot(candidate, currentSlot) <= problem.personsCount) {

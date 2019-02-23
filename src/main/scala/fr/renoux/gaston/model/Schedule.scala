@@ -7,11 +7,15 @@ import fr.renoux.gaston.util.CollectionImplicits._
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-    records: Set[Record]
+    private val wrapped: Set[Record]
 )(implicit
     val problem: Problem
 ) {
 
+  @inline private def updateRecords(f: Set[Record] => Set[Record]): Schedule =
+    copy(wrapped = f(records))
+
+  lazy val records: Set[Record] = wrapped
   lazy val slots: Set[Slot] = records.map(_.slot)
   lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
   lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = slots.zipWith(SlotSchedule(this, _)).toMap
@@ -26,23 +30,20 @@ case class Schedule(
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot)
 
-  /** Update the records from the schedule. */
-  def updateRecords(f: Set[Record] => Set[Record]): Schedule = copy(records = f(records))
+  /** Add a new record to this schedule. */
+  def add(record: Record): Schedule = updateRecords(_ + record)
 
-  /** Merge more triplets into this schedule. */
-  def merge(addedRecords: Set[Record]): Schedule = {
-    val cumulatedRecords = records ++ addedRecords
-    val mergedMap = cumulatedRecords.groupBy(t => (t.slot, t.topic)).mapValuesStrict(_.flatMap(_.persons))
-    val mergedRecords = mergedMap.toSet.map(Record.fromTuple2)
-    copy(records = mergedRecords)
-  }
-
-  def ++(addedRecords: Set[Record]): Schedule = merge(addedRecords)
+  def +(record: Record): Schedule = updateRecords(_ + record)
 
   /** Merge with another schedule's content. */
-  def merge(that: Schedule): Schedule = merge(that.records)
+  def merge(that: Schedule): Schedule = {
+    val cumulatedRecords = records ++ that.records
+    val mergedMap = cumulatedRecords.groupBy(t => (t.slot, t.topic)).mapValuesStrict(_.flatMap(_.persons))
+    val mergedRecords = mergedMap.toSet.map(Record.fromTuple2)
+    copy(wrapped = mergedRecords)
+  }
 
-  def ++(that: Schedule): Schedule = merge(that.records)
+  def ++(that: Schedule): Schedule = merge(that)
 
   /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */
   def addPersonToExistingTopic(topic: Topic, person: Person): Schedule = updateRecords(_.map {
@@ -50,7 +51,7 @@ case class Schedule(
     case r => r
   })
 
-  /** Swap two persons. Persons are in couple with there current record, not the target record. */
+  /** Swap two persons on a slot. Persons are in couple with there current record. */
   def swapPersons(rp1: (Record, Person), rp2: (Record, Person)): Schedule = updateRecords { records =>
     val (r1, p1) = rp1
     val (r2, p2) = rp2
@@ -95,9 +96,6 @@ case class Schedule(
     problem.constraints.forall(_.isRespected(this))
   }
 
-  /** @return Constraints broken by this schedule */
-  lazy val brokenConstraints: Set[Constraint] = problem.constraints.filter(_.isBroken(this))
-
   /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
@@ -125,14 +123,5 @@ object Schedule {
   /** Empty schedule for a problem */
   def empty(implicit problem: Problem): Schedule = Schedule()
 
-  def apply(schedule: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(schedule.flatten.toSet)
-
-  def apply(personsByTopicBySlot: Map[Slot, Map[Topic, Set[Person]]])(implicit problem: Problem) =
-    new Schedule(
-      personsByTopicBySlot.flatMap {
-        case (slot, topicsPersons) => topicsPersons.map {
-          case (topic, persons) => Record(slot, topic, persons)
-        }
-      }.toSet
-    )
+  def apply(entries: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(entries.flatten.toSet)
 }
