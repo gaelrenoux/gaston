@@ -23,7 +23,7 @@ object Constraint {
   /** Trait for constraints which can be evaluated slot by slot */
   trait SlotLevel extends Constraint {
 
-    /** Indicates if the constraint is respected on the given schedule. $ */
+    /** Indicates if the constraint is respected on the given schedule. Default implementation can be overriden. */
     override def isRespected(schedule: Schedule): Boolean = schedule.slotSchedules.forall(isRespectedSlot)
 
     /** Indicates if the constraint is respected on the given schedule. */
