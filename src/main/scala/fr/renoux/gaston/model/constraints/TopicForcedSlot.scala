@@ -7,7 +7,6 @@ import fr.renoux.gaston.model._
   */
 case class TopicForcedSlot(topic: Topic, slots: Set[Slot]) extends Constraint.SlotLevel {
 
-  /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean =
     schedule.topicToSlot.get(topic).forall(slots.contains)
 

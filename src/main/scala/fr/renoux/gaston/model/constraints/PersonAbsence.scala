@@ -8,7 +8,6 @@ import fr.renoux.gaston.util.OptionImplicits._
   */
 case class PersonAbsence(person: Person, slot: Slot) extends Constraint.SlotLevel {
 
-  /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean =
     !schedule.personsPerSlot.get(slot).flatContains(person)
 

@@ -9,7 +9,6 @@ import fr.renoux.gaston.model.{Constraint, Schedule, SlotSchedule, Topic}
 //TODO separate in min and max, to facilitate partial checking
 case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends Constraint.SlotLevel {
 
-  /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean =
     schedule.countPersonsPerTopic.get(topic).forall(checkBetweenMinMax)
 
@@ -18,7 +17,6 @@ case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends C
   }
 
   private def checkBetweenMinMax(value: Int): Boolean = value >= min && value <= max
-
 
   /** If there's a minimum, you can't check a partial solution */
   override val isApplicableToPartialSchedule: Boolean = min == 0

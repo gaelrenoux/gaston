@@ -8,7 +8,6 @@ import fr.renoux.gaston.util.OptionImplicits._
   */
 case class PersonTopicInterdiction(person: Person, topic: Topic) extends Constraint.SlotLevel {
 
-  /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean =
     !schedule.personsPerTopic.get(topic).flatContains(person)
 
