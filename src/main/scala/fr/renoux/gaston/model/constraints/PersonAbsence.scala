@@ -1,16 +1,15 @@
 package fr.renoux.gaston.model.constraints
 
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.OptionImplicits._
 
 /**
   * A person is missing on some slot.
   */
-case class PersonAbsence(person: Person, slot: Slot) extends AbstractConstraint[(Slot, Set[Person])] {
+case class PersonAbsence(person: Person, slot: Slot) extends Constraint {
 
-  override protected def elementsChecked(schedule: Schedule): Iterable[(Slot, Set[Person])] = schedule.personsPerSlot
-
-  override protected def check(checked: (Slot, Set[Person])): Boolean = {
-    slot != checked._1 || !checked._2(person)
-  }
+  /** Is this constraint respected on the schedule */
+  override def isRespected(schedule: Schedule): Boolean =
+    !schedule.personsPerSlot.get(slot).flatContains(person)
 
 }

@@ -1,18 +1,17 @@
 package fr.renoux.gaston.model.constraints
 
-import fr.renoux.gaston.model.{Person, Schedule, Topic}
+import fr.renoux.gaston.model.{Constraint, Schedule, Topic}
+
 
 /**
   * Min and max number of persons on a topic. Remember it includes everyone, even mandatory persons !
   */
 //TODO separate in min and max, to facilitate partial checking
-case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends AbstractConstraint[(Topic, Set[Person])] {
+case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends Constraint {
 
-  override protected def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
-
-  override protected def check(checked: (Topic, Set[Person])): Boolean = {
-    topic != checked._1 || checkBetweenMinMax(checked._2.size)
-  }
+  /** Is this constraint respected on the schedule */
+  override def isRespected(schedule: Schedule): Boolean =
+    schedule.personsPerTopic.get(topic).forall(ps => checkBetweenMinMax(ps.size))
 
   private def checkBetweenMinMax(value: Int): Boolean = value >= min && value <= max
 

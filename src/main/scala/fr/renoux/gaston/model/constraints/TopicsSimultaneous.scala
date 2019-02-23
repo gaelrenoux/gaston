@@ -1,13 +1,18 @@
 package fr.renoux.gaston.model.constraints
 
-import fr.renoux.gaston.model.{Schedule, Topic}
+import fr.renoux.gaston.model.{Constraint, Schedule, Topic}
 
 /** Those two topics must be on the same slot. I.e., a slot must either contain both or none. */
-case class TopicsSimultaneous(topics: Set[Topic]) extends AbstractConstraint[Set[Topic]] {
+case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint {
 
-  override protected def elementsChecked(schedule: Schedule): Iterable[Set[Topic]] = schedule.topicsPerSlot.values
+  private val topicsSize = topics.size
 
-  override protected def check(topicsOnSameSlot: Set[Topic]): Boolean =
-    topics.forall(topicsOnSameSlot) || !topics.exists(topicsOnSameSlot)
+  /** Is this constraint respected on the schedule */
+  override def isRespected(schedule: Schedule): Boolean = {
+    schedule.topicsPerSlot.values.forall { ts =>
+      val left = topics.diff(ts)
+      left.isEmpty || left.size == topicsSize
+    }
+  }
 }
 

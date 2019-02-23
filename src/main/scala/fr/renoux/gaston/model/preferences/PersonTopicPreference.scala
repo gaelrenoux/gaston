@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.OptionImplicits._
 
 case class PersonTopicPreference(
     person: Person,
@@ -10,12 +11,12 @@ case class PersonTopicPreference(
 
   /** Specific implementation, faster than the default */
   override def score(schedule: Schedule): Score = {
-    if (schedule.personsPerTopic(topic)(person)) reward
+    if (schedule.personsPerTopic.get(topic).flatContains(person)) reward
     else Score.Zero
   }
 
   override def scoreSlot(schedule: SlotSchedule): Score = {
-    if (schedule.personsPerTopic(topic)(person)) reward
+    if (schedule.personsPerTopic.get(topic).flatContains(person)) reward
     else Score.Zero
   }
 }

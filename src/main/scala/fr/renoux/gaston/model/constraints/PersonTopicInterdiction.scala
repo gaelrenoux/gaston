@@ -1,15 +1,15 @@
 package fr.renoux.gaston.model.constraints
 
-import fr.renoux.gaston.model.{Person, Schedule, Topic}
+import fr.renoux.gaston.model.{Constraint, Person, Schedule, Topic}
+import fr.renoux.gaston.util.OptionImplicits._
 
 /**
   * A person cannot be assigned to a topic.
   */
-case class PersonTopicInterdiction(person: Person, topic: Topic) extends AbstractConstraint[(Topic, Set[Person])] {
+case class PersonTopicInterdiction(person: Person, topic: Topic) extends Constraint {
 
-  override protected def elementsChecked(schedule: Schedule): Iterable[(Topic, Set[Person])] = schedule.personsPerTopic
+  /** Is this constraint respected on the schedule */
+  override def isRespected(schedule: Schedule): Boolean =
+    !schedule.personsPerTopic.get(topic).flatContains(person)
 
-  override protected def check(checked: (Topic, Set[Person])): Boolean = {
-    topic != checked._1 || !checked._2(person)
-  }
 }

@@ -1,17 +1,14 @@
 package fr.renoux.gaston.model.constraints
 
-import fr.renoux.gaston.model.{Schedule, Slot, Topic}
+import fr.renoux.gaston.model.{Constraint, Schedule, Slot, Topic}
 
 /**
-  * That topic must be on any of those slots.
+  * That topic must be on any of those slots, if it is planned at all.
   */
-case class TopicForcedSlot(topic: Topic, slots: Set[Slot]) extends AbstractConstraint[(Slot, Set[Topic])] {
+case class TopicForcedSlot(topic: Topic, slots: Set[Slot]) extends Constraint {
 
-  override protected def elementsChecked(schedule: Schedule): Iterable[(Slot, Set[Topic])] = schedule.topicsPerSlot
-
-  override protected def check(checked: (Slot, Set[Topic])): Boolean = {
-    val (s, ts) = checked
-    !ts.contains(topic) || slots.contains(s)
-  }
+  /** Is this constraint respected on the schedule */
+  override def isRespected(schedule: Schedule): Boolean =
+    schedule.topicToSlot.get(topic).forall(slots.contains)
 
 }
