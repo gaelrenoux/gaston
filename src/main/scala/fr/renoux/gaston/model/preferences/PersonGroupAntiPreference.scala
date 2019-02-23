@@ -11,9 +11,10 @@ case class PersonGroupAntiPreference(
     person: Person,
     group: Set[Person],
     reward: Score
-) extends Preference.Anti {
+) extends Preference.SlotLevel with Preference.Anti {
 
-  def score(schedule: Schedule): Score = {
+  /** Specific implementation, faster than the default */
+  override def score(schedule: Schedule): Score = {
     schedule.records.foldLeft(Score.Zero) {
       case (sum, r) if r.persons.contains(person) =>
         val intersection = r.persons.intersect(group).size
@@ -22,4 +23,10 @@ case class PersonGroupAntiPreference(
     }
   }
 
+  override def scoreSlot(schedule: SlotSchedule): Score = {
+    schedule.personGroups.filter(_.contains(person)).map { groupWithPerson =>
+      val count = group.intersect(groupWithPerson).size
+      if (count == 0) Score.Zero else reward * count
+    }.sum
+  }
 }

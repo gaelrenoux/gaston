@@ -1,7 +1,5 @@
 package fr.renoux.gaston.model
 
-/* TODO scores could be cached. In the Schedule, have a set of ScheduleSot, scorable separately for most. And transformations usually alter only one slot at a time. */
-
 /**
   * The more preferences are satisfied the better, but it's not mandatory. Preferences should implement [[equals()]] and
   * [[hashCode()]] to allow deduplication.
@@ -25,4 +23,13 @@ object Preference {
     assert(reward.value <= 0, s"AntiPreference $this should have a negative reward")
   }
 
+  /** Trait for preferences which can be evaluated slot by slot */
+  trait SlotLevel extends Preference {
+
+    /** Score the schedule according to this preference. Default implementation can be overriden. */
+    def score(schedule: Schedule): Score = schedule.slotSchedules.map(scoreSlot).sum
+
+    /** Score the slot schedule according to this preference */
+    def scoreSlot(schedule: SlotSchedule): Score
+  }
 }

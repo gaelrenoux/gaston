@@ -16,3 +16,17 @@ trait Constraint {
   /** Obviously, the opposite of isRespected. */
   def isBroken(schedule: Schedule): Boolean = !isRespected(schedule)
 }
+
+object Constraint {
+
+
+  /** Trait for constraints which can be evaluated slot by slot */
+  trait SlotLevel extends Constraint {
+
+    /** Indicates if the constraint is respected on the given schedule. $ */
+    override def isRespected(schedule: Schedule): Boolean = schedule.slotSchedules.forall(isRespectedSlot)
+
+    /** Indicates if the constraint is respected on the given schedule. */
+    def isRespectedSlot(schedule: SlotSchedule): Boolean
+  }
+}
