@@ -7,6 +7,7 @@ import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input.InputLoader
 import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.util.{Chrono, Tools}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.duration._
@@ -18,10 +19,11 @@ class Benchmark extends FlatSpec with Matchers {
   private val udoConProblem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
-  private val duration = 2.minutes
+  private val duration = 20.seconds
 
 
   "Systematic improver" should "give a good score" ignore {
+    implicit val tools: Tools = Tools(new Chrono)
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
@@ -29,28 +31,38 @@ class Benchmark extends FlatSpec with Matchers {
     log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
 
     println(s"$score after $count iterations")
+    println(s"${tools.chrono.times} in ${tools.chrono.counts}")
+
     schedule.isSolution should be(true)
     score.value should be > 500.0
     count should be > 50L
+
   }
 
 
   "Fast improver" should "give an good score" ignore {
+    implicit val tools: Tools = Tools(new Chrono)
 
     val runner = new Runner(udoConProblem, improverConstructor = new FastScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
 
+    log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
+
     println(s"$score after $count iterations")
+    println(s"${tools.chrono.times} in ${tools.chrono.counts}")
+
     schedule.isSolution should be(true)
     score.value should be > 500.0
     count should be > 125L
   }
 
-  "Compare improvers on various schedules" should "work" ignore {
+  "Compare improvers on various schedules" should "work" in {
+    implicit val tools: Tools = Tools(new Chrono)
 
     val seedFormat = new DecimalFormat("000")
     val scoreFormat = new DecimalFormat("0000")
     val durationFormat = new DecimalFormat("0000")
+
     def format(score: Score, duration: Long) =
       s"${durationFormat.format(duration)} ms   ${scoreFormat.format(score.value.round)}"
 
@@ -79,7 +91,5 @@ class Benchmark extends FlatSpec with Matchers {
       if (fstScore.value.round == sysScore.value.round) println(txt)
       else System.err.println(txt)
     }
-
-
   }
 }

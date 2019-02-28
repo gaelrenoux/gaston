@@ -2,6 +2,7 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.{Schedule, Score, Slot}
+import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -14,7 +15,7 @@ abstract class AbstractScheduleImprover extends ScheduleImprover {
 
   /** Main method. Returned an improved schedule, either because it can't be perfected any more or because the limit
     * number of rounds has been reached. */
-  override def improve(schedule: Schedule, initialScore: Score, rounds: Int = 1000)(implicit rand: Random): Schedule = {
+  override def improve(schedule: Schedule, initialScore: Score, rounds: Int = 1000)(implicit rand: Random, tools: Tools): Schedule = {
     log.debug("Improving new schedule")
     recImprove(schedule, initialScore, rounds)
   }
@@ -27,7 +28,7 @@ abstract class AbstractScheduleImprover extends ScheduleImprover {
       maxRounds: Int,
       slots: Queue[Slot] = Queue(problem.slots.toSeq: _*),
       slotRoundsLimit: Int = 1000
-  ): Schedule =
+  )(implicit tools: Tools): Schedule =
     if (maxRounds == 0) {
       log.debug("Stopping improvement because max number of rounds was reached")
       schedule
@@ -56,6 +57,6 @@ abstract class AbstractScheduleImprover extends ScheduleImprover {
 
   /** Returns the best possible move or swap on a specific slot, or None if there is nothing to do on that slot
     * anymore. Will be applied, so make sure you checked it was indeed better. */
-  protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot): Option[(Schedule, Score)]
+  protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot)(implicit tools: Tools): Option[(Schedule, Score)]
 
 }

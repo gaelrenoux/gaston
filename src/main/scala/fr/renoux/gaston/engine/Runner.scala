@@ -4,6 +4,7 @@ import java.time.Instant
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
+import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
@@ -31,7 +32,7 @@ class Runner(
   def run(
       maxDuration: Option[FiniteDuration] = None,
       seed: Long = Random.nextLong()
-  ): (Schedule, Score, Long) = {
+  )(implicit tools: Tools): (Schedule, Score, Long) = {
     implicit val random: Random = new Random(seed)
 
     val now = Instant.now()
@@ -48,7 +49,7 @@ class Runner(
       count: Long,
       currentSchedule: Schedule,
       currentScore: Score
-  )(implicit random: Random): (Schedule, Score, Long) = {
+  )(implicit random: Random, tools: Tools): (Schedule, Score, Long) = {
     val now = Instant.now()
 
     /* If time's out, stop now */
@@ -71,11 +72,15 @@ class Runner(
   }
 
   /** Produces a schedule and its score */
-  def runOnce()(implicit random: Random): (Schedule, Score) = {
-    val Some(initialSolution) = csFactory.makeSchedule
+  def runOnce()(implicit random: Random, tools: Tools): (Schedule, Score) = {
+    val Some(initialSolution) = tools.chrono("ConstrainedScheduleFactory.makeSchedule") {
+      csFactory.makeSchedule
+    }
     val initialScore = Scorer.score(initialSolution)
 
-    val finalSolution = psFactory.improve(initialSolution, initialScore)
+    val finalSolution = tools.chrono("ScheduleImprover.improve") {
+      psFactory.improve(initialSolution, initialScore)
+    }
     val finalScore = Scorer.score(finalSolution)
 
     (finalSolution, finalScore)

@@ -2,6 +2,7 @@ package fr.renoux.gaston.engine
 
 import fr.renoux.gaston.model.{Problem, Schedule, Score, Slot}
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.Tools
 
 /**
   * Improves an existing Schedule by satisfying preferences. At each step, explores systematically all possible moves
@@ -11,7 +12,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {
 
   /** Returns the best possible move or swap on a specific slot */
-  override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot)
+  override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot)(implicit tools: Tools)
   : Option[(Schedule, Score)] = {
     val slotSchedule = schedule.on(slot)
     val topics = slotSchedule.topics
