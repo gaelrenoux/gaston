@@ -95,10 +95,11 @@ class ScheduleSpec extends FlatSpec with Matchers {
     ))
   }
 
-  "add" should "add someone to an existing slot and topic" in {
+  "add" should "add a new record even if one already exists for that slot and topic" in {
     Simple.add(Record(Morning, Acting, Set(Eric, Fiona))) should be(Schedule(
       Morning(
-        Acting(Arthur, Bianca, Eric, Fiona),
+        Acting(Arthur, Bianca),
+        Acting(Eric, Fiona),
         Cooking(Corwin, Daniela)
       ),
       AfterNoon(
@@ -108,7 +109,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
     ))
   }
 
-  it should "create a new topic if needed" in {
+  it should "add a new record with an existing slot and a new topic" in {
     Simple.add(Record(Morning, Eating, Set(Eric, Fiona))) should be(Schedule(
       Morning(
         Acting(Arthur, Bianca),
@@ -122,7 +123,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
     ))
   }
 
-  it should "create a new slot if needed" in {
+  it should "add a new record with a new slot and a new topic" in {
     Simple.add(Record(Evening, Eating, Set(Eric, Fiona))) should be(Schedule(
       Morning(
         Acting(Arthur, Bianca),
@@ -238,10 +239,10 @@ class ScheduleSpec extends FlatSpec with Matchers {
   it should "not do anything if the topics are wrong" in {
     Simple.movePerson(Morning, Cooking, Acting, Arthur) should be(Simple)
   }*/
-
+/*
   it should "not do anything if the slot is missing" in {
     Simple.movePerson(Evening, Acting, Cooking, Arthur) should be(Simple)
-  }
+  }*/
 
   "isSound" should "validate a correct schedule" in {
     Simple.isSound should be(true)
