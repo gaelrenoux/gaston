@@ -19,10 +19,10 @@ class Benchmark extends FlatSpec with Matchers {
   private val udoConProblem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
-  private val duration = 20.seconds
+  private val duration = 2.minutes
 
 
-  "Systematic improver" should "give a good score" ignore {
+  "Systematic improver" should "give a good score" in {
     implicit val tools: Tools = Tools(new Chrono)
 
     val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
@@ -40,7 +40,7 @@ class Benchmark extends FlatSpec with Matchers {
   }
 
 
-  "Fast improver" should "give an good score" ignore {
+  "Fast improver" should "give an good score" in {
     implicit val tools: Tools = Tools(new Chrono)
 
     val runner = new Runner(udoConProblem, improverConstructor = new FastScheduleImprover(_))

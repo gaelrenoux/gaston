@@ -16,7 +16,7 @@ class Renderer(
   private val ShortScoreDecimalFormat = new DecimalFormat("000")
 
   /** For each person, preferences */
-  val preferencesByPerson: Map[Person, Set[PersonTopicPreference]] = problem.preferences.collect {
+  private val preferencesByPerson: Map[Person, Set[PersonTopicPreference]] = problem.preferences.collect {
     case p: PersonTopicPreference => p
   }.groupBy(_.person)
 
@@ -26,7 +26,7 @@ class Renderer(
 
 
   /** Display the persons' scores for that schedule */
-  def personsSatisfaction(schedule: Schedule): String = {
+  private def personsSatisfaction(schedule: Schedule): String = {
     val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(schedule)
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */

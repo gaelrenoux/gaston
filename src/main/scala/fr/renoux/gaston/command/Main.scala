@@ -28,7 +28,7 @@ object Main {
     log.info(s"Commande line is: $commandLine")
 
     val _ = run(commandLine, output).recover { case msg =>
-      output("Failed to run.\n" + msg.list.toList.mkString("\n"))
+      output.writeErrors(msg)
     }
   }
 
@@ -38,22 +38,22 @@ object Main {
     problem <- InputTranscriber.transcribe(inputRoot).disjunction
   } yield {
     if (commandLine.generateInput) {
-      output("\n" + InputLoader.render(inputRoot))
+      output.write("\n" + InputLoader.render(inputRoot))
     } else {
       val renderer = new Renderer(inputRoot.gaston.settings, problem)
       val runner = new Runner(problem, hook = (schedule, score, count) => {
-        output(renderer.all(schedule, score))
-        output(s"We have tried $count schedules !")
+        output.writeScheduleIfBetter(score, renderer.all(schedule, score))
+        output.writeAttempts(count)
       })
 
-      output(s"Starting to run !")
+      output.writeStart()
       val (schedule, score, _) = runner.run(
         commandLine.maxDuration,
         seed = commandLine.seed
       )
 
       /* Print final result */
-      output(renderer.all(schedule, score))
+      output.writeEnd(renderer.all(schedule, score))
     }
   }
 
@@ -91,6 +91,5 @@ object Main {
     val logger = loggerContext.getLogger("fr.renoux")
     logger.setLevel(Level.DEBUG)
   }
-
 
 }
