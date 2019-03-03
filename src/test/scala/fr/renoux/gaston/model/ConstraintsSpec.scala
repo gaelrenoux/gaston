@@ -15,6 +15,8 @@ class ConstraintsSpec extends FlatSpec with Matchers {
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
 
+  def scheduled(s: Slot, ts: Topic*): Schedule = Schedule(s(ts.map(_()): _*))
+
 
   behavior of "TopicNeedsNumberOfPersons"
   val fightingNeedsTwoToFourPersons = TopicNeedsNumberOfPersons(Fighting, min = 2, max = 4)
@@ -156,7 +158,7 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   }
 
 
-  behavior of "Forced"
+  behavior of "TopicForcedSlot"
   val partyMustBeEveningOrNight = TopicForcedSlot(Party, Set(Evening, Night))
 
   it should "break if the topic is on the wrong slot" in {
@@ -172,6 +174,29 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   it should "not break if the topic is missing" in {
     partyMustBeEveningOrNight.isRespected(scheduled(AfterNoon, Fighting, Michelangelo, Donatello, Raphael)
     ) should be(true)
+  }
+
+  behavior of "SlotMaxTopicCount"
+  val nightCanHaveOnlyTwoTopics = SlotMaxTopicCount(Night, 2)
+
+  it should "break with more topics" in {
+   nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party, Leading, Fighting)) should be(false)
+  }
+
+  it should "not break with exactly the number of topics" in {
+    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party, Leading)) should be(true)
+  }
+
+  it should "not break with less topics" in {
+    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party)) should be(true)
+  }
+
+  it should "not break with zero topics" in {
+    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night)) should be(true)
+  }
+
+  it should "not break if the slot has not been scheduled yet" in {
+    nightCanHaveOnlyTwoTopics.isRespected(Schedule.empty) should be(true)
   }
 
 }

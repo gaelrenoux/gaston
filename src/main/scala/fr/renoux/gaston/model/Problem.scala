@@ -4,7 +4,6 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 trait Problem {
-  val parallelization: Int
   val slots: Set[Slot]
   val topics: Set[Topic]
   val persons: Set[Person]
@@ -24,6 +23,8 @@ trait Problem {
     }.unzipEither
 
   val personsCount: Int
+
+  val maxTopicCountPerSlot: Map[Slot, Int]
 
   val personsPerSlot: Map[Slot, Set[Person]]
 

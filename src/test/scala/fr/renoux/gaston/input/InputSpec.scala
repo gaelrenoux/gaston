@@ -36,10 +36,6 @@ class InputSpec extends FlatSpec with Matchers {
 
   val minimalProblem: Problem = InputLoader.fromDefault.forceToModel
 
-  "Produced problem" should "contain the correct parallelization" in {
-    minimalProblem.parallelization should be(2)
-  }
-
   "Produced problem" should "contain the correct slots" in {
     minimalProblem.slots should be(Set(Slot("A"), Slot("B")))
   }
@@ -55,6 +51,8 @@ class InputSpec extends FlatSpec with Matchers {
 
   it should "contain the correct constraints" in {
     minimalProblem.constraints should be(Set(
+      SlotMaxTopicCount(Slot("A"), 4),
+      SlotMaxTopicCount(Slot("B"), 5),
       PersonTopicObligation(Person("bernard", Weight(1.0)), Topic("alpha")),
       PersonTopicInterdiction(Person("laverne"), Topic("beta")),
       TopicNeedsNumberOfPersons(Topic("alpha"), 5, 5),

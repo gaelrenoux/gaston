@@ -7,7 +7,6 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
 class ProblemImpl(
-    val parallelization: Int,
     val slots: Set[Slot],
     val topics: Set[Topic],
     val persons: Set[Person],
@@ -16,6 +15,11 @@ class ProblemImpl(
 ) extends Problem {
 
   lazy val personsCount: Int = persons.size
+
+  /** Max number of topics on a single slot */
+  override val maxTopicCountPerSlot: Map[Slot, Int] = constraints.collect {
+    case SlotMaxTopicCount(slot, count) => slot -> count
+  }.toMap.withDefaultValue(Int.MaxValue)
 
   /** For each topic, which persons are mandatory */
   lazy val mandatoryPersonsPerTopic: Map[Topic, Set[Person]] = {

@@ -3,8 +3,9 @@ package fr.renoux.gaston.engine
 import java.security.MessageDigest
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
+import scalaz.Scalaz._
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -82,8 +83,9 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
 
     } else {
       val currentSlot = slotsLeft.head
+      val maxTopicCount = problem.maxTopicCountPerSlot.get(currentSlot)
 
-      if (topicCountOnSlot(partialSchedule, currentSlot) >= problem.parallelization) {
+      if (maxTopicCount.exists(topicCountOnSlot(partialSchedule, currentSlot) >= _)) {
         /* The current slot has reached max parallelization. If it is not satisfied, we fail because we can't add more topics */
         if (maxPersonsOnSlot(partialSchedule, currentSlot) < problem.personsCount) {
           log.trace("Fail because current slot has reached max parallelization and it is not satisfied yet")
@@ -249,11 +251,11 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
 
   /** Upper limit of the number of possible schedules */
   def upperLimit: BigInt = {
-    val maxTopicsPerSlot = problem.parallelization
-    val personsPerTopic = problem.constraints.collect {
+    val maxPersonsPerTopic = problem.constraints.collect {
       case TopicNeedsNumberOfPersons(_, _, max) => max
     }.max
-    val minTopicsPerSlot = (problem.persons.size.toDouble / personsPerTopic).ceil.toInt
+    val minTopicsPerSlot = (problem.personsCount.toDouble / maxPersonsPerTopic).ceil.toInt
+    val maxTopicsPerSlot = problem.maxTopicCountPerSlot.nonEmpty.option(problem.maxTopicCountPerSlot.values.max).getOrElse((problem.topics.size.toDouble / problem.slots.size).floor.toInt)
 
     ConstrainedScheduleFactory.upperLimit(
       slots = problem.slots.size,

@@ -20,8 +20,8 @@ object UdoConTestModel {
 
   val Settings = InputSettings(
     incompatibilityAntiPreference = Score(-50),
-    defaultMin = 3,
-    defaultMax = 5
+    defaultMinPersonsPerTopic = 3,
+    defaultMaxPersonsPerTopic = 5
   )
 
   object Persons {
@@ -566,7 +566,7 @@ object UdoConTestModel {
 
   object Problems {
     val Complete: Problem = {
-      val p = new ProblemImpl(5, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = new ProblemImpl(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.debug(s"Complete problem is $p")
       p
     }

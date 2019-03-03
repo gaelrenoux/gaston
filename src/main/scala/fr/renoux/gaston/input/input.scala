@@ -11,17 +11,17 @@ case class InputRoot(
 case class InputModel(
     settings: InputSettings,
     udoSettings: Option[InputUdoSettings],
-    slots: Set[String],
+    slots: Set[InputSlot],
     persons: Set[InputPerson],
     topics: Set[InputTopic],
     constraints: Option[InputGlobalConstraints] = None
 )
 
 case class InputSettings(
-    parallelization: Option[Int] = None,
     incompatibilityAntiPreference: Score,
-    defaultMin: Int,
-    defaultMax: Int
+    defaultMaxTopicsPerSlot: Option[Int] = None,
+    defaultMinPersonsPerTopic: Int,
+    defaultMaxPersonsPerTopic: Int
 )
 
 case class InputUdoSettings(
@@ -39,6 +39,11 @@ case class InputUdoSettings(
     strongWishValue: Score,
     /* Score given to a weak wish */
     weakWishValue: Score
+)
+
+case class InputSlot(
+    name: String,
+    maxTopics: Option[Int] = None
 )
 
 case class InputTopic(

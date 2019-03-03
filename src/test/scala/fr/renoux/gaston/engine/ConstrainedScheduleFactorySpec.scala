@@ -95,7 +95,7 @@ class ConstrainedScheduleFactorySpec extends FlatSpec with Matchers with Private
 
   it should "work on a bigger number" in {
     val factory = new ConstrainedScheduleFactory(UdoConTestModel.Problems.Complete)
-    factory.upperLimit should be(BigInt("20479517675313935958720"))
+    factory.upperLimit should be(BigInt("346796529353273237958720"))
 
   }
 

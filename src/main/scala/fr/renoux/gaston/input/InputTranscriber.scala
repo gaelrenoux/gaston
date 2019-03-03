@@ -18,39 +18,26 @@ object InputTranscriber {
     //TODO better validation !
     val input: InputModel = inputRoot.gaston
 
-    val slotsPerName = input.slots.map { s => s -> Slot(s) }.toMap
+    val slotsPerName = input.slots.map { s => s.name -> Slot(s.name) }.toMap
     val topicsPerName = input.topics.map { t => t.name -> Topic(t.name) }.toMap
     val personsPerName = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
 
-    val absenceConstraints = getAbsenceConstraints(input, ctx)
+    val constraints = Set[Constraint]() ++
+        getSlotMaxesConstraints(input, ctx) ++
+        getAbsenceConstraints(input, ctx) ++
+        getInterdictionConstraints(input, ctx) ++
+        getObligationConstraints(input, ctx) ++
+        getNumberConstraints(input, ctx) ++
+        getForcedTopicConstraints(input, ctx) ++
+        getSimultaneousTopicsConstraints(input, ctx) ++
+        getExclusiveTopicsConstraints(input, ctx)
 
-    val interdictionConstraints = getInterdictionConstraints(input, ctx)
-
-    val obligationConstraints = getObligationConstraints(input, ctx)
-
-    val numberConstraints = getNumberConstraints(input, ctx)
-
-    val forcedSlotConstraints = getForcedTopicConstraints(input, ctx)
-
-    val simultaneousTopicsConstraints = getSimultaneousTopicsConstraints(input, ctx)
-
-    val exclusiveTopicsConstraints = getExclusiveTopicsConstraints(input, ctx)
-
-    val constraints = Set[Constraint]() ++ absenceConstraints ++ interdictionConstraints ++ obligationConstraints ++
-      numberConstraints ++ forcedSlotConstraints ++ simultaneousTopicsConstraints ++ exclusiveTopicsConstraints
-
-    val incompatibilityPreferences = getGroupAntiPreferences(input, ctx)
-
-    val personTopicPreferences = getPersonTopicPreferences(input, ctx)
-
-    val preferences = Set[Preference]() ++ incompatibilityPreferences ++ personTopicPreferences
-
-    val parallelization = input.settings.parallelization.getOrElse(
-      (topicsPerName.size.toDouble / slotsPerName.size).ceil.toInt)
+    val preferences = Set[Preference]() ++ 
+      getGroupAntiPreferences(input, ctx) ++
+      getPersonTopicPreferences(input, ctx)
 
     new ProblemImpl(
-      parallelization,
       slotsPerName.values.toSet,
       topicsPerName.values.toSet,
       personsPerName.values.toSet,
@@ -58,6 +45,13 @@ object InputTranscriber {
       preferences
     ).success
   }
+
+  private def getSlotMaxesConstraints(input: InputModel, ctx: Context): Set[SlotMaxTopicCount] =
+    input.slots.flatMap { inSlot =>
+      val slot = ctx.slotsPerName(inSlot.name)
+      val maxOption = inSlot.maxTopics orElse input.settings.defaultMaxTopicsPerSlot
+      maxOption.map(SlotMaxTopicCount(slot, _))
+    }
 
   private def getAbsenceConstraints(input: InputModel, ctx: Context): Set[PersonAbsence] =
     input.persons.flatMap { ip =>
@@ -84,8 +78,8 @@ object InputTranscriber {
   private def getNumberConstraints(input: InputModel, ctx: Context): Set[TopicNeedsNumberOfPersons] =
     input.topics.map { inTopic =>
       val topic = ctx.topicsPerName(inTopic.name)
-      val min = inTopic.min.getOrElse(input.settings.defaultMin)
-      val max = inTopic.max.getOrElse(input.settings.defaultMax)
+      val min = inTopic.min.getOrElse(input.settings.defaultMinPersonsPerTopic)
+      val max = inTopic.max.getOrElse(input.settings.defaultMaxPersonsPerTopic)
       TopicNeedsNumberOfPersons(topic, min, max)
     }
 

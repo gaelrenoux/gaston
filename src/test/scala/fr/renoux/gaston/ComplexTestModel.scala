@@ -80,7 +80,7 @@ class ComplexTestModel(seed: Long) {
 
   object Problems {
     val Complete: Problem = {
-      val p = new ProblemImpl(4, Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = new ProblemImpl(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }

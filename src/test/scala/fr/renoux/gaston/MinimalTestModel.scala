@@ -38,7 +38,7 @@ object MinimalTestModel {
   }
 
   object Problems {
-    val Minimal = new ProblemImpl(4, Slots.All, Topics.All, Persons.All, Set(), Set())
+    val Minimal = new ProblemImpl(Slots.All, Topics.All, Persons.All, Set(), Set())
   }
 
 }

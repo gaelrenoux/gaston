@@ -23,7 +23,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
     val cellsWithoutFirstRow = cells.tail
     //TODO better parameterize the line for starting topics
 
-    val slots: Set[String] = Set[String]() //no Slot to start
+    val slots: Set[InputSlot] = Set[InputSlot](InputSlot("Day1", maxTopics = Some(4)), InputSlot("Day2")) //sample Slots
 
     /* Keep the order to zip with the choices later */
     val topicsSeq: Seq[InputTopic] =
@@ -34,8 +34,8 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
 
         InputTopic(
           name = topicName,
-          min = min.filterNot(_ == settings.defaultMin),
-          max = max.filterNot(_ == settings.defaultMax)
+          min = min.filterNot(_ == settings.defaultMinPersonsPerTopic),
+          max = max.filterNot(_ == settings.defaultMaxPersonsPerTopic)
         )
       }
 
