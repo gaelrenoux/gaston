@@ -1,7 +1,8 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.command
 
 import java.text.DecimalFormat
 
+import fr.renoux.gaston.engine.Scorer
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.{Person, Problem, Schedule, Score}

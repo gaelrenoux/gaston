@@ -1,8 +1,9 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.command
 
 import java.time.Instant
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.engine._
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 import fr.renoux.gaston.util.Tools
 
@@ -14,11 +15,10 @@ import scala.util.Random
 
 /** Runs the whole schedule-searching stuff for a fixed amount of time. Can take hooks to do stuff at some frequency, like warn the user. */
 class Runner(
-    problem: Problem,
-    improverConstructor: Problem => ScheduleImprover = new FastScheduleImprover(_),
-    hook: (Schedule, Score, Long) => Unit = (_, _, _) => (),
-    hookFrequency: FiniteDuration = 20.seconds,
-    debugMode: Boolean = false
+                problem: Problem,
+                improverConstructor: Problem => ScheduleImprover = new GreedyScheduleImprover(_),
+                hook: (Schedule, Score, Long) => Unit = (_, _, _) => (),
+                hookFrequency: FiniteDuration = 20.seconds
 ) {
   private val parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
 
@@ -26,8 +26,9 @@ class Runner(
 
   private val log = Logger[Runner]
 
-  private val csFactory = new ConstrainedScheduleFactory(problem, debugMode = debugMode)
-  private val psFactory = improverConstructor(problem)
+  private val generator = new ScheduleGenerator(problem)
+  private val improver = improverConstructor(problem)
+  private val engine = new Engine(generator, improver)
 
   private val hookFrequencyMillis = hookFrequency.toMillis
 
@@ -58,7 +59,7 @@ class Runner(
     }
   }
 
-  /** Recursive run: if it still has time, produces a schedule then invokes itself again . */
+  /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
   @tailrec
   private def runRecursive(
       lastLog: Instant,
@@ -82,25 +83,10 @@ class Runner(
       } else lastLog
 
       /* Run once then recurse */
-      val (schedule, score) = runOnce()
+      val (schedule, score) = engine.run(random.nextLong)
       if (score > currentScore) runRecursive(newLastLog, timeout, count + 1, schedule, score)
       else runRecursive(newLastLog, timeout, count + 1, currentSchedule, currentScore)
     }
-  }
-
-  /** Produces a schedule and its score */
-  def runOnce()(implicit random: Random, tools: Tools): (Schedule, Score) = {
-    val Some(initialSolution) = tools.chrono("ConstrainedScheduleFactory.makeSchedule") {
-      csFactory.makeSchedule
-    }
-    val initialScore = Scorer.score(initialSolution)
-
-    val finalSolution = tools.chrono("ScheduleImprover.improve") {
-      psFactory.improve(initialSolution, initialScore)
-    }
-    val finalScore = Scorer.score(finalSolution)
-
-    (finalSolution, finalScore)
   }
 
 }

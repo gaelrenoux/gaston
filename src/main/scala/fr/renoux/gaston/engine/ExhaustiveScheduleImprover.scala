@@ -5,11 +5,13 @@ import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.Tools
 
 /**
-  * Improves an existing Schedule by satisfying preferences. At each step, explores systematically all possible moves
-  * and swaps, and applies the best one. Only works on two-person swaps. It is slow, as the same move will be examined
-  * many times.
+  * At each step, systematically iterate over all possible moves and swaps, and applies the best one that improves the
+  * schedule.
+  *
+  * Very slow, as it examines all possible moves at each step, which means the same moves will be examined many times (a
+  * move that was not chosen will probably appear again on the next step). However, it usually gets the optimum result.
   */
-class SystematicScheduleImprover(val problem: Problem) extends AbstractScheduleImprover {
+class ExhaustiveScheduleImprover(val problem: Problem) extends ScheduleImprover.Base {
 
   /** Returns the best possible move or swap on a specific slot */
   override protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot)(implicit tools: Tools)

@@ -4,6 +4,7 @@ import java.text.DecimalFormat
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.UdoConTestModel
+import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input.InputLoader
 import fr.renoux.gaston.model.Score
@@ -25,7 +26,7 @@ class Benchmark extends FlatSpec with Matchers {
   "Systematic improver" should "give a good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
-    val runner = new Runner(udoConProblem, improverConstructor = new SystematicScheduleImprover(_))
+    val runner = new Runner(udoConProblem, improverConstructor = new ExhaustiveScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
 
     log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
@@ -43,7 +44,7 @@ class Benchmark extends FlatSpec with Matchers {
   "Fast improver" should "give an good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
-    val runner = new Runner(udoConProblem, improverConstructor = new FastScheduleImprover(_))
+    val runner = new Runner(udoConProblem, improverConstructor = new GreedyScheduleImprover(_))
     val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
 
     log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
@@ -66,15 +67,15 @@ class Benchmark extends FlatSpec with Matchers {
     def format(score: Score, duration: Long) =
       s"${durationFormat.format(duration)} ms   ${scoreFormat.format(score.value.round)}"
 
-    val csFactory = new ConstrainedScheduleFactory(udoConProblem)
-    val systematicImprover = new SystematicScheduleImprover(udoConProblem)
-    val fastImprover = new FastScheduleImprover(udoConProblem)
+    val csFactory = new ScheduleGenerator(udoConProblem)
+    val systematicImprover = new ExhaustiveScheduleImprover(udoConProblem)
+    val fastImprover = new GreedyScheduleImprover(udoConProblem)
 
     println("       Systematic        Fast               ")
     for (seed <- 0 to 100) {
       implicit val rand: Random = new Random(seed)
 
-      val Some(initialSolution) = csFactory.makeSchedule
+      val Some(initialSolution) = csFactory.generate
       val initialScore = Scorer.score(initialSolution)
 
       val sysStart = System.currentTimeMillis()

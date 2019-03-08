@@ -15,7 +15,7 @@ import scala.util.Random
 /**
   * Uses backtracking to create a solution satisfying all constraints. Does not take preferences into account.
   */
-class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = false) {
+class ScheduleGenerator(val problem: Problem) {
 
   private implicit val _: Problem = problem
 
@@ -24,22 +24,15 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
 
   private var attemptsCount = 0
 
-  private val log = Logger[ConstrainedScheduleFactory]
+  private val log = Logger[ScheduleGenerator]
 
 
   /** Returns a Schedule satisfying all constraints, based on given random. Returns None if such a schedule cannot be
     *  constructed. */
-  def makeSchedule(implicit random: Random): Option[Schedule] = {
+  def generate(implicit random: Random, ctx: Context): Option[Schedule] = {
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
     backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)(completePartialSchedule)
-  }
-
-  /** Commodity function, mainly for testing purposes */
-  def makePartialSchedule(implicit random: Random): Option[Schedule] = {
-    val slots = random.shuffle(problem.slots.toList)
-    val topics = random.shuffle(problem.topics.toList)
-    backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)(Some(_))
   }
 
   private def md5(str: String): MD5 = MessageDigest.getInstance("MD5").digest(str.getBytes)
@@ -55,9 +48,10 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
     */
   private def backtrackAssignTopicsToSlots(partialSchedule: Schedule)
     (slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil)
-    (postTreatment: Schedule => Option[Schedule]): Option[Schedule] = {
+    (postTreatment: Schedule => Option[Schedule])
+    (implicit ctx: Context): Option[Schedule] = {
 
-    if (debugMode) {
+    if (ctx.debugMode) {
       val scheduleMd5 = md5(partialSchedule.toString)
       if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
     }
@@ -257,7 +251,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
     val minTopicsPerSlot = (problem.personsCount.toDouble / maxPersonsPerTopic).ceil.toInt
     val maxTopicsPerSlot = problem.maxTopicCountPerSlot.nonEmpty.option(problem.maxTopicCountPerSlot.values.max).getOrElse((problem.topics.size.toDouble / problem.slots.size).floor.toInt)
 
-    ConstrainedScheduleFactory.upperLimit(
+    ScheduleGenerator.upperLimit(
       slots = problem.slots.size,
       topics = problem.topics.size,
       minTopicsPerSlot = minTopicsPerSlot,
@@ -267,7 +261,7 @@ class ConstrainedScheduleFactory(val problem: Problem, val debugMode: Boolean = 
 
 }
 
-object ConstrainedScheduleFactory {
+object ScheduleGenerator {
 
   def upperLimit(slots: BigInt, topics: BigInt, minTopicsPerSlot: BigInt, maxTopicsPerSlot: BigInt): BigInt = {
 
