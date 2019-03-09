@@ -57,7 +57,7 @@ class Benchmark extends FlatSpec with Matchers {
     count should be > 125L
   }
 
-  "Compare improvers on various schedules" should "work" in {
+  "Compare improvers on various schedules" should "work" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
     val seedFormat = new DecimalFormat("000")
