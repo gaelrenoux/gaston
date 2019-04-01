@@ -4,7 +4,7 @@ import java.time.Instant
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine._
-import fr.renoux.gaston.model.{Problem, Schedule, Score}
+import fr.renoux.gaston.model.{Problem, ScoredSchedule}
 import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
@@ -15,20 +15,17 @@ import scala.util.Random
 
 /** Runs the whole schedule-searching stuff for a fixed amount of time. Can take hooks to do stuff at some frequency, like warn the user. */
 class Runner(
-                problem: Problem,
-                improverConstructor: Problem => ScheduleImprover = new GreedyScheduleImprover(_),
-                hook: (Schedule, Score, Long) => Unit = (_, _, _) => (),
-                hookFrequency: FiniteDuration = 20.seconds
+    problem: Problem,
+    engine: Engine,
+    hook: (ScoredSchedule, Long) => Unit = (_, _) => (),
+    hookFrequency: FiniteDuration = 20.seconds
 ) {
   private val parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
 
-  private implicit val _: Problem = problem
+  private implicit val _p: Problem = problem
 
   private val log = Logger[Runner]
 
-  private val generator = new ScheduleGenerator(problem)
-  private val improver = improverConstructor(problem)
-  private val engine = new Engine(generator, improver)
 
   private val hookFrequencyMillis = hookFrequency.toMillis
 
@@ -36,7 +33,7 @@ class Runner(
   def run(
       maxDuration: Option[FiniteDuration] = None,
       seed: Long = Random.nextLong()
-  )(implicit tools: Tools): (Schedule, Score, Long) = {
+  )(implicit tools: Tools): (ScoredSchedule, Long) = {
 
     val now = Instant.now()
     val timeout: Option[Instant] = maxDuration.map(d => now.plusSeconds(d.toSeconds))
@@ -46,16 +43,16 @@ class Runner(
       (0 until parallelRunCount).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
-          runRecursive(now, timeout, 0, Schedule.empty, Score.MinValue)
+          runRecursive(now, timeout, 0, ScoredSchedule.empty)
         }
       }
     }
 
-    val results: Seq[(Schedule, Score, Long)] = Await.result(future, maxDuration.map(2 * _).getOrElse(Duration.Inf))
-    results.fold((Schedule.empty, Score.Zero, 0L)) {
-      case ((bestSchedule, bestScore, totalCount), (schedule, score, count)) =>
-        if (score > bestScore) (schedule, score, totalCount + count)
-        else (bestSchedule, bestScore, totalCount + count)
+    val results: Seq[(ScoredSchedule, Long)] = Await.result(future, maxDuration.map(2 * _).getOrElse(Duration.Inf))
+    results.fold((ScoredSchedule.empty, 0L)) {
+      case ((best, totalCount), (current, count)) =>
+        if (best < current) (current, totalCount + count)
+        else (best, totalCount + count)
     }
   }
 
@@ -65,27 +62,26 @@ class Runner(
       lastLog: Instant,
       timeout: Option[Instant],
       count: Long,
-      currentSchedule: Schedule,
-      currentScore: Score
-  )(implicit random: Random, tools: Tools): (Schedule, Score, Long) = {
+      current: ScoredSchedule
+  )(implicit random: Random, tools: Tools): (ScoredSchedule, Long) = {
     val now = Instant.now()
 
     /* If time's out, stop now */
     if (timeout.exists(_ isBefore now)) {
       log.info(s"We have tried $count schedules ! It is time to stop !")
-      (currentSchedule, currentScore, count)
+      (current, count)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
       val newLastLog = if (now isAfter lastLog.plusMillis(hookFrequencyMillis)) {
-        hook(currentSchedule, currentScore, count)
+        hook(current, count)
         Instant.now()
       } else lastLog
 
       /* Run once then recurse */
-      val (schedule, score) = engine.run(random.nextLong)
-      if (score > currentScore) runRecursive(newLastLog, timeout, count + 1, schedule, score)
-      else runRecursive(newLastLog, timeout, count + 1, currentSchedule, currentScore)
+      val ss = engine.run(random.nextLong)
+      if (ss.score > current.score) runRecursive(newLastLog, timeout, count + 1, ss)
+      else runRecursive(newLastLog, timeout, count + 1, current)
     }
   }
 

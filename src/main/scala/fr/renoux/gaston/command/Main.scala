@@ -4,6 +4,7 @@ import java.nio.file.Path
 
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.engine.{Engine, GreedyScheduleImprover, ScheduleGenerator}
 import fr.renoux.gaston.input._
 import org.slf4j.LoggerFactory
 import scalaz._
@@ -39,20 +40,22 @@ object Main {
     if (commandLine.generateInput) {
       output.write("\n" + InputLoader.render(inputRoot))
     } else {
-      val renderer = new Renderer(inputRoot.gaston.settings, problem)
-      val runner = new Runner(problem, hook = (schedule, score, count) => {
-        output.writeScheduleIfBetter(score, renderer.all(schedule, score))
+      val engine = new Engine(new ScheduleGenerator(problem), new GreedyScheduleImprover(problem))
+      val render = new Renderer(inputRoot.gaston.settings, problem)
+
+      val runner = new Runner(problem, engine, hook = (ss, count) => {
+        output.writeScheduleIfBetter(ss.score, render(ss))
         output.writeAttempts(count)
       })
 
       output.writeStart()
-      val (schedule, score, _) = runner.run(
+      val (ss, _) = runner.run(
         commandLine.maxDuration,
         seed = commandLine.seed
       )
 
       /* Print final result */
-      output.writeEnd(renderer.all(schedule, score))
+      output.writeEnd(render(ss))
     }
   }
 

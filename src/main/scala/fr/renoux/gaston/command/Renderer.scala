@@ -5,8 +5,9 @@ import java.text.DecimalFormat
 import fr.renoux.gaston.engine.Scorer
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
-import fr.renoux.gaston.model.{Person, Problem, Schedule, Score}
+import fr.renoux.gaston.model._
 
+/** A tool to render a solution as a pretty String. */
 class Renderer(
     val settings: InputSettings,
     val problem: Problem
@@ -21,13 +22,9 @@ class Renderer(
     case p: PersonTopicPreference => p
   }.groupBy(_.person)
 
-  /** Formats the schedule and analysis to a pretty String */
-  def all(schedule: Schedule, score: Score): String =
-    s"\n${schedule.toFormattedString}\nSchedule score is $score\n\n${personsSatisfaction(schedule)}\n"
-
-
-  /** Display the persons' scores for that schedule */
-  private def personsSatisfaction(schedule: Schedule): String = {
+  /** Formats the schedule and analysis to a pretty String. Empty lines at the beginning and the end. */
+  def apply(scoredSchedule: ScoredSchedule): String = {
+    val ScoredSchedule(schedule, score) = scoredSchedule
     val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(schedule)
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
@@ -48,8 +45,13 @@ class Renderer(
       s"$nameTxt    $scoreTxt    ($satisfiedTxt$mandatoryTxt)"
     }.mkString("\n")
 
-    /* Adds a title line */
-    s"Person      Score     (Detail)\n$summaryTextBody"
+    s"""
+       |${schedule.toFormattedString}
+       |Schedule score is $score
+       |
+       |Person      Score     (Detail)
+       |$summaryTextBody
+       |""".stripMargin
   }
 
 }

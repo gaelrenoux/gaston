@@ -7,7 +7,7 @@ import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input.InputLoader
-import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.model.{Score, ScoredSchedule}
 import fr.renoux.gaston.util.{Chrono, Tools}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -26,8 +26,9 @@ class Benchmark extends FlatSpec with Matchers {
   "Systematic improver" should "give a good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
-    val runner = new Runner(udoConProblem, improverConstructor = new ExhaustiveScheduleImprover(_))
-    val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
+    val engine = new Engine(new ScheduleGenerator(udoConProblem), new ExhaustiveScheduleImprover(udoConProblem))
+    val runner = new Runner(udoConProblem, engine)
+    val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = 0L)
 
     log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
 
@@ -41,11 +42,12 @@ class Benchmark extends FlatSpec with Matchers {
   }
 
 
-  "Fast improver" should "give an good score" ignore {
+  "Fast improver" should "give an good score" in {
     implicit val tools: Tools = Tools(new Chrono)
 
-    val runner = new Runner(udoConProblem, improverConstructor = new GreedyScheduleImprover(_))
-    val (schedule, score, count) = runner.run(Some(duration), seed = 0L)
+    val engine = new Engine(new ScheduleGenerator(udoConProblem), new GreedyScheduleImprover(udoConProblem))
+    val runner = new Runner(udoConProblem, engine)
+    val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = 0L)
 
     log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
 

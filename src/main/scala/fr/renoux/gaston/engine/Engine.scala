@@ -1,17 +1,17 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.{Schedule, Score}
+import fr.renoux.gaston.model.ScoredSchedule
 import fr.renoux.gaston.util.Tools
 
 import scala.util.Random
 
 class Engine(
-                generator: ScheduleGenerator,
-                improver: ScheduleImprover
-            ) {
+    generator: ScheduleGenerator,
+    improver: ScheduleImprover
+) {
 
   /** Produces a schedule and its score */
-  def run(seed: Long)(implicit tools: Tools): (Schedule, Score) = {
+  def run(seed: Long)(implicit tools: Tools): ScoredSchedule = {
     implicit val random = new Random(seed)
 
     val Some(initialSolution) = tools.chrono("ConstrainedScheduleFactory.makeSchedule") {
@@ -24,7 +24,7 @@ class Engine(
     }
     val finalScore = Scorer.score(finalSolution)
 
-    (finalSolution, finalScore)
+    ScoredSchedule(finalSolution, finalScore)
   }
 
 }
