@@ -1,6 +1,7 @@
 package fr.renoux.gaston.input
 
 import ai.x.diff.DiffShow
+import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model.{Score, Weight}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -31,7 +32,7 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     val table = Source.fromResource("udocon-2017-table.csv").mkString
     val input = reader.read(table)
 
-    val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").forceToInput
+    val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").force
 
     /* Check a small one first, easier to debug */
     val ib = input.gaston.persons.find(_.name == "Boojum")
@@ -51,8 +52,8 @@ class UdoConTableReaderSpec extends FlatSpec with Matchers {
     val input = reader.read(table)
     val rendered = InputLoader.render(input)
 
-    val evaluated = InputLoader.fromString(rendered).forceToInput
-    val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").forceToInput
+    val evaluated = InputLoader.fromString(rendered).force
+    val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").force
 
     val diff = DiffShow.diff[InputRoot](input, expected)
     if (!diff.isIdentical) println(diff.string)

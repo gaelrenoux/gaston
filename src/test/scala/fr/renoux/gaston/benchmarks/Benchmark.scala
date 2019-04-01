@@ -3,10 +3,11 @@ package fr.renoux.gaston.benchmarks
 import java.text.DecimalFormat
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
-import fr.renoux.gaston.input.InputLoader
+import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.{Score, ScoredSchedule}
 import fr.renoux.gaston.util.{Chrono, Tools}
 import org.scalatest.{FlatSpec, Matchers}
@@ -17,7 +18,7 @@ import scala.util.Random
 class Benchmark extends FlatSpec with Matchers {
   private val log = Logger[Benchmark]
 
-  private val udoConProblem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
+  private val udoConProblem = problemFromClassPath("udocon-2017-completed.conf").force
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
   private val duration = 2.minutes
@@ -42,7 +43,7 @@ class Benchmark extends FlatSpec with Matchers {
   }
 
 
-  "Fast improver" should "give an good score" in {
+  "Fast improver" should "give an good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
     val engine = new Engine(new ScheduleGenerator(udoConProblem), new GreedyScheduleImprover(udoConProblem))

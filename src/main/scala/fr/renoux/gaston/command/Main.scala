@@ -7,11 +7,11 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.{Engine, GreedyScheduleImprover, ScheduleGenerator}
 import fr.renoux.gaston.input._
 import org.slf4j.LoggerFactory
+import scalaz.Scalaz._
 import scalaz._
-import scalaz.syntax.either._
-import scalaz.syntax.std.option._
 
 import scala.io.Source
+import scala.util.Try
 
 
 object Main {
@@ -33,7 +33,7 @@ object Main {
   }
 
   /** Run the application with command line arguments */
-  private def run(commandLine: CommandLine, output: Output): NonEmptyList[String] \/ Unit = for {
+  private def run(commandLine: CommandLine, output: Output): InputErrors \/ Unit = for {
     inputRoot <- loadInput(commandLine)
     problem <- InputTranscriber.transcribe(inputRoot).disjunction
   } yield {
@@ -59,33 +59,32 @@ object Main {
   }
 
   /** Load the requested input, according to the command lines arguments */
-  private def loadInput(commandLine: CommandLine): NonEmptyList[String] \/ InputRoot = for {
+  private def loadInput(commandLine: CommandLine): InputErrors \/ InputRoot = for {
     sampleInputRoot <-
-      if (commandLine.useSample) InputLoader.fromClassPath("sample.conf").toInput.disjunction.map(Some(_))
+      if (commandLine.useSample) InputLoader.fromClassPath("sample.conf").map(Some(_))
       else None.right
 
     explicitInputRoot <-
       commandLine.inputFile.map { path =>
         log.info(s"Loading from $path")
-        InputLoader.fromPath(path).toInput.disjunction.map(Some(_))
-      }.getOrElse(None.right)
+        InputLoader.fromPath(path).map(Some(_))
+      }.getOrElse(None.right[InputErrors])
 
     initialInputRoot <-
-      (explicitInputRoot orElse sampleInputRoot).toRightDisjunction(NonEmptyList("No settings submitted"))
+      (explicitInputRoot orElse sampleInputRoot).toRightDisjunction(InputErrors("No settings submitted"))
 
     udoConInputRootOption <-
-      commandLine.udoConTableFile.map(loadUdoConSettings(initialInputRoot, _)).getOrElse(None.right)
+      commandLine.udoConTableFile.map(loadUdoConSettings(initialInputRoot, _).map(Some(_))).getOrElse(None.right)
 
   } yield udoConInputRootOption getOrElse initialInputRoot
 
-  /** Load the UdoCon settings, ef they are required */
-  private def loadUdoConSettings(baseInput: InputRoot, path: Path): NonEmptyList[String] \/ Some[InputRoot] = for {
-    udoSettings <- baseInput.gaston.udoSettings
-      .toRightDisjunction(NonEmptyList("Missing UdoCon table settings"))
+  /** Load the UdoCon settings, if they are required */
+  private def loadUdoConSettings(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot = for {
+    table <- Try(Source.fromFile(path.toFile).mkString).toDisjunction.leftMap(t => InputErrors(t.toString))
+    udoSettings <- baseInput.gaston.udoSettings.toRightDisjunction(InputErrors("Missing UdoCon table settings"))
     udoReader = new UdoConTableReader(udoSettings, baseInput.gaston.settings)
-    table = Source.fromFile(path.toFile).mkString
     udoInput = udoReader.read(table)
-  } yield Some(udoInput)
+  } yield udoInput
 
 
   /** Set the log level to debuq */

@@ -1,10 +1,10 @@
 package fr.renoux.gaston.input
 
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.problem.ProblemImpl
-import fr.renoux.gaston.model._
-import scalaz.ValidationNel
+import scalaz.Validation
 import scalaz.syntax.validation._
 
 /** Converts the Input object to the Problem object. */
@@ -14,7 +14,7 @@ object InputTranscriber {
   private val personTotalScore: Double = 1000.0
 
   /** Load the real input from the user model. */
-  def transcribe(inputRoot: InputRoot): ValidationNel[String, Problem] = {
+  def transcribe(inputRoot: InputRoot): Validation[InputErrors, Problem] = {
     //TODO better validation !
     val input: InputModel = inputRoot.gaston
 
@@ -24,16 +24,16 @@ object InputTranscriber {
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
 
     val constraints = Set[Constraint]() ++
-        getSlotMaxesConstraints(input, ctx) ++
-        getAbsenceConstraints(input, ctx) ++
-        getInterdictionConstraints(input, ctx) ++
-        getObligationConstraints(input, ctx) ++
-        getNumberConstraints(input, ctx) ++
-        getForcedTopicConstraints(input, ctx) ++
-        getSimultaneousTopicsConstraints(input, ctx) ++
-        getExclusiveTopicsConstraints(input, ctx)
+      getSlotMaxesConstraints(input, ctx) ++
+      getAbsenceConstraints(input, ctx) ++
+      getInterdictionConstraints(input, ctx) ++
+      getObligationConstraints(input, ctx) ++
+      getNumberConstraints(input, ctx) ++
+      getForcedTopicConstraints(input, ctx) ++
+      getSimultaneousTopicsConstraints(input, ctx) ++
+      getExclusiveTopicsConstraints(input, ctx)
 
-    val preferences = Set[Preference]() ++ 
+    val preferences = Set[Preference]() ++
       getGroupAntiPreferences(input, ctx) ++
       getPersonTopicPreferences(input, ctx)
 

@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.input.InputLoader
-
+import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.input._
 
 class GreedyScheduleImproverSpec extends ScheduleImproverAbstractSpec {
 
@@ -12,7 +12,7 @@ class GreedyScheduleImproverSpec extends ScheduleImproverAbstractSpec {
   }
 
   it should "work a valid schedule (on a real-life model)" in {
-    val problem = InputLoader.fromClassPath("udocon-2017-completed.conf").forceToModel
+    val problem = problemFromClassPath("udocon-2017-completed.conf").force
     val (_, bestScore) = runWith(new GreedyScheduleImprover(_), problem, 4L until 5L)
     bestScore should be >= 300.0
   }

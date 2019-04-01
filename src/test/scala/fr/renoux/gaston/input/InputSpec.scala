@@ -2,6 +2,7 @@ package fr.renoux.gaston.input
 
 import java.io.File
 
+import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
@@ -10,13 +11,13 @@ import org.scalatest.{FlatSpec, Matchers}
 class InputSpec extends FlatSpec with Matchers {
 
   "Loading from default" should "load the default input when no name is given" in {
-    val (input, _) = InputLoader.fromDefault.forceToInputAndModel
+    val input = InputLoader.fromDefault.force
     input.gaston.settings.incompatibilityAntiPreference should be(Score(-1000))
     input.gaston.persons.size should be(3)
   }
 
   "Loading from the classpath" should "load the correct input" in {
-    val (input, _) = InputLoader.fromClassPath("named-configuration.conf").forceToInputAndModel
+    val input = InputLoader.fromClassPath("named-configuration.conf").force
     input.gaston.settings.incompatibilityAntiPreference should be(Score(-1042))
     input.gaston.persons.size should be(1)
   }
@@ -24,17 +25,17 @@ class InputSpec extends FlatSpec with Matchers {
   "Loading from a file" should "load the correct input" in {
     val stringPath = getClass.getResource("/named-configuration.conf").getPath
     val path = new File(stringPath).toPath
-    val (input, _) = InputLoader.fromPath(path).forceToInputAndModel
+    val input = InputLoader.fromPath(path).force
     input.gaston.settings.incompatibilityAntiPreference should be(Score(-1042))
     input.gaston.persons.size should be(1)
   }
 
   "Checking the sample" should "work" in {
-    InputLoader.fromClassPath("sample.conf").forceToInputAndModel
+    InputLoader.fromClassPath("sample.conf").force
   }
 
 
-  val minimalProblem: Problem = InputLoader.fromDefault.forceToModel
+  val minimalProblem: Problem = problemFromDefault.force
 
   "Produced problem" should "contain the correct slots" in {
     minimalProblem.slots should be(Set(Slot("A"), Slot("B")))

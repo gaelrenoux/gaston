@@ -1,10 +1,11 @@
 package fr.renoux.gaston
 
+import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.{InputLoader, InputSettings}
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.problem.ProblemImpl
-import fr.renoux.gaston.model._
 
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
@@ -178,4 +179,4 @@ class SimpleTestModel(implicit settings: InputSettings) {
 }
 
 
-object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.forceToInput.gaston.settings)
+object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.force.gaston.settings)

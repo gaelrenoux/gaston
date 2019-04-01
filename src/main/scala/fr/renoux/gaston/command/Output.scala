@@ -1,9 +1,8 @@
 package fr.renoux.gaston.command
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.input.{InputLoader, InputRoot, InputSettings}
+import fr.renoux.gaston.input.{InputErrors, InputLoader, InputRoot, InputSettings}
 import fr.renoux.gaston.model.{Problem, Score, ScoredSchedule}
-import scalaz.NonEmptyList
 
 /** Destination of all information in Gaston */
 class Output(silent: Boolean = false) {
@@ -47,6 +46,6 @@ class Output(silent: Boolean = false) {
     write(s"We have tried $attempts schedules !")
   }
 
-  def writeErrors(msg: NonEmptyList[String]): Unit =
+  def writeErrors(msg: InputErrors): Unit =
     write(s"Failed to run.\n${msg.list.toList.mkString("\n")}\n")
 }
