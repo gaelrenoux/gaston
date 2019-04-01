@@ -38,13 +38,12 @@ object Main {
     problem <- InputTranscriber.transcribe(inputRoot).disjunction
   } yield {
     if (commandLine.generateInput) {
-      output.write("\n" + InputLoader.render(inputRoot))
+      output.writeInput(inputRoot)
     } else {
       val engine = new Engine(new ScheduleGenerator(problem), new GreedyScheduleImprover(problem))
-      val render = new Renderer(inputRoot.gaston.settings, problem)
 
       val runner = new Runner(problem, engine, hook = (ss, count) => {
-        output.writeScheduleIfBetter(ss.score, render(ss))
+        output.writeScheduleIfBetter(ss, problem, inputRoot.gaston.settings)
         output.writeAttempts(count)
       })
 
@@ -55,7 +54,7 @@ object Main {
       )
 
       /* Print final result */
-      output.writeEnd(render(ss))
+      output.writeEnd(ss, problem, inputRoot.gaston.settings)
     }
   }
 
@@ -88,6 +87,8 @@ object Main {
     udoInput = udoReader.read(table)
   } yield Some(udoInput)
 
+
+  /** Set the log level to debuq */
   private def setDebugLogLevel(): Unit = {
     val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     val logger = loggerContext.getLogger("fr.renoux")
