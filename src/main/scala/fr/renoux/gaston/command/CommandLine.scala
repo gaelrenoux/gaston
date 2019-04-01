@@ -34,7 +34,7 @@ object CommandLine {
       .text("Input file.")
 
     opt[Unit]("from-sample").optional()
-      .action((path, in) => in.copy(useSample = true))
+      .action((_, in) => in.copy(useSample = true))
       .text("Use a sample input.")
 
     opt[Path]('u', "from-udo-table").optional().valueName("<file>")

@@ -3,7 +3,7 @@ import sbt.Keys._
 name := "gaston"
 version := "0.1-SNAPSHOT"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.8"
 scalacOptions ++= Seq(
   "-Ypartial-unification", // Enable partial unification in type constructor inference
   "-explaintypes", // Explain type errors in more detail.
