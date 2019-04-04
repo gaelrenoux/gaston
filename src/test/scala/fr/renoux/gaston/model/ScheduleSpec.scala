@@ -239,10 +239,10 @@ class ScheduleSpec extends FlatSpec with Matchers {
   it should "not do anything if the topics are wrong" in {
     Simple.movePerson(Morning, Cooking, Acting, Arthur) should be(Simple)
   }*/
-/*
-  it should "not do anything if the slot is missing" in {
-    Simple.movePerson(Evening, Acting, Cooking, Arthur) should be(Simple)
-  }*/
+  /*
+    it should "not do anything if the slot is missing" in {
+      Simple.movePerson(Evening, Acting, Cooking, Arthur) should be(Simple)
+    }*/
 
   "isSound" should "validate a correct schedule" in {
     Simple.isSound should be(true)

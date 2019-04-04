@@ -34,12 +34,12 @@ object ScheduleImprover {
     /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one. */
     @tailrec
     private def recImprove(
-                              schedule: Schedule,
-                              score: Score,
-                              maxRounds: Int,
-                              slots: Queue[Slot] = Queue(problem.slots.toSeq: _*),
-                              slotRoundsLimit: Int = 1000
-                          )(implicit tools: Tools): Schedule =
+        schedule: Schedule,
+        score: Score,
+        maxRounds: Int,
+        slots: Queue[Slot] = Queue(problem.slots.toSeq: _*),
+        slotRoundsLimit: Int = 1000
+    )(implicit tools: Tools): Schedule =
       if (maxRounds == 0) {
         log.debug("Stopping improvement because max number of rounds was reached")
         schedule
@@ -55,7 +55,7 @@ object ScheduleImprover {
           log.trace(s"    Removing slot with rounds limit at $slotRoundsLimit")
           /* The slot can't be perfected any more, go on to the next slot and no need to go back to this one */
           recImprove(schedule, score, maxRounds - 1, slotsTail)
-        } else  {
+        } else {
           /* The slot was perfected! If there are rounds left stay on the same slot, otherwise move to the next one */
           if (slotRoundsLimit > 0) {
             recImprove(candidate, candidateScore, maxRounds - 1, slotsTail.enqueue(slot), slotRoundsLimit - 1)
@@ -71,4 +71,5 @@ object ScheduleImprover {
     protected def getMoveOnSlot(schedule: Schedule, currentScore: Score, slot: Slot)(implicit tools: Tools): Option[(Schedule, Score)]
 
   }
+
 }

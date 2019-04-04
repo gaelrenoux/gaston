@@ -30,7 +30,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
       cellsWithoutFirstRow.map { row =>
         val topicName: String = row(udoSettings.topicsIndex)
         val max: Option[Int] = row(udoSettings.maxPlayersIndex).toIntOption.map(_ + 1) //add the GM
-        val min: Option[Int] = udoSettings.minPlayersIndex.map(row).flatMap(_.toIntOption).map(_ + 1) //add the GM
+      val min: Option[Int] = udoSettings.minPlayersIndex.map(row).flatMap(_.toIntOption).map(_ + 1) //add the GM
 
         InputTopic(
           name = topicName,
@@ -65,7 +65,7 @@ class UdoConTableReader(udoSettings: InputUdoSettings, settings: InputSettings) 
       }.toMap
 
     val persons = personChoices.map { case (person, choices) =>
-      val wishes =  choices.collect {
+      val wishes = choices.collect {
         case (Strong, ts) => InputPersonWishes(udoSettings.strongWishValue, ts.map(_.name))
         case (Weak, ts) => InputPersonWishes(udoSettings.weakWishValue, ts.map(_.name))
       }.toSet

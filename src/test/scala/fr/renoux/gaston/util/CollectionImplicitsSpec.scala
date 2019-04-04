@@ -3,6 +3,7 @@ package fr.renoux.gaston.util
 import org.scalatest.{FlatSpec, Matchers}
 
 class CollectionImplicitsSpec extends FlatSpec with Matchers {
+
   import CollectionImplicits._
 
   "TraversableOps.zipWith" should "work" in {

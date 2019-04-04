@@ -56,7 +56,7 @@ class ComplexTestModel(seed: Long) {
     val Numbers: Set[Constraint] = {
       val initial: Set[Constraint] = Topics.All.map(TopicNeedsNumberOfPersons(_, min = 4, max = 12))
       val toRemove = random.pick(initial, 2)
-      val toAdd = toRemove .map { case TopicNeedsNumberOfPersons(t, min, _) => TopicNeedsNumberOfPersons(t, min, 4) }
+      val toAdd = toRemove.map { case TopicNeedsNumberOfPersons(t, min, _) => TopicNeedsNumberOfPersons(t, min, 4) }
       initial -- toRemove ++ toAdd
     }
 

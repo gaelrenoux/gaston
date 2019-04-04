@@ -29,4 +29,5 @@ object Constraint {
     /** Indicates if the constraint is respected on the given schedule. */
     def isRespectedSlot(schedule: SlotSchedule): Boolean
   }
+
 }

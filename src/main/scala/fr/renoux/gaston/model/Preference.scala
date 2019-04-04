@@ -32,4 +32,5 @@ object Preference {
     /** Score the slot schedule according to this preference */
     def scoreSlot(schedule: SlotSchedule): Score
   }
+
 }

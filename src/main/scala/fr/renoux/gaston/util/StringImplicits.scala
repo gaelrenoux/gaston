@@ -12,4 +12,5 @@ object StringImplicits {
       case _: NumberFormatException => None
     }
   }
+
 }

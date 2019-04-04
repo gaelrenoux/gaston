@@ -22,5 +22,4 @@ class CommandLineTest extends FlatSpec with Matchers {
     parse("--from", "/tmp/filename.csv", "-d", "15 minutes").maxDuration should be(Some(15.minutes))
   }
 
-
 }

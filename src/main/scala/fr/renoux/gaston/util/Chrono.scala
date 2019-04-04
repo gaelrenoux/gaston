@@ -18,19 +18,19 @@ class Chrono(val enabled: Boolean = true) {
   }
 
   def store(name: String, time: Long, blocking: Boolean = false): Unit =
-  if (blocking) {
-    val _ = synchronized {
-      _times.put(name, _times(name) + time)
-      _counts.put(name, _counts(name) + 1)
-    }
-  } else {
-    val _ = Future {
-      synchronized {
+    if (blocking) {
+      val _ = synchronized {
         _times.put(name, _times(name) + time)
         _counts.put(name, _counts(name) + 1)
       }
-    }(ExecutionContext.global)
-  }
+    } else {
+      val _ = Future {
+        synchronized {
+          _times.put(name, _times(name) + time)
+          _counts.put(name, _counts(name) + 1)
+        }
+      }(ExecutionContext.global)
+    }
 
   def times: Map[String, Long] = synchronized {
     _times.toMap

@@ -8,15 +8,15 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.Random
 
 case class CommandLine(
-                        inputFile: Option[Path] = None,
-                        udoConTableFile: Option[Path] = None,
-                        useSample: Boolean = false,
-                        generateInput: Boolean = false,
-                        silent: Boolean = false,
-                        debug: Boolean = false,
-                        maxDuration: Option[FiniteDuration] = None,
-                        seed: Long = Random.nextLong()
-                      ) {
+    inputFile: Option[Path] = None,
+    udoConTableFile: Option[Path] = None,
+    useSample: Boolean = false,
+    generateInput: Boolean = false,
+    silent: Boolean = false,
+    debug: Boolean = false,
+    maxDuration: Option[FiniteDuration] = None,
+    seed: Long = Random.nextLong()
+) {
 
 }
 

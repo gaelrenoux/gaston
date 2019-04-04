@@ -15,7 +15,7 @@ class ConstraintsSpec extends FlatSpec with Matchers {
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
 
-  def scheduled(s: Slot, ts: Topic*): Schedule = Schedule(s(ts.map(_()): _*))
+  def scheduled(s: Slot, ts: Topic*): Schedule = Schedule(s(ts.map(_.apply()): _*))
 
 
   behavior of "TopicNeedsNumberOfPersons"
@@ -180,7 +180,7 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   val nightCanHaveOnlyTwoTopics = SlotMaxTopicCount(Night, 2)
 
   it should "break with more topics" in {
-   nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party, Leading, Fighting)) should be(false)
+    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party, Leading, Fighting)) should be(false)
   }
 
   it should "not break with exactly the number of topics" in {
