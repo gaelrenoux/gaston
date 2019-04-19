@@ -5,7 +5,7 @@ import java.text.DecimalFormat
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.UdoConTestModel
-import fr.renoux.gaston.command.Runner
+import fr.renoux.gaston.command.{Output, Runner}
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.{Score, ScoredSchedule}
@@ -46,11 +46,13 @@ class Benchmark extends FlatSpec with Matchers {
   "Fast improver" should "give an good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
+    val output = new Output
     val engine = new Engine(new ScheduleGenerator(udoConProblem), new GreedyScheduleImprover(udoConProblem))
-    val runner = new Runner(udoConProblem, engine)
+    val runner = new Runner(udoConProblem, engine, hook = (ss, count) => {
+      output.writeScheduleIfBetter(ss, udoConProblem, UdoConTestModel.Settings)
+      output.writeAttempts(count)
+    })
     val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = 0L)
-
-    log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
 
     println(s"$score after $count iterations")
     println(s"${tools.chrono.times} in ${tools.chrono.counts}")
