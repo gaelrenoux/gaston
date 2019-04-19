@@ -14,8 +14,6 @@ class Output(silent: Boolean = false) {
 
   private var bestScore: Score = Score.Zero
 
-  private var attempts: Long = 0L
-
   private def write(txt: => String): Unit = {
     log.info(txt)
     if (notSilent) {
@@ -42,8 +40,7 @@ class Output(silent: Boolean = false) {
   }
 
   def writeAttempts(count: Long): Unit = synchronized {
-    attempts += count
-    write(s"We have tried $attempts schedules !")
+    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} !")
   }
 
   def writeErrors(msg: InputErrors): Unit =
