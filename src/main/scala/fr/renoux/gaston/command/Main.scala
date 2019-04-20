@@ -43,7 +43,7 @@ object Main {
       val engine = new Engine(problem)
 
       val runner = new Runner(problem, engine, hook = (ss, count) => {
-        output.writeScheduleIfBetter(ss, problem, inputRoot.gaston.settings)
+        output.writeScheduleIfBetter(ss, problem)
         output.writeAttempts(count)
       })
 
@@ -54,7 +54,7 @@ object Main {
       )
 
       /* Print final result */
-      output.writeEnd(ss, problem, inputRoot.gaston.settings)
+      output.writeEnd(ss, problem)
     }
   }
 

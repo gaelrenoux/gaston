@@ -1,7 +1,7 @@
 package fr.renoux.gaston.command
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.input.{InputErrors, InputLoader, InputRoot, InputSettings}
+import fr.renoux.gaston.input.{InputErrors, InputLoader, InputRoot}
 import fr.renoux.gaston.model.{Problem, Score, ScoredSchedule}
 
 /** Destination of all information in Gaston */
@@ -23,18 +23,18 @@ class Output(silent: Boolean = false) {
 
   def writeStart(): Unit = write(s"Starting to run !")
 
-  def writeEnd(scoredSchedule: ScoredSchedule, problem: Problem, settings: InputSettings): Unit = {
-    val render = new Renderer(settings, problem)
+  def writeEnd(scoredSchedule: ScoredSchedule, problem: Problem): Unit = {
+    val render = new Renderer(problem)
     write(s"Finished !\n\n${render(scoredSchedule)}\n")
   }
 
   def writeInput(inputRoot: InputRoot): Unit =
     write(s"Aggregated configuration file is:\n\n${InputLoader.render(inputRoot)}\n")
 
-  def writeScheduleIfBetter(scoredSchedule: ScoredSchedule, problem: Problem, settings: InputSettings): Unit = synchronized {
+  def writeScheduleIfBetter(scoredSchedule: ScoredSchedule, problem: Problem): Unit = synchronized {
     if (scoredSchedule.score > bestScore) {
       bestScore = scoredSchedule.score
-      val render = new Renderer(settings, problem)
+      val render = new Renderer(problem)
       write(render(scoredSchedule))
     }
   }

@@ -18,9 +18,9 @@ class Runner(
     problem: Problem,
     engine: Engine,
     hook: (ScoredSchedule, Long) => Unit = (_, _) => (),
-    hookFrequency: FiniteDuration = 20.seconds
+    hookFrequency: FiniteDuration = 20.seconds,
+    parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
 ) {
-  private val parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
 
   private implicit val _p: Problem = problem
 

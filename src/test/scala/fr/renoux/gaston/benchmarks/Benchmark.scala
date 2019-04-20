@@ -1,102 +1,85 @@
 package fr.renoux.gaston.benchmarks
 
-import java.text.DecimalFormat
-
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.command.{Output, Runner}
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
-import fr.renoux.gaston.model.{Score, ScoredSchedule}
-import fr.renoux.gaston.util.{Chrono, Tools}
+import fr.renoux.gaston.model.{Problem, ScoredSchedule}
+import fr.renoux.gaston.util.{Chrono, Opt, Tools}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.duration._
-import scala.util.Random
 
 class Benchmark extends FlatSpec with Matchers {
+
   private val log = Logger[Benchmark]
 
   private val udoConProblem = problemFromClassPath("udocon-2017-completed.conf").force
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
-  private val duration = 2.minutes
 
-
-  "Systematic improver" should "give a good score" ignore {
-    implicit val tools: Tools = Tools(new Chrono)
-
-    val engine = new Engine(udoConProblem, new ExhaustiveScheduleImprover(_))
-    val runner = new Runner(udoConProblem, engine)
-    val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = 0L)
-
-    log.debug(s"Tested improver produced: ${schedule.toFormattedString}")
-
-    println(s"$score after $count iterations")
-    println(s"${tools.chrono.times} in ${tools.chrono.counts}")
-
-    schedule.isSolution should be(true)
-    score.value should be > 500.0
-    count should be > 50L
-
+  "Systematic improver" should "give an okay score" ignore {
+    benchmark(
+      improver = new ExhaustiveScheduleImprover(_),
+      duration = 2.minutes,
+      expectsScore = 500
+    )
   }
 
+  behavior of "Fast improver"
 
-  "Fast improver" should "give an good score" ignore {
+  it should "give an good score when working a short time" ignore {
+    benchmark(
+      duration = 5.minutes,
+      expectsScore = 600
+    )
+  }
+
+  it should "give an great score when working a long time" ignore {
+    benchmark(
+      duration = 20.minutes,
+      expectsScore = 700
+    )
+  }
+
+  /** Runs the engine with some values */
+  private def benchmark(
+      duration: FiniteDuration,
+      seed: Long = 0L,
+      problem: Problem = udoConProblem,
+      expectsCount: Long = 0,
+      expectsScore: Double,
+      parallelRunCount: Opt[Int] = Opt.Missing,
+      verbose: Boolean = true,
+      improver: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
+  ) = {
     implicit val tools: Tools = Tools(new Chrono)
+    val start = System.currentTimeMillis()
 
     val output = new Output
-    val engine = new Engine(udoConProblem, new GreedyScheduleImprover(_))
-    val runner = new Runner(udoConProblem, engine, hook = (ss, count) => {
-      output.writeScheduleIfBetter(ss, udoConProblem, UdoConTestModel.Settings)
+    val engine = new Engine(problem, improver)
+
+    def printer(ss: ScoredSchedule, count: Long): Unit = if (verbose) {
+      val time = (System.currentTimeMillis() - start) / 1000
+      println(s"After $time seconds")
+      output.writeScheduleIfBetter(ss, problem)
       output.writeAttempts(count)
-    })
-    val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = 0L)
+    }
+
+    val runner = parallelRunCount.toOption match {
+      case None => new Runner(problem, engine, hook = printer)
+      case Some(prc) => new Runner(problem, engine, hook = printer, parallelRunCount = prc)
+    }
+
+    val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = seed)
 
     println(s"$score after $count iterations")
     println(s"${tools.chrono.times} in ${tools.chrono.counts}")
 
     schedule.isSolution should be(true)
-    score.value should be > 500.0
-    count should be > 125L
-  }
-
-  "Compare improvers on various schedules" should "work" ignore {
-    implicit val tools: Tools = Tools(new Chrono)
-
-    val seedFormat = new DecimalFormat("000")
-    val scoreFormat = new DecimalFormat("0000")
-    val durationFormat = new DecimalFormat("0000")
-
-    def format(score: Score, duration: Long) =
-      s"${durationFormat.format(duration)} ms   ${scoreFormat.format(score.value.round)}"
-
-
-    val engine = new Engine(udoConProblem)
-    val systematicImprover = new ExhaustiveScheduleImprover(udoConProblem)
-    val fastImprover = new GreedyScheduleImprover(udoConProblem)
-
-    println("       Systematic        Fast               ")
-    for (seed <- 0 to 100) {
-      implicit val rand: Random = new Random(seed)
-
-      val Some(initialSolution) = engine.generateUnimproved
-      val initialScore = Scorer.score(initialSolution)
-
-      val sysStart = System.currentTimeMillis()
-      val sysSolution = systematicImprover.improve(initialSolution, initialScore)
-      val sysDuration = System.currentTimeMillis() - sysStart
-      val sysScore = Scorer.score(sysSolution)
-
-      val fstStart = System.currentTimeMillis()
-      val fstSolution = fastImprover.improve(initialSolution, initialScore)
-      val fstDuration = System.currentTimeMillis() - fstStart
-      val fstScore = Scorer.score(fstSolution)
-
-      val txt = s"${seedFormat.format(seed.toLong)}    ${format(sysScore, sysDuration)}    ${format(fstScore, fstDuration)}"
-      if (fstScore.value.round == sysScore.value.round) println(txt)
-      else System.err.println(txt)
-    }
+    score.value should be > expectsScore
+    count should be > expectsCount
   }
 }

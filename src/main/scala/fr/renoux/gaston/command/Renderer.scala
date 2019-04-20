@@ -3,13 +3,11 @@ package fr.renoux.gaston.command
 import java.text.DecimalFormat
 
 import fr.renoux.gaston.engine.Scorer
-import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model._
 
 /** A tool to render a solution as a pretty String. */
 class Renderer(
-    val settings: InputSettings,
     val problem: Problem
 ) {
 
