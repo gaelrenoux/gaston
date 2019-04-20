@@ -7,7 +7,7 @@ class GreedyScheduleImproverSpec extends ScheduleImproverAbstractSpec {
 
   "Fast improver" should "work a valid schedule (on a complex model)" in {
     val complexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
-    val (_, bestScore) = runWith(new GreedyScheduleImprover(_), complexTestModel.Problems.Complete, 0L until 1L)
+    val (_, bestScore) = runWith(new GreedyScheduleImprover(_), complexTestModel.Problems.Complete, 0L until 3L)
     bestScore should be >= 12.0
   }
 

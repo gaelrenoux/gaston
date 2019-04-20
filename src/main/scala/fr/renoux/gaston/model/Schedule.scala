@@ -15,6 +15,9 @@ case class Schedule(
   @inline private def updateRecords(f: Set[Record] => Set[Record]): Schedule =
     copy(wrapped = f(records))
 
+  @inline private def partialMapRecords(f: PartialFunction[Record, Record]): Schedule =
+    updateRecords(_.map { r => f.applyOrElse(r, identity[Record]) })
+
   lazy val records: Set[Record] = wrapped
   lazy val slots: Set[Slot] = records.map(_.slot)
   lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
@@ -28,8 +31,9 @@ case class Schedule(
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
 
-  lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict { ts => ts.view.map(problem.maxNumberPerTopic).sum }
-  lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict { ts => ts.view.map(problem.minNumberPerTopic).sum }
+  lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(problem.maxNumberPerTopic).sum)
+  lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(problem.minNumberPerTopic).sum)
+  lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(problem.mandatoryPersonsPerTopic))
 
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot)
@@ -49,11 +53,25 @@ case class Schedule(
 
   def ++(that: Schedule): Schedule = merge(that)
 
+  /** Clear all non-mandatory persons on the given slots. Returned schedule is partial, obviously. */
+  def clearSlots(slots: Slot*): Schedule = {
+    val slotsSet = slots.toSet
+    partialMapRecords {
+      case Record(s, t, _) if slotsSet(s) => Record(s, t, problem.mandatoryPersonsPerTopic(t))
+    }
+  }
+
+  /** Swap two topics from two different slots. Persons are not exchanged between those topics, so the whole schedule
+    * might become unsound. Parameters are the source, not the destination. */
+  def swapTopics(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = partialMapRecords {
+      case Record(s, t, ps) if (s, t) == st1 => Record(s, st2._2, ps)
+      case Record(s, t, ps) if (s, t) == st2 => Record(s, st1._2, ps)
+  }
+
   /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */
-  def addPersonToExistingTopic(topic: Topic, person: Person): Schedule = updateRecords(_.map {
+  def addPersonToExistingTopic(topic: Topic, person: Person): Schedule = partialMapRecords {
     case Record(s, t, ps) if t == topic => Record(s, t, ps + person)
-    case r => r
-  })
+  }
 
   /** Swap two persons on a slot. Persons are in couple with there current topic. */
   def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule = updateRecords { records =>

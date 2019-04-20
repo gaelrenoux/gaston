@@ -22,6 +22,12 @@ trait Problem {
       case s => Right(s)
     }.unzipEither
 
+  /** All slot unordered couples, without duplicates. The first element of the couple is always lower than the second. */
+  lazy val slotCouples: Set[(Slot, Slot)] = for {
+    s1 <- slots
+    s2 <- slots if s1.name < s2.name
+  } yield (s1, s2)
+
   val personsCount: Int
 
   val maxTopicCountPerSlot: Map[Slot, Int]
