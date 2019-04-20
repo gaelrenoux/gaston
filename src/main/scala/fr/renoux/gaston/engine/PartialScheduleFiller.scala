@@ -61,8 +61,8 @@ class PartialScheduleFiller(val problem: Problem) {
 
     /* check wether it's possible to make it work first */
     partialSchedule.topicsPerSlot.find { case (slot, topics) =>
-      val min = topics.toSeq.map(problem.minNumberPerTopic(_)).sum
-      val max = topics.toSeq.map(problem.maxNumberPerTopic(_)).sum
+      val min = topics.view.map(problem.minNumberPerTopic(_)).sum
+      val max = topics.view.map(problem.maxNumberPerTopic(_)).sum
       val pCount = problem.personsCountPerSlot(slot)
       pCount < min || pCount > max
     } match {

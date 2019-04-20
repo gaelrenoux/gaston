@@ -43,7 +43,7 @@ class Benchmark extends FlatSpec with Matchers {
   }
 
 
-  "Fast improver" should "give an good score" in {
+  "Fast improver" should "give an good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
     val output = new Output

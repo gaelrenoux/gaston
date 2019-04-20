@@ -38,10 +38,10 @@ class PartialSchedulesGeneratorSpec extends FlatSpec with Matchers with PrivateM
     solutions.take(100).foreach { ps =>
       ps.isPartialSolution should be(true)
       problem.constraints.filter(c => c.isApplicableToPartialSchedule && !c.isRespected(ps)) should be(Set())
-      /*problem.personsCountPerSlot.foreach { case (slot, count) =>
-        ps.minNumberPerSlot.getOrElse(slot, 0) should be <= count
-        ps.maxNumberPerSlot.getOrElse(slot, 0) should be >= count
-      }*/
+      problem.personsCountPerSlot.foreach { case (slot, count) =>
+        ps.minPersonsOnSlot.getOrElse(slot, 0) should be <= count
+        ps.maxPersonsOnSlot.getOrElse(slot, 0) should be >= count
+      }
     }
   }
 

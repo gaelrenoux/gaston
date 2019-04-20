@@ -121,9 +121,9 @@ class PartialSchedulesGenerator(val problem: Problem) {
 
   private def topicCountOnSlot(schedule: Schedule, slot: Slot) = schedule.topicsPerSlot.get(slot).map(_.size).getOrElse(0)
 
-  private def minPersonsOnSlot(schedule: Schedule, slot: Slot) = schedule.topicsPerSlot.getOrElse(slot, Set()).toSeq.map(problem.minNumberPerTopic.getOrElse(_, 0)).sum
+  private def minPersonsOnSlot(schedule: Schedule, slot: Slot) = schedule.minPersonsOnSlot.getOrElse(slot, 0)
 
-  private def maxPersonsOnSlot(schedule: Schedule, slot: Slot) = schedule.topicsPerSlot.getOrElse(slot, Set()).toSeq.map(problem.maxNumberPerTopic.getOrElse(_, problem.persons.size)).sum
+  private def maxPersonsOnSlot(schedule: Schedule, slot: Slot) = schedule.maxPersonsOnSlot.getOrElse(slot, 0)
 
 }
 

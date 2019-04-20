@@ -103,7 +103,7 @@ class ProblemImpl(
   /** The max number of persons for each topic that has a max number of persons */
   lazy val maxNumberPerTopic: Map[Topic, Int] = constraints.collect {
     case TopicNeedsNumberOfPersons(t, _, max) => (t, max)
-  }.toMap.withDefaultValue(Int.MaxValue)
+  }.toMap.withDefaultValue(personsCount)
 
   /** For everyone, its preferences */
   lazy val preferencesPerPerson: Map[Person, Set[Preference]] = preferences.groupBy(_.person)

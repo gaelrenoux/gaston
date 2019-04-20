@@ -28,8 +28,8 @@ case class Schedule(
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
 
-  lazy val maxNumberPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict { ts => ts.map(problem.maxNumberPerTopic).sum }
-  lazy val minNumberPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict { ts => ts.map(problem.minNumberPerTopic).sum }
+  lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict { ts => ts.view.map(problem.maxNumberPerTopic).sum }
+  lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict { ts => ts.view.map(problem.minNumberPerTopic).sum }
 
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot)
