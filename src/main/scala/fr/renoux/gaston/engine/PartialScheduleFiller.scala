@@ -1,126 +1,23 @@
 package fr.renoux.gaston.engine
 
-import java.security.MessageDigest
-
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model._
 
 import scala.annotation.tailrec
-import scala.collection.immutable.Queue
-import scala.collection.mutable
 import scala.util.Random
 
 /**
-  * Uses backtracking to create a solution satisfying all constraints. Does not take preferences into account.
+  * Fills a partial schedule with persons, ignoring preferences but respecting constraints.
   */
-class ScheduleGenerator(val problem: Problem) {
+class PartialScheduleFiller(val problem: Problem) {
 
-  private implicit val _: Problem = problem
-
-  type MD5 = Array[Byte]
-  private val candidateCache = mutable.Set[MD5]()
-
-  private var attemptsCount = 0
-
-  private val log = Logger[ScheduleGenerator]
-
-
-  /** Returns a Schedule satisfying all constraints, based on given random. Returns None if such a schedule cannot be
-    *  constructed. */
-  def generate(implicit random: Random, ctx: Context): Option[Schedule] = {
-    val slots = random.shuffle(problem.slots.toList)
-    val topics = random.shuffle(problem.topics.toList)
-    backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)(completePartialSchedule)
-  }
-
-  private def md5(str: String): MD5 = MessageDigest.getInstance("MD5").digest(str.getBytes)
-
-  /**
-    * Uses backtracking to construct a partial schedule with all topics assigned to slots, and mandatory people assigned to their topics. Then apply the post-treatment to have a complete schedule.
-    * @param partialSchedule Partial schedule we are starting from
-    * @param slotsLeft All slots on which we can still add some stuff, ordered by priority (we do a round-robin). Head is the current slot.
-    * @param topicsLeft Topics we can try for the current slot.
-    * @param topicsPassed Topics that won't work for the current slot, but may work for ulterior slots.
-    * @param postTreatment Post treatment to apply on the produced Schedule. If it returns none, the schedule was not acceptable so keep on backtracking.
-    * @return Some schedule that fits.
-    */
-  private def backtrackAssignTopicsToSlots(partialSchedule: Schedule)
-    (slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil)
-    (postTreatment: Schedule => Option[Schedule])
-    (implicit ctx: Context): Option[Schedule] = {
-
-    if (ctx.debugMode) {
-      val scheduleMd5 = md5(partialSchedule.toString)
-      if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
-    }
-
-    if (attemptsCount % 1000 == 0) log.debug(s"Tried $attemptsCount combinations")
-    log.trace(s"Tried $attemptsCount combinations")
-    attemptsCount += 1
-
-    if (slotsLeft.isEmpty) {
-      log.trace("All slots are satisfied and as much topics as possible have been assigned, apply postTreatment to see if solution is acceptable")
-      postTreatment(partialSchedule)
-
-    } else if (topicsLeft.isEmpty) {
-      /* No topic available for the current slot. If the current slot is not satisfied, we fail because there is no way to satisfy the current slot at this point. */
-      if (maxPersonsOnSlot(partialSchedule, slotsLeft.head) < problem.personsCount) {
-        log.trace("Fail because no topic available for current slot and it is not satisfied yet")
-        None
-      } else {
-        /* go on without the current slot */
-        log.trace("Go on without current clot because no topic available for it and it is already satisfied")
-        backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft.tail, topicsLeft ::: topicsPassed)(postTreatment)
-      }
-
-    } else {
-      val currentSlot = slotsLeft.head
-      val maxTopicCount = problem.maxTopicCountPerSlot.get(currentSlot)
-
-      if (maxTopicCount.exists(topicCountOnSlot(partialSchedule, currentSlot) >= _)) {
-        /* The current slot has reached max parallelization. If it is not satisfied, we fail because we can't add more topics */
-        if (maxPersonsOnSlot(partialSchedule, currentSlot) < problem.personsCount) {
-          log.trace("Fail because current slot has reached max parallelization and it is not satisfied yet")
-          None
-        } else {
-          /* go on without the current slot */
-          log.trace("Go on without current clot because it has reached max parallelization and it is satisfied")
-          backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft.tail, topicsLeft ::: topicsPassed)(postTreatment)
-        }
-      } else {
-        /* We can try to add more topics to the current slot */
-        val currentTopic = topicsLeft.head
-        val nextTopics = topicsLeft.tail
-
-        val record = Record(currentSlot, currentTopic, problem.mandatoryPersonsPerTopic(currentTopic)) //new record we want to try
-        val candidate = partialSchedule + record // generate a new candidate with this record
-
-        val possibleSchedule =
-          if (candidate.isSound && candidate.isPartialSolution && minPersonsOnSlot(candidate, currentSlot) <= problem.personsCount) {
-            log.trace(s"Go on with acceptable candidate and next slot: $candidate")
-            backtrackAssignTopicsToSlots(candidate)(slotsLeft.tail :+ currentSlot, nextTopics ::: topicsPassed, Nil)(postTreatment)
-          } else None
-
-        possibleSchedule.orElse {
-          /* candidate is not acceptable or lead to a failure, try again with next topic */
-          log.trace(s"Go on with new topic for current slot as the candidate is not OK")
-          backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft, nextTopics, currentTopic :: topicsPassed)(postTreatment)
-        }
-
-      }
-    }
-  }
-
-  private def topicCountOnSlot(schedule: Schedule, slot: Slot) = schedule.topicsPerSlot.get(slot).map(_.size).getOrElse(0)
-
-  private def minPersonsOnSlot(schedule: Schedule, slot: Slot) = schedule.topicsPerSlot.getOrElse(slot, Set()).toSeq.map(problem.minNumberPerTopic.getOrElse(_, 0)).sum
-
-  private def maxPersonsOnSlot(schedule: Schedule, slot: Slot) = schedule.topicsPerSlot.getOrElse(slot, Set()).toSeq.map(problem.maxNumberPerTopic.getOrElse(_, problem.persons.size)).sum
-
+  private val log = Logger[PartialSchedulesGenerator]
 
   /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
-    * schedule respecting all constraints. */
-  private def completePartialSchedule(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
+    * schedule respecting all constraints. Returns None if such a schedule cannot be constructed (e.g. too many people
+    * forbidden on a topic).
+    */
+  def fill(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
 
     /** Iterate over Slots, stop in case there is an incompatibility on some Slot */
     @tailrec
@@ -243,13 +140,3 @@ class ScheduleGenerator(val problem: Problem) {
 
 }
 
-object ScheduleGenerator {
-
-  /** Counting people on a certain topic */
-  private case class PersonsCount(
-      existing: Int, //how many persons are already present
-      needed: Int, //how many persons are needed to reach the min
-      optional: Int //how many persons can we add after the min is reached (or with existing number if already higher than min)
-  )
-
-}

@@ -43,7 +43,7 @@ class Benchmark extends FlatSpec with Matchers {
   }
 
 
-  "Fast improver" should "give an good score" ignore {
+  "Fast improver" should "give an good score" in {
     implicit val tools: Tools = Tools(new Chrono)
 
     val output = new Output
@@ -72,7 +72,8 @@ class Benchmark extends FlatSpec with Matchers {
     def format(score: Score, duration: Long) =
       s"${durationFormat.format(duration)} ms   ${scoreFormat.format(score.value.round)}"
 
-    val csFactory = new ScheduleGenerator(udoConProblem)
+
+    val engine = new Engine(udoConProblem)
     val systematicImprover = new ExhaustiveScheduleImprover(udoConProblem)
     val fastImprover = new GreedyScheduleImprover(udoConProblem)
 
@@ -80,7 +81,7 @@ class Benchmark extends FlatSpec with Matchers {
     for (seed <- 0 to 100) {
       implicit val rand: Random = new Random(seed)
 
-      val Some(initialSolution) = csFactory.generate
+      val Some(initialSolution) = engine.generateUnimproved
       val initialScore = Scorer.score(initialSolution)
 
       val sysStart = System.currentTimeMillis()

@@ -1,6 +1,6 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.{Problem, ScoredSchedule}
+import fr.renoux.gaston.model.{Problem, Schedule, ScoredSchedule}
 import fr.renoux.gaston.util.Tools
 
 import scala.util.Random
@@ -10,7 +10,8 @@ class Engine(
     altImprover: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
 ) {
 
-  val generator: ScheduleGenerator = new ScheduleGenerator(problem)
+  val generator: PartialSchedulesGenerator = new PartialSchedulesGenerator(problem)
+  val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
   val improver: ScheduleImprover = altImprover(problem)
 
   /** Produces a schedule and its score */
@@ -18,7 +19,7 @@ class Engine(
     implicit val _r: Random = new Random(seed)
 
     val Some(initialSolution) = tools.chrono("ConstrainedScheduleFactory.makeSchedule") {
-      generator.generate
+      generateUnimproved
     }
     val initialScore = Scorer.score(initialSolution)
 
@@ -30,4 +31,8 @@ class Engine(
     ScoredSchedule(finalSolution, finalScore)
   }
 
+  /** For testing purposes */
+  def generateUnimproved(implicit random: Random, ctx: Context): Option[Schedule] = {
+    generator.lazySeq.map(filler.fill).flatten.headOption
+  }
 }

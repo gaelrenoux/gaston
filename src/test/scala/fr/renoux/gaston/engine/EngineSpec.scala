@@ -7,19 +7,18 @@ import org.scalatest.{FlatSpec, Matchers, PrivateMethodTester}
 import scala.util.Random
 
 
-class ScheduleGeneratorSpec extends FlatSpec with Matchers with PrivateMethodTester {
-  private val log = Logger[ScheduleGeneratorSpec]
+class EngineSpec extends FlatSpec with Matchers with PrivateMethodTester {
+  private val log = Logger[EngineSpec]
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
-  private implicit val random = new Random(0L)
+  private implicit val _r: Random = new Random(0L)
 
   assert(SimpleTestModel.Solutions.Best.isSolution)
 
-
-  behavior of "makeSchedule"
+  behavior of "generateUnimproved"
 
   it should "work out a schedule when there is one (on a simple model)" in {
-    val factory = new ScheduleGenerator(SimpleTestModel.Problems.Complete)
-    val solution = factory.generate
+    val engine = new Engine(SimpleTestModel.Problems.Complete)
+    val solution = engine.generateUnimproved
     solution foreach { s =>
       log.info(s"Solution: ${s.toFormattedString}")
     }
@@ -27,8 +26,8 @@ class ScheduleGeneratorSpec extends FlatSpec with Matchers with PrivateMethodTes
   }
 
   it should "work out a schedule when there is one (on a complex model)" in {
-    val factory = new ScheduleGenerator(ComplexTestModel.Problems.Complete)
-    val solution = factory.generate
+    val engine = new Engine(ComplexTestModel.Problems.Complete)
+    val solution = engine.generateUnimproved
     solution foreach { s =>
       log.info(s"Solution: ${s.toFormattedString}")
     }
@@ -36,8 +35,8 @@ class ScheduleGeneratorSpec extends FlatSpec with Matchers with PrivateMethodTes
   }
 
   it should "always return a valid schedule if any (on a simple model)" in {
-    val factory = new ScheduleGenerator(SimpleTestModel.Problems.Complete)
-    val solution = factory.generate
+    val engine = new Engine(SimpleTestModel.Problems.Complete)
+    val solution = engine.generateUnimproved
     solution foreach { s =>
       log.info(s"Solution: ${s.toFormattedString}")
       SimpleTestModel.Problems.Complete.constraints.filter(!_.isRespected(s)) should be(Set())
@@ -45,8 +44,8 @@ class ScheduleGeneratorSpec extends FlatSpec with Matchers with PrivateMethodTes
   }
 
   it should "always return a valid schedule if any (on a complex model)" in {
-    val factory = new ScheduleGenerator(ComplexTestModel.Problems.Complete)
-    val solution = factory.generate
+    val engine = new Engine(ComplexTestModel.Problems.Complete)
+    val solution = engine.generateUnimproved
     solution foreach { s =>
       log.info(s"Solution: ${s.toFormattedString}")
       SimpleTestModel.Problems.Complete.constraints.filter(!_.isRespected(s)) should be(Set())
