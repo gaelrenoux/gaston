@@ -27,7 +27,7 @@ class Benchmark extends FlatSpec with Matchers {
   "Systematic improver" should "give a good score" ignore {
     implicit val tools: Tools = Tools(new Chrono)
 
-    val engine = new Engine(new ScheduleGenerator(udoConProblem), new ExhaustiveScheduleImprover(udoConProblem))
+    val engine = new Engine(udoConProblem, new ExhaustiveScheduleImprover(_))
     val runner = new Runner(udoConProblem, engine)
     val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = 0L)
 
@@ -47,7 +47,7 @@ class Benchmark extends FlatSpec with Matchers {
     implicit val tools: Tools = Tools(new Chrono)
 
     val output = new Output
-    val engine = new Engine(new ScheduleGenerator(udoConProblem), new GreedyScheduleImprover(udoConProblem))
+    val engine = new Engine(udoConProblem, new GreedyScheduleImprover(_))
     val runner = new Runner(udoConProblem, engine, hook = (ss, count) => {
       output.writeScheduleIfBetter(ss, udoConProblem, UdoConTestModel.Settings)
       output.writeAttempts(count)

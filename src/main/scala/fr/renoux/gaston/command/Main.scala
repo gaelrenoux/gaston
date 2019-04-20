@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.{Engine, GreedyScheduleImprover, ScheduleGenerator}
+import fr.renoux.gaston.engine.Engine
 import fr.renoux.gaston.input._
 import org.slf4j.LoggerFactory
 import scalaz.Scalaz._
@@ -40,7 +40,7 @@ object Main {
     if (commandLine.generateInput) {
       output.writeInput(inputRoot)
     } else {
-      val engine = new Engine(new ScheduleGenerator(problem), new GreedyScheduleImprover(problem))
+      val engine = new Engine(problem)
 
       val runner = new Runner(problem, engine, hook = (ss, count) => {
         output.writeScheduleIfBetter(ss, problem, inputRoot.gaston.settings)

@@ -4,8 +4,6 @@ import java.security.MessageDigest
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model._
-import fr.renoux.gaston.model.constraints.TopicNeedsNumberOfPersons
-import scalaz.Scalaz._
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -243,51 +241,9 @@ class ScheduleGenerator(val problem: Problem) {
         }
     }
 
-  /** Upper limit of the number of possible schedules */
-  def upperLimit: BigInt = {
-    val maxPersonsPerTopic = problem.constraints.collect {
-      case TopicNeedsNumberOfPersons(_, _, max) => max
-    }.max
-    val minTopicsPerSlot = (problem.personsCount.toDouble / maxPersonsPerTopic).ceil.toInt
-    val maxTopicsPerSlot = problem.maxTopicCountPerSlot.nonEmpty.option(problem.maxTopicCountPerSlot.values.max).getOrElse((problem.topics.size.toDouble / problem.slots.size).floor.toInt)
-
-    ScheduleGenerator.upperLimit(
-      slots = problem.slots.size,
-      topics = problem.topics.size,
-      minTopicsPerSlot = minTopicsPerSlot,
-      maxTopicsPerSlot = maxTopicsPerSlot
-    )
-  }
-
 }
 
 object ScheduleGenerator {
-
-  def upperLimit(slots: BigInt, topics: BigInt, minTopicsPerSlot: BigInt, maxTopicsPerSlot: BigInt): BigInt = {
-
-    @tailrec
-    def fact(n: BigInt, acc: BigInt = 1): BigInt = if (n <= 1) acc else fact(n - 1, acc * n)
-
-    def comb(n: BigInt, k: BigInt): BigInt = fact(n) / fact(k) / fact(n - k)
-
-    def recCount(slots: BigInt, topics: BigInt): BigInt = {
-      if (slots * minTopicsPerSlot > topics) {
-        0
-
-      } else if (slots == 1) {
-        val max = maxTopicsPerSlot.min(topics)
-        val r = (minTopicsPerSlot to max).map(comb(topics, _)).sum
-        r
-
-      } else {
-        val r = (minTopicsPerSlot to maxTopicsPerSlot).map(n => comb(topics, n) * recCount(slots - 1, topics - n)).sum
-        r
-      }
-    }
-
-    recCount(slots, topics)
-  }
-
 
   /** Counting people on a certain topic */
   private case class PersonsCount(
@@ -295,6 +251,5 @@ object ScheduleGenerator {
       needed: Int, //how many persons are needed to reach the min
       optional: Int //how many persons can we add after the min is reached (or with existing number if already higher than min)
   )
-
 
 }

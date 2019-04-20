@@ -12,7 +12,7 @@ abstract class ScheduleImproverAbstractSpec extends FlatSpec with Matchers {
 
   def runWith(improverConstructor: Problem => ScheduleImprover, problem: Problem, seeds: Traversable[Long]): (Schedule, Double) = {
 
-    implicit val _: Problem = problem
+    implicit val _p: Problem = problem
 
     var (bestSchedule, bestScore) = (Schedule.empty, Double.NegativeInfinity)
     for (seed <- seeds) {
