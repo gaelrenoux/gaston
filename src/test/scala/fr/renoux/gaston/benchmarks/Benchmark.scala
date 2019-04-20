@@ -11,6 +11,7 @@ import fr.renoux.gaston.util.{Chrono, Opt, Tools}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 class Benchmark extends FlatSpec with Matchers {
 
@@ -37,10 +38,11 @@ class Benchmark extends FlatSpec with Matchers {
     )
   }
 
-  it should "give an great score when working a long time" ignore {
+  it should "give an great score when working a long time" in {
     benchmark(
       duration = 20.minutes,
-      expectsScore = 700
+      expectsScore = 700,
+      parallelRunCount = 1
     )
   }
 
@@ -68,6 +70,8 @@ class Benchmark extends FlatSpec with Matchers {
       output.writeAttempts(count)
     }
 
+    val handler = logMinutes(verbose)
+
     val runner = parallelRunCount.toOption match {
       case None => new Runner(problem, engine, hook = printer)
       case Some(prc) => new Runner(problem, engine, hook = printer, parallelRunCount = prc)
@@ -78,8 +82,35 @@ class Benchmark extends FlatSpec with Matchers {
     println(s"$score after $count iterations")
     println(s"${tools.chrono.times} in ${tools.chrono.counts}")
 
+    schedule.problem.constraints.filterNot(_.isRespected(schedule)) should be(Set())
     schedule.isSolution should be(true)
     score.value should be > expectsScore
     count should be > expectsCount
+    handler.stop()
+  }
+
+  trait Stoppable {
+    def stop(): Unit
+  }
+
+  private def logMinutes(verbose: Boolean): Stoppable = new Stoppable {
+    private var continue = verbose
+    var lastMinute = 0
+    private val startTime = System.currentTimeMillis()
+
+    def stop(): Unit = {
+      continue = false
+    }
+
+    Future {
+      while (continue) {
+        Thread.sleep(1000)
+        if (System.currentTimeMillis() - startTime > 60000 * lastMinute) {
+          lastMinute = lastMinute + 1
+          println(s"Minute $lastMinute")
+        }
+      }
+    }(ExecutionContext.global)
+
   }
 }

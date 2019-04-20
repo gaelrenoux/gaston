@@ -35,6 +35,9 @@ case class Schedule(
   lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(problem.minNumberPerTopic).sum)
   lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(problem.mandatoryPersonsPerTopic))
 
+  lazy val scheduledTopics: Set[Topic] = records.map(_.topic)
+  lazy val unscheduledTopics: Set[Topic] = problem.topics -- scheduledTopics
+
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot)
 
@@ -61,12 +64,21 @@ case class Schedule(
     }
   }
 
-  /** Swap two topics from two different slots. Persons are not exchanged between those topics, so the whole schedule
-    * might become unsound. Parameters are the source, not the destination. */
+  /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
+    * schedule is probably unsound and/or partial. */
   def swapTopics(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = partialMapRecords {
-      case Record(s, t, ps) if (s, t) == st1 => Record(s, st2._2, ps)
-      case Record(s, t, ps) if (s, t) == st2 => Record(s, st1._2, ps)
+    case Record(s, t, _) if (s, t) == st1 => Record(s, st2._2, problem.mandatoryPersonsPerTopic(st2._2))//TODO should probably have a method that corrects the schedule
+    case Record(s, t, _) if (s, t) == st2 => Record(s, st1._2, problem.mandatoryPersonsPerTopic(st1._2))
   }
+
+  /** Replace an existing topic by a new one (typically unscheduled, on a slot). Mandatory persons are set on the new
+    * topic and no one else, so the schedule is probably unsound and/or partial. */
+  def replaceTopic(oldTopic: Topic, newTopic: Topic): Schedule = partialMapRecords {
+    case Record(s, t, _) if t == oldTopic  => Record(s, newTopic, problem.mandatoryPersonsPerTopic(newTopic))
+  }
+
+  def removeTopic(topic: Topic): Schedule = updateRecords(_.filter(_.topic != topic))
+
 
   /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */
   def addPersonToExistingTopic(topic: Topic, person: Person): Schedule = partialMapRecords {
@@ -119,6 +131,9 @@ case class Schedule(
   lazy val isPartialSolution: Boolean = {
     problem.constraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
   }
+
+  lazy val brokenPartialConstraints: Set[Constraint] =
+    problem.constraints.filterNot{ c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
   /** @return true if this respects all constraints */
   lazy val isSolution: Boolean = {

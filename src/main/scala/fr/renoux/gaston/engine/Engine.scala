@@ -1,16 +1,16 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.{Problem, Schedule, Score, ScoredSchedule, Topic}
+import fr.renoux.gaston.model.{Problem, Record, Schedule, Score, ScoredSchedule, Slot, Topic}
 import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
-import scala.collection.IterableView
 import scala.util.Random
 
 class Engine(
     problem: Problem,
     altImprover: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
 ) {
+  import Engine._
 
   val generator: PartialSchedulesGenerator = new PartialSchedulesGenerator(problem)
   val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
@@ -26,7 +26,7 @@ class Engine(
     val improved = improve(unimproved, unimprovedScore)
     val improvedScore = Scorer.score(improved)
 
-    recSwapImprove(ScoredSchedule(improved, improvedScore))
+    recHeavyImprove(ScoredSchedule(improved, improvedScore))
   }
 
   /** For testing purposes */
@@ -43,23 +43,28 @@ class Engine(
 
   /** Improve the schedule by trying swap after swap of topics. */
   @tailrec
-  private def recSwapImprove(schedule: ScoredSchedule, previousSwap: Option[(Topic, Topic)] = None, maxRound: Int = 100)(implicit rand: Random, tools: Tools): ScoredSchedule =
-    if (maxRound == 0) schedule else firstBetterSwap(schedule, previousSwap) match {
-      case None => schedule //can't make it any better
-      case Some((swappedSchedule, swap)) => recSwapImprove(swappedSchedule, Some(swap), maxRound - 1)
+  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 100)(implicit rand: Random, tools: Tools): ScoredSchedule =
+    if (maxRound == 0) schedule else heavyImprovement(schedule, previousMove) match {
+      case None =>
+        // println(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
+        schedule //can't make it any better
+      case Some((swappedSchedule, move)) =>
+        // println(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score})")
+        recHeavyImprove(swappedSchedule, move, maxRound - 1)
     }
 
   /** Take an already improved schedule, and return the first better schedule it can found by swapping topics. */
-  private def firstBetterSwap(scoredSchedule: ScoredSchedule, previousSwap: Option[(Topic, Topic)])
-    (implicit rand: Random, tools: Tools): Option[(ScoredSchedule, (Topic, Topic))] = {
+  private def heavyImprovement(scoredSchedule: ScoredSchedule, previousMove: Move)
+    (implicit rand: Random, tools: Tools): Option[(ScoredSchedule, Move)] = {
     val ScoredSchedule(schedule, score) = scoredSchedule
 
-    val allSwaps: IterableView[(ScoredSchedule, (Topic, Topic)), Iterable[_]] = for {
-      /* Iterate over all topics on differing slots */
+    /* Swap topics between two scheduled topics */
+    val allSwaps = for {
       (s1, s2) <- Random.shuffle(problem.slotCouples.toSeq).view //randomize for performances
       t1 <- schedule.topicsPerSlot(s1).view
       t2 <- schedule.topicsPerSlot(s2).view
-      if !previousSwap.contains((t1, t2)) && !previousSwap.contains((t2, t1)) //not the swap we just did
+      move = Move.Swap(t1, t2)
+      if !move.reverts(previousMove)
 
       /* Filter out impossible swaps because of mandatory persons */
       mandatoryPersonsTopic1 = problem.mandatoryPersonsPerTopic(t1)
@@ -69,15 +74,115 @@ class Engine(
       mandatoryPersonsSlot1 = schedule.mandatoryPersonsOnSlot(s1)
       if !mandatoryPersonsTopic2.exists(mandatoryPersonsSlot1) //check mandatories of T2 are not already blocked on S1
 
-      /* Generate the swap and improve it as much as possible */
+      /* Generate the swap */
       partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> t1, s2 -> t2)
+      if partial.isPartialSolution
+    } yield (partial, move)
+
+
+    /* Swap topics between unscheduled and scheduled */
+    val allExternalSwaps = for {
+      newT <- schedule.unscheduledTopics.view
+      oldT <- schedule.scheduledTopics.view
+      move = Move.Swap(oldT, newT)
+      if !move.reverts(previousMove)
+      slot = schedule.topicToSlot(oldT)
+
+      /* Filter out impossible swaps because of mandatory persons */
+      mandatoryPersonsNewTopic = problem.mandatoryPersonsPerTopic(newT)
+      mandatoryPersonsSlot = schedule.mandatoryPersonsOnSlot(slot)
+      if !mandatoryPersonsNewTopic.exists(mandatoryPersonsSlot)
+
+      /* Generate the swap */
+      partial = schedule.clearSlots(slot).replaceTopic(oldT, newT)
+      if partial.isPartialSolution
+    } yield (partial, move)
+
+
+    /* Add an unscheduled topic */
+    val allAdds = for {
+      slot <- Random.shuffle(problem.slots.toSeq).view
+      topic <- schedule.unscheduledTopics.view
+      move = Move.Add(slot, topic)
+      if !move.reverts(previousMove)
+
+      /* Filter out impossible adds because of mandatory persons */
+      mandatoryPersonsNewTopic = problem.mandatoryPersonsPerTopic(topic)
+      mandatoryPersonsSlot = schedule.mandatoryPersonsOnSlot(slot)
+      if !mandatoryPersonsNewTopic.exists(mandatoryPersonsSlot)
+
+      /* Generate the swap */
+      partial = schedule.clearSlots(slot).add(Record(slot, topic, mandatoryPersonsNewTopic))
+      if partial.isPartialSolution
+
+      /* Filter out impossible adds because of unreachable minimum */
+      if partial.minPersonsOnSlot(slot) <= problem.personsCountPerSlot(slot)
+    } yield (partial, move)
+
+
+    /* Remove a scheduled topic */
+    val allRemovals = for {
+      slot <- Random.shuffle(problem.slots.toSeq).view
+      topic <- schedule.topicsPerSlot(slot).view
+      move = Move.Remove(slot, topic)
+      if !move.reverts(previousMove)
+
+      /* Generate the swap */
+      partial = schedule.removeTopic(topic)
+      if partial.isPartialSolution
+
+      /* Filter out impossible adds because of maximum too low */
+      if partial.maxPersonsOnSlot(slot) >= problem.personsCountPerSlot(slot)
+    } yield (partial, move)
+
+
+    val improvedSchedules = for {
+      (partial, move) <- allSwaps ++ allExternalSwaps ++ allAdds ++ allRemovals
       unimproved <- filler.fill(partial)
       unimprovedScore = Scorer.score(unimproved)
       improved = improve(unimproved, unimprovedScore)
       improvedScore = Scorer.score(improved)
       if improvedScore > score
-    } yield (ScoredSchedule(improved, improvedScore), (t1, t2))
+    } yield (ScoredSchedule(improved, improvedScore), move)
 
-    allSwaps.headOption
+    improvedSchedules.headOption
   }
+}
+
+object Engine {
+
+  /** Moves on the Schedule */
+  trait Move {
+    def reverts(m: Move): Boolean
+  }
+
+  object Move {
+
+    case object Nothing extends Move {
+      override def reverts(m: Move): Boolean = false
+    }
+
+    case class Swap(a: Topic, b: Topic) extends Move {
+      override def reverts(m: Move): Boolean = m match {
+        case Swap(a1, b1) if (a, b) == (a1, b1) || (a, b) == (b1, a1) => true
+        case _ => false
+      }
+    }
+
+    case class Add(s: Slot, t: Topic) extends Move {
+      override def reverts(m: Move): Boolean = m match {
+        case Remove(s1, t1) if s == s1 && t == t1 => true
+        case _ => false
+      }
+    }
+
+    case class Remove(s: Slot, t: Topic) extends Move {
+      override def reverts(m: Move): Boolean = m match {
+        case Add(s1, t1) if s == s1 && t == t1 => true
+        case _ => false
+      }
+    }
+
+  }
+
 }
