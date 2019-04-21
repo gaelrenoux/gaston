@@ -116,12 +116,11 @@ object InputTranscriber {
     for {
       inPerson <- input.persons
       person = ctx.personsPerName(inPerson.name)
-      totalInputScore = inPerson.wishes.map(iw => iw.value.value * iw.topics.size).sum
+      totalInputScore = inPerson.wishes.values.sum.value
       scoreFactor = personTotalScore / totalInputScore
-      inWishes <- inPerson.wishes
-      topicName <- inWishes.topics
-      topic = ctx.topicsPerName(topicName)
-    } yield PersonTopicPreference(person, topic, inWishes.value * scoreFactor)
+      inWish <- inPerson.wishes
+      topic = ctx.topicsPerName(inWish._1)
+    } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
 
   private case class Context(

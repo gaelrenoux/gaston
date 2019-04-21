@@ -10,7 +10,7 @@ case class InputRoot(
 
 case class InputModel(
     settings: InputSettings,
-    udoSettings: Option[InputUdoSettings],
+    tableSettings: Option[InputTableSettings],
     slots: Set[InputSlot],
     persons: Set[InputPerson],
     topics: Set[InputTopic],
@@ -24,21 +24,32 @@ case class InputSettings(
     defaultMaxPersonsPerTopic: Int
 )
 
-case class InputUdoSettings(
-    /* Column at which the persons start on the first line */
+case class InputTableSettings(
+    separator: String,
+    /* Row where the persons' names appear */
+    personsRow: Int,
+    /* Additional header rows to ignore */
+    otherHeaderRowsCount: Int,
+    /* Column at which the persons start */
     personsStartingIndex: Int,
     /* Column for the topics */
-    topicsIndex: Int,
+    topicIndex: Int,
     /* Column for the min number of persons on that topic */
-    minPlayersIndex: Option[Int],
+    minPersonsIndex: Option[Int],
     /* Column for the max number of persons on that topic */
-    maxPlayersIndex: Int,
-    /* Weight given to any gamemaster */
-    gamemasterWeight: Weight,
-    /* Score given to a strong wish */
-    strongWishValue: Score,
-    /* Score given to a weak wish */
-    weakWishValue: Score
+    maxPersonsIndex: Int,
+    /* Number to add to the count of persons (typically because min and max don't always include the mandatory person) */
+    personsCountAdd: Int,
+    /* Index for one mandatory's person' name */
+    mandatoryPersonIndex: Int,
+    /* If a person is mandatory on one topic, his preferences will weight more on other topics (as a reward). Should be
+     higher than one. */
+    mandatoryPersonRewardWeight: Weight,
+    /* What text marks the person as forbidden on that topic */
+    forbiddenPersonMarker: Option[String],
+    /* For each preference value, how it should be translated to a score (unknown texts are ignored). If no mapping is
+    provided, the raw numerical values will be used.  */
+    preferencesScoreMapping: Option[Map[String, Score]]
 )
 
 case class InputSlot(
@@ -60,12 +71,7 @@ case class InputPerson(
     mandatory: Set[String] = Set(),
     forbidden: Set[String] = Set(),
     incompatible: Set[String] = Set(),
-    wishes: Set[InputPersonWishes] = Set()
-)
-
-case class InputPersonWishes(
-    value: Score,
-    topics: Set[String] = Set()
+    wishes: Map[String, Score] = Map()
 )
 
 case class InputGlobalConstraints(

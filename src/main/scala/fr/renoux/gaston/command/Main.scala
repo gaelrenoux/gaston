@@ -78,13 +78,18 @@ object Main {
 
   } yield udoConInputRootOption getOrElse initialInputRoot
 
-  /** Load the UdoCon settings, if they are required */
+  /** Load the table settings, if they are required */
   private def loadUdoConSettings(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot = for {
-    table <- Try(Source.fromFile(path.toFile).mkString).toDisjunction.leftMap(t => InputErrors(t.toString))
-    udoSettings <- baseInput.gaston.udoSettings.toRightDisjunction(InputErrors("Missing UdoCon table settings"))
-    udoReader = new UdoConTableReader(udoSettings, baseInput.gaston.settings)
+    table <- stringFromFile(path)
+    tableSettings <- baseInput.gaston.tableSettings.toRightDisjunction(InputErrors("Missing table settings"))
+    udoReader = new TableReader(tableSettings, baseInput.gaston.settings)
     udoInput = udoReader.read(table)
   } yield udoInput
+
+  private def stringFromFile(path: Path): InputErrors \/ String = Try {
+    val src = Source.fromFile(path.toFile)
+    try src.mkString finally src.close()
+  }.toDisjunction.leftMap(t => InputErrors(t.toString))
 
 
   /** Set the log level to debuq */
