@@ -38,7 +38,7 @@ class Benchmark extends FlatSpec with Matchers {
     )
   }
 
-  it should "give an great score when working a long time" in {
+  it should "give an great score when working a long time" ignore {
     benchmark(
       duration = 20.minutes,
       expectsScore = 700,
