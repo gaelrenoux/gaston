@@ -62,12 +62,12 @@ class PartialSchedulesGenerator(val problem: Problem) {
       if (!candidateCache.add(scheduleMd5)) throw new IllegalStateException(partialSchedule.toFormattedString)
     }
 
-    if (attemptsCount % 1000 == 0) log.debug(s"Tried $attemptsCount combinations")
+    if (attemptsCount % 10000 == 0) log.debug(s"Tried $attemptsCount combinations")
     log.trace(s"Tried $attemptsCount combinations")
     attemptsCount += 1
 
     if (slotsLeft.isEmpty) {
-      log.trace("All slots are satisfied and as much topics as possible have been assigned, return result")
+      log.debug("Found a partial schedule")
       State(partialSchedule, slotsLeft, topicsLeft, topicsPassed).some
 
     } else if (topicsLeft.isEmpty) {

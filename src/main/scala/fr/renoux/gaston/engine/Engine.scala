@@ -1,5 +1,6 @@
 package fr.renoux.gaston.engine
 
+import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.{Problem, Record, Schedule, Score, ScoredSchedule, Slot, Topic}
 import fr.renoux.gaston.util.Tools
 
@@ -11,6 +12,8 @@ class Engine(
     altImprover: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
 ) {
   import Engine._
+
+  val log = Logger[Engine]
 
   val generator: PartialSchedulesGenerator = new PartialSchedulesGenerator(problem)
   val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
@@ -46,10 +49,10 @@ class Engine(
   private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 100)(implicit rand: Random, tools: Tools): ScoredSchedule =
     if (maxRound == 0) schedule else heavyImprovement(schedule, previousMove) match {
       case None =>
-        // println(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
+        log.info(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
         schedule //can't make it any better
       case Some((swappedSchedule, move)) =>
-        // println(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score})")
+        log.info(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score}\n${swappedSchedule.schedule.toFormattedString}")
         recHeavyImprove(swappedSchedule, move, maxRound - 1)
     }
 

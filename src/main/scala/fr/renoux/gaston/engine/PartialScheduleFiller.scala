@@ -59,8 +59,10 @@ class PartialScheduleFiller(val problem: Problem) {
         completeForSlots(slotsTail, newSchedule)
     }
 
+    log.debug("Starting to fill the partial schedule")
+
     /* check wether it's possible to make it work first */
-    partialSchedule.topicsPerSlot.find { case (slot, topics) =>
+    val filled = partialSchedule.topicsPerSlot.find { case (slot, topics) =>
       val min = topics.view.map(problem.minNumberPerTopic(_)).sum
       val max = topics.view.map(problem.maxNumberPerTopic(_)).sum
       val pCount = problem.personsCountPerSlot(slot)
@@ -71,6 +73,10 @@ class PartialScheduleFiller(val problem: Problem) {
         log.trace(s"Impossible to fill slot $slot")
         None
     }
+
+    log.debug (if (filled.isDefined) "Partial schedule was filled" else "Could not fill partial schedule")
+
+    filled
   }
 
 
