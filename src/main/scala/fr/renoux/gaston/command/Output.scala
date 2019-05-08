@@ -12,7 +12,7 @@ class Output(silent: Boolean = false) {
   private val log = Logger[Output]
   private val notSilent = !silent
 
-  private var bestScore: Score = Score.Zero
+  private var bestScore: Score = Score.MinValue
 
   private def write(txt: => String): Unit = {
     log.info(txt)
@@ -21,7 +21,7 @@ class Output(silent: Boolean = false) {
     }
   }
 
-  def writeStart(): Unit = write(s"Starting to run !")
+  def writeStart(seed: Long): Unit = write(s"Starting to run ! (seed #$seed)")
 
   def writeEnd(scoredSchedule: ScoredSchedule, problem: Problem): Unit = {
     val render = new Renderer(problem)

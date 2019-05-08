@@ -47,7 +47,7 @@ object Main {
         output.writeAttempts(count)
       })
 
-      output.writeStart()
+      output.writeStart(commandLine.seed)
       val (ss, _) = runner.run(
         commandLine.maxDuration,
         seed = commandLine.seed
