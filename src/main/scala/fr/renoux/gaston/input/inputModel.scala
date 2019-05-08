@@ -21,7 +21,13 @@ case class InputSettings(
     incompatibilityAntiPreference: Score,
     defaultMaxTopicsPerSlot: Option[Int] = None,
     defaultMinPersonsPerTopic: Int,
-    defaultMaxPersonsPerTopic: Int
+    defaultMaxPersonsPerTopic: Int,
+    /* Maximum number of persons that can have no topic on a slot */
+    maxPersonsOnNothing: Int = 0,
+    /* Minimum number of persons that can have no topic on a slot (so that they can do something else) */
+    minPersonsOnNothing: Int = 0,
+    /* Negative score for someone not doing anything */
+    personOnNothingAntiPreference: Score = Score.Zero
 )
 
 case class InputTableSettings(

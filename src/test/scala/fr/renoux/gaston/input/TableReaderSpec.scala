@@ -29,7 +29,8 @@ class TableReaderSpec extends FlatSpec with Matchers {
   val settings = InputSettings(
     incompatibilityAntiPreference = Score(-1000),
     defaultMinPersonsPerTopic = 4,
-    defaultMaxPersonsPerTopic = 6
+    defaultMaxPersonsPerTopic = 6,
+    personOnNothingAntiPreference = Score(-100)
   )
 
   val reader = new TableReader(udoSettings, settings)
@@ -52,7 +53,7 @@ class TableReaderSpec extends FlatSpec with Matchers {
     if (input != expected) {
       printDiff(expected.gaston.settings, input.gaston.settings)
       printDiff(expected.gaston.tableSettings, input.gaston.tableSettings)
-      printDiff(expected.gaston.slots, input.gaston.slots)
+      printDiff(expected.gaston.slots.map(_.toList).toList, input.gaston.slots.map(_.toList).toList) //diff can't compare Seq
       printDiff(expected.gaston.topics, input.gaston.topics)
       printDiff(expected.gaston.persons, input.gaston.persons)
       printDiff(expected.gaston.constraints, input.gaston.constraints)
@@ -72,7 +73,7 @@ class TableReaderSpec extends FlatSpec with Matchers {
     if (input != expected) {
       printDiff(expected.gaston.settings, input.gaston.settings)
       printDiff(expected.gaston.tableSettings, input.gaston.tableSettings)
-      printDiff(expected.gaston.slots, input.gaston.slots)
+      printDiff(expected.gaston.slots.map(_.toList).toList, input.gaston.slots.map(_.toList).toList) //diff can't compare Seq
       printDiff(expected.gaston.topics, input.gaston.topics)
       printDiff(expected.gaston.persons, input.gaston.persons)
       printDiff(expected.gaston.constraints, input.gaston.constraints)

@@ -10,6 +10,8 @@ import scalaz.syntax.validation._
 /** Converts the Input object to the Problem object. */
 object InputTranscriber {
 
+  private val EmptyTopicNegativeScore = Score.PersonTotalScore.negative  * 0.02
+
   /** Load the real input from the user model. */
   def transcribe(inputRoot: InputRoot): Validation[InputErrors, Problem] = {
     //TODO better validation !
@@ -21,6 +23,25 @@ object InputTranscriber {
     val topicsPerName = input.topics.map { t => t.name -> Topic(t.name) }.toMap
     val personsPerName = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
+
+    val (nothingTopics, nothingTopicsConstraints, nothingTopicsPreferences) =
+      if (input.settings.maxPersonsOnNothing <= 0 || input.settings.maxPersonsOnNothing < input.settings.minPersonsOnNothing) {
+        (Set.empty[Topic], Set.empty[Constraint], Set.empty[Preference])
+
+      } else {
+        val nothings = slotsPerName.values.map { s =>
+          val topic = Topic.nothing(s)
+          val countConstraint = TopicNeedsNumberOfPersons(topic, input.settings.minPersonsOnNothing, input.settings.maxPersonsOnNothing)
+          val slotConstraint = TopicForcedSlot(topic, Set(s))
+          val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, EmptyTopicNegativeScore))
+          (topic, countConstraint, slotConstraint, antiPreferences)
+        }
+
+        val topics = nothings.map(_._1)
+        val constraints = nothings.map(_._2) ++ nothings.map(_._3)
+        val preferences = nothings.flatMap(_._4)
+        (topics, constraints, preferences)
+      }
 
     val constraints = Set[Constraint]() ++
       getSlotMaxesConstraints(input, ctx) ++
@@ -38,10 +59,10 @@ object InputTranscriber {
 
     new ProblemImpl(
       slotSequences,
-      topicsPerName.values.toSet,
+      topicsPerName.values.toSet ++ nothingTopics.toSet,
       personsPerName.values.toSet,
-      constraints,
-      preferences
+      constraints ++ nothingTopicsConstraints.toSet,
+      preferences ++ nothingTopicsPreferences.toSet
     ).success
   }
 

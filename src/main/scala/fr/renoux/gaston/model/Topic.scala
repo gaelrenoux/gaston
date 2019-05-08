@@ -7,3 +7,9 @@ case class Topic(name: String) extends AnyVal {
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
 }
+
+object Topic {
+
+  def nothing(slot: Slot) = Topic(s"Nothing (${slot.name})")
+
+}
