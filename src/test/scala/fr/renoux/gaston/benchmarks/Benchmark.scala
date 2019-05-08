@@ -31,6 +31,8 @@ class Benchmark extends FlatSpec with Matchers {
 
   behavior of "Fast improver"
 
+  //TODO needs the recHeavy improvement to be limited, in order to finish in time
+
   it should "give an good score when working a short time" ignore {
     benchmark(
       duration = 5.minutes,
