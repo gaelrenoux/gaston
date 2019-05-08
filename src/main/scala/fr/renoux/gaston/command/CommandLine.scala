@@ -15,7 +15,7 @@ case class CommandLine(
     silent: Boolean = false,
     debug: Boolean = false,
     maxDuration: Option[FiniteDuration] = None,
-    seed: Long = Random.nextLong()
+    seed: Long = math.abs(Random.nextLong())
 ) {
 
 }
