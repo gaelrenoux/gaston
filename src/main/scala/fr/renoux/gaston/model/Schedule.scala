@@ -120,9 +120,17 @@ case class Schedule(
 
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = {
-    val individualScores = problem.preferences.toSeq.map(p => p -> p.score(this))
+    val individualScores = problem.preferences.toSeq.collect {
+      case p: Preference.Personal => p -> p.score(this)
+    }
     individualScores.groupBy(_._1.person).mapValuesStrict(_.map(_._2).sum)
   }
+
+  lazy val unpersonalScore: Score =
+    problem.preferences.toSeq.map {
+      case _: Preference.Personal => Score.Zero
+      case p => p.score(this)
+    }.sum
 
   /**
     * Partial Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.

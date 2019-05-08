@@ -11,7 +11,7 @@ case class PersonGroupAntiPreference(
     person: Person,
     group: Set[Person],
     reward: Score
-) extends Preference.SlotLevel with Preference.Anti {
+) extends Preference.SlotLevel with Preference.Anti with Preference.Personal {
 
   /** Specific implementation, faster than the default */
   override def score(schedule: Schedule): Score = {

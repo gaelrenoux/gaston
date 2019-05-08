@@ -7,7 +7,7 @@ case class PersonTopicPreference(
     person: Person,
     topic: Topic,
     reward: Score
-) extends Preference.SlotLevel {
+) extends Preference.SlotLevel with Preference.Personal {
 
   /** Specific implementation, faster than the default */
   override def score(schedule: Schedule): Score = {

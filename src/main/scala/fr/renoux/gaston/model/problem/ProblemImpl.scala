@@ -106,7 +106,9 @@ class ProblemImpl(
   }.toMap.withDefaultValue(personsCount)
 
   /** For everyone, its preferences */
-  lazy val preferencesPerPerson: Map[Person, Set[Preference]] = preferences.groupBy(_.person)
+  lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect{
+    case p: Preference.Personal => p
+  }.groupBy(_.person)
 
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")

@@ -14,8 +14,11 @@ object Scorer {
   final def score(solution: Schedule): Score = {
     val scoresByPerson = solution.unweightedScoresByPerson
     val weightedScores = scoresByPerson.map { case (p, s) => s / p.weight }
+    val scoreWeightedPersons = weightedScores.toSeq.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+
+    val scoreOther = solution.unpersonalScore.value
     Score(
-      weightedScores.toSeq.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+      scoreOther + scoreWeightedPersons
     )
   }
 

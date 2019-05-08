@@ -6,9 +6,6 @@ package fr.renoux.gaston.model
   */
 trait Preference {
 
-  /** A preference always references someone */
-  val person: Person
-
   /** Score you get each time you satisfy this constraint. Anti-preferences (stuff you would like no to happen) should
     * have a negative reward */
   def reward: Score
@@ -18,6 +15,11 @@ trait Preference {
 }
 
 object Preference {
+
+  trait Personal extends Preference {
+    /** A personal preference always references someone */
+    val person: Person
+  }
 
   trait Anti extends Preference {
     assert(reward.value <= 0, s"AntiPreference $this should have a negative reward")
