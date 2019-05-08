@@ -28,7 +28,7 @@ class PartialScheduleFiller(val problem: Problem) {
       case (slot :: slotsTail, Some(schedule)) =>
         /* Handle current slot */
 
-        val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot(slot)
+        val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot.getOrElse(slot, Set.empty)
         val personsLeft = random.shuffle(personsLeftSet.toSeq)
 
         /*
@@ -43,7 +43,7 @@ class PartialScheduleFiller(val problem: Problem) {
 
         Dispatch.equallyWithMaxes(topicsMinMaxCurrent.map(_._3)) */
 
-        val topicsWithValues = schedule.topicsPerSlot(slot).map { t =>
+        val topicsWithValues = schedule.topicsPerSlot.getOrElse(slot, Set.empty).map { t =>
           val min = problem.minNumberPerTopic.getOrElse(t, 0)
           val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
           val current = schedule.countPersonsPerTopic(t)
@@ -126,7 +126,7 @@ class PartialScheduleFiller(val problem: Problem) {
           backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMax, ptail, person :: personsSkipped, topicsOpenToMaxDelayed)
         }
 
-      case (Nil, (topic, _) :: _, person :: ptail) if problem.forbiddenPersonsPerTopic(topic)(person) =>
+      case (Nil, (topic, _) :: _, person :: ptail) if problem.forbiddenPersonsPerTopic.getOrElse(topic, Set.empty)(person) =>
         log.trace("Current topic has not reached max number, but current person is forbidden on it: step to the next person")
         backtrackAssignPersonsToTopics(partialSchedule)(Nil, topicsOpenToMax, ptail, person :: personsSkipped, topicsOpenToMaxDelayed)
 

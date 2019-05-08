@@ -66,7 +66,7 @@ class InputSpec extends FlatSpec with Matchers {
   }
 
   it should "contain the correct preferences" in {
-    val scalingFactor: Double = 1000.0 / 7
+    val scalingFactor: Double = Score.PersonTotalScore.value / 7
     minimalProblem.preferences should be(Set(
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("alpha"), Score(scalingFactor * 5.0)),
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(scalingFactor * 1.0)),

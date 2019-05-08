@@ -32,6 +32,9 @@ object Score {
 
   private val TwoDecimalsFormat = new DecimalFormat("####.00")
 
+  /** What score should a person have if all its preferences are satisfied ? */
+  val PersonTotalScore = Score(1000.0)
+
   val Zero = Score(0)
 
   val MinValue = Score(Double.MinValue)

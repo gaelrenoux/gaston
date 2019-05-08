@@ -11,9 +11,10 @@ class Engine(
     problem: Problem,
     altImprover: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
 ) {
+
   import Engine._
 
-  val log = Logger[Engine]
+  private val log = Logger[Engine]
 
   val generator: PartialSchedulesGenerator = new PartialSchedulesGenerator(problem)
   val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
@@ -46,15 +47,20 @@ class Engine(
 
   /** Improve the schedule by trying swap after swap of topics. */
   @tailrec
-  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 100)(implicit rand: Random, tools: Tools): ScoredSchedule =
-    if (maxRound == 0) schedule else heavyImprovement(schedule, previousMove) match {
+  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 1000)(implicit rand: Random, tools: Tools): ScoredSchedule =
+    if (maxRound == 0) {
+      log.warn(s"HeavyImprove could not do its best (score is ${schedule.score})")
+      schedule
+    } else heavyImprovement(schedule, previousMove) match {
       case None =>
-        log.info(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
+        log.debug(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
         schedule //can't make it any better
       case Some((swappedSchedule, move)) =>
-        log.info(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score}\n${swappedSchedule.schedule.toFormattedString}")
+        log.debug(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score}\n${swappedSchedule.schedule.toFormattedString}")
         recHeavyImprove(swappedSchedule, move, maxRound - 1)
     }
+
+  private def shuffled[A](set: Set[A]): Seq[A] = Random.shuffle(set.toSeq)
 
   /** Take an already improved schedule, and return the first better schedule it can found by swapping topics. */
   private def heavyImprovement(scoredSchedule: ScoredSchedule, previousMove: Move)
@@ -63,9 +69,9 @@ class Engine(
 
     /* Swap topics between two scheduled topics */
     val allSwaps = for {
-      (s1, s2) <- Random.shuffle(problem.slotCouples.toSeq).view //randomize for performances
-      t1 <- schedule.topicsPerSlot(s1).view
-      t2 <- schedule.topicsPerSlot(s2).view
+      (s1, s2) <- shuffled(problem.slotCouples).view
+      t1 <- shuffled(schedule.topicsPerSlot(s1)).view
+      t2 <- shuffled(schedule.topicsPerSlot(s2)).view
       move = Move.Swap(t1, t2)
       if !move.reverts(previousMove)
 
@@ -85,8 +91,8 @@ class Engine(
 
     /* Swap topics between unscheduled and scheduled */
     val allExternalSwaps = for {
-      newT <- schedule.unscheduledTopics.view
-      oldT <- schedule.scheduledTopics.view
+      newT <- shuffled(schedule.unscheduledTopics).view
+      oldT <- shuffled(schedule.scheduledTopics).view
       move = Move.Swap(oldT, newT)
       if !move.reverts(previousMove)
       slot = schedule.topicToSlot(oldT)
@@ -104,8 +110,8 @@ class Engine(
 
     /* Add an unscheduled topic */
     val allAdds = for {
-      slot <- Random.shuffle(problem.slots.toSeq).view
-      topic <- schedule.unscheduledTopics.view
+      slot <- shuffled(problem.slots).view
+      topic <- shuffled(schedule.unscheduledTopics).view
       move = Move.Add(slot, topic)
       if !move.reverts(previousMove)
 
@@ -125,8 +131,8 @@ class Engine(
 
     /* Remove a scheduled topic */
     val allRemovals = for {
-      slot <- Random.shuffle(problem.slots.toSeq).view
-      topic <- schedule.topicsPerSlot(slot).view
+      slot <- shuffled(problem.slots).view
+      topic <- shuffled(schedule.topicsPerSlot(slot)).view
       move = Move.Remove(slot, topic)
       if !move.reverts(previousMove)
 
@@ -135,12 +141,13 @@ class Engine(
       if partial.isPartialSolution
 
       /* Filter out impossible adds because of maximum too low */
-      if partial.maxPersonsOnSlot(slot) >= problem.personsCountPerSlot(slot)
+      if partial.maxPersonsOnSlot.getOrElse(slot, 0) >= problem.personsCountPerSlot(slot)
     } yield (partial, move)
 
 
     val improvedSchedules = for {
-      (partial, move) <- allSwaps ++ allExternalSwaps ++ allAdds ++ allRemovals
+      (partial, move) <- allAdds ++ allSwaps ++ allExternalSwaps ++ allRemovals
+      _ = log.debug(s"Trying that move: $move")
       unimproved <- filler.fill(partial)
       unimprovedScore = Scorer.score(unimproved)
       improved = improve(unimproved, unimprovedScore)

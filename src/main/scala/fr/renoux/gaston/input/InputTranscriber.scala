@@ -10,9 +10,6 @@ import scalaz.syntax.validation._
 /** Converts the Input object to the Problem object. */
 object InputTranscriber {
 
-  /** What score should a person have if all its preferences are satisfied ? */
-  private val personTotalScore: Double = 1000.0
-
   /** Load the real input from the user model. */
   def transcribe(inputRoot: InputRoot): Validation[InputErrors, Problem] = {
     //TODO better validation !
@@ -117,7 +114,7 @@ object InputTranscriber {
       inPerson <- input.persons
       person = ctx.personsPerName(inPerson.name)
       totalInputScore = inPerson.wishes.values.sum.value
-      scoreFactor = personTotalScore / totalInputScore
+      scoreFactor = Score.PersonTotalScore.value / totalInputScore
       inWish <- inPerson.wishes
       topic = ctx.topicsPerName(inWish._1)
     } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
