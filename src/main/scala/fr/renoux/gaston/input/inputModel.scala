@@ -48,6 +48,8 @@ case class InputTableSettings(
     personsCountAdd: Int,
     /* Index for one mandatory's person' name */
     mandatoryPersonIndex: Int,
+    /* Index for the count of occurrences of a topic */
+    topicOccurrenceCountIndex: Option[Int],
     /* If a person is mandatory on one topic, his preferences will weight more on other topics (as a reward). Should be
      higher than one. */
     mandatoryPersonRewardWeight: Weight,
@@ -67,8 +69,12 @@ case class InputTopic(
     name: String,
     min: Option[Int],
     max: Option[Int],
+    occurrences: Option[Int] = None,
     slots: Option[Set[String]] = None
-)
+) {
+  /** Occurrence needs to be an Option to not appear when not needed */
+  lazy val forcedOccurrences: Int = occurrences.getOrElse(1)
+}
 
 case class InputPerson(
     name: String,

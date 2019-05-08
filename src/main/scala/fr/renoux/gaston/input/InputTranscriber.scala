@@ -20,7 +20,13 @@ object InputTranscriber {
     val slotSequences = input.slots.map(_.map(s => Slot(s.name)))
     val slotSet = slotSequences.flatten.toSet
     val slotsPerName = slotSet.map(s => s.name -> s).toMap
-    val topicsPerName = input.topics.map { t => t.name -> Topic(t.name) }.toMap
+    val topicsPerName = input.topics.map { inTopic =>
+      inTopic.forcedOccurrences match {
+        case 1 => inTopic.name -> Set(Topic(inTopic.name))
+        case c if c > 0 => inTopic.name -> (1 to c).toSet[Int].map(i => Topic(s"${inTopic.name} $i"))
+        case _ => throw new IllegalArgumentException("Can't have a negative number of occurrences") //TODO use Refined instead
+      }
+    }.toMap
     val personsPerName = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
 
@@ -51,7 +57,8 @@ object InputTranscriber {
       getObligationConstraints(input, ctx) ++
       getNumberConstraints(input, ctx) ++
       getSimultaneousTopicsConstraints(input, ctx) ++
-      getExclusiveTopicsConstraints(input, ctx)
+      getExclusiveTopicsConstraints(input, ctx) ++
+      getExclusiveOccurrencesConstraints(input, ctx)
 
     val preferences = Set[Preference]() ++
       getGroupAntiPreferences(input, ctx) ++
@@ -59,7 +66,7 @@ object InputTranscriber {
 
     new ProblemImpl(
       slotSequences,
-      topicsPerName.values.toSet ++ nothingTopics.toSet,
+      topicsPerName.values.flatten.toSet ++ nothingTopics.toSet,
       personsPerName.values.toSet,
       constraints ++ nothingTopicsConstraints.toSet,
       preferences ++ nothingTopicsPreferences.toSet
@@ -78,12 +85,13 @@ object InputTranscriber {
       ip.absences.map(ctx.slotsPerName).map(PersonAbsence(ctx.personsPerName(ip.name), _))
     }
 
-  private def getForcedSlotConstraints(input: InputModel, ctx: Context): Set[TopicForcedSlot] =
-    input.topics.collect {
+  private def getForcedSlotConstraints(input: InputModel, ctx: Context) =
+    input.topics.flatMap {
       case inTopic if inTopic.slots.nonEmpty =>
-        val topic = ctx.topicsPerName(inTopic.name)
+        val topics = ctx.topicsPerName(inTopic.name)
         val slots = inTopic.slots.get.map(ctx.slotsPerName)
-        TopicForcedSlot(topic, slots)
+        topics.map(TopicForcedSlot(_, slots))
+      case _ => Set.empty[TopicForcedSlot]
     }
 
   private def getInterdictionConstraints(input: InputModel, ctx: Context): Set[PersonTopicInterdiction] =
@@ -91,7 +99,7 @@ object InputTranscriber {
       ip <- input.persons
       person = ctx.personsPerName(ip.name)
       topicName <- ip.forbidden
-      topic = ctx.topicsPerName(topicName)
+      topic <- ctx.topicsPerName(topicName)
     } yield PersonTopicInterdiction(person, topic)
 
 
@@ -100,25 +108,33 @@ object InputTranscriber {
       ip <- input.persons
       person = ctx.personsPerName(ip.name)
       topicName <- ip.mandatory
-      topic = ctx.topicsPerName(topicName)
+      topic <- ctx.topicsPerName(topicName)
     } yield PersonTopicObligation(person, topic)
 
   private def getNumberConstraints(input: InputModel, ctx: Context): Set[TopicNeedsNumberOfPersons] =
     for {
       inTopic <- input.topics
-      topic = ctx.topicsPerName(inTopic.name)
+      topic <- ctx.topicsPerName(inTopic.name)
       min = inTopic.min.getOrElse(input.settings.defaultMinPersonsPerTopic)
       max = inTopic.max.getOrElse(input.settings.defaultMaxPersonsPerTopic)
     } yield TopicNeedsNumberOfPersons(topic, min, max)
 
   private def getSimultaneousTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsSimultaneous] =
     input.constraints.map(_.simultaneous).getOrElse(Set()).map { inConstraint =>
-      TopicsSimultaneous(inConstraint.topics.map(ctx.topicsPerName))
+      //TODO Better handling of simultaneous and multiple, should at least return an error
+      TopicsSimultaneous(inConstraint.topics.map(ctx.topicsPerName(_).head))
     }
 
   private def getExclusiveTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsExclusive] =
     input.constraints.map(_.exclusive).getOrElse(Set()).map { inConstraint =>
-      TopicsExclusive(inConstraint.topics.map(ctx.topicsPerName), inConstraint.exemptions.map(ctx.personsPerName))
+      TopicsExclusive(inConstraint.topics.flatMap(ctx.topicsPerName), inConstraint.exemptions.map(ctx.personsPerName))
+    }
+
+  private def getExclusiveOccurrencesConstraints(input: InputModel, ctx: Context): Set[TopicsExclusive] =
+    input.topics.filter(_.forcedOccurrences > 1).map { inTopic =>
+      val topics = ctx.topicsPerName(inTopic.name)
+      val mandatories = input.persons.filter(_.mandatory.contains(inTopic.name)).map(ip => ctx.personsPerName(ip.name))
+      TopicsExclusive(topics, mandatories)
     }
 
   private def getGroupAntiPreferences(input: InputModel, ctx: Context): Set[PersonGroupAntiPreference] =
@@ -139,13 +155,13 @@ object InputTranscriber {
       totalInputScore = inPerson.wishes.values.sum.value
       scoreFactor = Score.PersonTotalScore.value / totalInputScore
       inWish <- inPerson.wishes
-      topic = ctx.topicsPerName(inWish._1)
+      topic <- ctx.topicsPerName(inWish._1)
     } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
 
   private case class Context(
       slotsPerName: Map[String, Slot],
-      topicsPerName: Map[String, Topic],
+      topicsPerName: Map[String, Set[Topic]],
       personsPerName: Map[String, Person]
   )
 
