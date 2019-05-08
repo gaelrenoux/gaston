@@ -37,8 +37,9 @@ class ComplexTestModel(seed: Long) {
   }
 
   object Slots {
-    private val slotNames = Set("d1 am", "d1 pm", "d2 am", "d2 pm", "d3 am", "d3 pm")
-    val All: Set[Slot] = slotNames.map(Slot)
+    private val slotNames = Seq(Seq("d1 am", "d1 pm"), Seq("d2 am", "d2 pm"), Seq("d3 am", "d3 pm"))
+    val AllSequence: Seq[Seq[Slot]] = slotNames.map(_.map(Slot))
+    val AllSet: Set[Slot] = AllSequence.flatten.toSet
   }
 
   object Constraints {
@@ -80,7 +81,7 @@ class ComplexTestModel(seed: Long) {
 
   object Problems {
     val Complete: Problem = {
-      val p = new ProblemImpl(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = new ProblemImpl(Slots.AllSequence, Topics.All, Persons.All, Constraints.All, Preferences.All)
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }

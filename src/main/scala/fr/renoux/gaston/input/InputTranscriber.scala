@@ -15,7 +15,9 @@ object InputTranscriber {
     //TODO better validation !
     val input: InputModel = inputRoot.gaston
 
-    val slotsPerName = input.slots.map { s => s.name -> Slot(s.name) }.toMap
+    val slotSequences = input.slots.map(_.map(s => Slot(s.name)))
+    val slotSet = slotSequences.flatten.toSet
+    val slotsPerName = slotSet.map(s => s.name -> s).toMap
     val topicsPerName = input.topics.map { t => t.name -> Topic(t.name) }.toMap
     val personsPerName = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
@@ -35,7 +37,7 @@ object InputTranscriber {
       getPersonTopicPreferences(input, ctx)
 
     new ProblemImpl(
-      slotsPerName.values.toSet,
+      slotSequences,
       topicsPerName.values.toSet,
       personsPerName.values.toSet,
       constraints,
@@ -44,7 +46,7 @@ object InputTranscriber {
   }
 
   private def getSlotMaxesConstraints(input: InputModel, ctx: Context): Set[SlotMaxTopicCount] =
-    input.slots.flatMap { inSlot =>
+    input.slots.flatten.toSet[InputSlot].flatMap { inSlot =>
       val slot = ctx.slotsPerName(inSlot.name)
       val maxOption = inSlot.maxTopics orElse input.settings.defaultMaxTopicsPerSlot
       maxOption.map(SlotMaxTopicCount(slot, _))

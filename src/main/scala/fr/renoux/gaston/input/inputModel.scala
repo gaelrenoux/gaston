@@ -11,7 +11,7 @@ case class InputRoot(
 case class InputModel(
     settings: InputSettings,
     tableSettings: Option[InputTableSettings],
-    slots: Set[InputSlot],
+    slots: Seq[Seq[InputSlot]],
     persons: Set[InputPerson],
     topics: Set[InputTopic],
     constraints: Option[InputGlobalConstraints] = None

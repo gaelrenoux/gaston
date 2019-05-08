@@ -4,6 +4,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 trait Problem {
+  val slotSequences: Seq[Seq[Slot]]
   val slots: Set[Slot]
   val topics: Set[Topic]
   val persons: Set[Person]

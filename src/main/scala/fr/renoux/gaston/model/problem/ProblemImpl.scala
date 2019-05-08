@@ -7,12 +7,14 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
 class ProblemImpl(
-    val slots: Set[Slot],
+    val slotSequences: Seq[Seq[Slot]],
     val topics: Set[Topic],
     val persons: Set[Person],
     val constraints: Set[Constraint],
     val preferences: Set[Preference]
 ) extends Problem {
+
+  val slots: Set[Slot] = slotSequences.flatten.toSet
 
   lazy val personsCount: Int = persons.size
 

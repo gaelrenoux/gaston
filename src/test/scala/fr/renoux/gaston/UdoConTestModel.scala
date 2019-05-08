@@ -165,7 +165,7 @@ object UdoConTestModel {
     val D2Evening = Slot("D2-evening")
     val D3Afternoon = Slot("D3-afternoon")
 
-    val All: Set[Slot] = Set(D1Afternoon, D1Evening, D2Afternoon, D2Evening, D3Afternoon)
+    val All: Seq[Seq[Slot]] = Seq(Seq(D1Afternoon, D1Evening), Seq(D2Afternoon, D2Evening), Seq(D3Afternoon))
   }
 
   object Constraints {

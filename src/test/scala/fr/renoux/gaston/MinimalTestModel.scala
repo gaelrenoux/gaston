@@ -34,7 +34,7 @@ object MinimalTestModel {
     val Evening = Slot("evening")
     val Night = Slot("night")
 
-    val All: Set[Slot] = Set(Morning, AfterNoon, Evening, Night)
+    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening, Night))
   }
 
   object Problems {

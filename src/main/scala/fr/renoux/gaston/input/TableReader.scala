@@ -33,8 +33,12 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
     val cellsPersonsRow = cells(tableSettings.personsRow)
     val cellsWithContent = cells.drop(tableSettings.otherHeaderRowsCount + 1)
 
-    /* Slots are generated */
-    val slots: Set[InputSlot] = Set[InputSlot](InputSlot("Day1", maxTopics = Some(4)), InputSlot("Day2")) //sample Slots
+    /* Slots are sample slots, generated */
+    val slots = Seq(
+      Seq(InputSlot("Day1-afternoon"), InputSlot("Day1-evening", maxTopics = Some(4))),
+      Seq(InputSlot("Day2-afternoon"))
+    )
+
 
     /* Topics. Keep the order to zip with the choices later */
     val topicsSeq: Seq[InputTopic] =

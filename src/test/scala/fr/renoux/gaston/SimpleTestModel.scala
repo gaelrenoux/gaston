@@ -43,7 +43,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val Morning = Slot("morning")
     val AfterNoon = Slot("afternoon")
     val Evening = Slot("evening")
-    val All: Set[Slot] = Set(Morning, AfterNoon, Evening)
+    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
   }
 
   object Constraints {
