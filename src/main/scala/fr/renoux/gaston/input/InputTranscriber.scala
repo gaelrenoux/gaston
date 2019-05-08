@@ -46,10 +46,10 @@ object InputTranscriber {
     val constraints = Set[Constraint]() ++
       getSlotMaxesConstraints(input, ctx) ++
       getAbsenceConstraints(input, ctx) ++
+      getForcedSlotConstraints(input, ctx) ++
       getInterdictionConstraints(input, ctx) ++
       getObligationConstraints(input, ctx) ++
       getNumberConstraints(input, ctx) ++
-      getForcedTopicConstraints(input, ctx) ++
       getSimultaneousTopicsConstraints(input, ctx) ++
       getExclusiveTopicsConstraints(input, ctx)
 
@@ -78,6 +78,14 @@ object InputTranscriber {
       ip.absences.map(ctx.slotsPerName).map(PersonAbsence(ctx.personsPerName(ip.name), _))
     }
 
+  private def getForcedSlotConstraints(input: InputModel, ctx: Context): Set[TopicForcedSlot] =
+    input.topics.collect {
+      case inTopic if inTopic.slots.nonEmpty =>
+        val topic = ctx.topicsPerName(inTopic.name)
+        val slots = inTopic.slots.get.map(ctx.slotsPerName)
+        TopicForcedSlot(topic, slots)
+    }
+
   private def getInterdictionConstraints(input: InputModel, ctx: Context): Set[PersonTopicInterdiction] =
     for {
       ip <- input.persons
@@ -102,14 +110,6 @@ object InputTranscriber {
       min = inTopic.min.getOrElse(input.settings.defaultMinPersonsPerTopic)
       max = inTopic.max.getOrElse(input.settings.defaultMaxPersonsPerTopic)
     } yield TopicNeedsNumberOfPersons(topic, min, max)
-
-  private def getForcedTopicConstraints(input: InputModel, maps: Context): Set[TopicForcedSlot] =
-    input.topics.flatMap { inTopic =>
-      inTopic.slots.map { slots =>
-        val ss = slots.map(maps.slotsPerName)
-        TopicForcedSlot(maps.topicsPerName(inTopic.name), ss)
-      }
-    }
 
   private def getSimultaneousTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsSimultaneous] =
     input.constraints.map(_.simultaneous).getOrElse(Set()).map { inConstraint =>
