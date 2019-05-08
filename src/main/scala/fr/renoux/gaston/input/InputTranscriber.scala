@@ -75,12 +75,12 @@ object InputTranscriber {
     } yield PersonTopicObligation(person, topic)
 
   private def getNumberConstraints(input: InputModel, ctx: Context): Set[TopicNeedsNumberOfPersons] =
-    input.topics.map { inTopic =>
-      val topic = ctx.topicsPerName(inTopic.name)
-      val min = inTopic.min.getOrElse(input.settings.defaultMinPersonsPerTopic)
-      val max = inTopic.max.getOrElse(input.settings.defaultMaxPersonsPerTopic)
-      TopicNeedsNumberOfPersons(topic, min, max)
-    }
+    for {
+      inTopic <- input.topics
+      topic = ctx.topicsPerName(inTopic.name)
+      min = inTopic.min.getOrElse(input.settings.defaultMinPersonsPerTopic)
+      max = inTopic.max.getOrElse(input.settings.defaultMaxPersonsPerTopic)
+    } yield TopicNeedsNumberOfPersons(topic, min, max)
 
   private def getForcedTopicConstraints(input: InputModel, maps: Context): Set[TopicForcedSlot] =
     input.topics.flatMap { inTopic =>
