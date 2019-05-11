@@ -1,8 +1,20 @@
 package fr.renoux.gaston.model
 
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
-  * whatever. */
-case class Topic(name: String) extends AnyVal {
+  * whatever.
+  * @param movable Can the topic be moved to another slot than the one it is on ?
+  * @param removable Can the topic be removed from the schedule ?
+  * */
+case class Topic(
+    name: String,
+    mandatory: Set[Person] = Set(),
+    forbidden: Set[Person] = Set(),
+    movable: Boolean = true,
+    removable: Boolean = true
+) {
+
+  /** Create a series of duplicates for this Topic (for multi-occurrence topics) */
+  def duplicates(count: Int): Set[Topic] = (1 to count).toSet[Int].map(i => copy(name = s"$name $i"))
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
@@ -11,8 +23,8 @@ case class Topic(name: String) extends AnyVal {
 object Topic {
 
   /** Topics for people assigned to doing nothing. */
-  def nothing(slot: Slot) = Topic(s"Nothing (${slot.name})")
+  def nothing(slot: Slot) = Topic(s"Nothing (${slot.name})", movable = false)
 
   /** Topics for people not assigned yet on some slot. */
-  def unassigned(slot: Slot) = Topic(s"[${slot.name}]")
+  def unassigned(slot: Slot) = Topic(s"[${slot.name}]", movable = false, removable = false)
 }

@@ -33,7 +33,7 @@ class ComplexTestModel(seed: Long) {
     private val topicNames = Set("alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota",
       "kappa", "lambda", "mu", "nu", "ksi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "khi", "psi",
       "omega")
-    val All: Set[Topic] = topicNames.map(Topic.apply)
+    val All: Set[Topic] = topicNames.map(Topic(_))
     val Bases: Set[Topic] = Slots.AllSet.map(s => Topic.unassigned(s))
   }
 
