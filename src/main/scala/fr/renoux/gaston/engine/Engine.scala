@@ -8,7 +8,9 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 class Engine(
-    problem: Problem
+    problem: Problem,
+    stopAtScore: Double = Double.MaxValue,
+    maxImprovementRounds: Int = 1000
 ) {
 
   import Engine._
@@ -51,9 +53,13 @@ class Engine(
 
   /** Improve the schedule by trying swap after swap of topics. */
   @tailrec
-  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 10)(implicit rand: Random, tools: Tools): ScoredSchedule =
+  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = maxImprovementRounds)
+    (implicit rand: Random, tools: Tools): ScoredSchedule =
     if (maxRound == 0) {
       log.warn(s"HeavyImprove could not do its best (score is ${schedule.score})")
+      schedule
+    } else if (schedule.score.value >= stopAtScore) {
+      log.info(s"HeavyImprove stopped because expected score has been reached (score is ${schedule.score})")
       schedule
     } else heavyImprovement(schedule, previousMove) match {
       case None =>
@@ -70,6 +76,26 @@ class Engine(
   private def heavyImprovement(scoredSchedule: ScoredSchedule, previousMove: Move)
     (implicit rand: Random, tools: Tools): Option[(ScoredSchedule, Move)] = {
     val ScoredSchedule(schedule, score) = scoredSchedule
+
+    /* Add an unscheduled topic */
+    val allAdds = for {
+      slot <- shuffled(problem.slots).view
+      topic <- shuffled(schedule.unscheduledTopics).view
+      move = Move.Add(slot, topic)
+      if !move.reverts(previousMove)
+
+      /* Filter out impossible adds because of mandatory persons */
+      mandatoryPersonsNewTopic = problem.mandatoryPersonsPerTopic(topic)
+      mandatoryPersonsSlot = schedule.mandatoryPersonsOnSlot(slot)
+      if !mandatoryPersonsNewTopic.exists(mandatoryPersonsSlot)
+
+      /* Generate the swap */
+      partial = schedule.clearSlots(slot).add(Record(slot, topic, mandatoryPersonsNewTopic))
+      if partial.isPartialSolution
+
+      /* Filter out impossible adds because of unreachable minimum */
+      if partial.minPersonsOnSlot(slot) <= problem.personsCountPerSlot(slot)
+    } yield (partial, move)
 
     /* Swap topics between two scheduled topics */
     val allSwaps = for {
@@ -109,27 +135,6 @@ class Engine(
       /* Generate the swap */
       partial = schedule.clearSlots(slot).replaceTopic(oldT, newT)
       if partial.isPartialSolution
-    } yield (partial, move)
-
-
-    /* Add an unscheduled topic */
-    val allAdds = for {
-      slot <- shuffled(problem.slots).view
-      topic <- shuffled(schedule.unscheduledTopics).view
-      move = Move.Add(slot, topic)
-      if !move.reverts(previousMove)
-
-      /* Filter out impossible adds because of mandatory persons */
-      mandatoryPersonsNewTopic = problem.mandatoryPersonsPerTopic(topic)
-      mandatoryPersonsSlot = schedule.mandatoryPersonsOnSlot(slot)
-      if !mandatoryPersonsNewTopic.exists(mandatoryPersonsSlot)
-
-      /* Generate the swap */
-      partial = schedule.clearSlots(slot).add(Record(slot, topic, mandatoryPersonsNewTopic))
-      if partial.isPartialSolution
-
-      /* Filter out impossible adds because of unreachable minimum */
-      if partial.minPersonsOnSlot(slot) <= problem.personsCountPerSlot(slot)
     } yield (partial, move)
 
 

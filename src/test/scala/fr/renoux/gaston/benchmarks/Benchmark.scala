@@ -54,7 +54,7 @@ class Benchmark extends FlatSpec with Matchers {
     val start = System.currentTimeMillis()
 
     val output = new Output
-    val engine = new Engine(problem)
+    val engine = new Engine(problem, stopAtScore = expectsScore)
 
     def printer(ss: ScoredSchedule, count: Long): Unit = if (verbose) {
       val time = (System.currentTimeMillis() - start) / 1000
