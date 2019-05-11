@@ -3,6 +3,7 @@ package fr.renoux.gaston.model.preferences
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.OptionImplicits._
 
+/** Might be an anti-preference if the person really doesn't want to. */
 case class PersonTopicPreference(
     person: Person,
     topic: Topic,

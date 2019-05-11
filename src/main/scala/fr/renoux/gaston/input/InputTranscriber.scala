@@ -2,7 +2,7 @@ package fr.renoux.gaston.input
 
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.problem.ProblemImpl
 import scalaz.Validation
 import scalaz.syntax.validation._
@@ -53,16 +53,16 @@ object InputTranscriber {
       getSlotMaxesConstraints(input, ctx) ++
       getAbsenceConstraints(input, ctx) ++
       getForcedSlotConstraints(input, ctx) ++
-      getInterdictionConstraints(input, ctx) ++
       getObligationConstraints(input, ctx) ++
       getNumberConstraints(input, ctx) ++
-      getSimultaneousTopicsConstraints(input, ctx) ++
-      getExclusiveTopicsConstraints(input, ctx) ++
-      getExclusiveOccurrencesConstraints(input, ctx)
+      getSimultaneousTopicsConstraints(input, ctx)
 
     val preferences = Set[Preference]() ++
       getGroupAntiPreferences(input, ctx) ++
-      getPersonTopicPreferences(input, ctx)
+      getPersonTopicPreferences(input, ctx) ++
+      getInterdictionPreferences(input, ctx) ++
+      getExclusiveTopicsPreferences(input, ctx) ++
+      getExclusiveOccurrencesPreferences(input, ctx)
 
     new ProblemImpl(
       slotSequences,
@@ -94,14 +94,13 @@ object InputTranscriber {
       case _ => Set.empty[TopicForcedSlot]
     }
 
-  private def getInterdictionConstraints(input: InputModel, ctx: Context): Set[PersonTopicInterdiction] =
+  private def getInterdictionPreferences(input: InputModel, ctx: Context): Set[PersonTopicPreference] =
     for {
       ip <- input.persons
       person = ctx.personsPerName(ip.name)
       topicName <- ip.forbidden
       topic <- ctx.topicsPerName(topicName)
-    } yield PersonTopicInterdiction(person, topic)
-
+    } yield PersonTopicPreference(person, topic, Score.PersonTotalScore.negative)
 
   private def getObligationConstraints(input: InputModel, ctx: Context): Set[PersonTopicObligation] =
     for {
@@ -125,16 +124,16 @@ object InputTranscriber {
       TopicsSimultaneous(inConstraint.topics.map(ctx.topicsPerName(_).head))
     }
 
-  private def getExclusiveTopicsConstraints(input: InputModel, ctx: Context): Set[TopicsExclusive] =
+  private def getExclusiveTopicsPreferences(input: InputModel, ctx: Context): Set[TopicsExclusive] =
     input.constraints.map(_.exclusive).getOrElse(Set()).map { inConstraint =>
-      TopicsExclusive(inConstraint.topics.flatMap(ctx.topicsPerName), inConstraint.exemptions.map(ctx.personsPerName))
+      TopicsExclusive(inConstraint.topics.flatMap(ctx.topicsPerName), inConstraint.exemptions.map(ctx.personsPerName), Score.PersonTotalScore.negative * 100)
     }
 
-  private def getExclusiveOccurrencesConstraints(input: InputModel, ctx: Context): Set[TopicsExclusive] =
-    input.topics.filter(_.forcedOccurrences > 1).map { inTopic =>
+  private def getExclusiveOccurrencesPreferences(input: InputModel, ctx: Context): Set[TopicsExclusive] =
+    input.topics.filter(_.occurrences.exists(_ > 1)).map { inTopic =>
       val topics = ctx.topicsPerName(inTopic.name)
       val mandatories = input.persons.filter(_.mandatory.contains(inTopic.name)).map(ip => ctx.personsPerName(ip.name))
-      TopicsExclusive(topics, mandatories)
+      TopicsExclusive(topics, mandatories, Score.PersonTotalScore.negative * 100)
     }
 
   private def getGroupAntiPreferences(input: InputModel, ctx: Context): Set[PersonGroupAntiPreference] =

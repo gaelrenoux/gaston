@@ -123,41 +123,6 @@ class ConstraintsSpec extends FlatSpec with Matchers {
     ) should be(true)
   }
 
-
-  behavior of "TopicsExclusive"
-  val cannotLeadAndPartyExceptLeo = TopicsExclusive(Set(Leading, Party), Set(Leonardo))
-
-  it should "break if a person does both on different slots" in {
-    cannotLeadAndPartyExceptLeo.isRespected(scheduled(Morning, Leading, Donatello, Michelangelo) ++
-      scheduled(AfterNoon, Party, Raphael, Michelangelo)
-    ) should be(false)
-  }
-
-  it should "break if a person does both on different slots with another exempted person" in {
-    cannotLeadAndPartyExceptLeo.isRespected(scheduled(Morning, Leading, Donatello, Michelangelo, Leonardo) ++
-      scheduled(AfterNoon, Party, Raphael, Michelangelo, Leonardo)
-    ) should be(false)
-  }
-
-  it should "not break if no one does both" in {
-    cannotLeadAndPartyExceptLeo.isRespected(scheduled(Morning, Leading, Donatello, Michelangelo) ++
-      scheduled(AfterNoon, Party, Raphael)
-    ) should be(true)
-  }
-
-  it should "not break if an exempted person does both" in {
-    cannotLeadAndPartyExceptLeo.isRespected(scheduled(Morning, Leading, Donatello, Leonardo) ++
-      scheduled(AfterNoon, Party, Raphael, Leonardo, Michelangelo)
-    ) should be(true)
-  }
-
-  it should "break if a person does two out of three" in {
-    TopicsExclusive(Set(Leading, Party, Machines)).isRespected(scheduled(Morning, Leading, Leonardo, Michelangelo) ++
-      scheduled(AfterNoon, Party, Raphael, Michelangelo) ++ scheduled(Evening, Machines, Donatello)
-    ) should be(false)
-  }
-
-
   behavior of "TopicForcedSlot"
   val partyMustBeEveningOrNight = TopicForcedSlot(Party, Set(Evening, Night))
 

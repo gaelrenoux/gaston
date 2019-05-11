@@ -35,4 +35,6 @@ object Preference {
     def scoreSlot(schedule: SlotSchedule): Score
   }
 
+  val NecessaryPreferenceScore: Score = Score.PersonTotalScore.negative * 100
+
 }

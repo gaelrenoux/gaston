@@ -5,7 +5,7 @@ import java.io.File
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.PersonTopicPreference
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import org.scalatest.{FlatSpec, Matchers}
 
 class InputSpec extends FlatSpec with Matchers {
@@ -55,13 +55,11 @@ class InputSpec extends FlatSpec with Matchers {
       SlotMaxTopicCount(Slot("A"), 4),
       SlotMaxTopicCount(Slot("B"), 5),
       PersonTopicObligation(Person("bernard", Weight(1.0)), Topic("alpha")),
-      PersonTopicInterdiction(Person("laverne"), Topic("beta")),
       TopicNeedsNumberOfPersons(Topic("alpha"), 5, 5),
       TopicNeedsNumberOfPersons(Topic("gamma"), 4, 6),
       TopicNeedsNumberOfPersons(Topic("beta"), 4, 5),
       TopicForcedSlot(Topic("beta"), Set(Slot("A"))),
       TopicsSimultaneous(Set(Topic("alpha"), Topic("beta"))),
-      TopicsExclusive(Set(Topic("beta"), Topic("gamma")), Set(Person("laverne"))),
     ))
   }
 
@@ -70,7 +68,9 @@ class InputSpec extends FlatSpec with Matchers {
     minimalProblem.preferences should be(Set(
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("alpha"), Score(scalingFactor * 5.0)),
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(scalingFactor * 1.0)),
-      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("gamma"), Score(scalingFactor * 1.0))
+      PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("gamma"), Score(scalingFactor * 1.0)),
+      PersonTopicPreference(Person("laverne", Weight(1.0)), Topic("beta"), Score.PersonTotalScore.negative),
+      TopicsExclusive(Set(Topic("beta"), Topic("gamma")), Set(Person("laverne")))
     ))
   }
 
