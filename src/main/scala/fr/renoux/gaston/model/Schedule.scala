@@ -165,6 +165,8 @@ case class Schedule(
       }
     }
 
+    builder.append(unscheduledTopics.mkString("Unscheduled topics: ", ", ", "\n"))
+
     builder.toString
   }
 

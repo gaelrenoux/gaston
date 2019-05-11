@@ -94,7 +94,7 @@ class PartialScheduleFiller(val problem: Problem) {
     (topicsNeedingMin: List[(Topic, Int)], topicsOpenToMax: List[(Topic, Int)], personsLeft: List[Person], personsSkipped: List[Person], topicsOpenToMaxDelayed: List[(Topic, Int)]): Option[Schedule] =
     (topicsNeedingMin, topicsOpenToMax, personsLeft) match {
       case (Nil, _, Nil) if personsSkipped.isEmpty =>
-        log.debug("Finishing backtrackAssignPersonsToTopics because we have no more persons and all topics have their min numbers")
+        log.trace("Finishing backtrackAssignPersonsToTopics because we have no more persons and all topics have their min numbers")
         Some(partialSchedule) // no more persons left and min numbers all reached !
 
       case (_, _, Nil) =>
