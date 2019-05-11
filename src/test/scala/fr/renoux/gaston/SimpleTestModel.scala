@@ -13,6 +13,13 @@ class SimpleTestModel(implicit settings: InputSettings) {
   private val strongPreference = Score(5)
   private val weakPreference = Score(1)
 
+  object Slots {
+    val Morning = Slot("morning")
+    val AfterNoon = Slot("afternoon")
+    val Evening = Slot("evening")
+    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
+  }
+
   object Persons {
     val Arthur = Person("Arthur")
     val Bianca = Person("Bianca")
@@ -27,6 +34,10 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Topics {
+    val BaseMorning: Topic = Topic.unassigned(Slots.Morning)
+    val BaseAfternoon: Topic = Topic.unassigned(Slots.AfterNoon)
+    val BaseEvening: Topic = Topic.unassigned(Slots.Evening)
+
     val Acting = Topic("Acting")
     val Bathing = Topic("Bathing")
     val Cooking = Topic("Cooking")
@@ -36,14 +47,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val Grinding = Topic("Grinding")
     val Helping = Topic("Helping")
     val Inking = Topic("Inking")
+    val Bases = Set(BaseMorning, BaseAfternoon, BaseEvening)
     val All: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
-  }
-
-  object Slots {
-    val Morning = Slot("morning")
-    val AfterNoon = Slot("afternoon")
-    val Evening = Slot("evening")
-    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
   }
 
   object Constraints {
@@ -76,8 +81,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val IagoNotInTheAfterNoon = PersonAbsence(Iago, AfterNoon)
     val ArthurNotInTheEvening = PersonAbsence(Arthur, Evening)
 
-    val DefaultMinMaxes: Set[TopicNeedsNumberOfPersons] = Topics.All
-      .map(TopicNeedsNumberOfPersons(_, min = 2, max = 5))
+    val DefaultMinMaxes: Set[TopicNeedsNumberOfPersons] =
+      Topics.Bases.map(TopicNeedsNumberOfPersons(_, min = 0, max = 5000)) ++
+        Topics.All.map(TopicNeedsNumberOfPersons(_, min = 2, max = 5))
 
     val BathingAndEatingAreSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
 
@@ -145,7 +151,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
-    val Complete = new ProblemImpl(Slots.All, Topics.All, Persons.All, Constraints.All, Preferences.All)
+    val Complete = new ProblemImpl(Slots.All, Topics.Bases ++ Topics.All, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

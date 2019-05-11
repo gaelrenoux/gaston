@@ -30,6 +30,21 @@ object InputTranscriber {
     val personsPerName = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
     val ctx = Context(slotsPerName, topicsPerName, personsPerName)
 
+    val (startingTopics, startingTopicsConstraints, startingTopicsPreferences) = {
+      val dummies = slotsPerName.values.map { s =>
+        val topic = Topic.unassigned(s)
+        val countConstraint = TopicNeedsNumberOfPersons(topic, 0, personsPerName.size)
+        val slotConstraint = TopicForcedSlot(topic, Set(s))
+        val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
+        (topic, Set(slotConstraint, countConstraint), antiPreferences)
+      }
+
+      val topics = dummies.map(_._1)
+      val constraints = dummies.flatMap(_._2)
+      val preferences = dummies.flatMap(_._3)
+      (topics, constraints, preferences)
+    }
+
     val (nothingTopics, nothingTopicsConstraints, nothingTopicsPreferences) =
       if (input.settings.maxPersonsOnNothing <= 0 || input.settings.maxPersonsOnNothing < input.settings.minPersonsOnNothing) {
         (Set.empty[Topic], Set.empty[Constraint], Set.empty[Preference])
@@ -66,10 +81,10 @@ object InputTranscriber {
 
     new ProblemImpl(
       slotSequences,
-      topicsPerName.values.flatten.toSet ++ nothingTopics.toSet,
+      topicsPerName.values.flatten.toSet ++ startingTopics.toSet ++ nothingTopics.toSet,
       personsPerName.values.toSet,
-      constraints ++ nothingTopicsConstraints.toSet,
-      preferences ++ nothingTopicsPreferences.toSet
+      constraints ++ startingTopicsConstraints.toSet ++ nothingTopicsConstraints.toSet,
+      preferences ++ startingTopicsPreferences.toSet ++ nothingTopicsPreferences.toSet
     ).success
   }
 

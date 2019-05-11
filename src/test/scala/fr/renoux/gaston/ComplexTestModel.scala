@@ -34,6 +34,7 @@ class ComplexTestModel(seed: Long) {
       "kappa", "lambda", "mu", "nu", "ksi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "khi", "psi",
       "omega")
     val All: Set[Topic] = topicNames.map(Topic.apply)
+    val Bases: Set[Topic] = Slots.AllSet.map(s => Topic.unassigned(s))
   }
 
   object Slots {
@@ -61,7 +62,10 @@ class ComplexTestModel(seed: Long) {
       initial -- toRemove ++ toAdd
     }
 
+    val BasesForced: Set[Constraint] = Slots.AllSet.map { s => TopicForcedSlot(Topic.unassigned(s), Set(s)) }
+
     val All: Set[Constraint] = Obligations ++ Interdictions ++ Absences ++ Numbers
+    val Bases: Set[Constraint] = BasesForced
   }
 
   object Preferences {
@@ -77,11 +81,16 @@ class ComplexTestModel(seed: Long) {
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"),
     // Topic("sigma"), Score(100))
+
+    val Bases: Set[Preference] = for {
+      t <- Topics.Bases
+      p <- Persons.All
+    } yield PersonTopicPreference(p, t, Score.PersonTotalScore.negative)
   }
 
   object Problems {
     val Complete: Problem = {
-      val p = new ProblemImpl(Slots.AllSequence, Topics.All, Persons.All, Constraints.All, Preferences.All)
+      val p = new ProblemImpl(Slots.AllSequence, Topics.All ++ Topics.Bases, Persons.All, Constraints.All ++ Constraints.Bases, Preferences.All ++ Preferences.Bases)
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }

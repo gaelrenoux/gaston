@@ -11,7 +11,7 @@ import scala.util.Random
   */
 class PartialScheduleFiller(val problem: Problem) {
 
-  private val log = Logger[PartialSchedulesGenerator]
+  private val log = Logger[PartialScheduleFiller]
 
   /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
     * schedule respecting all constraints. Returns None if such a schedule cannot be constructed (e.g. too many people

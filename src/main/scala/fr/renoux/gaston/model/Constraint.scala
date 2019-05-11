@@ -2,7 +2,9 @@ package fr.renoux.gaston.model
 
 /**
   * Mandatory constraint on the solution. Constraints should implement [[equals()]] and [[hashCode()]] to allow
-  * deduplication.
+  * deduplication. Constraints are only the stuff that are integral in constructing the solution, not additional
+  * constraints such as people not wanting to play some game (those are handled as "soft" constraint, preferences with a
+  * heavy cost).
   */
 trait Constraint {
 

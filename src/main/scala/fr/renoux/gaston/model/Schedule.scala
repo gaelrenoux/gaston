@@ -175,5 +175,14 @@ object Schedule {
   /** Empty schedule for a problem */
   def empty(implicit problem: Problem): Schedule = Schedule()
 
+  /** Schedule where everyone is on an "unassigned" topic */
+  def everyoneUnassigned(implicit problem: Problem): Schedule = {
+    Schedule(
+      problem.slots.map { s =>
+        Record(s, Topic.unassigned(s), problem.personsPerSlot(s))
+      }
+    )
+  }
+
   def apply(entries: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(entries.flatten.toSet)
 }

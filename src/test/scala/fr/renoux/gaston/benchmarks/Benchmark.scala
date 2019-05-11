@@ -21,15 +21,7 @@ class Benchmark extends FlatSpec with Matchers {
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
 
-  "Systematic improver" should "give an okay score" ignore {
-    benchmark(
-      improver = new ExhaustiveScheduleImprover(_),
-      duration = 2.minutes,
-      expectsScore = 500
-    )
-  }
-
-  behavior of "Fast improver"
+  behavior of "Engine"
 
   //TODO needs the recHeavy improvement to be limited, in order to finish in time
 
@@ -56,14 +48,13 @@ class Benchmark extends FlatSpec with Matchers {
       expectsCount: Long = 0,
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing,
-      verbose: Boolean = true,
-      improver: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
-  ) = {
+      verbose: Boolean = true
+  ): Unit = {
     implicit val tools: Tools = Tools(new Chrono)
     val start = System.currentTimeMillis()
 
     val output = new Output
-    val engine = new Engine(problem, improver)
+    val engine = new Engine(problem)
 
     def printer(ss: ScoredSchedule, count: Long): Unit = if (verbose) {
       val time = (System.currentTimeMillis() - start) / 1000

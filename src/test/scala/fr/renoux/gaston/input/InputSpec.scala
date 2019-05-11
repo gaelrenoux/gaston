@@ -42,7 +42,7 @@ class InputSpec extends FlatSpec with Matchers {
   }
 
   it should "contain the correct topics" in {
-    minimalProblem.topics should be(Set(Topic("alpha"), Topic("beta"), Topic("gamma")))
+    minimalProblem.topics should be(Set(Topic.unassigned(Slot("A")), Topic.unassigned(Slot("B")), Topic("alpha"), Topic("beta"), Topic("gamma")))
   }
 
   it should "contain the correct persons" in {
@@ -54,6 +54,10 @@ class InputSpec extends FlatSpec with Matchers {
     minimalProblem.constraints should be(Set(
       SlotMaxTopicCount(Slot("A"), 4),
       SlotMaxTopicCount(Slot("B"), 5),
+      TopicForcedSlot(Topic.unassigned(Slot("A")),Set(Slot("A"))),
+      TopicForcedSlot(Topic.unassigned(Slot("B")),Set(Slot("B"))),
+      TopicNeedsNumberOfPersons(Topic.unassigned(Slot("A")), 0, 3),
+      TopicNeedsNumberOfPersons(Topic.unassigned(Slot("B")), 0, 3),
       PersonTopicObligation(Person("bernard", Weight(1.0)), Topic("alpha")),
       TopicNeedsNumberOfPersons(Topic("alpha"), 5, 5),
       TopicNeedsNumberOfPersons(Topic("gamma"), 4, 6),
@@ -65,7 +69,11 @@ class InputSpec extends FlatSpec with Matchers {
 
   it should "contain the correct preferences" in {
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
-    minimalProblem.preferences should be(Set(
+    val initialTopicsPreferences = for {
+      t <- Set(Topic.unassigned(Slot("A")), Topic.unassigned(Slot("B")))
+      p <- Set(Person("bernard", Weight(1.0)), Person("hoagie", Weight(1.5)), Person("laverne", Weight(1.0)))
+    } yield PersonTopicPreference(p, t, Score(-1000))
+    minimalProblem.preferences should be(initialTopicsPreferences ++ Set(
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("alpha"), Score(scalingFactor * 5.0)),
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("beta"), Score(scalingFactor * 1.0)),
       PersonTopicPreference(Person("bernard", Weight(1.0)), Topic("gamma"), Score(scalingFactor * 1.0)),

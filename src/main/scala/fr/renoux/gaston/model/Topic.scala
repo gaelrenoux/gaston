@@ -10,6 +10,9 @@ case class Topic(name: String) extends AnyVal {
 
 object Topic {
 
+  /** Topics for people assigned to doing nothing. */
   def nothing(slot: Slot) = Topic(s"Nothing (${slot.name})")
 
+  /** Topics for people not assigned yet on some slot. */
+  def unassigned(slot: Slot) = Topic(s"[${slot.name}]")
 }

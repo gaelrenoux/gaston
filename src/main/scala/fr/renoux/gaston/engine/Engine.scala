@@ -1,53 +1,57 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.{Problem, Record, Schedule, Score, ScoredSchedule, Slot, Topic}
+import fr.renoux.gaston.model.{Problem, Record, Schedule, ScoredSchedule, Slot, Topic}
 import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
 import scala.util.Random
 
 class Engine(
-    problem: Problem,
-    altImprover: Problem => ScheduleImprover = new GreedyScheduleImprover(_)
+    problem: Problem
 ) {
 
   import Engine._
 
   private val log = Logger[Engine]
 
-  val generator: PartialSchedulesGenerator = new PartialSchedulesGenerator(problem)
-  val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
-  val improver: ScheduleImprover = altImprover(problem)
+  private implicit val _p: Problem = problem
+
+  private val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
+  private val improver: ScheduleImprover = new ScheduleImprover(problem)
+
+  lazy val startingSchedule: ScoredSchedule = {
+    val s = Schedule.everyoneUnassigned
+    ScoredSchedule(s, Scorer.score(s))
+  }
+
+  /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. */
+  def lazySeq(seed: Long)(implicit tools: Tools): Stream[ScoredSchedule] = {
+    implicit val _r: Random = new Random(seed)
+
+    val initial: Option[(ScoredSchedule, Move)] = Some((startingSchedule, Move.Nothing))
+
+    Stream.iterate(initial) {
+      case None => None
+      case Some((ss, move)) =>  heavyImprovement(ss, move)
+    }.takeWhile(_.isDefined).map(_.get._1)
+  }
 
   /** Produces a schedule and its score */
   def run(seed: Long)(implicit tools: Tools): ScoredSchedule = {
     implicit val _r: Random = new Random(seed)
-
-    val Some(unimproved) = generateUnimproved
-    val unimprovedScore = Scorer.score(unimproved)
-
-    val improved = improve(unimproved, unimprovedScore)
-    val improvedScore = Scorer.score(improved)
-
-    recHeavyImprove(ScoredSchedule(improved, improvedScore))
+    recHeavyImprove(startingSchedule)
   }
 
-  /** For testing purposes */
-  def generateUnimproved(implicit random: Random, ctx: Context, tools: Tools): Option[Schedule] =
-    tools.chrono("ConstrainedScheduleFactory.makeSchedule") {
-      generator.lazySeq.map(filler.fill).flatten.headOption
-    }
-
   /** Improve the current schedule moving persons only. */
-  private def improve(schedule: Schedule, score: Score)(implicit rand: Random, tools: Tools): Schedule =
+  private def improve(scoredSchedule: ScoredSchedule)(implicit rand: Random, tools: Tools): ScoredSchedule =
     tools.chrono("ScheduleImprover.improve") {
-      improver.improve(schedule, score)
+      improver.improve(scoredSchedule)
     }
 
   /** Improve the schedule by trying swap after swap of topics. */
   @tailrec
-  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 1000)(implicit rand: Random, tools: Tools): ScoredSchedule =
+  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = 10)(implicit rand: Random, tools: Tools): ScoredSchedule =
     if (maxRound == 0) {
       log.warn(s"HeavyImprove could not do its best (score is ${schedule.score})")
       schedule
@@ -150,10 +154,9 @@ class Engine(
       _ = log.debug(s"Trying that move: $move")
       unimproved <- filler.fill(partial)
       unimprovedScore = Scorer.score(unimproved)
-      improved = improve(unimproved, unimprovedScore)
-      improvedScore = Scorer.score(improved)
-      if improvedScore > score
-    } yield (ScoredSchedule(improved, improvedScore), move)
+      improved = improve(ScoredSchedule(unimproved, unimprovedScore))
+      if improved.score > score
+    } yield (improved, move)
 
     improvedSchedules.headOption
   }
