@@ -2,9 +2,8 @@ package fr.renoux.gaston.command
 
 import java.text.DecimalFormat
 
-import fr.renoux.gaston.engine.Scorer
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.{Scorer, _}
 
 /** A tool to render a solution as a pretty String. */
 class Renderer(
@@ -21,8 +20,7 @@ class Renderer(
   }.groupBy(_.person)
 
   /** Formats the schedule and analysis to a pretty String. Empty lines at the beginning and the end. */
-  def apply(scoredSchedule: ScoredSchedule): String = {
-    val ScoredSchedule(schedule, score) = scoredSchedule
+  def apply(schedule: ScoredSchedule): String = {
     val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(schedule)
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
@@ -45,7 +43,7 @@ class Renderer(
 
     s"""
        |${schedule.toFormattedString}
-       |Schedule score is $score
+       |Schedule score is ${schedule.score}
        |
        |Person      Score     (Detail)
        |$summaryTextBody

@@ -23,34 +23,9 @@ class ProblemImpl(
     case SlotMaxTopicCount(slot, count) => slot -> count
   }.toMap.withDefaultValue(Int.MaxValue)
 
-  /** For each topic, which persons are mandatory */
-  lazy val mandatoryPersonsPerTopic: Map[Topic, Set[Person]] = {
 
-    val topicsWithMandatoryPersons: Map[Topic, Set[Person]] = constraints.collect {
-      case PersonTopicObligation(person, topic) => topic -> person
-    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
-
-    topics.map(_ -> Set[Person]()).toMap ++ topicsWithMandatoryPersons
-  }
-
-  lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] = {
-
-    val personsWithMandatoryTopics: Map[Person, Set[Topic]] = constraints.collect {
-      case PersonTopicObligation(person, topic) => person -> topic
-    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
-
-    persons.map(_ -> Set[Topic]()).toMap ++ personsWithMandatoryTopics
-  }
-
-  /** For each topic, which persons are forbidden */
-  lazy val forbiddenPersonsPerTopic: Map[Topic, Set[Person]] = {
-
-    val topicsWithForbiddenPersons: Map[Topic, Set[Person]] = constraints.collect {
-      case PersonTopicInterdiction(person, topic) => topic -> person
-    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
-
-    topics.map(_ -> Set[Person]()).toMap ++ topicsWithForbiddenPersons
-  }
+  lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] =
+    topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap
 
   /** Indicates wether a person is available on a slot or not. */
   lazy val personSlotsPossibilities: Set[(Person, Slot)] = {
@@ -73,10 +48,10 @@ class ProblemImpl(
     val couples = for {
       topic1 <- topics
       topic2 <- topics
-      if mandatoryPersonsPerTopic(topic1).intersect(mandatoryPersonsPerTopic(topic2)).nonEmpty
+      if topic1.mandatory.intersect(topic2.mandatory).nonEmpty
     } yield (topic1, topic2)
 
-    couples.groupToMap
+    couples.groupToMap.withDefaultValue(Set.empty)
   }
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
@@ -85,10 +60,10 @@ class ProblemImpl(
     val couples = for {
       slot <- slots
       topic <- topics
-      if mandatoryPersonsPerTopic(topic).exists(!personsPerSlot(slot).contains(_))
+      if topic.mandatory.exists(!personsPerSlot(slot).contains(_))
       //TODO add topic explicitely forbidden on the slot
     } yield (slot, topic)
-    couples.groupToMap
+    couples.groupToMap.withDefaultValue(Set.empty)
   }
 
   /** For each slots, the topics that must happen in that slot. Handles only topics with just one possible slot. */
@@ -96,16 +71,6 @@ class ProblemImpl(
     constraints.collect {
       case TopicForcedSlot(topic, slotSet) if slotSet.size == 1 => slotSet.head -> topic
     }.groupBy(_._1).mapValuesStrict(_.map(_._2))
-
-  /** The min number of persons for each topic that has a min number of persons */
-  lazy val minNumberPerTopic: Map[Topic, Int] = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, min, _) => (t, min)
-  }.toMap.withDefaultValue(0)
-
-  /** The max number of persons for each topic that has a max number of persons */
-  lazy val maxNumberPerTopic: Map[Topic, Int] = constraints.collect {
-    case TopicNeedsNumberOfPersons(t, _, max) => (t, max)
-  }.toMap.withDefaultValue(personsCount)
 
   /** For everyone, its preferences */
   lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect{

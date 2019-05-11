@@ -1,6 +1,4 @@
-package fr.renoux.gaston.engine
-
-import fr.renoux.gaston.model.{Person, Schedule, Score}
+package fr.renoux.gaston.model
 
 /** Scoring utilities for a given Problem. */
 object Scorer {

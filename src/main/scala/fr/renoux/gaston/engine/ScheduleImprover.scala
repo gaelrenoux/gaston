@@ -1,8 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.{Problem, ScoredSchedule, Slot}
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.model.{Problem, Schedule, Slot}
 import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
@@ -19,9 +18,9 @@ class ScheduleImprover(val problem: Problem) {
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
-  def improve(scoredSchedule: ScoredSchedule, rounds: Int = 10000)(implicit rand: Random, tools: Tools): ScoredSchedule =
+  def improve(scoredSchedule: Schedule, rounds: Int = 10000)(implicit rand: Random, tools: Tools): Schedule =
     tools.chrono("Improving persons") {
-      log.debug("Improving new schedule")
+      log.trace("Improving persons")
       recImprove(scoredSchedule, rounds)
     }
 
@@ -30,11 +29,11 @@ class ScheduleImprover(val problem: Problem) {
     * had a good pass at all slots anyway). */
   @tailrec
   private def recImprove(
-      scoredSchedule: ScoredSchedule,
+      scoredSchedule: Schedule,
       maxRounds: Int,
       slots: Queue[Slot] = Queue(problem.slots.toSeq: _*),
       slotRoundsLimit: Int = 1000
-  )(implicit rand: Random): ScoredSchedule =
+  )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {
       log.warn("Stopping improvement because max number of rounds was reached")
       scoredSchedule
@@ -58,39 +57,38 @@ class ScheduleImprover(val problem: Problem) {
 
   /** Returns the first move or swap it finds that makes the schedule better, or None if there is nothing to do on that
     * slot anymore. */
-  private def goodMoveOnSlot(scoredSchedule: ScoredSchedule, slot: Slot)(implicit rand: Random): Option[ScoredSchedule] = {
-    val ScoredSchedule(schedule, score) = scoredSchedule
-    val slotSchedule = schedule.on(slot)
-    val topics = slotSchedule.topics
+  private def goodMoveOnSlot(currentSchedule: Schedule, slot: Slot)(implicit rand: Random): Option[Schedule] = {
+    if (false) rand.nextLong()
+    val slotSchedule = currentSchedule.on(slot)
 
-    val optionalOnTopic =
-      topics.zipWith { t => schedule.personsPerTopic(t) -- problem.mandatoryPersonsPerTopic(t) }.toMap
-
-    val topicsWithEnough = slotSchedule.records.filter { r => problem.minNumberPerTopic(r.topic) < r.persons.size }
-    val topicsWithNotTooMuch = slotSchedule.records.filter { r => problem.maxNumberPerTopic(r.topic) > r.persons.size }
+    lazy val records = rand.shuffle(slotSchedule.records)
+    lazy val removablePersons = rand.shuffle(slotSchedule.records.filter(_.canRemovePersons))
+    lazy val addablePersons = rand.shuffle(slotSchedule.records.filter(_.canAddPersons))
 
     /* All schedules on which we swapped two persons */
-    val swappedSchedules = for {
-      r1 <- rand.shuffle(slotSchedule.records.toSeq).view //TODO avoid duplicates (cases where we just swap r1 and r2)
+    lazy val swappedSchedules = for {
+      r1 <- records.view
+      r2 <- records.view if r1 < r2 //avoiding duplicates (cases where we just swap r1 and r2)
       t1 = r1.topic
-      r2 <- (slotSchedule.records - r1).view
       t2 = r2.topic
-      p1 <- (optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)).view
-      p2 <- (optionalOnTopic(r2.topic) -- problem.forbiddenPersonsPerTopic(r1.topic)).view
-    } yield schedule.swapPersons(slot, (t1, p1), (t2, p2))
+      p1 <- (r1.optionalPersons -- t2.forbidden).view
+      p2 <- (r2.optionalPersons -- t1.forbidden).view
+      improvedSchedule = currentSchedule.swapPersons(slot, (t1, p1), (t2, p2))
+      if improvedSchedule.score > currentSchedule.score
+    } yield improvedSchedule
 
     /* All schedules on which we moved one person from one topic to another */
-    val movedSchedules = for {
-      r1 <- rand.shuffle(topicsWithEnough.toSeq).view //view to execute only while iterating, since we only want the first opportunity
+    lazy val movedSchedules = for {
+      r1 <- removablePersons.view
+      r2 <- addablePersons.view if r1 != r2
       t1 = r1.topic
-      r2 <- (topicsWithNotTooMuch - r1).view
       t2 = r2.topic
-      p <- (optionalOnTopic(r1.topic) -- problem.forbiddenPersonsPerTopic(r2.topic)).view
-    } yield schedule.movePerson(slot, t1, t2, p)
+      p <- (r1.optionalPersons -- t2.forbidden).view
+      improvedSchedule = currentSchedule.movePerson(slot, t1, t2, p)
+      if improvedSchedule.score > currentSchedule.score
+    } yield improvedSchedule
 
-    val allNewSchedules = swappedSchedules ++ movedSchedules
-    val scoredSchedules = allNewSchedules.zipWith(Scorer.score)
-    scoredSchedules.dropWhile(_._2 <= score).headOption.map((ScoredSchedule.apply _).tupled)
+    swappedSchedules.headOption orElse movedSchedules.headOption
   }
 
 }

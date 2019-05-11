@@ -43,16 +43,15 @@ class PartialScheduleFiller(val problem: Problem) {
 
         Dispatch.equallyWithMaxes(topicsMinMaxCurrent.map(_._3)) */
 
-        val topicsWithValues = schedule.topicsPerSlot.getOrElse(slot, Set.empty).map { t =>
-          val min = problem.minNumberPerTopic.getOrElse(t, 0)
-          val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
-          val current = schedule.countPersonsPerTopic(t)
-
-          ((t, min - current), (t, max - math.max(min, current)))
+        val topics = schedule.topicsPerSlot.getOrElse(slot, Set.empty)
+        val (topicsWithNeeded, topicsWithOptional) = topics.map { t =>
+          val count = schedule.countPersonsPerTopic(t)
+          val needed = t.min - count
+          val optional = t.max - math.max(t.min, count)
+          (t -> needed, t -> optional)
         }.unzip
-
-        val topicsNeedingMin = topicsWithValues._1 filter (_._2 > 0)
-        val topicsOpenToMax = topicsWithValues._2 filter (_._2 > 0)
+        val topicsNeedingMin = topicsWithNeeded.filter(c => c._2 > 0)
+        val topicsOpenToMax = topicsWithOptional.filter(_._2 > 0)
 
         val newSchedule = backtrackAssignPersonsToTopics(schedule)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft.toList, Nil, Nil)
 
@@ -63,8 +62,8 @@ class PartialScheduleFiller(val problem: Problem) {
 
     /* check wether it's possible to make it work first */
     val filled = partialSchedule.topicsPerSlot.find { case (slot, topics) =>
-      val min = topics.view.map(problem.minNumberPerTopic(_)).sum
-      val max = topics.view.map(problem.maxNumberPerTopic(_)).sum
+      val min = topics.view.map(_.min).sum
+      val max = topics.view.map(_.max).sum
       val pCount = problem.personsCountPerSlot(slot)
       pCount < min || pCount > max
     } match {
@@ -74,7 +73,7 @@ class PartialScheduleFiller(val problem: Problem) {
         None
     }
 
-    log.debug (if (filled.isDefined) "Partial schedule was filled" else "Could not fill partial schedule")
+    log.debug(if (filled.isDefined) "Partial schedule was filled" else "Could not fill partial schedule")
 
     filled
   }
@@ -109,7 +108,7 @@ class PartialScheduleFiller(val problem: Problem) {
         log.trace("No more topics open to max, go again with all delayed topics")
         backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMaxDelayed, personsLeft ++ personsSkipped, Nil, Nil)
 
-      case ((topic, _) :: _, _, person :: ptail) if problem.forbiddenPersonsPerTopic(topic)(person) =>
+      case ((topic, _) :: _, _, person :: ptail) if topic.forbidden(person) =>
         log.trace("Current topic has not reached min number, but current person is forbidden on it: step to the next person")
         backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMax, ptail, person :: personsSkipped, topicsOpenToMaxDelayed)
 
@@ -126,7 +125,7 @@ class PartialScheduleFiller(val problem: Problem) {
           backtrackAssignPersonsToTopics(partialSchedule)(topicsNeedingMin, topicsOpenToMax, ptail, person :: personsSkipped, topicsOpenToMaxDelayed)
         }
 
-      case (Nil, (topic, _) :: _, person :: ptail) if problem.forbiddenPersonsPerTopic.getOrElse(topic, Set.empty)(person) =>
+      case (Nil, (topic, _) :: _, person :: ptail) if topic.forbidden(person) =>
         log.trace("Current topic has not reached max number, but current person is forbidden on it: step to the next person")
         backtrackAssignPersonsToTopics(partialSchedule)(Nil, topicsOpenToMax, ptail, person :: personsSkipped, topicsOpenToMaxDelayed)
 

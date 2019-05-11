@@ -37,14 +37,14 @@ trait Problem {
 
   val personsCountPerSlot: Map[Slot, Int]
 
-  val mandatoryPersonsPerTopic: Map[Topic, Set[Person]]
-
-  val forbiddenPersonsPerTopic: Map[Topic, Set[Person]]
-
-  val minNumberPerTopic: Map[Topic, Int]
-
-  val maxNumberPerTopic: Map[Topic, Int]
-
   val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
+
+  /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
+    * are mandatory). */
+  val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]]
+
+  /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
+    * is missing). */
+  val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]]
 
 }

@@ -25,14 +25,14 @@ class Benchmark extends FlatSpec with Matchers {
 
   //TODO needs the recHeavy improvement to be limited, in order to finish in time
 
-  it should "give an good score when working a short time" in {
+  it should "give an good score when working a short time" ignore {
     benchmark(
       duration = 5.minutes,
       expectsScore = 600
     )
   }
 
-  it should "give an great score when working a long time" ignore {
+  it should "give an great score when working a long time" in {
     benchmark(
       duration = 20.minutes,
       expectsScore = 700,
@@ -70,14 +70,14 @@ class Benchmark extends FlatSpec with Matchers {
       case Some(prc) => new Runner(problem, engine, hook = printer, parallelRunCount = prc)
     }
 
-    val (ScoredSchedule(schedule, score), count) = runner.run(Some(duration), seed = seed)
+    val (schedule, count) = runner.run(Some(duration), seed = seed)
 
-    println(s"$score after $count iterations")
+    println(s"${schedule.score} after $count iterations")
     println(s"${tools.chrono.times} in ${tools.chrono.counts}")
 
     schedule.problem.constraints.filterNot(_.isRespected(schedule)) should be(Set())
     schedule.isSolution should be(true)
-    score.value should be > expectsScore
+    schedule.score.value should be > expectsScore
     count should be > expectsCount
     handler.stop()
   }

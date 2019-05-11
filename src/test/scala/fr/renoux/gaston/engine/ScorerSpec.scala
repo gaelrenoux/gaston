@@ -1,5 +1,6 @@
 package fr.renoux.gaston.engine
 
+import fr.renoux.gaston.model.Scorer
 import fr.renoux.gaston.{SimpleTestModel, UdoConTestModel}
 import org.scalatest.{FlatSpec, Matchers}
 

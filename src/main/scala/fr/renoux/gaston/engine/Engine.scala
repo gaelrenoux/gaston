@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.{Problem, Record, Schedule, ScoredSchedule, Slot, Topic}
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
@@ -22,39 +22,36 @@ class Engine(
   private val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
   private val improver: ScheduleImprover = new ScheduleImprover(problem)
 
-  lazy val startingSchedule: ScoredSchedule = {
-    val s = Schedule.everyoneUnassigned
-    ScoredSchedule(s, Scorer.score(s))
-  }
+  lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
 
   /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. */
-  def lazySeq(seed: Long)(implicit tools: Tools): Stream[ScoredSchedule] = {
+  def lazySeq(seed: Long)(implicit tools: Tools): Stream[Schedule] = {
     implicit val _r: Random = new Random(seed)
 
-    val initial: Option[(ScoredSchedule, Move)] = Some((startingSchedule, Move.Nothing))
+    val initial: Option[(Schedule, Move)] = Some((startingSchedule, Move.Nothing))
 
     Stream.iterate(initial) {
       case None => None
-      case Some((ss, move)) =>  heavyImprovement(ss, move)
+      case Some((ss, move)) => heavyImprovement(ss, move)
     }.takeWhile(_.isDefined).map(_.get._1)
   }
 
   /** Produces a schedule and its score */
-  def run(seed: Long)(implicit tools: Tools): ScoredSchedule = {
+  def run(seed: Long)(implicit tools: Tools): Schedule = {
     implicit val _r: Random = new Random(seed)
     recHeavyImprove(startingSchedule)
   }
 
   /** Improve the current schedule moving persons only. */
-  private def improve(scoredSchedule: ScoredSchedule)(implicit rand: Random, tools: Tools): ScoredSchedule =
+  private def improve(scoredSchedule: Schedule)(implicit rand: Random, tools: Tools): Schedule =
     tools.chrono("ScheduleImprover.improve") {
       improver.improve(scoredSchedule)
     }
 
   /** Improve the schedule by trying swap after swap of topics. */
   @tailrec
-  private def recHeavyImprove(schedule: ScoredSchedule, previousMove: Move = Move.Nothing, maxRound: Int = maxImprovementRounds)
-    (implicit rand: Random, tools: Tools): ScoredSchedule =
+  private def recHeavyImprove(schedule: Schedule, previousMove: Move = Move.Nothing, maxRound: Int = maxImprovementRounds)
+    (implicit rand: Random, tools: Tools): Schedule =
     if (maxRound == 0) {
       log.warn(s"HeavyImprove could not do its best (score is ${schedule.score})")
       schedule
@@ -66,31 +63,33 @@ class Engine(
         log.debug(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
         schedule //can't make it any better
       case Some((swappedSchedule, move)) =>
-        log.debug(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score}\n${swappedSchedule.schedule.toFormattedString}")
+        log.debug(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score}\n${swappedSchedule.toFormattedString}")
         recHeavyImprove(swappedSchedule, move, maxRound - 1)
     }
 
   private def shuffled[A](set: Set[A]): Seq[A] = Random.shuffle(set.toSeq)
 
   /** Take an already improved schedule, and return the first better schedule it can found by swapping topics. */
-  private def heavyImprovement(scoredSchedule: ScoredSchedule, previousMove: Move)
-    (implicit rand: Random, tools: Tools): Option[(ScoredSchedule, Move)] = {
-    val ScoredSchedule(schedule, score) = scoredSchedule
+  private def heavyImprovement(schedule: Schedule, previousMove: Move)
+    (implicit rand: Random, tools: Tools): Option[(Schedule, Move)] = {
 
     /* Add an unscheduled topic */
-    val allAdds = for {
+    lazy val allAdds = for {
       slot <- shuffled(problem.slots).view
-      topic <- shuffled(schedule.unscheduledTopics).view
+
+      /* Filter out impossible adds because of incompatibility */
+      slotSchedule = schedule.on(slot)
+      topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.currentIncompatibleTopics).view
+
       move = Move.Add(slot, topic)
       if !move.reverts(previousMove)
 
-      /* Filter out impossible adds because of mandatory persons */
-      mandatoryPersonsNewTopic = problem.mandatoryPersonsPerTopic(topic)
-      mandatoryPersonsSlot = schedule.mandatoryPersonsOnSlot(slot)
-      if !mandatoryPersonsNewTopic.exists(mandatoryPersonsSlot)
+      /* Filter out impossible adds because mandatory persons are already taken */
+      mandatoryPersonsSlot = slotSchedule.mandatory
+      if !topic.mandatory.exists(mandatoryPersonsSlot)
 
       /* Generate the swap */
-      partial = schedule.clearSlots(slot).add(Record(slot, topic, mandatoryPersonsNewTopic))
+      partial = schedule.clearSlots(slot).add(Record(slot, topic, topic.mandatory))
       if partial.isPartialSolution
 
       /* Filter out impossible adds because of unreachable minimum */
@@ -98,39 +97,37 @@ class Engine(
     } yield (partial, move)
 
     /* Swap topics between two scheduled topics */
-    val allSwaps = for {
+    lazy val allSwaps = for {
       (s1, s2) <- shuffled(problem.slotCouples).view
-      t1 <- shuffled(schedule.topicsPerSlot(s1)).view
-      t2 <- shuffled(schedule.topicsPerSlot(s2)).view
+      slotSchedule1 = schedule.on(s1)
+      slotSchedule2 = schedule.on(s2)
+
+      t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.hardIncompatibleTopics).view //can't take current topics since we're removing one
+      t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.hardIncompatibleTopics).view //can't take current topics since we're removing one
       move = Move.Swap(t1, t2)
       if !move.reverts(previousMove)
 
       /* Filter out impossible swaps because of mandatory persons */
-      mandatoryPersonsTopic1 = problem.mandatoryPersonsPerTopic(t1)
-      mandatoryPersonsSlot2 = schedule.mandatoryPersonsOnSlot(s2)
-      if !mandatoryPersonsTopic1.exists(mandatoryPersonsSlot2) //check mandatories of T1 are not already blocked on S2
-      mandatoryPersonsTopic2 = problem.mandatoryPersonsPerTopic(t2)
-      mandatoryPersonsSlot1 = schedule.mandatoryPersonsOnSlot(s1)
-      if !mandatoryPersonsTopic2.exists(mandatoryPersonsSlot1) //check mandatories of T2 are not already blocked on S1
+      if !t1.mandatory.exists(slotSchedule2.mandatory) //check mandatories of T1 are not already blocked on S2
+      if !t2.mandatory.exists(slotSchedule1.mandatory) //check mandatories of T2 are not already blocked on S1
 
       /* Generate the swap */
       partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> t1, s2 -> t2)
-      if partial.isPartialSolution
+      if partial.isPartialSolution //TODO recheck everything, could maybe not check what has been verified already
     } yield (partial, move)
 
 
     /* Swap topics between unscheduled and scheduled */
-    val allExternalSwaps = for {
+    lazy val allExternalSwaps = for {
       newT <- shuffled(schedule.unscheduledTopics).view
       oldT <- shuffled(schedule.scheduledTopics).view
       move = Move.Swap(oldT, newT)
       if !move.reverts(previousMove)
       slot = schedule.topicToSlot(oldT)
+      slotSchedule = schedule.on(slot)
 
       /* Filter out impossible swaps because of mandatory persons */
-      mandatoryPersonsNewTopic = problem.mandatoryPersonsPerTopic(newT)
-      mandatoryPersonsSlot = schedule.mandatoryPersonsOnSlot(slot)
-      if !mandatoryPersonsNewTopic.exists(mandatoryPersonsSlot)
+      if !newT.mandatory.exists(slotSchedule.mandatory)
 
       /* Generate the swap */
       partial = schedule.clearSlots(slot).replaceTopic(oldT, newT)
@@ -139,9 +136,10 @@ class Engine(
 
 
     /* Remove a scheduled topic */
-    val allRemovals = for {
+    lazy val allRemovals = for {
       slot <- shuffled(problem.slots).view
-      topic <- shuffled(schedule.topicsPerSlot(slot)).view
+      slotSchedule = schedule.on(slot)
+      topic <- shuffled(slotSchedule.topics).view
       move = Move.Remove(slot, topic)
       if !move.reverts(previousMove)
 
@@ -155,12 +153,11 @@ class Engine(
 
 
     val improvedSchedules = for {
-      (partial, move) <- allAdds ++ allSwaps ++ allExternalSwaps ++ allRemovals
+      (partial, move) <- allAdds.toStream #::: allSwaps.toStream #::: allExternalSwaps.toStream #::: allRemovals.toStream
       _ = log.debug(s"Trying that move: $move")
       unimproved <- filler.fill(partial)
-      unimprovedScore = Scorer.score(unimproved)
-      improved = improve(ScoredSchedule(unimproved, unimprovedScore))
-      if improved.score > score
+      improved = improve(unimproved)
+      if improved.score > schedule.score
     } yield (improved, move)
 
     improvedSchedules.headOption

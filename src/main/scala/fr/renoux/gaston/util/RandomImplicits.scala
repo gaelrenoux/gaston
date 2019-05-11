@@ -7,13 +7,18 @@ object RandomImplicits {
 
   implicit class RandomOps(wrapped: Random) {
     /** Picks randomly an element in a set. */
-    def pick[A](s: Set[A]): A = {
+    @inline
+    final def pick[A](s: Set[A]): A = {
       val i = wrapped.nextInt(s.size)
       s.toSeq(i)
     }
 
     /** Picks randomly several distinct elements in a Set */
-    def pick[A](s: Set[A], count: Int): Seq[A] = wrapped.shuffle(s.toSeq).take(count)
+    @inline
+    final def pick[A](s: Set[A], count: Int): Seq[A] = wrapped.shuffle(s.toSeq).take(count)
+
+    @inline
+    def shuffle[A](s: Set[A]): Seq[A] = wrapped.shuffle(s.toSeq)
   }
 
 }

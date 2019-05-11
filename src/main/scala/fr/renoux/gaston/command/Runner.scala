@@ -4,7 +4,7 @@ import java.time.Instant
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine._
-import fr.renoux.gaston.model.{Problem, ScoredSchedule}
+import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
@@ -17,7 +17,7 @@ import scala.util.Random
 class Runner(
     problem: Problem,
     engine: Engine,
-    hook: (ScoredSchedule, Long) => Unit = (_, _) => (),
+    hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
     parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
 ) {
@@ -33,7 +33,7 @@ class Runner(
   def run(
       maxDuration: Option[FiniteDuration] = None,
       seed: Long = Random.nextLong()
-  )(implicit tools: Tools): (ScoredSchedule, Long) = {
+  )(implicit tools: Tools): (Schedule, Long) = {
 
     val now = Instant.now()
     val timeout: Option[Instant] = maxDuration.map(d => now.plusSeconds(d.toSeconds))
@@ -43,13 +43,13 @@ class Runner(
       (0 until parallelRunCount).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
-          runRecursive(now, timeout, 0, ScoredSchedule.empty)
+          runRecursive(now, timeout, 0, Schedule.everyoneUnassigned)
         }
       }
     }
 
-    val results: Seq[(ScoredSchedule, Long)] = Await.result(future, maxDuration.map(2 * _).getOrElse(Duration.Inf))
-    results.fold((ScoredSchedule.empty, 0L)) {
+    val results: Seq[(Schedule, Long)] = Await.result(future, maxDuration.map(2 * _).getOrElse(Duration.Inf))
+    results.fold((Schedule.everyoneUnassigned, 0L)) {
       case ((best, totalCount), (current, count)) =>
         if (best < current) (current, totalCount + count)
         else (best, totalCount + count)
@@ -62,8 +62,8 @@ class Runner(
       lastLog: Instant,
       timeout: Option[Instant],
       count: Long,
-      current: ScoredSchedule
-  )(implicit random: Random, tools: Tools): (ScoredSchedule, Long) = {
+      current: Schedule
+  )(implicit random: Random, tools: Tools): (Schedule, Long) = {
     val now = Instant.now()
 
     /* If time's out, stop now */

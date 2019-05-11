@@ -23,7 +23,9 @@ class InputTranscription(inputRoot: InputRoot) {
   lazy val topicsPerName: Map[String, Set[Topic]] = input.topics.map { inTopic =>
     val mandatory =  input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
     val forbidden = input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
-    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden)
+    val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
+    val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
+    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max)
 
     inTopic.forcedOccurrences match {
       case 1 => inTopic.name -> Set(baseTopic)
