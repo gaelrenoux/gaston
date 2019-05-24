@@ -25,7 +25,7 @@ class ProblemImpl(
 
 
   lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] =
-    topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap
+    topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 
   /** Indicates wether a person is available on a slot or not. */
   lazy val personSlotsPossibilities: Set[(Person, Slot)] = {
