@@ -59,7 +59,7 @@ class Runner(
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
   @tailrec
   private def runRecursive(
-      lastLog: Instant,
+      nextLog: Instant,
       timeout: Option[Instant],
       count: Long,
       current: Schedule
@@ -73,15 +73,15 @@ class Runner(
 
     } else {
       /* If the last log is old enough, render the current best schedule */
-      val newLastLog = if (now isAfter lastLog.plusMillis(hookFrequencyMillis)) {
+      val newNextLog = if (now isAfter nextLog) {
         hook(current, count)
-        Instant.now()
-      } else lastLog
+        Instant.now().plusMillis(hookFrequencyMillis)
+      } else nextLog
 
       /* Run once then recurse */
       val ss = engine.run(random.nextLong)
-      if (ss.score > current.score) runRecursive(newLastLog, timeout, count + 1, ss)
-      else runRecursive(newLastLog, timeout, count + 1, current)
+      if (ss.score > current.score) runRecursive(newNextLog, timeout, count + 1, ss)
+      else runRecursive(newNextLog, timeout, count + 1, current)
     }
   }
 

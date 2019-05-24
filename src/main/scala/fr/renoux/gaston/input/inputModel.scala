@@ -27,7 +27,9 @@ case class InputSettings(
     /* Minimum number of persons that can have no topic on a slot (so that they can do something else) */
     minPersonsOnNothing: Int = 0,
     /* Negative score for someone not doing anything */
-    personOnNothingAntiPreference: Score = Score.Zero
+    personOnNothingAntiPreference: Score = Score.Zero,
+    /* Should initial schedules on each iteration be empty or backtracked ? */
+    backtrackInitialSchedule: Boolean = true //TODO Should be calculated
 )
 
 case class InputTableSettings(

@@ -10,7 +10,8 @@ import scala.util.Random
 class Engine(
     problem: Problem,
     stopAtScore: Double = Double.MaxValue,
-    maxImprovementRounds: Int = 1000
+    maxImprovementRounds: Int = 1000,
+    backtrackInitialSchedule: Boolean = false
 ) {
 
   import Engine._
@@ -19,16 +20,21 @@ class Engine(
 
   private implicit val _p: Problem = problem
 
+  private val initialScheduleGenerator  = new InitialScheduleGenerator(problem)
   private val filler: PartialScheduleFiller = new PartialScheduleFiller(problem)
   private val improver: ScheduleImprover = new ScheduleImprover(problem)
 
   lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
 
+
+
   /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. */
   def lazySeq(seed: Long)(implicit tools: Tools): Stream[Schedule] = {
     implicit val _r: Random = new Random(seed)
 
-    val initial: Option[(Schedule, Move)] = Some((startingSchedule, Move.Nothing))
+    val initial: Option[(Schedule, Move)] =
+      if (backtrackInitialSchedule) Some((initialScheduleGenerator.generate, Move.Nothing))
+      else Some((startingSchedule, Move.Nothing))
 
     Stream.iterate(initial) {
       case None => None
@@ -39,7 +45,10 @@ class Engine(
   /** Produces a schedule and its score */
   def run(seed: Long)(implicit tools: Tools): Schedule = {
     implicit val _r: Random = new Random(seed)
-    recHeavyImprove(startingSchedule)
+    val initial =
+      if (backtrackInitialSchedule) initialScheduleGenerator.generate
+      else startingSchedule
+    recHeavyImprove(initial)
   }
 
   /** Improve the current schedule moving persons only. */

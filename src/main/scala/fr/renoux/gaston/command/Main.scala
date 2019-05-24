@@ -40,7 +40,7 @@ object Main {
     if (commandLine.generateInput) {
       output.writeInput(inputRoot)
     } else {
-      val engine = new Engine(problem)
+      val engine = new Engine(problem, backtrackInitialSchedule = inputRoot.gaston.settings.backtrackInitialSchedule)
 
       val runner = new Runner(problem, engine, hook = (ss, count) => {
         output.writeScheduleIfBetter(ss, problem)
