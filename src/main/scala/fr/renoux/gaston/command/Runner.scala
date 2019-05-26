@@ -7,6 +7,7 @@ import fr.renoux.gaston.engine._
 import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Tools
 
+import scala.Ordering.Implicits._
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -43,7 +44,7 @@ class Runner(
       (0 until parallelRunCount).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
-          runRecursive(now, timeout, 0, Schedule.everyoneUnassigned)
+          runRecursive(now.plusMillis(hookFrequencyMillis), timeout, 0, Schedule.everyoneUnassigned)
         }
       }
     }
@@ -62,7 +63,8 @@ class Runner(
       nextLog: Instant,
       timeout: Option[Instant],
       count: Long,
-      current: Schedule
+      current: Schedule,
+      stream: Stream[Schedule] = Stream.empty
   )(implicit random: Random, tools: Tools): (Schedule, Long) = {
     val now = Instant.now()
 
@@ -79,9 +81,11 @@ class Runner(
       } else nextLog
 
       /* Run once then recurse */
-      val ss = engine.run(random.nextLong)
-      if (ss.score > current.score) runRecursive(newNextLog, timeout, count + 1, ss)
-      else runRecursive(newNextLog, timeout, count + 1, current)
+
+      val evaluated = if (stream.nonEmpty) stream else engine.lazySeq(random.nextLong())
+      val ss = evaluated.head
+      if (ss.score > current.score) runRecursive(newNextLog, timeout, count + 1, ss, evaluated.tail)
+      else runRecursive(newNextLog, timeout, count + 1, current, evaluated.tail)
     }
   }
 

@@ -10,7 +10,7 @@ case class Schedule(
     private val wrapped: Set[Record]
 )(implicit
     val problem: Problem
-) extends Ordered[Schedule] {
+) {
 
   @inline private def updateRecords(f: Set[Record] => Set[Record]): Schedule =
     copy(wrapped = f(records))
@@ -39,8 +39,6 @@ case class Schedule(
   lazy val unscheduledTopics: Set[Topic] = problem.topics -- scheduledTopics
 
   lazy val score: Score = if (records.isEmpty) Score.MinValue else Scorer.score(this)
-
-  override def compare(that: Schedule): Int = score.compare(that.score)
 
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot) //TODO cache this
@@ -177,6 +175,10 @@ case class Schedule(
 }
 
 object Schedule {
+
+  implicit object ScheduleIsOrdered extends Ordering[Schedule] {
+    override def compare(x: Schedule, y: Schedule): Int = x.score.compare(y.score)
+  }
 
   /** Empty schedule for a problem */
   def empty(implicit problem: Problem): Schedule = Schedule()

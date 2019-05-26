@@ -28,7 +28,7 @@ class Engine(
 
 
 
-  /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. */
+  /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
   def lazySeq(seed: Long)(implicit tools: Tools): Stream[Schedule] = {
     implicit val _r: Random = new Random(seed)
 
