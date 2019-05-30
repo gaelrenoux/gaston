@@ -3,7 +3,7 @@ package fr.renoux.gaston.input
 import java.io.{File, PrintWriter}
 import java.nio.file.Path
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{ConfigFactory, ConfigRenderOptions}
 import com.typesafe.scalalogging.Logger
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
@@ -17,6 +17,10 @@ object InputLoader {
   //TODO handle exceptions
   private val log = Logger[InputLoader.type]
 
+  private lazy val renderConfig = ConfigRenderOptions.defaults()
+    .setOriginComments(false)
+    .setJson(false)
+
   /* Do not delete the pureconfig.generic.auto._ import even though IntelliJ marks is as unused */
   import pureconfig.generic.auto._
 
@@ -29,7 +33,7 @@ object InputLoader {
     loadConfig[InputRoot](tsConfig).disjunction.leftMap(transformErrors)
   }
 
-  /** Loads from defined files on the filesystem. */
+  /** Loads from defined files on the filesystem. Ignores the reference configuration. */
   def fromPath(files: Path*): InputErrors \/ InputRoot = {
     log.debug(s"Loading those files: ${files.mkString("; ")}")
     loadConfigFromFiles[InputRoot](files, failOnReadError = true).disjunction.leftMap(transformErrors)
@@ -53,8 +57,6 @@ object InputLoader {
     }
 
   /** Render a configuration into a String. */
-  def render(input: InputRoot): String = ConfigWriter[InputRoot].to(input).render().split("\n").flatMap { line =>
-    if (line.trim.startsWith("#")) None else Some(line)
-  }.mkString("\n")
+  def render(input: InputRoot): String = ConfigWriter[InputRoot].to(input).render(renderConfig)
 
 }
