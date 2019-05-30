@@ -12,8 +12,8 @@ class InputSpec extends FlatSpec with Matchers {
 
   "Loading from default" should "load the default input when no name is given" in {
     val input = InputLoader.fromDefault.force
-    input.gaston.settings.incompatibilityAntiPreference should be(Score(-1000))
-    input.gaston.persons.size should be(3)
+    input.gaston.settings.defaultMaxTopicsPerSlot should be(Some(3))
+    input.gaston.persons.size should be(15)
   }
 
   "Loading from the classpath" should "load the correct input" in {
@@ -31,11 +31,11 @@ class InputSpec extends FlatSpec with Matchers {
   }
 
   "Checking the sample" should "work" in {
-    InputLoader.fromClassPath("sample.conf").force
+    InputLoader.fromClassPath("application.conf").force
   }
 
 
-  val problem: Problem = problemFromDefault.force
+  val problem: Problem = problemFromClassPath("test-application").force
 
   object expected {
 

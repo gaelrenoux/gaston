@@ -9,7 +9,13 @@ object MainLauncher extends App {
     //"--silent"
   ))
 
-  def displayUdoCon2108(): Unit = Main.main(Array(
+  def displayUdoCon2017(): Unit = Main.main(Array(
+    "--from-table",
+    "/home/gael/Repositories/Gael/gaston/src/test/resources/udocon-2017-table.csv",
+    "--generate-input",
+  ))
+
+  def displayUdoCon2018(): Unit = Main.main(Array(
     "--from",
     "/home/gael/Temp/UdoCon/udocon_2018_settings.conf",
     "--from-udo-table",
@@ -22,5 +28,5 @@ object MainLauncher extends App {
     "src/test/resources/udocon-2017-completed.conf"
   ))
 
-  runOnRealCase()
+  displayUdoCon2017()
 }

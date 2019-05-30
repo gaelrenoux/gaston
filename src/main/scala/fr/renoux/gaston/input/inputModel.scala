@@ -9,57 +9,39 @@ case class InputRoot(
 )
 
 case class InputModel(
-    settings: InputSettings,
-    tableSettings: Option[InputTableSettings],
-    slots: Seq[Seq[InputSlot]],
-    persons: Set[InputPerson],
-    topics: Set[InputTopic],
-    constraints: Option[InputGlobalConstraints] = None
+    settings: InputSettings = InputSettings(),
+    tableSettings: Option[InputTableSettings] = None,
+    slots: Seq[Seq[InputSlot]] = Seq(),
+    persons: Set[InputPerson] = Set(),
+    topics: Set[InputTopic] = Set(),
+    constraints: InputGlobalConstraints = InputGlobalConstraints()
 )
 
 case class InputSettings(
-    incompatibilityAntiPreference: Score,
+    incompatibilityAntiPreference: Score = Score(-1000),
     defaultMaxTopicsPerSlot: Option[Int] = None,
-    defaultMinPersonsPerTopic: Int,
-    defaultMaxPersonsPerTopic: Int,
-    /* Maximum number of persons that can have no topic on a slot */
+    defaultMinPersonsPerTopic: Int = 1,
+    defaultMaxPersonsPerTopic: Int = 10,
     maxPersonsOnNothing: Int = 0,
-    /* Minimum number of persons that can have no topic on a slot (so that they can do something else) */
     minPersonsOnNothing: Int = 0,
-    /* Negative score for someone not doing anything */
     personOnNothingAntiPreference: Score = Score.Zero,
-    /* Should initial schedules on each iteration be empty or backtracked ? */
     backtrackInitialSchedule: Boolean = true //TODO Should be calculated
 )
 
 case class InputTableSettings(
-    separator: String,
-    /* Row where the persons' names appear */
-    personsRow: Int,
-    /* Additional header rows to ignore */
-    otherHeaderRowsCount: Int,
-    /* Column at which the persons start */
-    personsStartingIndex: Int,
-    /* Column for the topics */
-    topicIndex: Int,
-    /* Column for the min number of persons on that topic */
-    minPersonsIndex: Option[Int],
-    /* Column for the max number of persons on that topic */
-    maxPersonsIndex: Int,
-    /* Number to add to the count of persons (typically because min and max don't always include the mandatory person) */
-    personsCountAdd: Int,
-    /* Index for one mandatory's person' name */
-    mandatoryPersonIndex: Int,
-    /* Index for the count of occurrences of a topic */
-    topicOccurrenceCountIndex: Option[Int],
-    /* If a person is mandatory on one topic, his preferences will weight more on other topics (as a reward). Should be
-     higher than one. */
-    mandatoryPersonRewardWeight: Weight,
-    /* What text marks the person as forbidden on that topic */
-    forbiddenPersonMarker: Option[String],
-    /* For each preference value, how it should be translated to a score (unknown texts are ignored). If no mapping is
-    provided, the raw numerical values will be used.  */
-    preferencesScoreMapping: Option[Map[String, Score]]
+    separator: String = "\t",
+    personsRow: Int = 0,
+    otherHeaderRowsCount: Int = 0,
+    personsStartingIndex: Int = 4,
+    topicIndex: Int = 0,
+    topicOccurrenceCountIndex: Option[Int] = None,
+    mandatoryPersonIndex: Int = 1,
+    minPersonsIndex: Option[Int] = None,
+    maxPersonsIndex: Int = 3,
+    personsCountAdd: Int = 0,
+    mandatoryPersonWeight: Weight = Weight.Default,
+    forbiddenPersonMarker: Option[String] = None,
+    preferencesScoreMapping: Option[Map[String, Score]] = None
 )
 
 case class InputSlot(
@@ -69,8 +51,8 @@ case class InputSlot(
 
 case class InputTopic(
     name: String,
-    min: Option[Int],
-    max: Option[Int],
+    min: Option[Int] = None,
+    max: Option[Int] = None,
     occurrences: Option[Int] = None,
     slots: Option[Set[String]] = None
 ) {

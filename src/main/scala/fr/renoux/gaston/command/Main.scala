@@ -60,23 +60,15 @@ object Main {
 
   /** Load the requested input, according to the command lines arguments */
   private def loadInput(commandLine: CommandLine): InputErrors \/ InputRoot = for {
-    sampleInputRoot <-
-      if (commandLine.useSample) InputLoader.fromClassPath("sample.conf").map(Some(_))
-      else None.right
-
-    explicitInputRoot <-
-      commandLine.inputFile.map { path =>
+    baseInput <- commandLine.inputFile.map { path =>
         log.info(s"Loading from $path")
-        InputLoader.fromPath(path).map(Some(_))
-      }.getOrElse(None.right[InputErrors])
-
-    initialInputRoot <-
-      (explicitInputRoot orElse sampleInputRoot).toRightDisjunction(InputErrors("No settings submitted"))
-
-    udoConInputRootOption <-
-      commandLine.udoConTableFile.map(loadUdoConSettings(initialInputRoot, _).map(Some(_))).getOrElse(None.right)
-
-  } yield udoConInputRootOption getOrElse initialInputRoot
+        InputLoader.fromPath(path)
+      }.getOrElse {
+      log.info(s"Loading from default")
+        InputLoader.fromDefault
+      }
+    udoConInputOption <- commandLine.tableFile.traverse(loadUdoConSettings(baseInput, _))
+  } yield udoConInputOption getOrElse baseInput
 
   /** Load the table settings, if they are required */
   private def loadUdoConSettings(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot = for {

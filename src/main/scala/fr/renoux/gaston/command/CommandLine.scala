@@ -9,8 +9,7 @@ import scala.util.Random
 
 case class CommandLine(
     inputFile: Option[Path] = None,
-    udoConTableFile: Option[Path] = None,
-    useSample: Boolean = false,
+    tableFile: Option[Path] = None,
     generateInput: Boolean = false,
     silent: Boolean = false,
     debug: Boolean = false,
@@ -33,13 +32,9 @@ object CommandLine {
       .action((path, in) => in.copy(inputFile = Some(path)))
       .text("Input file.")
 
-    opt[Unit]("from-sample").optional()
-      .action((_, in) => in.copy(useSample = true))
-      .text("Use a sample input.")
-
-    opt[Path]('u', "from-udo-table").optional().valueName("<file>")
-      .action((path, in) => in.copy(udoConTableFile = Some(path)))
-      .text("Import a table withe UdoCon wish-list format, use it to generate or complete the input file.")
+    opt[Path]('t', "from-table").optional().valueName("<file>")
+      .action((path, in) => in.copy(tableFile = Some(path)))
+      .text("Import a table, use it to generate or complete the input file.")
 
     opt[Unit]('g', "generate-input").optional()
       .action((_, in) => in.copy(generateInput = true))

@@ -86,7 +86,7 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
 
       InputPerson(
         name = person,
-        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonRewardWeight else Weight.Default,
+        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else Weight.Default,
         mandatory = mandatoryTopics,
         forbidden = forbiddenTopics,
         wishes = scoresByTopic
@@ -101,7 +101,8 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
         tableSettings = Some(tableSettings),
         slots = slots,
         persons = SortedSet(persons: _*),
-        topics = SortedSet(topicsSeq: _*)
+        topics = SortedSet(topicsSeq: _*),
+        constraints = InputGlobalConstraints()
       )
     )
   }

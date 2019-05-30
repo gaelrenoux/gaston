@@ -9,8 +9,6 @@ import scala.io.Source
 
 class TableReaderSpec extends FlatSpec with Matchers {
 
-  //private val log = Logger[TableReaderSpec]
-
   val udoSettings = InputTableSettings(
     separator = "\t",
     personsRow = 0,
@@ -22,9 +20,9 @@ class TableReaderSpec extends FlatSpec with Matchers {
     topicOccurrenceCountIndex = None,
     personsCountAdd = 1,
     mandatoryPersonIndex = 1,
-    mandatoryPersonRewardWeight = Weight(1.5),
+    mandatoryPersonWeight = Weight(1.5),
     forbiddenPersonMarker = Some("0"),
-    preferencesScoreMapping = Some(Map("1" -> Score(1), "2" -> Score(5), "+++" -> Score( 5.0 ), "++" -> Score( 2.0 ), "+" -> Score( 1.0 )))
+    preferencesScoreMapping = Some(Map("1" -> Score(1), "2" -> Score(5)))
   )
 
   val settings = InputSettings(
@@ -59,6 +57,12 @@ class TableReaderSpec extends FlatSpec with Matchers {
       printDiff(expected.gaston.persons, input.gaston.persons)
       printDiff(expected.gaston.constraints, input.gaston.constraints)
     }
+    input.gaston.settings should be(expected.gaston.settings)
+    input.gaston.tableSettings should be(expected.gaston.tableSettings)
+    input.gaston.slots should be(expected.gaston.slots)
+    input.gaston.topics should be(expected.gaston.topics)
+    input.gaston.persons should be(expected.gaston.persons)
+    input.gaston.constraints should be(expected.gaston.constraints)
     input should be(expected)
   }
 

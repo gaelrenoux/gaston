@@ -10,8 +10,6 @@ import scalaz.syntax.validation._
 /** Converts the Input object to the Problem object. */
 class InputTranscription(inputRoot: InputRoot) {
 
-  private val EmptyTopicNegativeScore = Score.PersonTotalScore.negative * 0.02 //TODO externalize
-
   val input: InputModel = inputRoot.gaston
   val settings: InputSettings = input.settings
 
@@ -86,7 +84,7 @@ class InputTranscription(inputRoot: InputRoot) {
 
 
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
-      input.constraints.map(_.simultaneous).getOrElse(Set()).map { inConstraint =>
+      input.constraints.simultaneous.map { inConstraint =>
         //TODO Better handling of simultaneous and multiple is needed, should at least return an error
         TopicsSimultaneous(inConstraint.topics.map(topicsPerName(_).head))
       }
@@ -104,7 +102,7 @@ class InputTranscription(inputRoot: InputRoot) {
   /* Preferences */
   object Preferences {
     lazy val exclusiveTopics: Set[TopicsExclusive] =
-      input.constraints.map(_.exclusive).getOrElse(Set()).map { inConstraint =>
+      input.constraints.exclusive.map { inConstraint =>
         TopicsExclusive(inConstraint.topics.flatMap(topicsPerName), inConstraint.exemptions.map(personsPerName), Score.PersonTotalScore.negative * 100)
       }
 
@@ -166,7 +164,7 @@ class InputTranscription(inputRoot: InputRoot) {
         val topic = Topic.nothing(s)
         val countConstraint = TopicNeedsNumberOfPersons(topic, settings.minPersonsOnNothing, settings.maxPersonsOnNothing)
         val slotConstraint = TopicForcedSlot(topic, Set(s))
-        val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, EmptyTopicNegativeScore))
+        val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, settings.personOnNothingAntiPreference))
         (topic, countConstraint, slotConstraint, antiPreferences)
       }
 
