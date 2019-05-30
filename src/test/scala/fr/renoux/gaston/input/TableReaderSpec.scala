@@ -12,8 +12,8 @@ class TableReaderSpec extends FlatSpec with Matchers {
   val udoSettings = InputTableSettings(
     separator = "\t",
     personsRow = 0,
-    otherHeaderRowsCount = 0,
-    personsStartingIndex = 4,
+    wishesStartRow = 1,
+    personsStartIndex = 4,
     topicIndex = 0,
     maxPersonsIndex = 2,
     minPersonsIndex = None,

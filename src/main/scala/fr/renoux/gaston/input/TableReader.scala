@@ -31,7 +31,7 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
 
     log.debug(s"Cells:\n${cells.mkString("\n")}")
     val cellsPersonsRow = cells(tableSettings.personsRow)
-    val cellsWithContent = cells.drop(tableSettings.otherHeaderRowsCount + 1)
+    val cellsWithContent = cells.drop(tableSettings.wishesStartRow)
 
     /* Slots are sample slots, generated */
     val slots = Seq(
@@ -67,7 +67,7 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
     }.groupToMap.mapValuesStrict(_.toSet)
 
     /* The persons, */
-    val indexedPersonNames = cellsPersonsRow.zipWithIndex.drop(tableSettings.personsStartingIndex)
+    val indexedPersonNames = cellsPersonsRow.zipWithIndex.drop(tableSettings.personsStartIndex)
     val persons = indexedPersonNames.map { case (person, personColumnIndex) =>
 
       val personColumn = cellsWithContent.map { row =>

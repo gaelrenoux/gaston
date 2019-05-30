@@ -31,8 +31,8 @@ case class InputSettings(
 case class InputTableSettings(
     separator: String = "\t",
     personsRow: Int = 0,
-    otherHeaderRowsCount: Int = 0,
-    personsStartingIndex: Int = 4,
+    wishesStartRow: Int = 1,
+    personsStartIndex: Int = 4,
     topicIndex: Int = 0,
     topicOccurrenceCountIndex: Option[Int] = None,
     mandatoryPersonIndex: Int = 1,
