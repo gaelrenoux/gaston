@@ -27,6 +27,7 @@ case class Schedule(
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = recordsPerSlot.mapValuesStrict { x => x.map(_.topic) }
+  lazy val countTopicsPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.size)
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
@@ -36,7 +37,7 @@ case class Schedule(
   lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(_.mandatory))
 
   lazy val scheduledTopics: Set[Topic] = records.map(_.topic)
-  lazy val unscheduledTopics: Set[Topic] = problem.topics -- scheduledTopics
+  lazy val unscheduledTopics: Set[Topic] = (problem.topics -- scheduledTopics).filter(_.removable)
 
   lazy val score: Score = if (records.isEmpty) Score.MinValue else Scorer.score(this)
 
@@ -47,6 +48,10 @@ case class Schedule(
   def add(record: Record): Schedule = updateRecords(_ + record)
 
   def +(record: Record): Schedule = updateRecords(_ + record)
+
+  def add(records: Set[Record]): Schedule = if (records.isEmpty) this else updateRecords(_ ++ records)
+
+  def ++(records: Set[Record]): Schedule = if (records.isEmpty) this else updateRecords(_ ++ records)
 
   /** Merge with another schedule's content. */
   def merge(that: Schedule): Schedule = {
@@ -109,11 +114,11 @@ case class Schedule(
 
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
-    val noUbiquity = recordsPerSlot.values.forall { records =>
+    lazy val noUbiquity = recordsPerSlot.values.forall { records =>
       val persons = records.toSeq.flatMap(_.persons.toSeq) //toSeq to keep duplicates, we're looking for them
       persons.size == persons.toSet.size
     }
-    val noDuplicates = {
+    lazy val noDuplicates = {
       val topicsSeq = topicsPerSlot.values.flatten
       topicsSeq.size == topicsSeq.toSet.size
     }

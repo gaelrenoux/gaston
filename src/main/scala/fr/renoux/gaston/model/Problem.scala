@@ -33,8 +33,13 @@ trait Problem {
 
   val maxTopicCountPerSlot: Map[Slot, Int]
 
+  /** For each persons, its available slots */
+  val slotsPerPerson: Map[Person, Set[Slot]]
+
+  /** For each slot, the available persons */
   val personsPerSlot: Map[Slot, Set[Person]]
 
+  /** For each slot, the number of available persons */
   val personsCountPerSlot: Map[Slot, Int]
 
   val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
@@ -51,5 +56,7 @@ trait Problem {
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
     * is missing). */
   val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]]
+
+  val simultaneousTopicPerTopic: Map[Topic, Set[Topic]]
 
 }

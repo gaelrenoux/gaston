@@ -6,6 +6,8 @@ import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopi
 import fr.renoux.gaston.model.problem.ProblemImpl
 import scalaz.Validation
 import scalaz.syntax.validation._
+import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.CanGroupToMap._
 
 /** Converts the Input object to the Problem object. */
 class InputTranscription(inputRoot: InputRoot) {
@@ -19,7 +21,7 @@ class InputTranscription(inputRoot: InputRoot) {
 
   /* Topics */
   lazy val topicsPerName: Map[String, Set[Topic]] = input.topics.map { inTopic =>
-    val mandatory =  input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
+    val mandatory = input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
     val forbidden = input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
     val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
@@ -27,13 +29,31 @@ class InputTranscription(inputRoot: InputRoot) {
 
     val occurringTopics = inTopic.forcedOccurrences match {
       case 1 => Set(baseTopic)
-      case c if c > 0 => baseTopic.occurrences(c)
+      case c if c > 0 => baseTopic.occurrences(c).toSet
       case _ => throw new IllegalArgumentException("Can't have a non-positive number of occurrences") //TODO use Refined instead
     }
 
-    inTopic.name -> occurringTopics
+    val multipleTopics = inTopic.forcedMultiple match {
+      case 1 => occurringTopics
+      case c if c > 0 => occurringTopics.flatMap { topic =>
+        val groups = topic.multiple(c)
+        val sortedMandatories = baseTopic.mandatory.toSeq.sortBy(_.name) //sorted to be deterministic, therefore more testable
+
+        /* dispatch the mandatory persons on the groups */
+        val mandatoriesByGroup = sortedMandatories.zip(Stream.continually(groups).flatten).map(_.swap).groupToMap
+        groups.map { t => t.copy(mandatory = mandatoriesByGroup.getOrElse(t, Nil).toSet) }
+      }
+      case _ => throw new IllegalArgumentException("Can't have a non-positive number of multiples") //TODO use Refined instead
+    }
+
+    inTopic.name -> multipleTopics
 
   }.toMap
+
+  /* Topics, but with multiple ones grouped */
+  lazy val topicGroupsPerName: Map[String, Set[Set[Topic]]] = topicsPerName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
+
+  lazy val topics: Set[Topic] = topicsPerName.values.toSet.flatten
 
   /* Persons */
   lazy val personsPerName: Map[String, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
@@ -63,33 +83,29 @@ class InputTranscription(inputRoot: InputRoot) {
 
     lazy val obligations: Set[PersonTopicObligation] =
       for {
-        ip <- input.persons
-        person = personsPerName(ip.name)
-        topicName <- ip.mandatory
-        topic <- topicsPerName(topicName)
+        topic <- topics
+        person <- topic.mandatory
       } yield PersonTopicObligation(person, topic)
 
     lazy val interdictions: Set[PersonTopicInterdiction] =
       for {
-        ip <- input.persons
-        person = personsPerName(ip.name)
-        topicName <- ip.forbidden
-        topic <- topicsPerName(topicName)
+        topic <- topics
+        person <- topic.forbidden
       } yield PersonTopicInterdiction(person, topic)
 
     lazy val numbers: Set[TopicNeedsNumberOfPersons] =
-      for {
-        inTopic <- input.topics
-        topic <- topicsPerName(inTopic.name)
-        min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
-        max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-      } yield TopicNeedsNumberOfPersons(topic, min, max)
+      topics.map { topic => TopicNeedsNumberOfPersons(topic, topic.min, topic.max) }
 
 
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
         //TODO Better handling of simultaneous and occurrences is needed, should at least return an error
         TopicsSimultaneous(inConstraint.topics.map(topicsPerName(_).head))
+      }
+
+    lazy val simultaneousMultiple: Set[TopicsSimultaneous] =
+      input.topics.filter(_.multiple.exists(_ > 1)).flatMap { inTopic =>
+        topicGroupsPerName(inTopic.name).map(TopicsSimultaneous)
       }
 
     lazy val all: Set[Constraint] =
@@ -99,7 +115,8 @@ class InputTranscription(inputRoot: InputRoot) {
         obligations ++
         interdictions ++
         numbers ++
-        simultaneousTopics
+        simultaneousTopics ++
+        simultaneousMultiple
   }
 
   /* Preferences */
@@ -109,12 +126,16 @@ class InputTranscription(inputRoot: InputRoot) {
         TopicsExclusive(inConstraint.topics.flatMap(topicsPerName), inConstraint.exemptions.map(personsPerName), Score.PersonTotalScore.negative * 100)
       }
 
-    lazy val exclusiveOccurrences: Set[TopicsExclusive] =
-      input.topics.filter(_.occurrences.exists(_ > 1)).map { inTopic =>
-        val topics = topicsPerName(inTopic.name)
-        val mandatoryPersons = input.persons.filter(_.mandatory.contains(inTopic.name)).map(ip => personsPerName(ip.name))
-        TopicsExclusive(topics, mandatoryPersons, Score.PersonTotalScore.negative * 100)
-      }
+    lazy val exclusiveOccurrencesAndMultiples: Set[TopicsExclusive] =
+      input.topics
+        .filter { t =>
+          t.occurrences.exists(_ > 1) || t.multiple.exists(_ > 1)
+        }
+        .map { inTopic =>
+          val topics = topicsPerName(inTopic.name)
+          val mandatoryPersons = input.persons.filter(_.mandatory.contains(inTopic.name)).map(ip => personsPerName(ip.name))
+          TopicsExclusive(topics, mandatoryPersons, Score.PersonTotalScore.negative * 100)
+        }
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
       input.persons.collect {
@@ -141,7 +162,7 @@ class InputTranscription(inputRoot: InputRoot) {
       groupDislikes ++
         personTopicPreferences ++
         exclusiveTopics ++
-        exclusiveOccurrences
+        exclusiveOccurrencesAndMultiples
   }
 
   object Unassigned {

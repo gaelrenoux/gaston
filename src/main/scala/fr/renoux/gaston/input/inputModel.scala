@@ -59,10 +59,14 @@ case class InputTopic(
     min: Option[Int] = None,
     max: Option[Int] = None,
     occurrences: Option[Int] = None,
+    multiple: Option[Int] = None,
     slots: Option[Set[String]] = None
 ) {
   /** Occurrence needs to be an Option to not appear when not needed */
   lazy val forcedOccurrences: Int = occurrences.getOrElse(1)
+
+  /** Multiple needs to be an Option to not appear when not needed */
+  lazy val forcedMultiple: Int = multiple.getOrElse(1)
 }
 
 case class InputPerson(

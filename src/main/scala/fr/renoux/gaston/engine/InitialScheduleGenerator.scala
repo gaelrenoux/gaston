@@ -102,7 +102,9 @@ class InitialScheduleGenerator(val problem: Problem) {
         val nextTopics = topicsLeft.tail
 
         val record = Record(currentSlot, currentTopic, currentTopic.mandatory) //new record we want to try
-        val candidate = partialSchedule + record // generate a new candidate with this record
+        val necessaryAdditions = problem.simultaneousTopicPerTopic(currentTopic).map(t => Record(currentSlot, t, t.mandatory))
+
+        val candidate = partialSchedule + record ++ necessaryAdditions // generate a new candidate with this record
 
         val possibleSchedule =
           if (candidate.isSound && candidate.isPartialSolution && minPersonsOnSlot(candidate, currentSlot) <= problem.personsCount) {

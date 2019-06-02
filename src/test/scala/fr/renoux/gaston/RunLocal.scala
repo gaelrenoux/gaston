@@ -25,10 +25,15 @@ object RunLocal extends App {
     "--generate-input",
   ))
 
-  def runOnRealCase(): Unit = Main.main(Array(
+  def runUdoCon2017(): Unit = Main.main(Array(
     "--from",
     "src/test/resources/udocon2017/uc17-completed.conf"
   ))
 
-  displayUdoCon2019()
+  def runUdoCon2019(): Unit = Main.main(Array(
+    "--from",
+    "src/test/resources/udocon2019/uc19-completed.conf"
+  ))
+
+  runUdoCon2019()
 }

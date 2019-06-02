@@ -35,17 +35,12 @@ class ProblemImpl(
     for {p <- persons; s <- slots if !absences((p, s))} yield (p, s)
   }
 
-  /** For each persons, its available slots */
   lazy val slotsPerPerson: Map[Person, Set[Slot]] = personSlotsPossibilities.groupToMap
 
-  /** For each slot, the available persons */
   lazy val personsPerSlot: Map[Slot, Set[Person]] = personSlotsPossibilities.map(_.swap).groupToMap
 
-  /** For each slot, the number of available persons */
   lazy val personsCountPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
 
-  /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
-    * are mandatory). */
   lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
     val couples = for {
       topic1 <- topics
@@ -56,8 +51,6 @@ class ProblemImpl(
     couples.groupToMap.withDefaultValue(Set.empty)
   }
 
-  /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
-    * is missing). */
   lazy val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slots
@@ -68,13 +61,19 @@ class ProblemImpl(
     couples.groupToMap.withDefaultValue(Set.empty)
   }
 
+  lazy val simultaneousTopicPerTopic: Map[Topic, Set[Topic]] = {
+    constraints.collect {
+      case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
+    }.flatten.toMap.withDefaultValue(Set())
+  }
+
   /** For each slots, the topics that must happen in that slot. Handles only topics with just one possible slot. */
   lazy val forcedTopicsPerSlot: Map[Slot, Set[Topic]] =
     constraints.collect {
       case TopicForcedSlot(topic, slotSet) if slotSet.size == 1 => slotSet.head -> topic
     }.groupBy(_._1).mapValuesStrict(_.map(_._2))
 
-  lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect{
+  lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
   }.groupBy(_.person).withDefaultValue(Set())
 
