@@ -17,7 +17,7 @@ class Benchmark extends FlatSpec with Matchers {
 
   private val log = Logger[Benchmark]
 
-  private val udoConProblem = problemFromClassPath("udocon-2017-completed.conf").force
+  private val udoConProblem = problemFromClassPath("udocon2017/uc17-completed.conf").force
   private val lastYear = UdoConTestModel.Solutions.Actual
   udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
 

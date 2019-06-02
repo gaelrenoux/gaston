@@ -36,10 +36,10 @@ class TableReaderSpec extends FlatSpec with Matchers {
 
   behavior of "read"
   it should "read correctly" in {
-    val table = Source.fromResource("udocon-2017-table.csv").mkString
+    val table = Source.fromResource("udocon2017/uc17-table.csv").mkString
     val input = reader.read(table)
 
-    val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").force
+    val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check a small one first, easier to debug */
     val ib = input.gaston.persons.find(_.name == "Boojum")
@@ -67,12 +67,12 @@ class TableReaderSpec extends FlatSpec with Matchers {
   }
 
   it should "be rendered correctly" in {
-    val table = Source.fromResource("udocon-2017-table.csv").mkString
+    val table = Source.fromResource("udocon2017/uc17-table.csv").mkString
     val input = reader.read(table)
     val rendered = InputLoader.render(input)
 
     val evaluated = InputLoader.fromString(rendered).force
-    val expected = InputLoader.fromClassPath("udocon-2017-from-table.conf").force
+    val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check all */
     if (input != expected) {
