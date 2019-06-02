@@ -34,7 +34,7 @@ case class InputTableSettings(
     wishesStartRow: Int = 1,
     personsStartCol: Int = 4,
     topicCol: Int = 0,
-    topicOccurrenceCountCol: Option[Int] = None,
+    topicOccurrencesCol: Option[Int] = None,
     mandatoryPersonCol: Int = 1,
     minPersonsCol: Option[Int] = None,
     maxPersonsCol: Int = 3,

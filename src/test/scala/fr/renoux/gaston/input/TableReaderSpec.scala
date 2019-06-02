@@ -17,7 +17,7 @@ class TableReaderSpec extends FlatSpec with Matchers {
     topicCol = 0,
     maxPersonsCol = 2,
     minPersonsCol = None,
-    topicOccurrenceCountCol = None,
+    topicOccurrencesCol = None,
     personsCountAdd = 1,
     mandatoryPersonCol = 1,
     mandatoryPersonWeight = Weight(1.5),

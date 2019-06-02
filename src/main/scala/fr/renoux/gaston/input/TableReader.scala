@@ -46,7 +46,7 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
         val topicName: String = row(tableSettings.topicCol)
         val max: Option[Int] = row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd)
         val min: Option[Int] = tableSettings.minPersonsCol.map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd)
-        val occurrences: Option[Int] = tableSettings.topicOccurrenceCountCol.map(row).flatMap(_.toIntOption)
+        val occurrences: Option[Int] = tableSettings.topicOccurrencesCol.map(row).flatMap(_.toIntOption)
 
         InputTopic(
           name = topicName,
