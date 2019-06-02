@@ -45,9 +45,10 @@ measure, each person has 1000 points distributed over their wishes.
         - `max-topics`: Maximum number of topics to schedule on this slot (e.g. because space as limited at that time).
     - `topics`: The topics to schedule. The following lines describe the structure of one topic.
         - `name`: Name of the topic. Must be unique among topics.
-        - `min`: Minimum number of persons on a topic. Default value is empty (will use the settings' value).  
-        - `max`: Maximum number of persons on a topic. Default value is empty (will use the settings' value).  
+        - `min`: Minimum number of persons on a topic. Default value is empty (will use the settings' value).
+        - `max`: Maximum number of persons on a topic. Default value is empty (will use the settings' value).
         - `occurrences`: How many sessions of the topic are possible. Default value is 1.
+        - `multiple`: How many parallel sessions this topic represents (all sessions are simultaneous). Note than min and max are for one session. Default value is 1.
         - `slots`: An array of slot names on which the topic can be scheduled. Default value is empty (can be scheduled on any slot).  
     - `persons`: The persons to schedule. The following lines describe the structure of one person.
         - `name`: Name of the person. Must be unique among persons.
