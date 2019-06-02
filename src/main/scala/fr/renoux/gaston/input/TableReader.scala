@@ -98,7 +98,7 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
     InputRoot(
       InputModel(
         settings = settings,
-        tableSettings = Some(tableSettings),
+        tableSettings = tableSettings,
         slots = slots,
         persons = SortedSet(persons: _*),
         topics = SortedSet(topicsSeq: _*),

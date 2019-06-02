@@ -1,39 +1,12 @@
 package fr.renoux.gaston.input
 
-import java.io.File
-
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.model.{Slot, _}
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
+import fr.renoux.gaston.model.{Slot, _}
 import org.scalatest.{FlatSpec, Matchers}
 
 class InputSpec extends FlatSpec with Matchers {
-
-  "Loading from default" should "load the default input when no name is given" in {
-    val input = InputLoader.fromDefault.force
-    input.gaston.settings.defaultMaxTopicsPerSlot should be(Some(3))
-    input.gaston.persons.size should be(15)
-  }
-
-  "Loading from the classpath" should "load the correct input" in {
-    val input = InputLoader.fromClassPath("named-configuration.conf").force
-    input.gaston.settings.incompatibilityAntiPreference should be(Score(-1042))
-    input.gaston.persons.size should be(1)
-  }
-
-  "Loading from a file" should "load the correct input" in {
-    val stringPath = getClass.getResource("/named-configuration.conf").getPath
-    val path = new File(stringPath).toPath
-    val input = InputLoader.fromPath(path).force
-    input.gaston.settings.incompatibilityAntiPreference should be(Score(-1042))
-    input.gaston.persons.size should be(1)
-  }
-
-  "Checking the sample" should "work" in {
-    InputLoader.fromClassPath("application.conf").force
-  }
-
 
   val problem: Problem = problemFromClassPath("test-application").force
 

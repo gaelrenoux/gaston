@@ -13,7 +13,7 @@ package object input {
   def InputErrors(hDesc: String, tDesc: String*): InputErrors =
     NonEmptyList(InputError(hDesc), tDesc.map(InputError(_)): _*)
 
-  /** Loads from application.conf (and reference.conf) */
+  /** Loads default values */
   def problemFromDefault: InputErrors \/ Problem = InputLoader.fromDefault.flatMap(transcribe)
 
   /** Loads from a specifically-named file if the classpath. */

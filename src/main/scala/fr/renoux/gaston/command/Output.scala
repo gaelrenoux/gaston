@@ -29,7 +29,7 @@ class Output(silent: Boolean = false) {
   }
 
   def writeInput(inputRoot: InputRoot): Unit =
-    write(s"Aggregated configuration file is:\n\n${InputLoader.render(inputRoot)}\n")
+    write(s"\n${InputLoader.render(inputRoot)}\n")
 
   def writeScheduleIfBetter(scoredSchedule: ScoredSchedule, problem: Problem): Unit = synchronized {
     if (scoredSchedule.score > bestScore) {

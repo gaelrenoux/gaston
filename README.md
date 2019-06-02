@@ -63,6 +63,11 @@ measure, each person has 1000 points distributed over their wishes.
         - `exclusive`: An array of exclusivity constraints.
             - `topics`: An array of topics. A person can only be scheduled on one of these topics.
 
+You can generate an input file with old default values with:
+```
+java -jar target/scala-2.12/gaston-assembly-0.2-SNAPSHOT.jar --generate-input
+```
+
 
 ### Example
 
@@ -219,7 +224,6 @@ The parameters for the import are in the `tableSettings` section of the input fi
 - `mandatory-person-weight`: A special weight for a person if it is mandatory on at least one topic (see field `gaston.persons.weight`). Default value is `1`, i.e. same as everyone else. 
 - `forbidden-person-marker`: This value in a wish cell indicates that that person is forbidden on that topic (see field `gaston.persons.forbidden`). Default value is `0`.
 - `preferences-score-mapping`: An object mapping for each possible text in a wish cell, the associated score. Unknown texts are ignored. Optional, if the field is missing (or set to `null`), the text in the cell will be converted as the number and used (if the text is not a number, it is ignored).
-
 
 ### Example input
 

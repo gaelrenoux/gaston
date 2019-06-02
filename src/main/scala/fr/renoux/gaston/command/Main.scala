@@ -61,22 +61,21 @@ object Main {
   /** Load the requested input, according to the command lines arguments */
   private def loadInput(commandLine: CommandLine): InputErrors \/ InputRoot = for {
     baseInput <- commandLine.inputFile.map { path =>
-        log.info(s"Loading from $path")
-        InputLoader.fromPath(path)
-      }.getOrElse {
+      log.info(s"Loading from $path")
+      InputLoader.fromPath(path)
+    }.getOrElse {
       log.info(s"Loading from default")
-        InputLoader.fromDefault
-      }
-    udoConInputOption <- commandLine.tableFile.traverse(loadUdoConSettings(baseInput, _))
-  } yield udoConInputOption getOrElse baseInput
+      InputLoader.fromDefault
+    }
+    tableInputOption <- commandLine.tableFile.traverse(importTable(baseInput, _))
+  } yield tableInputOption getOrElse baseInput
 
-  /** Load the table settings, if they are required */
-  private def loadUdoConSettings(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot = for {
-    table <- stringFromFile(path)
-    tableSettings <- baseInput.gaston.tableSettings.toRightDisjunction(InputErrors("Missing table settings"))
-    udoReader = new TableReader(tableSettings, baseInput.gaston.settings)
-    udoInput = udoReader.read(table)
-  } yield udoInput
+  /** Import a table */
+  private def importTable(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot =
+    stringFromFile(path).map { table =>
+      val reader = new TableReader(baseInput.gaston.tableSettings, baseInput.gaston.settings)
+      reader.read(table)
+    }
 
   private def stringFromFile(path: Path): InputErrors \/ String = Try {
     val src = Source.fromFile(path.toFile)

@@ -18,7 +18,7 @@ object MainLauncher extends App {
   def displayUdoCon2018(): Unit = Main.main(Array(
     "--from",
     "/home/gael/Temp/UdoCon/udocon_2018_settings.conf",
-    "--from-udo-table",
+    "--from-table",
     "/home/gael/Temp/UdoCon/udocon_2018_table.conf",
     "--generate-input",
   ))

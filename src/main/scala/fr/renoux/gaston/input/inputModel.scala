@@ -5,12 +5,12 @@ import fr.renoux.gaston.model._
 /* All line and column indices are zero-based */
 
 case class InputRoot(
-    gaston: InputModel
+    gaston: InputModel = InputModel()
 )
 
 case class InputModel(
     settings: InputSettings = InputSettings(),
-    tableSettings: Option[InputTableSettings] = None,
+    tableSettings: InputTableSettings = InputTableSettings(),
     slots: Seq[Seq[InputSlot]] = Seq(),
     persons: Set[InputPerson] = Set(),
     topics: Set[InputTopic] = Set(),
@@ -24,7 +24,7 @@ case class InputSettings(
     defaultMaxPersonsPerTopic: Int = 10,
     maxPersonsOnNothing: Int = 0,
     minPersonsOnNothing: Int = 0,
-    personOnNothingAntiPreference: Score = Score.Zero,
+    personOnNothingAntiPreference: Score = Score(-100),
     backtrackInitialSchedule: Boolean = true //TODO Should be calculated
 )
 

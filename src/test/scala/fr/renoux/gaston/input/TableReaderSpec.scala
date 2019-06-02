@@ -9,7 +9,7 @@ import scala.io.Source
 
 class TableReaderSpec extends FlatSpec with Matchers {
 
-  val udoSettings = InputTableSettings(
+  val tableSettings = InputTableSettings(
     separator = "\t",
     personsRow = 0,
     wishesStartRow = 1,
@@ -32,7 +32,7 @@ class TableReaderSpec extends FlatSpec with Matchers {
     personOnNothingAntiPreference = Score(-100)
   )
 
-  val reader = new TableReader(udoSettings, settings)
+  val reader = new TableReader(tableSettings, settings)
 
   behavior of "read"
   it should "read correctly" in {

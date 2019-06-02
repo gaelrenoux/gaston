@@ -24,7 +24,7 @@ object InputLoader {
   /* Do not delete the pureconfig.generic.auto._ import even though IntelliJ marks is as unused */
   import pureconfig.generic.auto._
 
-  /** Loads from application.conf (and reference.conf) */
+  /** Loads from default values */
   def fromDefault: InputErrors \/ InputRoot = loadConfig[InputRoot].disjunction.leftMap(transformErrors)
 
   /** Loads from a specifically-named file if the classpath. */
@@ -33,7 +33,7 @@ object InputLoader {
     loadConfig[InputRoot](tsConfig).disjunction.leftMap(transformErrors)
   }
 
-  /** Loads from defined files on the filesystem. Ignores the reference configuration. */
+  /** Loads from defined files on the filesystem. */
   def fromPath(files: Path*): InputErrors \/ InputRoot = {
     log.debug(s"Loading those files: ${files.mkString("; ")}")
     loadConfigFromFiles[InputRoot](files, failOnReadError = true).disjunction.leftMap(transformErrors)
