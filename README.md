@@ -37,12 +37,12 @@ measure, each person has 1000 points distributed over their wishes.
         - `separator`: Separator between fields (should be inside quotation marks). Default value is `\t` (tabulation). 
         - `persons-row`: Row where the person names appear. Default value is `0` (first row).
         - `wishes-start-row`: First row of wishes, typically one because there's the persons' line before. Default value is `1` (wishes start on the second line).
-        - `persons-start-index`: First column containing a person on the persons' line. Default value is `4`.
-        - `topic-index`: The topics's column. Default value is `0`. 
-        - `topic-occurrence-count-index`: The column indicating how many sessions of the topic are possible. Default value is empty, meaning all topics can only happen once. 
-        - `mandatory-person-index`: The column indicating the mandatory person on a topic. Default value is `1`. 
-        - `min-persons-index`: The column indicating the min number of persons on a topic. Default value is empty (will use the settings' value). 
-        - `max-persons-index`: The column indicating the max number of persons on a topic. Default value is empty (will use the settings' value). 
+        - `persons-start-col`: First column containing a person on the persons' line. Default value is `4`.
+        - `topic-col`: The topics's column. Default value is `0`. 
+        - `topic-occurrence-count-col`: The column indicating how many sessions of the topic are possible. Default value is empty, meaning all topics can only happen once. 
+        - `mandatory-person-col`: The column indicating the mandatory person on a topic. Default value is `1`. 
+        - `min-persons-col`: The column indicating the min number of persons on a topic. Default value is empty (will use the settings' value). 
+        - `max-persons-col`: The column indicating the max number of persons on a topic. Default value is empty (will use the settings' value). 
         - `persons-count-add`: A number to add to the min and max number of persons read, because sometimes the mandatory person isn't counted in the table. Default value is `0`. 
         - `mandatory-person-weight`: A special weight for a person if it is mandatory on at least one topic (see `persons.weight` below). Default value is `1`, i.e. same as everyone else.  
         - `forbidden-person-marker`: This value in a wish cell indicates that that person is forbidden on that topic. Default value is `0`.

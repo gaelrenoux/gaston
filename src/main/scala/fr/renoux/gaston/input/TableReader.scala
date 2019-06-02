@@ -43,10 +43,10 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
     /* Topics. Keep the order to zip with the choices later */
     val topicsSeq: Seq[InputTopic] =
       cellsWithContent.map { row =>
-        val topicName: String = row(tableSettings.topicIndex)
-        val max: Option[Int] = row(tableSettings.maxPersonsIndex).toIntOption.map(_ + tableSettings.personsCountAdd)
-        val min: Option[Int] = tableSettings.minPersonsIndex.map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd)
-        val occurrences: Option[Int] = tableSettings.topicOccurrenceCountIndex.map(row).flatMap(_.toIntOption)
+        val topicName: String = row(tableSettings.topicCol)
+        val max: Option[Int] = row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd)
+        val min: Option[Int] = tableSettings.minPersonsCol.map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd)
+        val occurrences: Option[Int] = tableSettings.topicOccurrenceCountCol.map(row).flatMap(_.toIntOption)
 
         InputTopic(
           name = topicName,
@@ -61,13 +61,13 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
 
     /* For each person's names, a list of mandatory topic's names */
     val mandatoryPersonsToTopics = cells.map { row =>
-      val topicName: String = row(tableSettings.topicIndex)
-      val mandatoryName: String = row(tableSettings.mandatoryPersonIndex)
+      val topicName: String = row(tableSettings.topicCol)
+      val mandatoryName: String = row(tableSettings.mandatoryPersonCol)
       mandatoryName -> topicName
     }.groupToMap.mapValuesStrict(_.toSet)
 
     /* The persons, */
-    val indexedPersonNames = cellsPersonsRow.zipWithIndex.drop(tableSettings.personsStartIndex)
+    val indexedPersonNames = cellsPersonsRow.zipWithIndex.drop(tableSettings.personsStartCol)
     val persons = indexedPersonNames.map { case (person, personColumnIndex) =>
 
       val personColumn = cellsWithContent.map { row =>
