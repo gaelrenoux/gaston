@@ -32,7 +32,16 @@ class TableReaderSpec extends FlatSpec with Matchers {
     personOnNothingAntiPreference = Score(-100)
   )
 
-  val reader = new TableReader(tableSettings, settings)
+  val input = InputModel(
+    settings = settings,
+    tableSettings = tableSettings,
+    slots = Seq(
+      Seq(InputSlot("D1-afternoon"), InputSlot("D1-evening", maxTopics = Some(5))),
+      Seq(InputSlot("D2-afternoon"), InputSlot("D2-evening", maxTopics = Some(5))),
+      Seq(InputSlot("D3-afternoon"))
+    ))
+
+  val reader = new TableReader(input)
 
   behavior of "read"
   it should "read correctly" in {

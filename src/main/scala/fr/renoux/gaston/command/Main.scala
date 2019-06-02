@@ -73,7 +73,7 @@ object Main {
   /** Import a table */
   private def importTable(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot =
     stringFromFile(path).map { table =>
-      val reader = new TableReader(baseInput.gaston.tableSettings, baseInput.gaston.settings)
+      val reader = new TableReader(baseInput.gaston)
       reader.read(table)
     }
 

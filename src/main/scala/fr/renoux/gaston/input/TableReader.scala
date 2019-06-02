@@ -12,7 +12,10 @@ import scala.util.Try
 /**
   * Reads a table of preferences to complement the input settings.
   */
-class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
+class TableReader(input: InputModel) {
+
+  val tableSettings: InputTableSettings = input.tableSettings
+  val settings: InputSettings = input.settings
 
   private val log = Logger[TableReader]
 
@@ -32,13 +35,6 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
     log.debug(s"Cells:\n${cells.mkString("\n")}")
     val cellsPersonsRow = cells(tableSettings.personsRow)
     val cellsWithContent = cells.drop(tableSettings.wishesStartRow)
-
-    /* Slots are sample slots, generated */
-    val slots = Seq(
-      Seq(InputSlot("Day1-afternoon"), InputSlot("Day1-evening", maxTopics = Some(4))),
-      Seq(InputSlot("Day2-afternoon"))
-    )
-
 
     /* Topics. Keep the order to zip with the choices later */
     val topicsSeq: Seq[InputTopic] =
@@ -99,7 +95,7 @@ class TableReader(tableSettings: InputTableSettings, settings: InputSettings) {
       InputModel(
         settings = settings,
         tableSettings = tableSettings,
-        slots = slots,
+        slots = input.slots,
         persons = SortedSet(persons: _*),
         topics = SortedSet(topicsSeq: _*),
         constraints = InputGlobalConstraints()
