@@ -39,6 +39,11 @@ trait Problem {
 
   val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
 
+  val forbiddenTopicsPerPerson: Map[Person, Set[Topic]]
+
+  /** For everyone, their personal preferences */
+  val preferencesPerPerson: Map[Person, Set[Preference.Personal]]
+
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
     * are mandatory). */
   val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]]

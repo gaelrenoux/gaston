@@ -28,6 +28,11 @@ case class InputSettings(
     backtrackInitialSchedule: Boolean = true //TODO Should be calculated
 )
 
+object InputSettings {
+  val defaultDefaultMinPersonsPerTopic: Int = 1
+  val defaultDefaultMaxPersonsPerTopic: Int = 10
+}
+
 case class InputTableSettings(
     separator: String = "\t",
     personsRow: Int = 0,

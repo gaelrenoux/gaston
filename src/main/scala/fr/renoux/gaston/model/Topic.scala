@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.input.InputSettings
+
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
   * @param movable Can the topic be moved to another slot than the one it is on ?
@@ -9,14 +11,14 @@ case class Topic(
     name: String,
     mandatory: Set[Person] = Set(),
     forbidden: Set[Person] = Set(),
-    min: Int = 0,
+    min: Int = Topic.DefaultMin,
     max: Int = Topic.DefaultMax,
     movable: Boolean = true,
     removable: Boolean = true
 ) {
 
-  /** Create a series of duplicates for this Topic (for multi-occurrence topics) */
-  def duplicates(count: Int): Set[Topic] = (1 to count).toSet[Int].map(i => copy(name = s"$name $i"))
+  /** Duplicate this Topic as several occurrences */
+  def occurrences(count: Int): Set[Topic] = (1 to count).toSet[Int].map(i => copy(name = s"$name #$i"))
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
@@ -24,7 +26,9 @@ case class Topic(
 
 object Topic {
 
-  private val DefaultMax = 1000
+  private val DefaultMin = InputSettings.defaultDefaultMinPersonsPerTopic
+
+  private val DefaultMax = InputSettings.defaultDefaultMaxPersonsPerTopic
 
   /** Topics for people assigned to doing nothing. */
   def nothing(slot: Slot) = Topic(s"Nothing (${slot.name})", movable = false)

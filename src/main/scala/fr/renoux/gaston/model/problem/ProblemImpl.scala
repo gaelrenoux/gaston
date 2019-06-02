@@ -23,9 +23,11 @@ class ProblemImpl(
     case SlotMaxTopicCount(slot, count) => slot -> count
   }.toMap.withDefaultValue(Int.MaxValue)
 
-
   lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] =
     topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
+
+  lazy val forbiddenTopicsPerPerson: Map[Person, Set[Topic]] =
+    topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 
   /** Indicates wether a person is available on a slot or not. */
   lazy val personSlotsPossibilities: Set[(Person, Slot)] = {
@@ -72,10 +74,9 @@ class ProblemImpl(
       case TopicForcedSlot(topic, slotSet) if slotSet.size == 1 => slotSet.head -> topic
     }.groupBy(_._1).mapValuesStrict(_.map(_._2))
 
-  /** For everyone, its preferences */
   lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect{
     case p: Preference.Personal => p
-  }.groupBy(_.person)
+  }.groupBy(_.person).withDefaultValue(Set())
 
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")

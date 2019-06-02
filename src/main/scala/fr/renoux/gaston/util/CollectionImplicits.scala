@@ -43,6 +43,8 @@ object CollectionImplicits {
     /** Unjike Scala's mapValues, this one is **not** lazily evaluated. */
     def mapValuesStrict[V1](f: V => V1): Map[K, V1] = wrapped.map { case (k, v) => k -> f(v) }
 
+    def mapKeys[K1](f: K => K1): Map[K1, V] = wrapped.map { case (k, v) => f(k) -> v }
+
   }
 
 }

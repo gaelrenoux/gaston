@@ -25,11 +25,14 @@ class InputTranscription(inputRoot: InputRoot) {
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
     val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max)
 
-    inTopic.forcedOccurrences match {
-      case 1 => inTopic.name -> Set(baseTopic)
-      case c if c > 0 => inTopic.name -> baseTopic.duplicates(c)
-      case _ => throw new IllegalArgumentException("Can't have a negative number of occurrences") //TODO use Refined instead
+    val occurringTopics = inTopic.forcedOccurrences match {
+      case 1 => Set(baseTopic)
+      case c if c > 0 => baseTopic.occurrences(c)
+      case _ => throw new IllegalArgumentException("Can't have a non-positive number of occurrences") //TODO use Refined instead
     }
+
+    inTopic.name -> occurringTopics
+
   }.toMap
 
   /* Persons */
@@ -85,7 +88,7 @@ class InputTranscription(inputRoot: InputRoot) {
 
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
-        //TODO Better handling of simultaneous and multiple is needed, should at least return an error
+        //TODO Better handling of simultaneous and occurrences is needed, should at least return an error
         TopicsSimultaneous(inConstraint.topics.map(topicsPerName(_).head))
       }
 
