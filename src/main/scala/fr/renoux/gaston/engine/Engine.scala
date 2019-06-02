@@ -78,6 +78,8 @@ class Engine(
 
   private def shuffled[A](set: Set[A]): Seq[A] = Random.shuffle(set.toSeq)
 
+  private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicPerTopic(topic) + topic
+
   /** Take an already improved schedule, and return the first better schedule it can found by swapping topics. */
   private def heavyImprovement(schedule: Schedule, previousMove: Move)
     (implicit rand: Random, tools: Tools): Option[(Schedule, Move)] = {
@@ -89,16 +91,18 @@ class Engine(
       /* Filter out impossible adds because of incompatibility */
       slotSchedule = schedule.on(slot)
       topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.currentIncompatibleTopics).view
+      topicsToAdd = linkedTopics(topic)
 
-      move = Move.Add(slot, topic)
+      move = Move.Add(slot, topicsToAdd)
       if !move.reverts(previousMove)
 
       /* Filter out impossible adds because mandatory persons are already taken */
       mandatoryPersonsSlot = slotSchedule.mandatory
-      if !topic.mandatory.exists(mandatoryPersonsSlot)
+      if !topicsToAdd.flatMap(_.mandatory).exists(mandatoryPersonsSlot)
 
       /* Generate the swap */
-      partial = schedule.clearSlots(slot).add(Record(slot, topic, topic.mandatory))
+      records = topicsToAdd.map { t => Record(slot, t, t.mandatory) }
+      partial = schedule.clearSlots(slot).add(records)
       if partial.isPartialSolution
 
       /* Filter out impossible adds because of unreachable minimum */
@@ -113,16 +117,18 @@ class Engine(
 
       t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.hardIncompatibleTopics).view //can't take current topics since we're removing one
       t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.hardIncompatibleTopics).view //can't take current topics since we're removing one
-      move = Move.Swap(t1, t2)
+      topics1 = linkedTopics(t1)
+      topics2 = linkedTopics(t2)
+      move = Move.Swap(topics1, topics2)
       if !move.reverts(previousMove)
 
       /* Filter out impossible swaps because of mandatory persons */
-      if !t1.mandatory.exists(slotSchedule2.mandatory) //check mandatories of T1 are not already blocked on S2
-      if !t2.mandatory.exists(slotSchedule1.mandatory) //check mandatories of T2 are not already blocked on S1
+      if !topics1.flatMap(_.mandatory).exists(slotSchedule2.mandatory) //check mandatories of T1 are not already blocked on S2
+      if !topics2.flatMap(_.mandatory).exists(slotSchedule1.mandatory) //check mandatories of T2 are not already blocked on S1
 
       /* Generate the swap */
-      partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> t1, s2 -> t2)
-      if partial.isPartialSolution //TODO recheck everything, could maybe not check what has been verified already
+      partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> topics1, s2 -> topics2)
+      if partial.isPartialSolution //TODO this rechecks everything, we shouldn't check what has been checked individually before
     } yield (partial, move)
 
 
@@ -130,16 +136,18 @@ class Engine(
     lazy val allExternalSwaps = for {
       newT <- shuffled(schedule.unscheduledTopics).view
       oldT <- shuffled(schedule.scheduledTopics).view
-      move = Move.Swap(oldT, newT)
+      newTs = linkedTopics(newT)
+      oldTs = linkedTopics(oldT)
+      move = Move.Swap(oldTs, newTs)
       if !move.reverts(previousMove)
       slot = schedule.topicToSlot(oldT)
       slotSchedule = schedule.on(slot)
 
       /* Filter out impossible swaps because of mandatory persons */
-      if !newT.mandatory.exists(slotSchedule.mandatory)
+      if !newTs.flatMap(_.mandatory).exists(slotSchedule.mandatory)
 
       /* Generate the swap */
-      partial = schedule.clearSlots(slot).replaceTopic(oldT, newT)
+      partial = schedule.clearSlots(slot).replaceTopics(slot, oldTs, newTs)
       if partial.isPartialSolution
     } yield (partial, move)
 
@@ -149,11 +157,13 @@ class Engine(
       slot <- shuffled(problem.slots).view
       slotSchedule = schedule.on(slot)
       topic <- shuffled(slotSchedule.topics).view
-      move = Move.Remove(slot, topic)
+      topicsToRemove = linkedTopics(topic)
+
+      move = Move.Remove(slot, topicsToRemove)
       if !move.reverts(previousMove)
 
       /* Generate the swap */
-      partial = schedule.removeTopic(topic)
+      partial = schedule.removeTopics(topicsToRemove)
       if partial.isPartialSolution
 
       /* Filter out impossible adds because of maximum too low */
@@ -186,21 +196,21 @@ object Engine {
       override def reverts(m: Move): Boolean = false
     }
 
-    case class Swap(a: Topic, b: Topic) extends Move {
+    case class Swap(a: Set[Topic], b: Set[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
         case Swap(a1, b1) if (a, b) == (a1, b1) || (a, b) == (b1, a1) => true
         case _ => false
       }
     }
 
-    case class Add(s: Slot, t: Topic) extends Move {
+    case class Add(s: Slot, t: Set[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
         case Remove(s1, t1) if s == s1 && t == t1 => true
         case _ => false
       }
     }
 
-    case class Remove(s: Slot, t: Topic) extends Move {
+    case class Remove(s: Slot, t: Set[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
         case Add(s1, t1) if s == s1 && t == t1 => true
         case _ => false

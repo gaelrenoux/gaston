@@ -73,9 +73,18 @@ case class Schedule(
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
-  def swapTopics(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = partialMapRecords {
+  def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = partialMapRecords {
     case Record(s, t, _) if (s, t) == st1 => Record(s, st2._2, st2._2.mandatory) //TODO should probably have a method that corrects the schedule
     case Record(s, t, _) if (s, t) == st2 => Record(s, st1._2, st1._2.mandatory)
+  }
+
+  /** Swap two groups of topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
+    * schedule is probably unsound and/or partial. */
+  def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = updateRecords { records =>
+    val all = st1._2 ++ st2._2
+    records.filterNot(r => all.contains(r.topic)) ++
+      st1._2.map(t => Record(st2._1, t, t.mandatory)) ++
+      st2._2.map(t => Record(st1._1, t, t.mandatory))
   }
 
   /** Replace an existing topic by a new one (typically unscheduled, on a slot). Mandatory persons are set on the new
@@ -84,7 +93,14 @@ case class Schedule(
     case Record(s, t, _) if t == oldTopic => Record(s, newTopic, newTopic.mandatory)
   }
 
+  def replaceTopics(slot: Slot, oldTopics: Set[Topic], newTopics: Set[Topic]): Schedule = updateRecords { records =>
+    records.filterNot(r => oldTopics.contains(r.topic)) ++
+      newTopics.map(t => Record(slot, t, t.mandatory))
+  }
+
   def removeTopic(topic: Topic): Schedule = updateRecords(_.filter(_.topic != topic))
+
+  def removeTopics(topics: Set[Topic]): Schedule = updateRecords(_.filterNot(r => topics.contains(r.topic)))
 
 
   /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */
