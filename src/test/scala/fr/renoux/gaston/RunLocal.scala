@@ -1,8 +1,11 @@
 package fr.renoux.gaston
 
+import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.command.Main
 
 object RunLocal extends App {
+
+  val log = Logger[RunLocal.type]
 
   def displaySample(): Unit = Main.main(Array(
     "--from-sample",
@@ -34,6 +37,10 @@ object RunLocal extends App {
     "--from",
     "src/test/resources/udocon2019/uc19-completed.conf"
   ))
+
+  log.info("Let's start !!!")
+  log.debug("Checking debug level")
+  log.trace("Checking trace level")
 
   runUdoCon2019()
 }

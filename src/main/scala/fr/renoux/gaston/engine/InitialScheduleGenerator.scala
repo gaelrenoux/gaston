@@ -24,6 +24,7 @@ class InitialScheduleGenerator(val problem: Problem) {
   val improver = new ScheduleImprover(problem)
 
   def generate(implicit random: Random): Schedule = {
+    log.debug("Generating a single initial schedule")
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList.filter(_.removable))
     val unimproved = recFill(Schedule.empty, Queue(slots: _*), topics, Nil)
@@ -44,6 +45,7 @@ class InitialScheduleGenerator(val problem: Problem) {
 
   /** A lazy sequence of partial schedules. If the first one doesn't fit, go on. Ends when we can't backtrack any more. */
   def lazySeq(implicit random: Random): Stream[Schedule] = {
+    log.debug("Generating a stream of schedules")
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList)
 
@@ -78,7 +80,7 @@ class InitialScheduleGenerator(val problem: Problem) {
         None
       } else {
         /* go on without the current slot */
-        log.trace("Go on without current clot because no topic available for it and it is already satisfied")
+        log.trace("Go on without current slot because no topic available for it and it is already satisfied")
         backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft.tail, topicsLeft ::: topicsPassed)
       }
 
@@ -93,7 +95,7 @@ class InitialScheduleGenerator(val problem: Problem) {
           None
         } else {
           /* go on without the current slot */
-          log.trace("Go on without current clot because it has reached max parallelization and it is satisfied")
+          log.trace("Go on without current slot because it has reached max parallelization and it is satisfied")
           backtrackAssignTopicsToSlots(partialSchedule)(slotsLeft.tail, topicsLeft ::: topicsPassed)
         }
       } else {
