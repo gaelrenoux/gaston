@@ -26,8 +26,7 @@ java -jar target/scala-2.12/gaston-assembly-0.2-SNAPSHOT.jar --help
 
 ## Input file
 
-The input file describes the problem to solve. It follows the HOCON format. To have an idea of how the score values
-measure, each person has 1000 points distributed over their wishes.
+The input file describes the problem to solve. It follows the HOCON format, and should be in UTF-8. To give you an idea the values of the scores, each person has 1000 points distributed over their wishes.
 
 - `gaston`: Root element of the configuration.
     - `settings`: Global settings. All fields are optional and have a default value.
@@ -57,7 +56,7 @@ measure, each person has 1000 points distributed over their wishes.
         - `mandatory`: An array of topic names for which this person is mandatory: it must be present on those topics. Default value is an empty array.
         - `forbidden`: An array of topic names for which this person is forbidden: it cannot be scheduled on those topics. Default value is an empty array.
         - `incompatible`: An array of person names this person wish not to share a topic with. Default value is an empty array.
-        - `wishes`: A mapping of topic names to scores. The higher the score, the more that persons wishes to be on that topic.
+        - `wishes`: A mapping of topic names to scores. The higher the score, the more that persons wishes to be on that topic. The scores will be rebalanced so that everyone has a 1000 points total.
     - `constraints`: Global constraints on the schedule.
         - `simultaneous`: An array of simultaneity constraints.
             - `topics`: An array of topics. Those topics must all be scheduled on the same slot, or not at all.
