@@ -1,5 +1,6 @@
 package fr.renoux.gaston.engine
 
+import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.SlotImprover.Move
 import fr.renoux.gaston.model._
 
@@ -8,12 +9,13 @@ import scala.util.Random
 class Engine(
     stopAtScore: Double = Double.MaxValue,
     maxImprovementRounds: Int = 1000,
-    backtrackInitialSchedule: Boolean = false
+    backtrackInitialSchedule: Boolean = false,
+    triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, ctx: Context) {
 
   //private val log = Logger[Engine]
 
-  private val generator = new ScheduleGenerator
+  private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
   private lazy val improver = new SlotImprover(stopAtScore, maxImprovementRounds)
 
   lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned(problem)

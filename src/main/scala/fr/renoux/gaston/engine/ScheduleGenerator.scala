@@ -1,8 +1,11 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.CollectionImplicits._
 import scalaz.Scalaz._
+import scalaz.\/
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -12,7 +15,7 @@ import scala.util.Random
   * Uses backtracking to produce a Stream of schedules. Those schedules are not the best you could have, but they are
   * valid and all persons have their optimal slots.
   */
-class ScheduleGenerator(implicit problem: Problem, ctx: Context) {
+class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
 
   private val log = Logger[ScheduleGenerator]
 
@@ -29,7 +32,7 @@ class ScheduleGenerator(implicit problem: Problem, ctx: Context) {
 
     val initialState = Option(State(Schedule.empty, Queue(slots: _*), topics))
     Stream.iterate(initialState) {
-      case Some(s) => backtrackAssignTopicsToSlots(s)
+      case Some(s) => backtrackAssignTopicsToSlots(s).toOption
       case None => None
     }.takeWhile(_.isDefined).map(_.get.partialSchedule)
   }
@@ -39,20 +42,19 @@ class ScheduleGenerator(implicit problem: Problem, ctx: Context) {
     log.debug("Generating a single schedule")
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList.filter(_.removable))
-
-    val unimproved = recFill(Schedule.empty, Queue(slots: _*), topics, Nil)
+    val state = State(Schedule.empty, Queue(slots: _*), topics)
+    val unimproved = backtrackAndFill(state)
     improver.improve(unimproved.get)
   }
 
   @tailrec
-  private def recFill(partialSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic])
+  private def backtrackAndFill(state: State)
     (implicit random: Random): Option[Schedule] = {
-    val state = State(partialSchedule, slotsLeft, topicsLeft, topicsPassed)
-    backtrackAssignTopicsToSlots(state) match {
+    backtrackAssignTopicsToSlots(state).toOption match {
       case None => None
-      case Some(State(ps, sl, tl, tp)) => filler.fill(ps) match {
-        case None => recFill(ps, sl, tl, tp)
-        case Some(s) => Some(s)
+      case Some(newState) => filler.fill(newState.partialSchedule) match {
+        case None => backtrackAndFill(newState)
+        case Some(schedule) => Some(schedule)
       }
     }
   }
@@ -63,49 +65,48 @@ class ScheduleGenerator(implicit problem: Problem, ctx: Context) {
     * needed.
     * @return The state of the backtracking, with a schedule that fits.
     */
-  private def backtrackAssignTopicsToSlots(state: State): Option[State] = {
+  private def backtrackAssignTopicsToSlots(state: State, failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)): BacktrackingFailures \/ State = {
     if (state.isSlotsEmpty) {
       log.debug("Found an initial schedule")
-      state.some
+      state.right[BacktrackingFailures]
 
     } else if (state.isTopicsEmptyOnHeadSlot) {
       /* No topic left available for the current slot. Fail if the current slot is not satisfied yet. */
       if (state.isHeadSlotMaxPersonsTooLow) {
         log.trace("Fail because no topic available for current slot and it is not satisfied yet")
-        None
+        failures.addNoTopics(state.headSlot).left[State]
       } else {
+        /* Go on without the current slot */
         log.trace("Go on without current slot because no topic available for it and it is already satisfied")
-        backtrackAssignTopicsToSlots(state.withHeadSlotSatisfied)
+        backtrackAssignTopicsToSlots(state.withHeadSlotSatisfied, failures)
       }
 
     } else if (state.isMaxParallelizationReachedOnHeadSlot) {
       /* Current slot has reached max parallelization. Fail if the current slot is not satisfied yet. */
       if (state.isHeadSlotMaxPersonsTooLow) {
         log.trace("Fail because current slot has reached max parallelization and it is not satisfied yet")
-        None
+        failures.addMaxParallelizationReached(state.headSlot).left[State]
       } else {
-        /* go on without the current slot */
+        /* Go on without the current slot */
         log.trace("Go on without current slot because it has reached max parallelization and it is satisfied")
-        backtrackAssignTopicsToSlots(state.withHeadSlotSatisfied)
+        backtrackAssignTopicsToSlots(state.withHeadSlotSatisfied, failures)
       }
+
+    } else if (!state.isGoodCandidate) {
+      /* candidate is not acceptable or lead to a failure, go on to next topic */
+      log.trace(s"Go on with new topic for current slot as the candidate is not OK")
+      backtrackAssignTopicsToSlots(state.withPassedHeadTopic, failures)
 
     } else {
-      /* We can try to add more topics to the current slot */
-      val candidateSchedule = state.candidate.partialSchedule
-
-      val possibleSchedule =
-        if (candidateSchedule.isSound && candidateSchedule.isPartialSolution && !candidateSchedule.on(state.headSlot).isMinPersonsTooHigh) {
-          log.trace(s"Go on with acceptable candidate and next slot: $candidateSchedule")
-          backtrackAssignTopicsToSlots(state.candidate)
-        } else None
-
-      possibleSchedule.orElse {
+      /* Finally ! We can try to add the current topic to the current slot */
+      log.trace(s"Go on with acceptable candidate and next slot: ${state.candidate}")
+      backtrackAssignTopicsToSlots(state.withCandidateAcknowledged, failures).recoverWith[BacktrackingFailures, State] { case fs =>
         /* candidate is not acceptable or lead to a failure, backtrack and try again with next topic */
         log.trace(s"Go on with new topic for current slot as the candidate is not OK")
-        backtrackAssignTopicsToSlots(state.withPassedHeadTopic)
+        backtrackAssignTopicsToSlots(state.withPassedHeadTopic, fs)
       }
-
     }
+
   }
 
 }
@@ -141,23 +142,44 @@ object ScheduleGenerator {
 
     lazy val withPassedHeadTopic: State = State(partialSchedule, slotsLeft, topicsLeft.tail, headTopic :: topicsPassed)
 
-    def withNewScheduleFromHeadTopic(schedule: Schedule): State = State(schedule, slotsLeft.tail :+ headSlot, topicsLeft.tail ::: topicsPassed)
+    private lazy val topicsSimultaneousWithHeadTopic = problem.simultaneousTopicPerTopic(headTopic)
 
-    lazy val candidate: State = {
+    lazy val candidate: Schedule = {
       val record = Record(headSlot, headTopic, headTopic.mandatory)
-      val additionalTopics = problem.simultaneousTopicPerTopic(headTopic)
-      val additionalRecords = additionalTopics.map(t => Record(headSlot, t, t.mandatory))
-      val candidate = partialSchedule + record ++ additionalRecords
 
+      val additionalRecords = topicsSimultaneousWithHeadTopic.map(t => Record(headSlot, t, t.mandatory))
+      partialSchedule + record ++ additionalRecords
+    }
+
+    lazy val withCandidateAcknowledged: State = {
       val newTopicsLeft =
-        if (additionalTopics.isEmpty) {
+        if (topicsSimultaneousWithHeadTopic.isEmpty) {
           topicsLeft.tail ::: topicsPassed
         } else {
-          topicsLeft.tail.filter(additionalTopics.contains) ::: topicsPassed.filter(additionalTopics.contains)
+          topicsLeft.tail.filter(topicsSimultaneousWithHeadTopic.contains) ::: topicsPassed.filter(topicsSimultaneousWithHeadTopic.contains)
         }
 
       State(candidate, slotsLeft.tail :+ headSlot, newTopicsLeft)
     }
+
+    lazy val isGoodCandidate: Boolean =
+      candidate.isSound && candidate.isPartialSolution && !candidate.on(headSlot).isMinPersonsTooHigh
+
+  }
+
+  case class BacktrackingFailures (
+      triggerOnFailures: BacktrackingFailures => Unit,
+      noTopics: Map[Slot, Int] = Map(),
+      maxParallelizationReached: Map[Slot, Int] = Map(),
+      total: Int = 0
+  ) {
+    if (total > 0) triggerOnFailures(this)
+
+    def addNoTopics(slot: Slot): BacktrackingFailures =
+      copy(noTopics = noTopics.updatedWithOrElse(slot)(_ + 1, 1), total = total + 1)
+
+    def addMaxParallelizationReached(slot: Slot): BacktrackingFailures =
+      copy(maxParallelizationReached = maxParallelizationReached.updatedWithOrElse(slot)(_ + 1, 1), total = total + 1)
   }
 
 }

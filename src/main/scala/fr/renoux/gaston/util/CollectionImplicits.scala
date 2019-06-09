@@ -36,6 +36,11 @@ object CollectionImplicits {
 
     def updatedWith(k: K)(f: V => V): Map[K, V] = wrapped.alter(k)(_.map(f))
 
+    def updatedWithOrElse(k: K)(f: V => V, v: => V): Map[K, V] = {
+      val newValue = wrapped.get(k).map(f).getOrElse(v)
+      wrapped.updated(k, newValue)
+    }
+
     def toFormattedString: String = wrapped.map { case (key, value) =>
       s"$key: $value"
     }.mkString("\n")

@@ -42,7 +42,10 @@ object Main {
     if (commandLine.generateInput) {
       output.writeInput(input)
     } else {
-      val engine = new Engine(backtrackInitialSchedule = input.settings.backtrackInitialSchedule)(problem, Context.Default)
+      val engine = new Engine(
+        backtrackInitialSchedule = input.settings.backtrackInitialSchedule,
+        triggerOnBacktrackingFailure = output.writeBacktrackingFailure
+      )(problem, Context.Default)
 
       val runner = new Runner(engine, hook = (ss, count) => {
         output.writeScheduleIfBetter(ss)
