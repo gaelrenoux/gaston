@@ -1,4 +1,4 @@
-package fr.renoux.gaston.model.problem
+package fr.renoux.gaston.model.impl
 
 import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.model.constraints._

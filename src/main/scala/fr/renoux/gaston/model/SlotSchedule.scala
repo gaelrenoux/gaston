@@ -15,14 +15,17 @@ case class SlotSchedule(
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList //not a Set: we do not want to deduplicate identical groups!
   lazy val mandatory: Set[Person] = schedule.mandatoryPersonsOnSlot(slot)
-  lazy val minPersons: Int = schedule.minPersonsOnSlot(slot)
-  lazy val maxPersons: Int = schedule.maxPersonsOnSlot(slot)
+  lazy val minPersons: Option[Int] = schedule.minPersonsOnSlot.get(slot)
+  lazy val maxPersons: Option[Int] = schedule.maxPersonsOnSlot.get(slot)
 
   /** Topics that cannot be added on this slot, because of the slot itself */
   lazy val hardIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
   lazy val currentIncompatibleTopics: Set[Topic] = hardIncompatibleTopics ++ topics.flatMap(problem.incompatibleTopicsPerTopic)
+
+  lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
+  lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
 
   /** Get the Persons for a specific Topic */
   def on(t: Topic): Set[Person] = personsPerTopic.getOrElse(t, Set())

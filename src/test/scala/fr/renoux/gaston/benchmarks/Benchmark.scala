@@ -62,7 +62,7 @@ class Benchmark extends FlatSpec with Matchers {
       output.writeAttempts(count)
     }
 
-    val handler = logMinutes(verbose)
+    val handler = logMinutes(false) // (verbose)
 
     val runner = parallelRunCount.toOption match {
       case None => new Runner( engine, hook = printer)(problem)
@@ -103,6 +103,5 @@ class Benchmark extends FlatSpec with Matchers {
         }
       }
     }(ExecutionContext.global)
-
   }
 }

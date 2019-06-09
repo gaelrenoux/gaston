@@ -1,6 +1,6 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.model.problem.ProblemImpl
+import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 
 

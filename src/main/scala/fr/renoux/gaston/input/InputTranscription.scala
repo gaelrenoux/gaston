@@ -3,7 +3,7 @@ package fr.renoux.gaston.input
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
-import fr.renoux.gaston.model.problem.ProblemImpl
+import fr.renoux.gaston.model.impl.ProblemImpl
 import scalaz.Validation
 import scalaz.syntax.validation._
 import fr.renoux.gaston.util.CollectionImplicits._

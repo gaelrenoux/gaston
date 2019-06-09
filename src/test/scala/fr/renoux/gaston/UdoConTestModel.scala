@@ -5,7 +5,7 @@ import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
-import fr.renoux.gaston.model.problem.ProblemImpl
+import fr.renoux.gaston.model.impl.ProblemImpl
 
 import scala.util.Random
 
