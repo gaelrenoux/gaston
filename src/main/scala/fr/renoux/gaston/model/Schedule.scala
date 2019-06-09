@@ -213,5 +213,6 @@ object Schedule {
     )
   }
 
+  /** Commodity method */
   def apply(entries: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(entries.flatten.toSet)
 }

@@ -28,7 +28,7 @@ class TableReader(input: InputModel) {
   }
 
   /** Read the table as a CSV text */
-  def read(table: String): InputRoot = {
+  def read(table: String): InputModel = {
     val lines: Seq[String] = table.split("\n", -1).filter(_.nonEmpty).toSeq
     val cells: Seq[Seq[String]] = lines.map(_.split(tableSettings.separator, -1).map(_.trim).toSeq)
 
@@ -91,15 +91,13 @@ class TableReader(input: InputModel) {
 
     log.debug(s"Persons: $persons")
 
-    InputRoot(
-      InputModel(
-        settings = settings,
-        tableSettings = tableSettings,
-        slots = input.slots,
-        persons = SortedSet(persons: _*),
-        topics = SortedSet(topicsSeq: _*),
-        constraints = InputGlobalConstraints()
-      )
+    InputModel(
+      settings = settings,
+      tableSettings = tableSettings,
+      slots = input.slots,
+      persons = SortedSet(persons: _*),
+      topics = SortedSet(topicsSeq: _*),
+      constraints = InputGlobalConstraints()
     )
   }
 

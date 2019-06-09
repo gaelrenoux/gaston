@@ -9,24 +9,37 @@ import scala.collection.immutable.Queue
 import scala.util.Random
 
 /**
-  * Uses backtracking to produce a Stream of partial schedules. Those schedules do not violate any constraint, but not
-  * all persons are in it. Used to start with a proper schedule.
+  * Uses backtracking to produce a Stream of schedules. Those schedules are not the best you could have, but they are
+  * valid and all persons have their optimal slots.
   */
-class InitialScheduleGenerator(val problem: Problem) {
+class ScheduleGenerator(implicit problem: Problem, ctx: Context) {
 
-  private val log = Logger[InitialScheduleGenerator]
+  private val log = Logger[ScheduleGenerator]
 
-  import InitialScheduleGenerator._
+  import ScheduleGenerator._
 
-  private implicit val _p: Problem = problem
+  private val filler = new PartialScheduleFiller
+  private val improver = new PersonPlacementImprover
 
-  val filler = new PartialScheduleFiller(problem)
-  val improver = new ScheduleImprover(problem)
+  /** A lazy sequence of partial schedules. If the first one doesn't fit, go on. Ends when we can't backtrack any more. */
+  def lazySeq(implicit random: Random): Stream[Schedule] = {
+    log.debug("Generating a stream of schedules")
+    val slots = random.shuffle(problem.slots.toList)
+    val topics = random.shuffle(problem.topics.toList)
 
-  def generate(implicit random: Random): Schedule = {
-    log.debug("Generating a single initial schedule")
+    val initialState = backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)
+    Stream.iterate(initialState) {
+      case Some(State(ps, sl, tl, tp)) => backtrackAssignTopicsToSlots(ps)(sl, tl, tp)
+      case None => None
+    }.takeWhile(_.isDefined).map(_.get.partialSchedule)
+  }
+
+  /** Generates just one schedule. */
+  def createOne(implicit random: Random): Schedule = {
+    log.debug("Generating a single schedule")
     val slots = random.shuffle(problem.slots.toList)
     val topics = random.shuffle(problem.topics.toList.filter(_.removable))
+
     val unimproved = recFill(Schedule.empty, Queue(slots: _*), topics, Nil)
     improver.improve(unimproved.get)
   }
@@ -41,19 +54,6 @@ class InitialScheduleGenerator(val problem: Problem) {
         case Some(s) => Some(s)
       }
     }
-  }
-
-  /** A lazy sequence of partial schedules. If the first one doesn't fit, go on. Ends when we can't backtrack any more. */
-  def lazySeq(implicit random: Random): Stream[Schedule] = {
-    log.debug("Generating a stream of schedules")
-    val slots = random.shuffle(problem.slots.toList)
-    val topics = random.shuffle(problem.topics.toList)
-
-    val initialState = backtrackAssignTopicsToSlots(Schedule.empty)(Queue(slots: _*), topics)
-    Stream.iterate(initialState) {
-      case Some(State(ps, sl, tl, tp)) => backtrackAssignTopicsToSlots(ps)(sl, tl, tp)
-      case None => None
-    }.takeWhile(_.isDefined).map(_.get.partialSchedule)
   }
 
   /**
@@ -132,7 +132,7 @@ class InitialScheduleGenerator(val problem: Problem) {
 
 }
 
-object InitialScheduleGenerator {
+object ScheduleGenerator {
 
 
   /** Backtracking state

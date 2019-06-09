@@ -185,4 +185,4 @@ class SimpleTestModel(implicit settings: InputSettings) {
 }
 
 
-object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.force.gaston.settings)
+object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.force.settings)

@@ -9,7 +9,7 @@ import scala.util.Random
 /**
   * Fills a partial schedule with persons, ignoring preferences but respecting constraints.
   */
-class PartialScheduleFiller(val problem: Problem) {
+class PartialScheduleFiller(implicit private val problem: Problem) {
 
   private val log = Logger[PartialScheduleFiller]
 
@@ -30,18 +30,6 @@ class PartialScheduleFiller(val problem: Problem) {
 
         val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot.getOrElse(slot, Set.empty)
         val personsLeft = random.shuffle(personsLeftSet.toSeq)
-
-        /*
-        val topicsMinMaxCurrent = random.shuffle(
-          schedule.topicsPerSlot(slot) map { t =>
-            val min = problem.minNumberPerTopic.getOrElse(t, 0)
-            val max = problem.maxNumberPerTopic.getOrElse(t, Int.MaxValue)
-            val current = schedule.countPersonsPerTopic(t)
-            (t, min, max, current)
-          } toSeq
-        )
-
-        Dispatch.equallyWithMaxes(topicsMinMaxCurrent.map(_._3)) */
 
         val topics = schedule.topicsPerSlot.getOrElse(slot, Set.empty)
         val (topicsWithNeeded, topicsWithOptional) = topics.map { t =>

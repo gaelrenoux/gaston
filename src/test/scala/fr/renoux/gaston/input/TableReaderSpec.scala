@@ -51,27 +51,27 @@ class TableReaderSpec extends FlatSpec with Matchers {
     val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check a small one first, easier to debug */
-    val ib = input.gaston.persons.find(_.name == "Boojum")
-    val eb = expected.gaston.persons.find(_.name == "Boojum")
+    val ib = input.persons.find(_.name == "Boojum")
+    val eb = expected.persons.find(_.name == "Boojum")
     val smallDiff = DiffShow.diff(ib, eb)
     if (!smallDiff.isIdentical) println(smallDiff.string)
     ib should be(eb)
 
     /* Check all */
     if (input != expected) {
-      printDiff(expected.gaston.settings, input.gaston.settings)
-      printDiff(expected.gaston.tableSettings, input.gaston.tableSettings)
-      printDiff(expected.gaston.slots.map(_.toList).toList, input.gaston.slots.map(_.toList).toList) //diff can't compare Seq
-      printDiff(expected.gaston.topics, input.gaston.topics)
-      printDiff(expected.gaston.persons, input.gaston.persons)
-      printDiff(expected.gaston.constraints, input.gaston.constraints)
+      printDiff(expected.settings, input.settings)
+      printDiff(expected.tableSettings, input.tableSettings)
+      printDiff(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
+      printDiff(expected.topics, input.topics)
+      printDiff(expected.persons, input.persons)
+      printDiff(expected.constraints, input.constraints)
     }
-    input.gaston.settings should be(expected.gaston.settings)
-    input.gaston.tableSettings should be(expected.gaston.tableSettings)
-    input.gaston.slots should be(expected.gaston.slots)
-    input.gaston.topics should be(expected.gaston.topics)
-    input.gaston.persons should be(expected.gaston.persons)
-    input.gaston.constraints should be(expected.gaston.constraints)
+    input.settings should be(expected.settings)
+    input.tableSettings should be(expected.tableSettings)
+    input.slots should be(expected.slots)
+    input.topics should be(expected.topics)
+    input.persons should be(expected.persons)
+    input.constraints should be(expected.constraints)
     input should be(expected)
   }
 
@@ -85,12 +85,12 @@ class TableReaderSpec extends FlatSpec with Matchers {
 
     /* Check all */
     if (input != expected) {
-      printDiff(expected.gaston.settings, input.gaston.settings)
-      printDiff(expected.gaston.tableSettings, input.gaston.tableSettings)
-      printDiff(expected.gaston.slots.map(_.toList).toList, input.gaston.slots.map(_.toList).toList) //diff can't compare Seq
-      printDiff(expected.gaston.topics, input.gaston.topics)
-      printDiff(expected.gaston.persons, input.gaston.persons)
-      printDiff(expected.gaston.constraints, input.gaston.constraints)
+      printDiff(expected.settings, input.settings)
+      printDiff(expected.tableSettings, input.tableSettings)
+      printDiff(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
+      printDiff(expected.topics, input.topics)
+      printDiff(expected.persons, input.persons)
+      printDiff(expected.constraints, input.constraints)
     }
     evaluated should be(expected)
   }

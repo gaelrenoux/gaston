@@ -1,9 +1,12 @@
 package fr.renoux.gaston.engine
 
+import fr.renoux.gaston.util.Tools
+
 case class Context(
-    debugMode: Boolean = false
+    debugMode: Boolean = false,
+    tools: Tools = Tools.NoOp
 )
 
 object Context {
-  implicit val Default: Context = Context()
+  val Default: Context = Context()
 }

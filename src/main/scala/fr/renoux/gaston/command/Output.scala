@@ -1,11 +1,11 @@
 package fr.renoux.gaston.command
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.input.{InputErrors, InputLoader, InputRoot}
-import fr.renoux.gaston.model.{Problem, Score, ScoredSchedule}
+import fr.renoux.gaston.input.{InputLoader, InputModel}
+import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
 /** Destination of all information in Gaston */
-class Output(silent: Boolean = false) {
+class Output(silent: Boolean = false)(implicit val problem: Problem) {
 
   private val SeparatorLine = "*" * 80
 
@@ -23,26 +23,23 @@ class Output(silent: Boolean = false) {
 
   def writeStart(seed: Long): Unit = write(s"Starting to run ! (seed #$seed)")
 
-  def writeEnd(scoredSchedule: ScoredSchedule, problem: Problem): Unit = {
+  def writeEnd(schedule: Schedule): Unit = {
     val render = new Renderer(problem)
-    write(s"Finished !\n\n${render(scoredSchedule)}\n")
+    write(s"Finished !\n\n${render(schedule)}\n")
   }
 
-  def writeInput(inputRoot: InputRoot): Unit =
-    write(s"\n${InputLoader.render(inputRoot)}\n")
+  def writeInput(input: InputModel): Unit =
+    write(s"\n${InputLoader.render(input)}\n")
 
-  def writeScheduleIfBetter(scoredSchedule: ScoredSchedule, problem: Problem): Unit = synchronized {
-    if (scoredSchedule.score > bestScore) {
-      bestScore = scoredSchedule.score
+  def writeScheduleIfBetter(schedule: Schedule): Unit = synchronized {
+    if (schedule.score > bestScore) {
+      bestScore = schedule.score
       val render = new Renderer(problem)
-      write(render(scoredSchedule))
+      write(render(schedule))
     }
   }
 
   def writeAttempts(count: Long): Unit = synchronized {
     write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} !")
   }
-
-  def writeErrors(msg: InputErrors): Unit =
-    write(s"Failed to run.\n${msg.list.toList.mkString("\n")}\n")
 }

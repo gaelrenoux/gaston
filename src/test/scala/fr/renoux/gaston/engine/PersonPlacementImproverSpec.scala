@@ -2,7 +2,7 @@ package fr.renoux.gaston.engine
 
 import org.scalatest.{FlatSpec, Matchers}
 
-abstract class ScheduleImproverSpec extends FlatSpec with Matchers {
+abstract class PersonPlacementImproverSpec extends FlatSpec with Matchers {
 
   "Improver" should "improve a simple problem" ignore {
     //TODO

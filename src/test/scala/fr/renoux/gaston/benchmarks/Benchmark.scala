@@ -6,7 +6,7 @@ import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.command.{Output, Runner}
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
-import fr.renoux.gaston.model.{Problem, ScoredSchedule}
+import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.{Chrono, Opt, Tools}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -23,9 +23,7 @@ class Benchmark extends FlatSpec with Matchers {
 
   behavior of "Engine"
 
-  //TODO needs the recHeavy improvement to be limited, in order to finish in time
-
-  it should "give an good score when working a short time" ignore  {
+  it should "give an good score when working a short time" in {
     benchmark(
       duration = 5.minutes,
       expectsScore = 600
@@ -45,29 +43,30 @@ class Benchmark extends FlatSpec with Matchers {
       duration: FiniteDuration,
       seed: Long = 0L,
       problem: Problem = udoConProblem,
+      context: Context = Context.Default,
       expectsCount: Long = 0,
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing,
       verbose: Boolean = true
   ): Unit = {
-    implicit val tools: Tools = Tools(new Chrono)
+    val tools: Tools = Tools(new Chrono)
     val start = System.currentTimeMillis()
 
-    val output = new Output
-    val engine = new Engine(problem, stopAtScore = expectsScore, backtrackInitialSchedule = true)
+    val output = new Output()(problem)
+    val engine = new Engine(stopAtScore = expectsScore, backtrackInitialSchedule = true)(problem, context)
 
-    def printer(ss: ScoredSchedule, count: Long): Unit = if (verbose) {
+    def printer(ss: Schedule, count: Long): Unit = if (verbose) {
       val time = (System.currentTimeMillis() - start) / 1000
       println(s"After $time seconds")
-      output.writeScheduleIfBetter(ss, problem)
+      output.writeScheduleIfBetter(ss)
       output.writeAttempts(count)
     }
 
     val handler = logMinutes(verbose)
 
     val runner = parallelRunCount.toOption match {
-      case None => new Runner(problem, engine, hook = printer)
-      case Some(prc) => new Runner(problem, engine, hook = printer, parallelRunCount = prc)
+      case None => new Runner( engine, hook = printer)(problem)
+      case Some(prc) => new Runner( engine, hook = printer, parallelRunCount = prc)(problem)
     }
 
     val (schedule, count) = runner.run(Some(duration), seed = seed)

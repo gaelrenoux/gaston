@@ -2,7 +2,6 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.{Problem, Schedule, Slot}
-import fr.renoux.gaston.util.Tools
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -10,16 +9,16 @@ import scala.util.Random
 
 
 /**
-  * Improves an existing Schedule by moving persons around.
+  * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them.
   */
-class ScheduleImprover(val problem: Problem) {
+class PersonPlacementImprover(implicit private val problem: Problem, private val ctx: Context) {
 
-  private val log = Logger[ScheduleImprover]
+  private val log = Logger[PersonPlacementImprover]
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
-  def improve(scoredSchedule: Schedule, rounds: Int = 10000)(implicit rand: Random, tools: Tools): Schedule =
-    tools.chrono("Improving persons") {
+  def improve(scoredSchedule: Schedule, rounds: Int = 10000)(implicit rand: Random): Schedule =
+    ctx.tools.chrono("Improving persons") {
       log.trace("Improving persons")
       recImprove(scoredSchedule, rounds)
     }

@@ -5,7 +5,6 @@ import java.time.Instant
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.model.{Problem, Schedule}
-import fr.renoux.gaston.util.Tools
 
 import scala.Ordering.Implicits._
 import scala.annotation.tailrec
@@ -16,14 +15,11 @@ import scala.util.Random
 
 /** Runs the whole schedule-searching stuff for a fixed amount of time. Can take hooks to do stuff at some frequency, like warn the user. */
 class Runner(
-    problem: Problem,
     engine: Engine,
     hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
     parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
-) {
-
-  private implicit val _p: Problem = problem
+)(implicit problem: Problem) {
 
   private val log = Logger[Runner]
 
@@ -34,7 +30,7 @@ class Runner(
   def run(
       maxDuration: Option[FiniteDuration] = None,
       seed: Long = Random.nextLong()
-  )(implicit tools: Tools): (Schedule, Long) = {
+  ): (Schedule, Long) = {
 
     val now = Instant.now()
     val timeout: Option[Instant] = maxDuration.map(d => now.plusSeconds(d.toSeconds))
@@ -65,7 +61,7 @@ class Runner(
       count: Long,
       current: Schedule,
       stream: Stream[Schedule] = Stream.empty
-  )(implicit random: Random, tools: Tools): (Schedule, Long) = {
+  )(implicit random: Random): (Schedule, Long) = {
     val now = Instant.now()
 
     /* If time's out, stop now */

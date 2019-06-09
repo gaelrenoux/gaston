@@ -4,10 +4,6 @@ import fr.renoux.gaston.model._
 
 /* All line and column indices are zero-based */
 
-case class InputRoot(
-    gaston: InputModel = InputModel()
-)
-
 case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),

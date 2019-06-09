@@ -10,9 +10,8 @@ import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.CanGroupToMap._
 
 /** Converts the Input object to the Problem object. */
-class InputTranscription(inputRoot: InputRoot) {
+class InputTranscription(input: InputModel) {
 
-  val input: InputModel = inputRoot.gaston
   val settings: InputSettings = input.settings
 
   /* Slots */
@@ -209,5 +208,5 @@ class InputTranscription(inputRoot: InputRoot) {
 }
 
 object InputTranscription {
-  def apply(inputRoot: InputRoot): InputTranscription = new InputTranscription(inputRoot)
+  def apply(input: InputModel): InputTranscription = new InputTranscription(input)
 }

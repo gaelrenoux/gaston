@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.Engine
+import fr.renoux.gaston.engine.{Context, Engine}
 import fr.renoux.gaston.input._
 import org.slf4j.LoggerFactory
 import scalaz.Scalaz._
@@ -24,28 +24,30 @@ object Main {
     if (commandLine.debug) {
       setDebugLogLevel()
     }
-    val output = new Output(commandLine.silent)
     log.info(s"Commande line is: $commandLine")
 
-    val _ = run(commandLine, output).recover { case msg =>
-      output.writeErrors(msg)
+    val _ = run(commandLine).recover { case errors =>
+      val msg = s"Failed to run.\n${errors.list.toList.mkString("\n")}\n"
+      log.info(msg)
+      println(msg)
     }
   }
 
   /** Run the application with command line arguments */
-  private def run(commandLine: CommandLine, output: Output): InputErrors \/ Unit = for {
-    inputRoot <- loadInput(commandLine)
-    problem <- InputTranscription(inputRoot).problem.disjunction
+  private def run(commandLine: CommandLine): InputErrors \/ Unit = for {
+    input <- loadInput(commandLine)
+    problem <- InputTranscription(input).problem.disjunction
   } yield {
+    val output = new Output(commandLine.silent)(problem)
     if (commandLine.generateInput) {
-      output.writeInput(inputRoot)
+      output.writeInput(input)
     } else {
-      val engine = new Engine(problem, backtrackInitialSchedule = inputRoot.gaston.settings.backtrackInitialSchedule)
+      val engine = new Engine(backtrackInitialSchedule = input.settings.backtrackInitialSchedule)(problem, Context.Default)
 
-      val runner = new Runner(problem, engine, hook = (ss, count) => {
-        output.writeScheduleIfBetter(ss, problem)
+      val runner = new Runner(engine, hook = (ss, count) => {
+        output.writeScheduleIfBetter(ss)
         output.writeAttempts(count)
-      })
+      })(problem)
 
       output.writeStart(commandLine.seed)
       val (ss, _) = runner.run(
@@ -54,12 +56,12 @@ object Main {
       )
 
       /* Print final result */
-      output.writeEnd(ss, problem)
+      output.writeEnd(ss)
     }
   }
 
   /** Load the requested input, according to the command lines arguments */
-  private def loadInput(commandLine: CommandLine): InputErrors \/ InputRoot = for {
+  private def loadInput(commandLine: CommandLine): InputErrors \/ InputModel = for {
     baseInput <- commandLine.inputFile.map { path =>
       log.info(s"Loading from $path")
       InputLoader.fromPath(path)
@@ -71,9 +73,9 @@ object Main {
   } yield tableInputOption getOrElse baseInput
 
   /** Import a table */
-  private def importTable(baseInput: InputRoot, path: Path): InputErrors \/ InputRoot =
+  private def importTable(baseInput: InputModel, path: Path): InputErrors \/ InputModel =
     stringFromFile(path).map { table =>
-      val reader = new TableReader(baseInput.gaston)
+      val reader = new TableReader(baseInput)
       reader.read(table)
     }
 

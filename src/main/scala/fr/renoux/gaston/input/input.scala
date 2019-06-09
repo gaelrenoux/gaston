@@ -25,6 +25,6 @@ package object input {
   /** Loads from a String */
   def problemFromString(config: String): InputErrors \/ Problem = InputLoader.fromString(config).flatMap(transcribe)
 
-  private def transcribe(root: InputRoot): InputErrors \/ Problem = InputTranscription(root).problem.disjunction
+  private def transcribe(input: InputModel): InputErrors \/ Problem = InputTranscription(input).problem.disjunction
 
 }
