@@ -35,7 +35,7 @@ object RunLocal extends App {
 
   def runUdoCon2019(): Unit = Main.main(Array(
     "--from",
-    "src/test/resources/udocon2019/uc19-completed.conf"
+    "src/test/resources/udocon2019/uc19-selpoivre.conf"
   ))
 
   log.info("Let's start !!!")
