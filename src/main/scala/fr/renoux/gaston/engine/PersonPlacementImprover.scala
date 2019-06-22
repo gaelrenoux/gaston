@@ -1,6 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.engine.Context._
 import fr.renoux.gaston.model.{Problem, Schedule, Slot}
 
 import scala.annotation.tailrec
@@ -18,7 +19,7 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
   def improve(scoredSchedule: Schedule, rounds: Int = 10000)(implicit rand: Random): Schedule =
-    ctx.tools.chrono("Improving persons") {
+    chrono("PersonPlacementImprover >  improve") {
       log.trace("Improving persons")
       recImprove(scoredSchedule, rounds)
     }
@@ -30,7 +31,7 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
   private def recImprove(
       scoredSchedule: Schedule,
       maxRounds: Int,
-      slots: Queue[Slot] = Queue(problem.slots.toSeq: _*),
+      slots: Queue[Slot] = Queue(problem.slotsSeq: _*),
       slotRoundsLimit: Int = 1000
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {
@@ -56,38 +57,39 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
 
   /** Returns the first move or swap it finds that makes the schedule better, or None if there is nothing to do on that
     * slot anymore. */
-  private def goodMoveOnSlot(currentSchedule: Schedule, slot: Slot)(implicit rand: Random): Option[Schedule] = {
-    if (false) rand.nextLong()
-    val slotSchedule = currentSchedule.on(slot)
+  private def goodMoveOnSlot(currentSchedule: Schedule, slot: Slot)(implicit rand: Random): Option[Schedule] =
+    chrono("PersonPlacementImprover >  improve > goodMoveOnSlot") {
+      if (false) rand.nextLong()
+      val slotSchedule = currentSchedule.on(slot)
 
-    lazy val records = rand.shuffle(slotSchedule.records)
-    lazy val removablePersons = rand.shuffle(slotSchedule.records.filter(_.canRemovePersons))
-    lazy val addablePersons = rand.shuffle(slotSchedule.records.filter(_.canAddPersons))
+      lazy val records = rand.shuffle(slotSchedule.records)
+      lazy val removablePersons = rand.shuffle(slotSchedule.records.filter(_.canRemovePersons))
+      lazy val addablePersons = rand.shuffle(slotSchedule.records.filter(_.canAddPersons))
 
-    /* All schedules on which we swapped two persons */
-    lazy val swappedSchedules = for {
-      r1 <- records.view
-      r2 <- records.view if r1 < r2 //avoiding duplicates (cases where we just swap r1 and r2)
-      t1 = r1.topic
-      t2 = r2.topic
-      p1 <- (r1.optionalPersons -- t2.forbidden).view
-      p2 <- (r2.optionalPersons -- t1.forbidden).view
-      improvedSchedule = currentSchedule.swapPersons(slot, (t1, p1), (t2, p2))
-      if improvedSchedule.score > currentSchedule.score
-    } yield improvedSchedule
+      /* All schedules on which we swapped two persons */
+      lazy val swappedSchedules = for {
+        r1 <- records.view
+        r2 <- records.view if r1 < r2 //avoiding duplicates (cases where we just swap r1 and r2)
+        t1 = r1.topic
+        t2 = r2.topic
+        p1 <- (r1.optionalPersons -- t2.forbidden).view
+        p2 <- (r2.optionalPersons -- t1.forbidden).view
+        improvedSchedule = currentSchedule.swapPersons(slot, (t1, p1), (t2, p2))
+        if improvedSchedule.score > currentSchedule.score
+      } yield improvedSchedule
 
-    /* All schedules on which we moved one person from one topic to another */
-    lazy val movedSchedules = for {
-      r1 <- removablePersons.view
-      r2 <- addablePersons.view if r1 != r2
-      t1 = r1.topic
-      t2 = r2.topic
-      p <- (r1.optionalPersons -- t2.forbidden).view
-      improvedSchedule = currentSchedule.movePerson(slot, t1, t2, p)
-      if improvedSchedule.score > currentSchedule.score
-    } yield improvedSchedule
+      /* All schedules on which we moved one person from one topic to another */
+      lazy val movedSchedules = for {
+        r1 <- removablePersons.view
+        r2 <- addablePersons.view if r1 != r2
+        t1 = r1.topic
+        t2 = r2.topic
+        p <- (r1.optionalPersons -- t2.forbidden).view
+        improvedSchedule = currentSchedule.movePerson(slot, t1, t2, p)
+        if improvedSchedule.score > currentSchedule.score
+      } yield improvedSchedule
 
-    swappedSchedules.headOption orElse movedSchedules.headOption
-  }
+      swappedSchedules.headOption orElse movedSchedules.headOption
+    }
 
 }

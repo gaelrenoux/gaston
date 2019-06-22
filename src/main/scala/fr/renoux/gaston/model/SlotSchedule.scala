@@ -7,6 +7,7 @@ case class SlotSchedule(
     schedule: Schedule,
     slot: Slot
 ) {
+
   val problem: Problem = schedule.problem
   lazy val records: Set[Record] = schedule.records.filter(_.slot == slot)
   lazy val topics: Set[Topic] = schedule.topicsPerSlot(slot)
@@ -17,6 +18,8 @@ case class SlotSchedule(
   lazy val mandatory: Set[Person] = schedule.mandatoryPersonsOnSlot(slot)
   lazy val minPersons: Option[Int] = schedule.minPersonsOnSlot.get(slot)
   lazy val maxPersons: Option[Int] = schedule.maxPersonsOnSlot.get(slot)
+
+  lazy val topicsSeq: Seq[Topic] = topics.toSeq
 
   /** Topics that cannot be added on this slot, because of the slot itself */
   lazy val hardIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)

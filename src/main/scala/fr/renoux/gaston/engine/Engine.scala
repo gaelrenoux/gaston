@@ -18,7 +18,7 @@ class Engine(
   private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
   private lazy val improver = new SlotImprover(stopAtScore, maxImprovementRounds)
 
-  lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned(problem)
+  lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
 
   /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
   def lazySeq(seed: Long): Stream[Schedule] = {

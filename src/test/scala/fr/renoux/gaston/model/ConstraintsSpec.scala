@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.model.constraints._
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -11,7 +12,8 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   import fr.renoux.gaston.MinimalTestModel.Slots._
   import fr.renoux.gaston.MinimalTestModel.Topics._
 
-  implicit val problem: Problem = Minimal
+  private implicit val problem: Problem = Minimal
+  private implicit val context: Context = Context.Default
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
 

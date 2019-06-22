@@ -50,7 +50,7 @@ object Main {
       val runner = new Runner(engine, hook = (ss, count) => {
         output.writeScheduleIfBetter(ss)
         output.writeAttempts(count)
-      })(problem)
+      })(problem, Context.Default)
 
       output.writeStart(commandLine.seed)
       val (ss, _) = runner.run(

@@ -16,9 +16,6 @@ object RandomImplicits {
     /** Picks randomly several distinct elements in a Set */
     @inline
     final def pick[A](s: Set[A], count: Int): Seq[A] = wrapped.shuffle(s.toSeq).take(count)
-
-    @inline
-    def shuffle[A](s: Set[A]): Seq[A] = wrapped.shuffle(s.toSeq)
   }
 
 }

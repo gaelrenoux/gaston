@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.engine.Context
 import org.scalatest.{FlatSpec, Matchers}
 
 class ScheduleSpec extends FlatSpec with Matchers {
@@ -10,7 +11,8 @@ class ScheduleSpec extends FlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Solutions._
   import fr.renoux.gaston.SimpleTestModel.Topics._
 
-  implicit val problem: Problem = Complete
+  private implicit val problem: Problem = Complete
+  private implicit val context: Context = Context.Default
 
   private val Simple = Schedule(
     Morning(

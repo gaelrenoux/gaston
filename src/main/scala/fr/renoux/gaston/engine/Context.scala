@@ -9,4 +9,8 @@ case class Context(
 
 object Context {
   val Default: Context = Context()
+
+  def chrono[A](name: String)(a: => A)(implicit c: Context): A = {
+    c.tools.chrono(name)(a)
+  }
 }

@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
@@ -579,6 +580,7 @@ object UdoConTestModel {
     import Slots._
 
     private implicit val problem: Problem = Problems.Complete
+    private implicit val context: Context = Context.Default
 
     val Actual: Schedule = Schedule(
       D1Afternoon(

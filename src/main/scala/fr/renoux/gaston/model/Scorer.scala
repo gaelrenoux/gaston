@@ -1,5 +1,8 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.engine.Context
+import fr.renoux.gaston.engine.Context.chrono
+
 /** Scoring utilities for a given Problem. */
 object Scorer {
 
@@ -9,12 +12,17 @@ object Scorer {
   /** Score that solution for the current problem. Returns a global score prioritizing the score of the least satisfied
     * person, with the total score as a tie breaker. Personal scores are divided by the person's weight before
     * comparison. */
-  final def score(solution: Schedule): Score = {
-    val scoresByPerson = solution.unweightedScoresByPerson
-    val weightedScores = scoresByPerson.map { case (p, s) => s / p.weight }
-    val scoreWeightedPersons = weightedScores.toSeq.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+  final def score(solution: Schedule)(implicit ctx: Context): Score = chrono("Scorer > score") {
+    val scoresByPerson = chrono("Scorer > score > scoresByPerson") {
+      solution.unweightedScoresByPerson
+    }
+    val weightedScores = scoresByPerson.toSeq.map { case (p, s) => s / p.weight }
+    val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
 
-    val scoreOther = solution.unpersonalScore.value
+    val scoreOther = chrono("Scorer > score > scoreOther") {
+      solution.unpersonalScore.value
+    }
+
     Score(
       scoreOther + scoreWeightedPersons
     )

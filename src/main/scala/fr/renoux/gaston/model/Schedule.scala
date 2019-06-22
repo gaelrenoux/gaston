@@ -1,6 +1,8 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.util.CollectionImplicits._
+import Context._
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -9,7 +11,8 @@ import fr.renoux.gaston.util.CollectionImplicits._
 case class Schedule(
     private val wrapped: Set[Record]
 )(implicit
-    val problem: Problem
+    val problem: Problem,
+    ctx: Context
 ) {
 
   @inline private def updateRecords(f: Set[Record] => Set[Record]): Schedule =
@@ -38,6 +41,10 @@ case class Schedule(
 
   lazy val scheduledTopics: Set[Topic] = records.map(_.topic)
   lazy val unscheduledTopics: Set[Topic] = (problem.topics -- scheduledTopics).filter(_.removable)
+
+  lazy val recordsSeq: Seq[Record] = records.toSeq
+  lazy val scheduledTopicsSeq: Seq[Topic] = scheduledTopics.toSeq
+  lazy val unscheduledTopicsSeq: Seq[Topic] = unscheduledTopics.toSeq
 
   lazy val score: Score = if (records.isEmpty) Score.MinValue else Scorer.score(this)
 
@@ -130,8 +137,8 @@ case class Schedule(
 
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
-    lazy val noUbiquity = recordsPerSlot.values.forall { records =>
-      val persons = records.toSeq.flatMap(_.persons.toSeq) //toSeq to keep duplicates, we're looking for them
+    lazy val noUbiquity = recordsPerSlot.values.forall { recordsOnSlot =>
+      val persons = recordsOnSlot.toSeq.flatMap(_.personsSeq) //Seq to keep duplicates, we're looking for them
       persons.size == persons.toSet.size
     }
     lazy val noDuplicates = {
@@ -143,14 +150,19 @@ case class Schedule(
 
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = {
-    val individualScores = problem.preferences.toSeq.collect {
-      case p: Preference.Personal => p -> p.score(this)
+    val individualScores = chrono("Schedule > unweightedScoresByPerson > individualScores") {
+      problem.preferencesSeq.collect {
+        case p: Preference.Personal => p -> p.score(this)
+      }
     }
-    individualScores.groupBy(_._1.person).mapValuesStrict(_.map(_._2).sum)
+
+    chrono("Schedule > unweightedScoresByPerson > sum") {
+      individualScores.groupBy(_._1.person).mapValuesStrict(_.foldLeft(Score.Zero)(_ + _._2))
+    }
   }
 
   lazy val unpersonalScore: Score =
-    problem.preferences.toSeq.map {
+    problem.preferencesSeq.map {
       case _: Preference.Personal => Score.Zero
       case p => p.score(this)
     }.sum
@@ -202,10 +214,10 @@ object Schedule {
   }
 
   /** Empty schedule for a problem */
-  def empty(implicit problem: Problem): Schedule = Schedule()
+  def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule()
 
   /** Schedule where everyone is on an "unassigned" topic */
-  def everyoneUnassigned(implicit problem: Problem): Schedule = {
+  def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = {
     Schedule(
       problem.slots.map { s =>
         Record(s, Topic.unassigned(s), problem.personsPerSlot(s))
@@ -214,5 +226,5 @@ object Schedule {
   }
 
   /** Commodity method */
-  def apply(entries: Seq[Record]*)(implicit problem: Problem): Schedule = new Schedule(entries.flatten.toSet)
+  def apply(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule = new Schedule(entries.flatten.toSet)
 }

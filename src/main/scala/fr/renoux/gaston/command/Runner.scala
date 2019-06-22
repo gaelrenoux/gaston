@@ -19,7 +19,7 @@ class Runner(
     hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
     parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
-)(implicit problem: Problem) {
+)(implicit problem: Problem, ctx: Context) {
 
   private val log = Logger[Runner]
 

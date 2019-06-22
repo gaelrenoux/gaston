@@ -11,6 +11,12 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
+  lazy val slotsSeq: Seq[Slot] = slots.toSeq
+  lazy val topicsSeq: Seq[Topic] = topics.toSeq
+  lazy val personsSeq: Seq[Person] = persons.toSeq
+  lazy val constraintsSeq: Seq[Constraint] = constraints.toSeq
+  lazy val preferencesSeq: Seq[Preference] = preferences.toSeq
+
   lazy val (slotLevelPreferences: Set[Preference.SlotLevel], globalLevelPreferences: Set[Preference]) =
     preferences.collect {
       case s: Preference.SlotLevel => Left(s)
@@ -28,6 +34,8 @@ trait Problem {
     s1 <- slots
     s2 <- slots if s1.name < s2.name
   } yield (s1, s2)
+
+  lazy val slotCouplesSeq: Seq[(Slot, Slot)] = slotCouples.toSeq
 
   val personsCount: Int
 

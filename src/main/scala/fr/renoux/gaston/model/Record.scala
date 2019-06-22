@@ -4,6 +4,8 @@ package fr.renoux.gaston.model
 /** A Record is a triplet of slot, topic and assigned persons */
 case class Record(slot: Slot, topic: Topic, persons: Set[Person]) extends Ordered[Record] {
 
+  lazy val personsSeq: Seq[Person] = persons.toSeq
+
   /* No need to compare persons, on a given schedule there is not two records with the same slot and topic */
   override def compare(that: Record): Int = {
     val compareSlots = slot.name.compareTo(that.slot.name)

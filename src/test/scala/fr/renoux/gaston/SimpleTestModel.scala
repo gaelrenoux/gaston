@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
 import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
@@ -161,6 +162,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Topics._
 
     private implicit val problem: Problem = Problems.Complete
+    private implicit val context: Context = Context.Default
 
     val Best = Schedule(
       Morning(

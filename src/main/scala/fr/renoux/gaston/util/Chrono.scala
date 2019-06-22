@@ -3,21 +3,21 @@ package fr.renoux.gaston.util
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
-class Chrono(val enabled: Boolean = true) {
+sealed class Chrono(blocking: Boolean = false) {
 
   private val _times: mutable.Map[String, Long] = mutable.Map[String, Long]().withDefaultValue(0L)
 
   private val _counts: mutable.Map[String, Long] = mutable.Map[String, Long]().withDefaultValue(0L)
 
-  def apply[A](name: String, blocking: Boolean = false)(a: => A): A = {
+  def apply[A](name: String)(a: => A): A = {
     val start = System.currentTimeMillis()
     val evaluated = a
     val duration = System.currentTimeMillis() - start
-    store(name, duration, blocking)
+    store(name, duration)
     evaluated
   }
 
-  def store(name: String, time: Long, blocking: Boolean = false): Unit =
+  private def store(name: String, time: Long): Unit =
     if (blocking) {
       val _ = synchronized {
         _times.put(name, _times(name) + time)
@@ -36,12 +36,29 @@ class Chrono(val enabled: Boolean = true) {
     _times.toMap
   }
 
+  def timesPretty: String =
+    times.toSeq.sortBy(_._1).map { case (k, v) => s"  $k: $v"}.mkString("(\n", "\n", "\n)")
+
+
   def counts: Map[String, Long] = synchronized {
     _counts.toMap
   }
 
+  def countsPretty: String =
+    counts.toSeq.sortBy(_._1).map { case (k, v) => s"  $k: $v"}.mkString("(\n", "\n", "\n)")
+
 }
 
 object Chrono {
-  val NoOp = new Chrono(enabled = false)
+  object NoOp extends Chrono {
+    override def apply[A](name: String)(a: => A): A = a
+
+    override val times: Map[String, Long] = Map.empty
+
+    override val timesPretty: String = ""
+
+    override val counts: Map[String, Long] = Map.empty
+
+    override val countsPretty: String = ""
+  }
 }

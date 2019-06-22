@@ -3,19 +3,19 @@ package fr.renoux.gaston.benchmarks
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.UdoConTestModel
-import fr.renoux.gaston.command.{Output, Runner}
+import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
-import fr.renoux.gaston.model.{Problem, Schedule}
-import fr.renoux.gaston.util.{Chrono, Opt, Tools}
+import fr.renoux.gaston.model.Problem
+import fr.renoux.gaston.util.Opt
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-class Benchmark extends FlatSpec with Matchers {
+class RegressionBenchmark extends FlatSpec with Matchers {
 
-  private val log = Logger[Benchmark]
+  private val log = Logger[RegressionBenchmark]
 
   private val udoConProblem = problemFromClassPath("udocon2017/uc17-completed.conf").force
   private val lastYear = UdoConTestModel.Solutions.Actual
@@ -23,7 +23,7 @@ class Benchmark extends FlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give an good score when working a short time" in {
+  it should "give an good score when working a short time" ignore {
     benchmark(
       duration = 5.minutes,
       expectsScore = 600
@@ -46,39 +46,27 @@ class Benchmark extends FlatSpec with Matchers {
       context: Context = Context.Default,
       expectsCount: Long = 0,
       expectsScore: Double,
-      parallelRunCount: Opt[Int] = Opt.Missing,
-      verbose: Boolean = true
+      parallelRunCount: Opt[Int] = Opt.Missing
   ): Unit = {
-    val tools: Tools = Tools(new Chrono)
-    val start = System.currentTimeMillis()
-
-    val output = new Output()(problem)
     val engine = new Engine(stopAtScore = expectsScore, backtrackInitialSchedule = true)(problem, context)
 
-    def printer(ss: Schedule, count: Long): Unit = if (verbose) {
-      val time = (System.currentTimeMillis() - start) / 1000
-      println(s"After $time seconds")
-      output.writeScheduleIfBetter(ss)
-      output.writeAttempts(count)
-    }
+    val handler = logMinutes(true) // (verbose)
 
-    val handler = logMinutes(false) // (verbose)
+    try {
+      val runner = parallelRunCount.toOption match {
+        case None => new Runner(engine)(problem, context)
+        case Some(prc) => new Runner(engine, parallelRunCount = prc)(problem, context)
+      }
 
-    val runner = parallelRunCount.toOption match {
-      case None => new Runner( engine, hook = printer)(problem)
-      case Some(prc) => new Runner( engine, hook = printer, parallelRunCount = prc)(problem)
-    }
+      val (schedule, count) = runner.run(Some(duration), seed = seed)
 
-    val (schedule, count) = runner.run(Some(duration), seed = seed)
+      println(s"${schedule.score} after $count iterations")
 
-    println(s"${schedule.score} after $count iterations")
-    println(s"${tools.chrono.times} in ${tools.chrono.counts}")
-
-    schedule.problem.constraints.filterNot(_.isRespected(schedule)) should be(Set())
-    schedule.isSolution should be(true)
-    schedule.score.value should be > expectsScore
-    count should be > expectsCount
-    handler.stop()
+      schedule.problem.constraints.filterNot(_.isRespected(schedule)) should be(Set())
+      schedule.isSolution should be(true)
+      schedule.score.value should be > expectsScore
+      count should be > expectsCount
+    } finally handler.stop()
   }
 
   trait Stoppable {
