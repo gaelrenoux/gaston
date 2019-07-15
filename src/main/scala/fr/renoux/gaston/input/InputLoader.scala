@@ -5,6 +5,8 @@ import java.nio.file.Path
 
 import com.typesafe.config.{ConfigFactory, ConfigRenderOptions, ConfigValue}
 import com.typesafe.scalalogging.Logger
+import eu.timepit.refined.api.Refined
+import eu.timepit.refined.collection.NonEmpty
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
 import scalaz.Scalaz._
@@ -21,9 +23,14 @@ object InputLoader {
     .setOriginComments(false)
     .setJson(false)
 
-  /* Do not delete the following imports even though IntelliJ mark them as unused */
   import eu.timepit.refined.pureconfig._
   import pureconfig.generic.auto._
+
+  //forces IntelliJ to keep the previous imports, otherwise it marks them as unused
+  private lazy val _ = {
+    exportReader[List[Int]]
+    refTypeConfigConvert[Refined, String, NonEmpty]
+  }
 
   /** Loads from default values */
   def fromDefault: InputErrors \/ InputModel = loadConfig[InputModel]("gaston").disjunction.leftMap(transformErrors)
