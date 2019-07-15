@@ -35,7 +35,7 @@ object Weight {
 
     override def toFloat(x: Weight): Float = x.value.toFloat
 
-    override def toDouble(x: Weight): Double = x.value.toDouble
+    override def toDouble(x: Weight): Double = x.value
 
     override def compare(x: Weight, y: Weight): Int = x.value.compareTo(y.value)
 
