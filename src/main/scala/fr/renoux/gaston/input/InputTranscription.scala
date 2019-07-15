@@ -2,15 +2,15 @@ package fr.renoux.gaston.input
 
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.impl.ProblemImpl
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
+import fr.renoux.gaston.util.CanGroupToMap._
+import fr.renoux.gaston.util.CollectionImplicits._
 import scalaz.Validation
 import scalaz.syntax.validation._
-import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.CanGroupToMap._
 
 /** Converts the Input object to the Problem object. */
-class InputTranscription(input: InputModel) {
+private[input] class InputTranscription(input: InputModel) {
 
   val settings: InputSettings = input.settings
 
@@ -205,8 +205,4 @@ class InputTranscription(input: InputModel) {
       Preferences.all ++ Unassigned.preferences ++ Nothing.preferences
     ).success
 
-}
-
-object InputTranscription {
-  def apply(input: InputModel): InputTranscription = new InputTranscription(input)
 }

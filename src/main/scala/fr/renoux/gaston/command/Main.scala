@@ -36,7 +36,7 @@ object Main {
   /** Run the application with command line arguments */
   private def run(commandLine: CommandLine): InputErrors \/ Unit = for {
     input <- loadInput(commandLine)
-    problem <- InputTranscription(input).problem.disjunction
+    problem <- transcribe(input)
   } yield {
     val output = new Output(commandLine.silent)(problem)
     if (commandLine.generateInput) {
