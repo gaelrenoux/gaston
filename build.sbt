@@ -33,7 +33,7 @@ scalacOptions ++= Seq(
   "-Xlint:private-shadow", // A private field (or class parameter) shadows a superclass field.
   "-Xlint:type-parameter-shadow", // A local type parameter shadows a type already in scope.
   "-Xlint:unsound-match", // Pattern match may not be typesafe.
-  
+
   "-deprecation", // Emit warning and location for usages of deprecated APIs
   "-unchecked" // Enable additional warnings where generated code depends on assumptions
 
@@ -49,7 +49,12 @@ libraryDependencies ++= Seq(
   "com.github.scopt" %% "scopt" % "3.7.1",
 
   "org.scalaz" %% "scalaz-core" % "7.2.27",
-  
+
+  "eu.timepit" %% "refined" % "0.9.8",
+  "eu.timepit" %% "refined-scalaz" % "0.9.8",
+  "eu.timepit" %% "refined-pureconfig" % "0.9.8",
+  "eu.timepit" %% "refined-scopt" % "0.9.8",
+
   "ai.x" %% "diff" % "2.0.1",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 )

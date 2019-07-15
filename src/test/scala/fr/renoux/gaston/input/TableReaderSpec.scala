@@ -1,6 +1,7 @@
 package fr.renoux.gaston.input
 
 import ai.x.diff.DiffShow
+import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model.{Score, Weight}
 import org.scalatest.{FlatSpec, Matchers}
@@ -35,10 +36,10 @@ class TableReaderSpec extends FlatSpec with Matchers {
   val input = InputModel(
     settings = settings,
     tableSettings = tableSettings,
-    slots = Seq(
-      Seq(InputSlot("D1-afternoon"), InputSlot("D1-evening", maxTopics = Some(5))),
-      Seq(InputSlot("D2-afternoon"), InputSlot("D2-evening", maxTopics = Some(5))),
-      Seq(InputSlot("D3-afternoon"))
+    slots = List(
+      List(InputSlot("D1-afternoon"), InputSlot("D1-evening", maxTopics = Some(5))),
+      List(InputSlot("D2-afternoon"), InputSlot("D2-evening", maxTopics = Some(5))),
+      List(InputSlot("D3-afternoon"))
     ))
 
   val reader = new TableReader(input)
@@ -51,10 +52,10 @@ class TableReaderSpec extends FlatSpec with Matchers {
     val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check a small one first, easier to debug */
-    val ib = input.persons.find(_.name == "Boojum")
-    val eb = expected.persons.find(_.name == "Boojum")
-    val smallDiff = DiffShow.diff(ib, eb)
-    if (!smallDiff.isIdentical) println(smallDiff.string)
+    val ib = input.persons.find(_.name.value == "Boojum")
+    val eb = expected.persons.find(_.name.value == "Boojum")
+    //val smallDiff = DiffShow.diff(ib, eb) //TODO make it work with refined
+    //if (!smallDiff.isIdentical) println(smallDiff.string)
     ib should be(eb)
 
     /* Check all */

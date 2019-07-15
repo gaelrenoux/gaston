@@ -1,12 +1,13 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
+import eu.timepit.refined.auto._
 import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.impl.ProblemImpl
+import fr.renoux.gaston.model.preferences.PersonTopicPreference
 
 import scala.util.Random
 
@@ -172,8 +173,8 @@ object UdoConTestModel {
   object Constraints {
 
     import Persons._
-    import Topics._
     import Slots._
+    import Topics._
 
     val AllObligations: Set[Constraint] = Set(
       PersonTopicObligation(Highlandjul, Agon),
@@ -576,8 +577,8 @@ object UdoConTestModel {
   object Solutions {
 
     import Persons._
-    import Topics._
     import Slots._
+    import Topics._
 
     private implicit val problem: Problem = Problems.Complete
     private implicit val context: Context = Context.Default

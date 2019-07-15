@@ -1,5 +1,6 @@
 package fr.renoux.gaston.input
 
+import eu.timepit.refined.auto._
 import fr.renoux.gaston.model.constraints.TopicsSimultaneous
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
@@ -17,7 +18,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
   behavior of "Occurrences"
 
   {
-    val inputTopics = Set(InputTopic(
+    val inputTopics = List(InputTopic(
       name = "alpha",
       occurrences = Some(3)
     ))
@@ -33,7 +34,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     they should "all have the same mandatory, forbidden and wishes" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
-        persons = Set(
+        persons = List(
           InputPerson("Arnold", mandatory = Set("alpha")),
           InputPerson("Bianca", forbidden = Set("alpha")),
           InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
@@ -49,7 +50,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     they should "be exclusive except for mandatory people" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
-        persons = Set(
+        persons = List(
           InputPerson("Arnold", mandatory = Set("alpha"))
         )
       ))
@@ -65,7 +66,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
   behavior of "Multiple"
 
   {
-    val inputTopics = Set(InputTopic(
+    val inputTopics = List(InputTopic(
       name = "alpha",
       multiple = Some(3)
     ))
@@ -81,7 +82,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     they should "all have the same forbidden and wishes" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
-        persons = Set(
+        persons = List(
           InputPerson("Bianca", forbidden = Set("alpha")),
           InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
         )
@@ -95,7 +96,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     they should "be exclusive except for mandatory people" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
-        persons = Set(
+        persons = List(
           InputPerson("Arnold", mandatory = Set("alpha"))
         )
       ))
@@ -107,7 +108,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     they should "be simultaneous" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
-        persons = Set(
+        persons = List(
           InputPerson("Arnold", mandatory = Set("alpha"))
         )
       ))
@@ -119,7 +120,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     they should "dispatch mandatory persons" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
-        persons = Set(
+        persons = List(
           InputPerson("Arnold", mandatory = Set("alpha")),
           InputPerson("Bianca", mandatory = Set("alpha"))
         )

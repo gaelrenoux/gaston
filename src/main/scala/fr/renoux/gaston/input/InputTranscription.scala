@@ -8,6 +8,8 @@ import fr.renoux.gaston.util.CanGroupToMap._
 import fr.renoux.gaston.util.CollectionImplicits._
 import scalaz.Validation
 import scalaz.syntax.validation._
+import eu.timepit.refined.auto._
+import eu.timepit.refined.types.string.NonEmptyString
 
 /** Converts the Input object to the Problem object. */
 private[input] class InputTranscription(input: InputModel) {
@@ -15,34 +17,36 @@ private[input] class InputTranscription(input: InputModel) {
   val settings: InputSettings = input.settings
 
   /* Slots */
-  lazy val slotSequences: Seq[Seq[Slot]] = input.slots.map(_.map(s => Slot(s.name)))
-  lazy val slotsPerName: Map[String, Slot] = slotSequences.flatten.map(s => s.name -> s).toMap
+  lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap(s => s.name -> Slot(s.name))
+  lazy val slotSequences: Seq[Seq[Slot]] = slotSequencesWithNames.mapMap(_._2)
+  lazy val slotsPerName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
+  lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
 
   /* Topics */
-  lazy val topicsPerName: Map[String, Set[Topic]] = input.topics.map { inTopic =>
-    val mandatory = input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
-    val forbidden = input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
+  lazy val topicsPerName: Map[NonEmptyString, Set[Topic]] = input.topics.map { inTopic =>
+    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
+    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
     val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
     val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max)
 
-    val occurringTopics = inTopic.forcedOccurrences match {
+    /* Demultiply topics if more than one occurence of the topic */
+    val occurringTopics = inTopic.forcedOccurrences.value match {
       case 1 => Set(baseTopic)
-      case c if c > 0 => baseTopic.occurrences(c).toSet
-      case _ => throw new IllegalArgumentException("Can't have a non-positive number of occurrences") //TODO use Refined instead
+      case c => baseTopic.occurrences(c).toSet
     }
 
-    val multipleTopics = inTopic.forcedMultiple match {
+    /* Demultiply topics if topic is multiple */
+    val multipleTopics = inTopic.forcedMultiple.value match {
       case 1 => occurringTopics
       case c if c > 0 => occurringTopics.flatMap { topic =>
-        val groups = topic.multiple(c)
+        val instances = topic.multiple(c)
         val sortedMandatories = baseTopic.mandatory.toSeq.sortBy(_.name) //sorted to be deterministic, therefore more testable
 
-        /* dispatch the mandatory persons on the groups */
-        val mandatoriesByGroup = sortedMandatories.zip(Stream.continually(groups).flatten).map(_.swap).groupToMap
-        groups.map { t => t.copy(mandatory = mandatoriesByGroup.getOrElse(t, Nil).toSet) }
+        /* dispatch the mandatory persons on the instances */
+        val mandatoriesByInstance = sortedMandatories.zip(Stream.continually(instances).flatten).map(_.swap).groupToMap
+        instances.map { t => t.copy(mandatory = mandatoriesByInstance.getOrElse(t, Nil).toSet) }
       }
-      case _ => throw new IllegalArgumentException("Can't have a non-positive number of multiples") //TODO use Refined instead
     }
 
     inTopic.name -> multipleTopics
@@ -50,29 +54,30 @@ private[input] class InputTranscription(input: InputModel) {
   }.toMap
 
   /* Topics, but with multiple ones grouped */
-  lazy val topicGroupsPerName: Map[String, Set[Set[Topic]]] = topicsPerName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
+  lazy val topicGroupsPerName: Map[NonEmptyString, Set[Set[Topic]]] =
+    topicsPerName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
 
   lazy val topics: Set[Topic] = topicsPerName.values.toSet.flatten
 
   /* Persons */
-  lazy val personsPerName: Map[String, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
+  lazy val personsPerName: Map[NonEmptyString, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
 
   /* Constraints */
   object Constraints {
     lazy val slotMaxTopicCount: Set[SlotMaxTopicCount] =
-      input.slots.flatten.toSet[InputSlot].flatMap { inSlot =>
+      slotsSet.flatMap { inSlot =>
         val slot = slotsPerName(inSlot.name)
         val maxOption = inSlot.maxTopics orElse settings.defaultMaxTopicsPerSlot
         maxOption.map(SlotMaxTopicCount(slot, _))
       }
 
     lazy val absences: Set[PersonAbsence] =
-      input.persons.flatMap { ip =>
+      input.personsSet.flatMap { ip =>
         ip.absences.map(slotsPerName).map(PersonAbsence(personsPerName(ip.name), _))
       }
 
     lazy val forcedSlots: Set[TopicForcedSlot] =
-      input.topics.flatMap {
+      input.topicsSet.flatMap {
         case inTopic if inTopic.slots.nonEmpty =>
           val topics = topicsPerName(inTopic.name)
           val slots = inTopic.slots.get.map(slotsPerName)
@@ -103,7 +108,7 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val simultaneousMultiple: Set[TopicsSimultaneous] =
-      input.topics.filter(_.multiple.exists(_ > 1)).flatMap { inTopic =>
+      input.topicsSet.filter(_.multiple.exists(_ > 1)).flatMap { inTopic =>
         topicGroupsPerName(inTopic.name).map(TopicsSimultaneous)
       }
 
@@ -126,18 +131,18 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val exclusiveOccurrencesAndMultiples: Set[TopicsExclusive] =
-      input.topics
+      input.topicsSet
         .filter { t =>
           t.occurrences.exists(_ > 1) || t.multiple.exists(_ > 1)
         }
         .map { inTopic =>
           val topics = topicsPerName(inTopic.name)
-          val mandatoryPersons = input.persons.filter(_.mandatory.contains(inTopic.name)).map(ip => personsPerName(ip.name))
+          val mandatoryPersons = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(ip => personsPerName(ip.name))
           TopicsExclusive(topics, mandatoryPersons, Score.PersonTotalScore.negative * 100)
         }
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
-      input.persons.collect {
+      input.personsSet.collect {
         case ip if ip.incompatible.nonEmpty =>
           val person = personsPerName(ip.name)
           val group = ip.incompatible.map(personsPerName)
@@ -149,12 +154,13 @@ private[input] class InputTranscription(input: InputModel) {
       * improving the schedule. Right now, we do not handle negative preferences well. */
     lazy val personTopicPreferences: Set[PersonTopicPreference] =
       for {
-        inPerson <- input.persons
+        inPerson <- input.personsSet
         person = personsPerName(inPerson.name)
         totalInputScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value //TODO Right now, negative prefs are ignored in the total count
         scoreFactor = Score.PersonTotalScore.value / totalInputScore
         inWish <- inPerson.wishes
-        topic <- topicsPerName(inWish._1)
+        wishedTopicName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
+        topic <- topicsPerName(wishedTopicName)
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
     lazy val all: Set[Preference] =
@@ -179,8 +185,8 @@ private[input] class InputTranscription(input: InputModel) {
   }
 
   object Nothing {
-    lazy val enabled: Boolean = settings.maxPersonsOnNothing > 0 &&
-      settings.maxPersonsOnNothing >= settings.minPersonsOnNothing
+    lazy val enabled: Boolean =
+      settings.maxPersonsOnNothing > 0 && settings.maxPersonsOnNothing >= settings.minPersonsOnNothing
 
     private lazy val elements: Iterable[(Topic, TopicNeedsNumberOfPersons, TopicForcedSlot, Iterable[PersonTopicPreference])] =
       slotsPerName.values.map { s =>

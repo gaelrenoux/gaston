@@ -32,6 +32,13 @@ object CollectionImplicits {
 
   }
 
+  implicit class Traversable2Ops[A, RI, RO](val wrapped: TraversableLike[TraversableLike[A, RI], RO]) extends AnyVal {
+
+    def mapMap[B, RIB, ROB](f: A => B)(implicit bfi: CanBuildFrom[RI, B, RIB], bfo: CanBuildFrom[RO, RIB, ROB]): ROB =
+      wrapped.map(_.map(f))
+
+  }
+
   implicit class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
 
     def updatedWith(k: K)(f: V => V): Map[K, V] = wrapped.alter(k)(_.map(f))

@@ -1,12 +1,14 @@
 package fr.renoux.gaston.input
 
 import com.typesafe.scalalogging.Logger
+import eu.timepit.refined.auto._
+import eu.timepit.refined.types.numeric.PosInt
+import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model.{Score, Weight}
 import fr.renoux.gaston.util.CanGroupToMap._
-import fr.renoux.gaston.util.StringImplicits._
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.StringImplicits._
 
-import scala.collection.immutable.SortedSet
 import scala.util.Try
 
 /**
@@ -20,15 +22,16 @@ class TableReader(input: InputModel) {
   private val log = Logger[TableReader]
 
   private implicit object InputTopicOrdering extends Ordering[InputTopic] {
-    override def compare(x: InputTopic, y: InputTopic): Int = x.name.compareTo(y.name)
+    override def compare(x: InputTopic, y: InputTopic): Int = x.name.value.compareTo(y.name.value)
   }
 
   private implicit object InputPersonOrdering extends Ordering[InputPerson] {
-    override def compare(x: InputPerson, y: InputPerson): Int = x.name.compareTo(y.name)
+    override def compare(x: InputPerson, y: InputPerson): Int = x.name.value.compareTo(y.name.value)
   }
 
   /** Read the table as a CSV text */
   def read(table: String): InputModel = {
+    //TODO replace calls to unsafeFrom with proper validation
     val lines: Seq[String] = table.split("\n", -1).filter(_.nonEmpty).toSeq
     val cells: Seq[Seq[String]] = lines.map(_.split(tableSettings.separator, -1).map(_.trim).toSeq)
 
@@ -40,12 +43,12 @@ class TableReader(input: InputModel) {
     val topicsSeq: Seq[InputTopic] =
       cellsWithContent.map { row =>
         val topicName: String = row(tableSettings.topicCol)
-        val max: Option[Int] = row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd)
-        val min: Option[Int] = tableSettings.minPersonsCol.map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd)
-        val occurrences: Option[Int] = tableSettings.topicOccurrencesCol.map(row).flatMap(_.toIntOption)
+        val max: Option[PosInt] = row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
+        val min: Option[PosInt] = tableSettings.minPersonsCol.map(_.value).map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
+        val occurrences: Option[PosInt] = tableSettings.topicOccurrencesCol.map(_.value).map(row).flatMap(_.toIntOption).map(PosInt.unsafeFrom)
 
         InputTopic(
-          name = topicName,
+          name = NonEmptyString.unsafeFrom(topicName),
           min = min.filterNot(_ == settings.defaultMinPersonsPerTopic),
           max = max.filterNot(_ == settings.defaultMaxPersonsPerTopic),
           occurrences = occurrences
@@ -56,15 +59,16 @@ class TableReader(input: InputModel) {
     val topicNames = topicsSeq.map(_.name)
 
     /* For each person's names, a list of mandatory topic's names */
-    val mandatoryPersonsToTopics = cells.map { row =>
-      val topicName: String = row(tableSettings.topicCol)
-      val mandatoryName: String = row(tableSettings.mandatoryPersonCol)
+    val mandatoryPersonsToTopics: Map[NonEmptyString, Set[NonEmptyString]] = cells.map { row =>
+      val topicName = NonEmptyString.unsafeFrom(row(tableSettings.topicCol))
+      val mandatoryName = NonEmptyString.unsafeFrom(row(tableSettings.mandatoryPersonCol))
       mandatoryName -> topicName
     }.groupToMap.mapValuesStrict(_.toSet)
 
     /* The persons, */
     val indexedPersonNames = cellsPersonsRow.zipWithIndex.drop(tableSettings.personsStartCol)
-    val persons = indexedPersonNames.map { case (person, personColumnIndex) =>
+    val persons = indexedPersonNames.map { case (maybePerson, personColumnIndex) =>
+      val person = NonEmptyString.unsafeFrom(maybePerson)
 
       val personColumn = cellsWithContent.map { row =>
         if (row.length <= personColumnIndex) "" else row(personColumnIndex).trim
@@ -77,7 +81,7 @@ class TableReader(input: InputModel) {
       }.getOrElse(Set.empty)
 
       val scoresByTopic = topicsSeq.zip(personColumn).flatMap {
-        case (topic, value) => wishValueToScoreOption(value).map(topic.name -> _)
+        case (topic, value) => wishValueToScoreOption(value).map(topic.name.value -> _)
       }.toMap
 
       InputPerson(
@@ -95,8 +99,8 @@ class TableReader(input: InputModel) {
       settings = settings,
       tableSettings = tableSettings,
       slots = input.slots,
-      persons = SortedSet(persons: _*),
-      topics = SortedSet(topicsSeq: _*),
+      persons = persons.toList.sorted,
+      topics = topicsSeq.toList.sorted,
       constraints = InputGlobalConstraints()
     )
   }

@@ -21,7 +21,8 @@ object InputLoader {
     .setOriginComments(false)
     .setJson(false)
 
-  /* Do not delete the pureconfig.generic.auto._ import even though IntelliJ marks is as unused */
+  /* Do not delete the following imports even though IntelliJ mark them as unused */
+  import eu.timepit.refined.pureconfig._
   import pureconfig.generic.auto._
 
   /** Loads from default values */

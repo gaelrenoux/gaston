@@ -1,7 +1,5 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.input.InputSettings
-
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
   * @param movable Can the topic be moved to another slot than the one it is on ?
@@ -29,9 +27,9 @@ case class Topic(
 
 object Topic {
 
-  private val DefaultMin = InputSettings.defaultDefaultMinPersonsPerTopic
+  val DefaultMin = 1
 
-  private val DefaultMax = InputSettings.defaultDefaultMaxPersonsPerTopic
+  val DefaultMax = 10
 
   val OccurrenceMarker = "#"
 

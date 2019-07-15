@@ -1,78 +1,79 @@
 package fr.renoux.gaston.input
 
-import fr.renoux.gaston.model._
+import eu.timepit.refined.auto._
+import eu.timepit.refined.types.numeric._
+import eu.timepit.refined.types.string.NonEmptyString
+import fr.renoux.gaston.model.{Score, Topic, Weight}
 
 /* All line and column indices are zero-based */
 
 case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),
-    slots: Seq[Seq[InputSlot]] = Seq(),
-    persons: Set[InputPerson] = Set(),
-    topics: Set[InputTopic] = Set(),
+    slots: List[List[InputSlot]] = Nil,
+    persons: List[InputPerson] = Nil,
+    topics: List[InputTopic] = Nil,
     constraints: InputGlobalConstraints = InputGlobalConstraints()
-)
+) {
+  lazy val topicsSet: Set[InputTopic] = topics.toSet
+  lazy val personsSet: Set[InputPerson] = persons.toSet
+}
 
 case class InputSettings(
     incompatibilityAntiPreference: Score = Score(-1000),
-    defaultMaxTopicsPerSlot: Option[Int] = None,
-    defaultMinPersonsPerTopic: Int = 1,
-    defaultMaxPersonsPerTopic: Int = 10,
-    maxPersonsOnNothing: Int = 0,
-    minPersonsOnNothing: Int = 0,
+    defaultMaxTopicsPerSlot: Option[PosInt] = None,
+    defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
+    defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
+    maxPersonsOnNothing: NonNegInt = 0,
+    minPersonsOnNothing: NonNegInt = 0,
     personOnNothingAntiPreference: Score = Score(-100),
     backtrackInitialSchedule: Boolean = true //TODO Should be calculated
 )
 
-object InputSettings {
-  val defaultDefaultMinPersonsPerTopic: Int = 1
-  val defaultDefaultMaxPersonsPerTopic: Int = 10
-}
-
 case class InputTableSettings(
-    separator: String = "\t",
-    personsRow: Int = 0,
-    wishesStartRow: Int = 1,
-    personsStartCol: Int = 4,
-    topicCol: Int = 0,
-    topicOccurrencesCol: Option[Int] = None,
-    mandatoryPersonCol: Int = 1,
-    minPersonsCol: Option[Int] = None,
-    maxPersonsCol: Int = 3,
-    personsCountAdd: Int = 0,
+    separator: NonEmptyString = "\t",
+    personsRow: NonNegInt = 0,
+    wishesStartRow: NonNegInt = 1,
+    personsStartCol: NonNegInt = 4,
+    topicCol: NonNegInt = 0,
+    topicOccurrencesCol: Option[NonNegInt] = None,
+    mandatoryPersonCol: NonNegInt = 1,
+    minPersonsCol: Option[NonNegInt] = None,
+    maxPersonsCol: NonNegInt = 3,
+    personsCountAdd: NonNegInt = 0,
     mandatoryPersonWeight: Weight = Weight.Default,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
 )
 
 case class InputSlot(
-    name: String,
-    maxTopics: Option[Int] = None
+    name: NonEmptyString,
+    maxTopics: Option[PosInt] = None
 )
 
 case class InputTopic(
-    name: String,
-    min: Option[Int] = None,
-    max: Option[Int] = None,
-    occurrences: Option[Int] = None,
-    multiple: Option[Int] = None,
-    slots: Option[Set[String]] = None
+    name: NonEmptyString,
+    min: Option[PosInt] = None,
+    max: Option[PosInt] = None,
+    occurrences: Option[PosInt] = None,
+    multiple: Option[PosInt] = None,
+    slots: Option[Set[NonEmptyString]] = None
 ) {
   /** Occurrence needs to be an Option to not appear when not needed */
-  lazy val forcedOccurrences: Int = occurrences.getOrElse(1)
+  lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1: PosInt)
 
   /** Multiple needs to be an Option to not appear when not needed */
-  lazy val forcedMultiple: Int = multiple.getOrElse(1)
+  lazy val forcedMultiple: PosInt = multiple.getOrElse(1: PosInt)
 }
 
 case class InputPerson(
-    name: String,
+    name: NonEmptyString,
     weight: Weight = Weight.Default,
-    absences: Set[String] = Set(),
-    mandatory: Set[String] = Set(),
-    forbidden: Set[String] = Set(),
-    incompatible: Set[String] = Set(),
-    wishes: Map[String, Score] = Map()
+    absences: Set[NonEmptyString] = Set(),
+    mandatory: Set[NonEmptyString] = Set(),
+    forbidden: Set[NonEmptyString] = Set(),
+    incompatible: Set[NonEmptyString] = Set(),
+    wishes: Map[String, Score] = Map() //can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
 )
 
 case class InputGlobalConstraints(
@@ -81,10 +82,10 @@ case class InputGlobalConstraints(
 )
 
 case class InputSimultaneousConstraint(
-    topics: Set[String]
+    topics: Set[NonEmptyString]
 )
 
 case class InputExclusiveConstraint(
-    topics: Set[String],
-    exemptions: Set[String] = Set()
+    topics: Set[NonEmptyString],
+    exemptions: Set[NonEmptyString] = Set()
 )
