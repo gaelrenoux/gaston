@@ -1,8 +1,11 @@
 package fr.renoux.gaston.input
 
+import eu.timepit.refined._
+import eu.timepit.refined.api.{Refined, Validate}
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.numeric._
 import eu.timepit.refined.types.string.NonEmptyString
+import fr.renoux.gaston.input.InputRefinements._
 import fr.renoux.gaston.model.{Score, Topic, Weight}
 
 /* All line and column indices are zero-based */
@@ -20,13 +23,13 @@ case class InputModel(
 }
 
 case class InputSettings(
-    incompatibilityAntiPreference: Score = Score(-1000),
+    incompatibilityAntiPreference: NonPosScore = NonPosScore(-1000.0),
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
     defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
     maxPersonsOnNothing: NonNegInt = 0,
     minPersonsOnNothing: NonNegInt = 0,
-    personOnNothingAntiPreference: Score = Score(-100),
+    personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
     backtrackInitialSchedule: Boolean = true //TODO Should be calculated
 )
 
@@ -41,7 +44,7 @@ case class InputTableSettings(
     minPersonsCol: Option[NonNegInt] = None,
     maxPersonsCol: NonNegInt = 3,
     personsCountAdd: NonNegInt = 0,
-    mandatoryPersonWeight: Weight = Weight.Default,
+    mandatoryPersonWeight: PosWeight = refineV[WeightPositive](Weight.Default).right.get,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
 )
@@ -68,7 +71,7 @@ case class InputTopic(
 
 case class InputPerson(
     name: NonEmptyString,
-    weight: Weight = Weight.Default,
+    weight: PosWeight = refineV[WeightPositive](Weight.Default).right.get,
     absences: Set[NonEmptyString] = Set(),
     mandatory: Set[NonEmptyString] = Set(),
     forbidden: Set[NonEmptyString] = Set(),
@@ -89,3 +92,28 @@ case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
     exemptions: Set[NonEmptyString] = Set()
 )
+
+object InputRefinements {
+
+  case class ScoreNonPositive()
+
+  implicit val scoreNonPositiveValidate: Validate.Plain[Score, ScoreNonPositive] =
+    Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", ScoreNonPositive())
+
+  type NonPosScore = Score Refined ScoreNonPositive
+
+  object NonPosScore {
+    def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).right.get
+  }
+
+  case class WeightPositive()
+
+  implicit val weightPositiveValidate: Validate.Plain[Weight, WeightPositive] =
+    Validate.fromPredicate(w => w.value > 0, w => s"($w is positive)", WeightPositive())
+
+  type PosWeight = Weight Refined WeightPositive
+
+  object PosWeight {
+    def apply(w: PosDouble): PosWeight = refineV[WeightPositive](Weight(w)).right.get
+  }
+}

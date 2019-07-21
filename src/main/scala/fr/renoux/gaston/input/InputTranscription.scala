@@ -1,20 +1,93 @@
 package fr.renoux.gaston.input
 
+import eu.timepit.refined.auto._
+import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.refineV
+import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap._
 import fr.renoux.gaston.util.CollectionImplicits._
-import scalaz.Validation
+import scalaz.{NonEmptyList, Validation}
 import scalaz.syntax.validation._
-import eu.timepit.refined.auto._
-import eu.timepit.refined.types.string.NonEmptyString
 
 /** Converts the Input object to the Problem object. */
 private[input] class InputTranscription(input: InputModel) {
 
   val settings: InputSettings = input.settings
+
+  lazy val errors: Set[String] =
+    Set[String]() ++ {
+      if (input.settings.defaultMinPersonsPerTopic <= input.settings.defaultMaxPersonsPerTopic) None
+      else Some(s"Settings: default min persons per topic (${input.settings.defaultMinPersonsPerTopic}) " +
+        s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic}) ")
+    } ++ {
+      if (input.settings.minPersonsOnNothing <= input.settings.maxPersonsOnNothing) None
+      else Some(s"Settings: Min persons on nothing (${input.settings.minPersonsOnNothing}) " +
+        s"is higher than max persons on nothing  (${input.settings.maxPersonsOnNothing})")
+    } ++ {
+      input.topics
+        .filter { t => (t.min, t.max).zipped.exists(_ > _) }
+        .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
+    } ++ {
+      input.topics.flatMap { t =>
+        val badSlots = t.slots.getOrElse(Set()).filter(s => !slotsSet.exists(_.name == s)).map(s => s"[$s]")
+        if (badSlots.isEmpty) None
+        else Some(s"Topic [${t.name}]: undefined slots: ${badSlots.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badSlots = p.absences.filter(!slotsPerName.contains(_)).map(s => s"[$s]")
+        if (badSlots.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined absence slots: ${badSlots.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badTopics = p.mandatory.filter(!topicsPerName.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined mandatory topics: ${badTopics.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badTopics = p.forbidden.filter(!topicsPerName.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined forbidden topics: ${badTopics.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badTopics = p.wishes.keys.map(refineV[NonEmpty](_).right.get).filter(!topicsPerName.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined wished topics: ${badTopics.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badPersons = p.incompatible.filter(!personsPerName.contains(_)).map(p => s"[$p]")
+        if (badPersons.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined incompatible persons: ${badPersons.mkString(", ")}")
+      }
+    } ++ {
+      input.constraints.exclusive
+        .flatMap(_.topics)
+        .filter(!topicsPerName.contains(_))
+        .map(t => s"Exclusive constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.exclusive
+        .flatMap(_.exemptions)
+        .filter(!personsPerName.contains(_))
+        .map(p => s"Exclusive constraint: unknown person: [$p]")
+    } ++ {
+      input.constraints.simultaneous
+        .flatMap(_.topics)
+        .filter(!topicsPerName.contains(_))
+        .map(t => s"Simultaneous constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.simultaneous
+        .flatMap(_.topics)
+        .filter(t => topicsPerName(t).size > 1)
+        .map(t => s"Simultaneous constraint: topic [$t]: can't be multiple or have several occurrences")
+    }
 
   /* Slots */
   lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap(s => s.name -> Slot(s.name))
@@ -103,7 +176,7 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
-        //TODO Better handling of simultaneous and occurrences is needed, should at least return an error
+        //TODO Better handling of simultaneous and occurrences is needed. Will return an error above
         TopicsSimultaneous(inConstraint.topics.map(topicsPerName(_).head))
       }
 
@@ -202,13 +275,18 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val preferences: Set[PersonTopicPreference] = if (enabled) elements.flatMap(_._4).toSet else Set.empty
   }
 
-  lazy val problem: Validation[InputErrors, Problem] =
+  lazy val problem: Problem =
     new ProblemImpl(
       slotSequences,
       topicsPerName.values.flatten.toSet ++ Unassigned.topics ++ Nothing.topics,
       personsPerName.values.toSet,
       Constraints.all ++ Unassigned.constraints ++ Nothing.constraints,
       Preferences.all ++ Unassigned.preferences ++ Nothing.preferences
-    ).success
+    )
+
+  lazy val result: Validation[InputErrors, Problem] = errors.toList.sorted.map(InputError(_)) match {
+    case Nil => problem.success
+    case h :: q => NonEmptyList(h, q: _*).failure
+  }
 
 }

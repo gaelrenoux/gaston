@@ -3,6 +3,7 @@ package fr.renoux.gaston
 import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.engine.Context
+import fr.renoux.gaston.input.InputRefinements.NonPosScore
 import fr.renoux.gaston.input.InputSettings
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
@@ -21,7 +22,7 @@ object UdoConTestModel {
   val weakPreference = Score(1)
 
   val Settings = InputSettings(
-    incompatibilityAntiPreference = Score(-50),
+    incompatibilityAntiPreference = NonPosScore(-50.0),
     defaultMinPersonsPerTopic = 3,
     defaultMaxPersonsPerTopic = 5
   )

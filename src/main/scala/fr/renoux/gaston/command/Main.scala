@@ -27,7 +27,12 @@ object Main {
     log.info(s"Commande line is: $commandLine")
 
     val _ = run(commandLine).recover { case errors =>
-      val msg = s"Failed to run.\n${errors.list.toList.mkString("\n")}\n"
+      val msg = s"Failed to run.\n${
+        errors.list.toList.map {
+          case InputError(desc, Some(file), Some(line)) => s"$file: line $line: $desc"
+          case InputError(desc, _, _) => desc
+        }.mkString("\n")
+      }\n"
       log.info(msg)
       println(msg)
     }

@@ -12,7 +12,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
   import fr.renoux.gaston.TestUtils._
 
   private def from(model: InputModel): Problem = {
-    new InputTranscription(model).problem.valueOr(e => throw new IllegalArgumentException(e.toString))
+    new InputTranscription(model).result.valueOr(e => throw new IllegalArgumentException(e.toString))
   }
 
   behavior of "Occurrences"

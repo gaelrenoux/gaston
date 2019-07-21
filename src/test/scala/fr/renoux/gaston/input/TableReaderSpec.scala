@@ -3,7 +3,8 @@ package fr.renoux.gaston.input
 import ai.x.diff.DiffShow
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.model.{Score, Weight}
+import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
+import fr.renoux.gaston.model.Score
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.io.Source
@@ -21,16 +22,16 @@ class TableReaderSpec extends FlatSpec with Matchers {
     topicOccurrencesCol = None,
     personsCountAdd = 1,
     mandatoryPersonCol = 1,
-    mandatoryPersonWeight = Weight(1.5),
+    mandatoryPersonWeight = PosWeight(1.5),
     forbiddenPersonMarker = Some("0"),
     preferencesScoreMapping = Some(Map("1" -> Score(1), "2" -> Score(5)))
   )
 
   val settings = InputSettings(
-    incompatibilityAntiPreference = Score(-1000),
+    incompatibilityAntiPreference = NonPosScore(-1000.0),
     defaultMinPersonsPerTopic = 4,
     defaultMaxPersonsPerTopic = 6,
-    personOnNothingAntiPreference = Score(-100)
+    personOnNothingAntiPreference = NonPosScore(-100.0)
   )
 
   val input = InputModel(
