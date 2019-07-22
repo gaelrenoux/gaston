@@ -3,7 +3,7 @@ import sbt.Keys._
 name := "gaston"
 version := "0.3.0"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.12.8" //waiting on artima supersafe and refined (and a little ai.x.diff, but it's not a big deal)
 scalacOptions ++= Seq(
   "-Ypartial-unification", // Enable partial unification in type constructor inference
   "-explaintypes", // Explain type errors in more detail.
@@ -44,11 +44,11 @@ libraryDependencies ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
 
-  "com.typesafe" % "config" % "1.3.3",
-  "com.github.pureconfig" %% "pureconfig" % "0.10.1",
+  "com.typesafe" % "config" % "1.3.4",
+  "com.github.pureconfig" %% "pureconfig" % "0.11.1",
   "com.github.scopt" %% "scopt" % "3.7.1",
 
-  "org.scalaz" %% "scalaz-core" % "7.2.27",
+  "org.scalaz" %% "scalaz-core" % "7.2.28",
 
   "eu.timepit" %% "refined" % "0.9.8",
   "eu.timepit" %% "refined-scalaz" % "0.9.8",
@@ -56,7 +56,7 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "refined-scopt" % "0.9.8",
 
   "ai.x" %% "diff" % "2.0.1",
-  "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")
