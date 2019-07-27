@@ -8,7 +8,7 @@ import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
-import fr.renoux.gaston.util.CanGroupToMap._
+import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 import scalaz.{NonEmptyList, Validation}
 import scalaz.syntax.validation._

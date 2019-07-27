@@ -2,7 +2,7 @@ package fr.renoux.gaston.model.impl
 
 import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.util.CanGroupToMap._
+import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */

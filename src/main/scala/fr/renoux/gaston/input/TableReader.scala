@@ -7,7 +7,7 @@ import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.input.InputRefinements.WeightPositive
 import fr.renoux.gaston.model.{Score, Weight}
-import fr.renoux.gaston.util.CanGroupToMap._
+import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.StringImplicits._
 
@@ -110,6 +110,7 @@ class TableReader(input: InputModel) {
       constraints = InputGlobalConstraints()
     )
   }
+
   // scalastyle:on method.length
 
   def wishValueToScoreOption(value: String): Option[Score] =
