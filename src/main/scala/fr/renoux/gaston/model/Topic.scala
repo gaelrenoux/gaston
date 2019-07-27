@@ -7,8 +7,8 @@ package fr.renoux.gaston.model
   * */
 case class Topic(
     name: String,
-    mandatory: Set[Person] = Set(),
-    forbidden: Set[Person] = Set(),
+    mandatory: Set[Person] = Set.empty,
+    forbidden: Set[Person] = Set.empty,
     min: Int = Topic.DefaultMin,
     max: Int = Topic.DefaultMax,
     movable: Boolean = true,

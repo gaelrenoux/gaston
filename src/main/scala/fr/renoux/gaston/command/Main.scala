@@ -95,9 +95,10 @@ object Main {
 
   /** Set the log level to debuq */
   private def setDebugLogLevel(): Unit = {
-    val loggerContext = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
-    val logger = loggerContext.getLogger("fr.renoux")
-    logger.setLevel(Level.DEBUG)
+    LoggerFactory.getILoggerFactory match {
+      case ctx: LoggerContext => ctx.getLogger("fr.renoux").setLevel(Level.DEBUG)
+      case _ => println("Cannot set logger level to DEBUG")
+    }
   }
 
 }

@@ -64,7 +64,7 @@ class ProblemImpl(
   lazy val simultaneousTopicPerTopic: Map[Topic, Set[Topic]] = {
     constraints.collect {
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
-    }.flatten.toMap.withDefaultValue(Set())
+    }.flatten.toMap.withDefaultValue(Set.empty)
   }
 
   /** For each slots, the topics that must happen in that slot. Handles only topics with just one possible slot. */
@@ -75,7 +75,7 @@ class ProblemImpl(
 
   lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
-  }.groupBy(_.person).withDefaultValue(Set())
+  }.groupBy(_.person).withDefaultValue(Set.empty)
 
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")

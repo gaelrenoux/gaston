@@ -10,7 +10,7 @@ object RandomImplicits {
     @inline
     final def pick[A](s: Set[A]): A = {
       val i = wrapped.nextInt(s.size)
-      s.toSeq(i)
+      s.toIndexedSeq(i)
     }
 
     /** Picks randomly several distinct elements in a Set */

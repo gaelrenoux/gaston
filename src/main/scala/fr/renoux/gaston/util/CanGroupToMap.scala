@@ -23,6 +23,10 @@ object CanGroupToMap {
     override def groupToMap[B, C](a: Seq[(B, C)]): Map[B, Seq[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
   }
 
+  implicit object IndexedSeqCanGroupToMap extends CanGroupToMap[IndexedSeq] {
+    override def groupToMap[B, C](a: IndexedSeq[(B, C)]): Map[B, IndexedSeq[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
+  }
+
   implicit object IterableCanGroupToMap extends CanGroupToMap[Iterable] {
     override def groupToMap[B, C](a: Iterable[(B, C)]): Map[B, Iterable[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
   }

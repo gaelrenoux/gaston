@@ -35,8 +35,8 @@ class TableReader(input: InputModel) {
   // scalastyle:off method.length
   def read(table: String): InputModel = {
     // TODO replace calls to unsafeFrom with proper validation
-    val lines: Seq[String] = table.split("\n", -1).filter(_.nonEmpty).toSeq
-    val cells: Seq[Seq[String]] = lines.map(_.split(tableSettings.separator, -1).map(_.trim).toSeq)
+    val lines: IndexedSeq[String] = table.split("\n", -1).filter(_.nonEmpty).toIndexedSeq
+    val cells: IndexedSeq[IndexedSeq[String]] = lines.map(_.split(tableSettings.separator, -1).map(_.trim).toIndexedSeq)
 
     log.debug(s"Cells:\n${cells.mkString("\n")}")
     val cellsPersonsRow = cells(tableSettings.personsRow)

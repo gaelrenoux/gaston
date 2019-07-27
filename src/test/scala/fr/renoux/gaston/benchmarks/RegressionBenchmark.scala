@@ -23,7 +23,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give an good score when working a short time" ignore {
+  it should "give an good score when working a short time" in {
     benchmark(
       duration = 5.minutes,
       expectsScore = 600
@@ -62,7 +62,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
 
       println(s"${schedule.score} after $count iterations")
 
-      schedule.problem.constraints.filterNot(_.isRespected(schedule)) should be(Set())
+      schedule.problem.constraints.filterNot(_.isRespected(schedule)) should be(Set.empty)
       schedule.isSolution should be(true)
       schedule.score.value should be > expectsScore
       count should be > expectsCount

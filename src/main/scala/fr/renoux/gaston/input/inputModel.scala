@@ -73,16 +73,16 @@ case class InputTopic(
 case class InputPerson(
     name: NonEmptyString,
     weight: PosWeight = refineV[WeightPositive](Weight.Default).right.get,
-    absences: Set[NonEmptyString] = Set(),
-    mandatory: Set[NonEmptyString] = Set(),
-    forbidden: Set[NonEmptyString] = Set(),
-    incompatible: Set[NonEmptyString] = Set(),
-    wishes: Map[String, Score] = Map() // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
+    absences: Set[NonEmptyString] = Set.empty,
+    mandatory: Set[NonEmptyString] = Set.empty,
+    forbidden: Set[NonEmptyString] = Set.empty,
+    incompatible: Set[NonEmptyString] = Set.empty,
+    wishes: Map[String, Score] = Map.empty // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
 )
 
 case class InputGlobalConstraints(
-    simultaneous: Set[InputSimultaneousConstraint] = Set(),
-    exclusive: Set[InputExclusiveConstraint] = Set()
+    simultaneous: Set[InputSimultaneousConstraint] = Set.empty,
+    exclusive: Set[InputExclusiveConstraint] = Set.empty
 )
 
 case class InputSimultaneousConstraint(
@@ -91,15 +91,15 @@ case class InputSimultaneousConstraint(
 
 case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
-    exemptions: Set[NonEmptyString] = Set()
+    exemptions: Set[NonEmptyString] = Set.empty
 )
 
 object InputRefinements {
 
-  case class ScoreNonPositive()
+  class ScoreNonPositive()
 
   implicit val scoreNonPositiveValidate: Validate.Plain[Score, ScoreNonPositive] =
-    Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", ScoreNonPositive())
+    Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", new ScoreNonPositive())
 
   type NonPosScore = Score Refined ScoreNonPositive
 
@@ -107,10 +107,10 @@ object InputRefinements {
     def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).right.get
   }
 
-  case class WeightPositive()
+  class WeightPositive()
 
   implicit val weightPositiveValidate: Validate.Plain[Weight, WeightPositive] =
-    Validate.fromPredicate(w => w.value > 0, w => s"($w is positive)", WeightPositive())
+    Validate.fromPredicate(w => w.value > 0, w => s"($w is positive)", new WeightPositive())
 
   type PosWeight = Weight Refined WeightPositive
 

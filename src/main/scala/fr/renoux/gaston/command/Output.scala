@@ -56,7 +56,7 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
           val percent = 100.0 * count / fs.total
           percent -> s"[${percent.round}%] Max number of topics too low on slot ${slot.name}"
       }
-      val allMessages = (noTopicMessages ++ maxParaMessages).sortBy(_._1).reverse.map(_._2).mkString("\n")
+      val allMessages = (noTopicMessages ++ maxParaMessages).sortBy(_._1).reverseMap(_._2).mkString("\n")
 
       write(s"I'm having trouble generating a valid schedule. Probable causes are: \n$allMessages")
     }

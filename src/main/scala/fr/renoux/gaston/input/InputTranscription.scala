@@ -19,7 +19,7 @@ private[input] class InputTranscription(input: InputModel) {
   val settings: InputSettings = input.settings
 
   lazy val errors: Set[String] =
-    Set[String]() ++ {
+    Set.empty[String] ++ {
       if (input.settings.defaultMinPersonsPerTopic <= input.settings.defaultMaxPersonsPerTopic) None
       else Some(s"Settings: default min persons per topic (${input.settings.defaultMinPersonsPerTopic}) " +
         s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic}) ")
@@ -33,7 +33,7 @@ private[input] class InputTranscription(input: InputModel) {
         .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
     } ++ {
       input.topics.flatMap { t =>
-        val badSlots = t.slots.getOrElse(Set()).filter(s => !slotsSet.exists(_.name == s)).map(s => s"[$s]")
+        val badSlots = t.slots.getOrElse(Set.empty).filter(s => !slotsSet.exists(_.name == s)).map(s => s"[$s]")
         if (badSlots.isEmpty) None
         else Some(s"Topic [${t.name}]: undefined slots: ${badSlots.mkString(", ")}")
       }

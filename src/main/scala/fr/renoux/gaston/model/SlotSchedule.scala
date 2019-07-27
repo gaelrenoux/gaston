@@ -31,6 +31,6 @@ case class SlotSchedule(
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
 
   /** Get the Persons for a specific Topic */
-  def on(t: Topic): Set[Person] = personsPerTopic.getOrElse(t, Set())
+  def on(t: Topic): Set[Person] = personsPerTopic.getOrElse(t, Set.empty)
 
 }

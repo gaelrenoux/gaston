@@ -61,7 +61,6 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
     * slot anymore. */
   private def goodMoveOnSlot(currentSchedule: Schedule, slot: Slot)(implicit rand: Random): Option[Schedule] =
     chrono("PersonPlacementImprover >  improve > goodMoveOnSlot") {
-      if (false) rand.nextLong()
       val slotSchedule = currentSchedule.on(slot)
 
       lazy val records = rand.shuffle(slotSchedule.records)
