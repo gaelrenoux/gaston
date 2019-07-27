@@ -6,6 +6,7 @@ import fr.renoux.gaston.util.OptionImplicits._
 /**
   * A person must be assigned to this topic.
   */
+@hardCoded
 case class PersonTopicObligation(person: Person, topic: Topic) extends Constraint.SlotLevel {
 
   override def isRespected(schedule: Schedule): Boolean =

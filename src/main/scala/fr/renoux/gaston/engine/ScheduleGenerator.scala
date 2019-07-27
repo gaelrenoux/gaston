@@ -14,6 +14,8 @@ import scala.util.Random
 /**
   * Uses backtracking to produce a Stream of schedules. Those schedules are not the best you could have, but they are
   * valid and all persons have their optimal slots.
+  *
+  * Placing persons on the generated schedule is delegated to the PartialScheduleFiller.
   */
 class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
 
@@ -52,6 +54,7 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
     * needed.
     * @return The state of the backtracking, with a schedule that fits.
     */
+  // scalastyle:off method.length
   private def backtrackAssignTopicsToSlots(
       state: State,
       failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)
@@ -71,7 +74,7 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
         backtrackAssignTopicsToSlots(state.withHeadSlotSatisfied, failures)
       }
 
-    } else if (state.isMaxParallelizationReachedOnHeadSlot) {
+    } else if (state.isMaxTopicsReachedOnHeadSlot) {
       /* Current slot has reached max parallelization. Fail if the current slot is not satisfied yet. */
       if (state.isHeadSlotMaxPersonsTooLow) {
         log.trace("Fail because current slot has reached max parallelization and it is not satisfied yet")
@@ -81,6 +84,11 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
         log.trace("Go on without current slot because it has reached max parallelization and it is satisfied")
         backtrackAssignTopicsToSlots(state.withHeadSlotSatisfied, failures)
       }
+
+    } else if (!state.isHeadTopicOkOnHeadSlot) {
+      /* current topic cannot be added to the current slot, go on to next topic */
+      log.trace("Go on with new topic for current slot as the topic is not compatible with the slot")
+      backtrackAssignTopicsToSlots(state.withPassedHeadTopic, failures)
 
     } else if (!state.isGoodCandidate) {
       /* candidate is not acceptable or lead to a failure, go on to next topic */
@@ -96,8 +104,8 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
         backtrackAssignTopicsToSlots(state.withPassedHeadTopic, fs)
       }
     }
-
   }
+  // scalastyle:on method.length
 
 }
 
@@ -119,8 +127,10 @@ object ScheduleGenerator {
 
     lazy val isHeadSlotMaxPersonsTooLow: Boolean = partialSchedule.on(headSlot).isMaxPersonsTooLow
 
-    lazy val isMaxParallelizationReachedOnHeadSlot: Boolean =
+    lazy val isMaxTopicsReachedOnHeadSlot: Boolean =
       ^(partialSchedule.countTopicsPerSlot.get(headSlot), problem.maxTopicCountPerSlot.get(headSlot))(_ >= _).getOrElse(false)
+
+    lazy val isHeadTopicOkOnHeadSlot: Boolean = problem.forcedSlotsPerTopic.get(headTopic).forall(_.contains(headSlot))
 
     lazy val headSlot: Slot = slotsLeft.head
 

@@ -6,7 +6,7 @@ import fr.renoux.gaston.model.{Constraint, Schedule, SlotSchedule, Topic}
 /**
   * Min and max number of persons on a topic. Remember it includes everyone, even mandatory persons !
   */
-// TODO separate in min and max, to facilitate partial checking
+@hardCoded
 case class TopicNeedsNumberOfPersons(topic: Topic, min: Int, max: Int) extends Constraint.SlotLevel {
 
   override def isRespected(schedule: Schedule): Boolean =

@@ -1,8 +1,8 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.engine.Context
+import fr.renoux.gaston.engine.Context._
 import fr.renoux.gaston.util.CollectionImplicits._
-import Context._
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -27,11 +27,13 @@ case class Schedule(
   lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
   lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = slots.zipWith(SlotSchedule(this, _)).toMap
   lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
+  lazy val countTopicsLeftPerSlot: Map[Slot, Int] = problem.slots.zipWith(s => problem.maxTopicCountPerSlot(s) - countTopicsPerSlot.getOrElse(s, 0)).toMap
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = recordsPerSlot.mapValuesStrict { x => x.map(_.topic) }
   lazy val countTopicsPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.size)
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
+  lazy val countPersonsPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
 

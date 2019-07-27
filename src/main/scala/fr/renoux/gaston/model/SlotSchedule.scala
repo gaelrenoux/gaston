@@ -20,12 +20,17 @@ case class SlotSchedule(
   lazy val maxPersons: Option[Int] = schedule.maxPersonsOnSlot.get(slot)
 
   lazy val topicsSeq: Seq[Topic] = topics.toSeq
+  lazy val maxTopics: Int = problem.maxTopicCountPerSlot(slot)
+  lazy val maxTopicsLeft: Int = maxTopics - topics.size
 
   /** Topics that cannot be added on this slot, because of the slot itself */
-  lazy val hardIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
+  lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
+
+  /** Topics that cannot be added on this slot as it now (but may be added later if the configuration of the slot changes) */
+  lazy val currentlyIncompatibleTopics: Set[Topic] = topics.flatMap(problem.incompatibleTopicsPerTopic)
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
-  lazy val currentIncompatibleTopics: Set[Topic] = hardIncompatibleTopics ++ topics.flatMap(problem.incompatibleTopicsPerTopic)
+  lazy val incompatibleTopics: Set[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics
 
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)

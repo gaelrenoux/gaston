@@ -4,6 +4,7 @@ import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.OptionImplicits._
 
 /** A person is missing on some slot. */
+@hardCoded
 case class PersonAbsence(person: Person, slot: Slot) extends Constraint.SlotLevel {
 
   override def isRespected(schedule: Schedule): Boolean =

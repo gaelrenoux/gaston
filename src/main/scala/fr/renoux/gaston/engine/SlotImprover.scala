@@ -53,15 +53,22 @@ class SlotImprover(
 
         /* Filter out impossible adds because of incompatibility */
         slotSchedule = schedule.on(slot)
-        topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.currentIncompatibleTopics).view
+        topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
         topicsToAdd = linkedTopics(topic)
+        if slotSchedule.maxTopicsLeft >= topicsToAdd.size
 
         move = Move.Add(slot, topicsToAdd)
         if !move.reverts(previousMove)
 
+        personsMandatoryOnTopic = topicsToAdd.flatMap(_.mandatory)
+
         /* Filter out impossible adds because mandatory persons are already taken */
-        mandatoryPersonsSlot = slotSchedule.mandatory
-        if !topicsToAdd.flatMap(_.mandatory).exists(mandatoryPersonsSlot)
+        personsAlreadyMandatoryOnSlot = slotSchedule.mandatory
+        if !personsMandatoryOnTopic.exists(personsAlreadyMandatoryOnSlot)
+
+        /* Filter out impossible adds because mandatory persons are missing */
+        personsMissingOnSlot = problem.personsMissingPerSlot(slot)
+        if !personsMandatoryOnTopic.exists(personsMissingOnSlot)
 
         /* Generate the swap */
         records = topicsToAdd.map { t => Record(slot, t, t.mandatory) }
@@ -81,16 +88,30 @@ class SlotImprover(
         slotSchedule1 = schedule.on(s1)
         slotSchedule2 = schedule.on(s2)
 
-        t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.hardIncompatibleTopics).view // can't take current topics since we're removing one
-        t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.hardIncompatibleTopics).view // can't take current topics since we're removing one
+        t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.permanentlyIncompatibleTopics).view
+        t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.permanentlyIncompatibleTopics).view
         topics1 = linkedTopics(t1)
         topics2 = linkedTopics(t2)
+        if slotSchedule1.maxTopicsLeft >= topics2.size - topics1.size
+        if slotSchedule2.maxTopicsLeft >= topics1.size - topics2.size
+
         move = Move.Swap(topics1, topics2)
         if !move.reverts(previousMove)
 
-        /* Filter out impossible swaps because of mandatory persons */
-        if !topics1.flatMap(_.mandatory).exists(slotSchedule2.mandatory) // check mandatories of T1 are not already blocked on S2
-        if !topics2.flatMap(_.mandatory).exists(slotSchedule1.mandatory) // check mandatories of T2 are not already blocked on S1
+        personsMandatoryOnT1 = topics1.flatMap(_.mandatory)
+        personsMandatoryOnT2 = topics2.flatMap(_.mandatory)
+
+        /* Filter out impossible adds because mandatory persons are already taken */
+        personsAlreadyMandatoryOnS1 = slotSchedule1.mandatory -- personsMandatoryOnT1 // taking this topic off, they're not mandatory any more on the slot
+        personsAlreadyMandatoryOnS2 = slotSchedule2.mandatory -- personsMandatoryOnT2 // taking this topic off, they're not mandatory any more on the slot
+        if !personsMandatoryOnT1.exists(personsAlreadyMandatoryOnS2) // check mandatories of T1 are not already blocked on S2
+        if !personsMandatoryOnT2.exists(personsAlreadyMandatoryOnS1) // check mandatories of T2 are not already blocked on
+
+        /* Filter out impossible adds because mandatory persons are missing */
+        personsMissingOnSl = problem.personsMissingPerSlot(s1)
+        personsMissingOnS2 = problem.personsMissingPerSlot(s2)
+        if !personsMandatoryOnT1.exists(personsMissingOnS2)
+        if !personsMandatoryOnT2.exists(personsMissingOnSl)
 
         /* Generate the swap */
         partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> topics1, s2 -> topics2)
@@ -102,17 +123,27 @@ class SlotImprover(
     lazy val allExternalSwaps = chrono("SlotImprover > improveOnce > allExternalSwaps") {
       /* Swap topics between unscheduled and scheduled */
       for {
-        newT <- shuffled(schedule.unscheduledTopicsSeq).view
         oldT <- shuffled(schedule.scheduledTopicsSeq).view
-        newTs = linkedTopics(newT)
-        oldTs = linkedTopics(oldT)
-        move = Move.Swap(oldTs, newTs)
-        if !move.reverts(previousMove)
         slot = schedule.topicToSlot(oldT)
         slotSchedule = schedule.on(slot)
+        newT <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
+        oldTs = linkedTopics(oldT)
+        newTs = linkedTopics(newT)
+        if slotSchedule.maxTopicsLeft >= newTs.size - oldTs.size
+
+        move = Move.Swap(oldTs, newTs)
+        if !move.reverts(previousMove)
+
+        personsMandatoryOnOldTs = oldTs.flatMap(_.mandatory)
+        personsMandatoryOnNewTs = newTs.flatMap(_.mandatory)
 
         /* Filter out impossible swaps because of mandatory persons */
-        if !newTs.flatMap(_.mandatory).exists(slotSchedule.mandatory)
+        personsAlreadyMandatoryOnSlot = slotSchedule.mandatory -- personsMandatoryOnOldTs // taking this topic off, they're not mandatory any more on the slot
+        if !personsMandatoryOnNewTs.exists(personsAlreadyMandatoryOnSlot)
+
+        /* Filter out impossible adds because mandatory persons are missing */
+        personsMissingOnSlot = problem.personsMissingPerSlot(slot)
+        if !personsMandatoryOnNewTs.exists(personsMissingOnSlot)
 
         /* Generate the swap */
         partial = schedule.clearSlots(slot).replaceTopics(slot, oldTs, newTs)

@@ -47,12 +47,18 @@ trait Problem {
   /** For each slot, the available persons */
   val personsPerSlot: Map[Slot, Set[Person]]
 
+  /** For each slot, the missing persons (may be faster) */
+  val personsMissingPerSlot: Map[Slot, Set[Person]]
+
   /** For each slot, the number of available persons */
   val personsCountPerSlot: Map[Slot, Int]
 
   val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
 
   val forbiddenTopicsPerPerson: Map[Person, Set[Topic]]
+
+  /** For each topic that can't be on all slots, the slots it can be on. If a topic is not in that Map, then it can be on any slot. */
+  val forcedSlotsPerTopic: Map[Topic, Set[Slot]]
 
   /** For everyone, their personal preferences */
   val preferencesPerPerson: Map[Person, Set[Preference.Personal]]

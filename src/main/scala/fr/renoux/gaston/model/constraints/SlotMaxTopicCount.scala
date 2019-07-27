@@ -3,6 +3,7 @@ package fr.renoux.gaston.model.constraints
 import fr.renoux.gaston.model._
 
 /** Max number of topics on this specfic slot. */
+@hardCoded
 case class SlotMaxTopicCount(slot: Slot, count: Int) extends Constraint.SlotLevel {
 
   override def isRespected(schedule: Schedule): Boolean =

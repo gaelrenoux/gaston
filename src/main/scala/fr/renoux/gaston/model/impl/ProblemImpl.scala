@@ -39,6 +39,10 @@ class ProblemImpl(
 
   lazy val personsPerSlot: Map[Slot, Set[Person]] = personSlotsPossibilities.map(_.swap).groupToMap
 
+  lazy val personsMissingPerSlot: Map[Slot, Set[Person]] =
+    slots.map(_ -> Set.empty[Person]).toMap ++
+      constraints.collect { case PersonAbsence(p, s) => s -> p }.groupBy(_._1).mapValuesStrict(_.map(_._2))
+
   lazy val personsCountPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
 
   lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
@@ -56,7 +60,7 @@ class ProblemImpl(
       slot <- slots
       topic <- topics
       if topic.mandatory.exists(!personsPerSlot(slot).contains(_))
-      // TODO add topic explicitely forbidden on the slot
+      if forcedSlotsPerTopic.get(topic).exists(!_.contains(slot))
     } yield (slot, topic)
     couples.groupToMap.withDefaultValue(Set.empty)
   }
@@ -67,11 +71,8 @@ class ProblemImpl(
     }.flatten.toMap.withDefaultValue(Set.empty)
   }
 
-  /** For each slots, the topics that must happen in that slot. Handles only topics with just one possible slot. */
-  lazy val forcedTopicsPerSlot: Map[Slot, Set[Topic]] =
-    constraints.collect {
-      case TopicForcedSlot(topic, slotSet) if slotSet.size == 1 => slotSet.head -> topic
-    }.groupBy(_._1).mapValuesStrict(_.map(_._2))
+  lazy val forcedSlotsPerTopic: Map[Topic, Set[Slot]] =
+    constraints.collect { case TopicForcedSlot(t, ss) => t -> ss }.groupBy(_._1).mapValuesStrict(_.map(_._2).reduce(_ intersect _))
 
   lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
