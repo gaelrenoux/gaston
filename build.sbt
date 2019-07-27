@@ -40,7 +40,6 @@ scalacOptions ++= Seq(
   "-Xlint:type-parameter-shadow", // Warn when a local type parameter shadows a type already in scope.
   "-Xlint:unsound-match", // Warn when a pattern is not typesafe.
   "-Xlint:inaccessible", // Warn about inaccessible types in method signatures.
-  "-Xlint:adapted-args", // Warn if an argument list is modified to match the receiver.
   "-Xlint:missing-interpolator", // A string literal appears to be missing an interpolator id.
   "-Xlint:doc-detached", // A Scaladoc comment appears to be detached from its element.
   "-Xlint:private-shadow", // A private field (or class parameter) shadows a superclass field.

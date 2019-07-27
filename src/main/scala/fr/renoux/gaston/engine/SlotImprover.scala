@@ -40,7 +40,7 @@ class SlotImprover(
     }
 
 
-  /** Take an already improved schedule, and return the first better schedule it can found by swapping topics. */
+  /** Take an already improved schedule, and return the first better schedule it can find by swapping topics. */
   // scalastyle:off cyclomatic.complexity method.length
   def improveOnce(schedule: Schedule, previousMove: Move)
     (implicit rand: Random): Option[(Schedule, Move)] = chrono("SlotImprover > improveOnce") {

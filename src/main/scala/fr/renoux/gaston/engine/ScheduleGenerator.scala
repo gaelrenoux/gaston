@@ -24,19 +24,6 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
   private val filler = new PartialScheduleFiller
   private val improver = new PersonPlacementImprover
 
-  /** A lazy sequence of partial schedules. If the first one doesn't fit, go on. Ends when we can't backtrack any more. */
-  def lazySeq(implicit random: Random): Stream[Schedule] = {
-    log.debug("Generating a stream of schedules")
-    val slots = random.shuffle(problem.slots.toList)
-    val topics = random.shuffle(problem.topics.toList)
-
-    val initialState = Option(State(Schedule.empty, Queue(slots: _*), topics))
-    Stream.iterate(initialState) {
-      case Some(s) => backtrackAssignTopicsToSlots(s).toOption
-      case None => None
-    }.takeWhile(_.isDefined).map(_.get.partialSchedule)
-  }
-
   /** Generates just one schedule. */
   def createOne(implicit random: Random): Schedule = {
     log.debug("Generating a single schedule")

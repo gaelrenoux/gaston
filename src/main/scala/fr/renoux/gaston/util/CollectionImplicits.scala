@@ -57,6 +57,12 @@ object CollectionImplicits {
 
     def mapKeys[K1](f: K => K1): Map[K1, V] = wrapped.map { case (k, v) => f(k) -> v }
 
+    def zipByKeys[K1 >: K, V1](that: Map[K1, V1]): Map[K1, (Option[V], Option[V1])] = {
+      val inWrapped: Map[K, (Option[V], Option[V1])] = wrapped.map { case (k, v) => k -> (Some(v), that.get(k)) }
+      val notInWrapped: Map[K1, (Option[V], Option[V1])] = (that.keySet -- wrapped.keySet).map { k => k -> (None, that.get(k)) }.toMap
+      inWrapped ++ notInWrapped
+    }
+
   }
 
 }
