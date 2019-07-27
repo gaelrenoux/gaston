@@ -39,8 +39,6 @@ trait Problem {
 
   val personsCount: Int
 
-  val maxTopicCountPerSlot: Map[Slot, Int]
-
   /** For each persons, its available slots */
   val slotsPerPerson: Map[Person, Set[Slot]]
 

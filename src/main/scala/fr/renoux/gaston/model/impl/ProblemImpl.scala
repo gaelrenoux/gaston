@@ -18,11 +18,6 @@ class ProblemImpl(
 
   lazy val personsCount: Int = persons.size
 
-  /** Max number of topics on a single slot */
-  override val maxTopicCountPerSlot: Map[Slot, Int] = constraints.collect {
-    case SlotMaxTopicCount(slot, count) => slot -> count
-  }.toMap.withDefaultValue(Int.MaxValue)
-
   lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] =
     topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 

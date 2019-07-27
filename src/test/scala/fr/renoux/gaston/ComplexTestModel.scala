@@ -11,9 +11,8 @@ import fr.renoux.gaston.util.RandomImplicits._
 import scala.collection.mutable
 import scala.util.Random
 
-/**
-  * Created by gael on 07/05/17.
-  */
+// scalastyle:off magic.number
+
 class ComplexTestModel(seed: Long) {
 
   private val log = Logger(classOf[ComplexTestModel])
@@ -33,38 +32,30 @@ class ComplexTestModel(seed: Long) {
     private val topicNames = Set("alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota",
       "kappa", "lambda", "mu", "nu", "ksi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "khi", "psi",
       "omega")
-    val All: Set[Topic] = topicNames.map(Topic(_))
+    val All: Set[Topic] = topicNames.map { n =>
+      val mand = random.pick(Persons.All)
+      val forb = random.pick(Persons.All - mand)
+      Topic(n, mandatory = Set(mand), forbidden = Set(forb), min = 4, max = 12)
+    }
     val Bases: Set[Topic] = Slots.AllSet.map(s => Topic.unassigned(s))
   }
 
   object Slots {
     private val slotNames = Seq(Seq("d1 am", "d1 pm"), Seq("d2 am", "d2 pm"), Seq("d3 am", "d3 pm"))
-    val AllSequence: Seq[Seq[Slot]] = slotNames.map(_.map(Slot))
+    val AllSequence: Seq[Seq[Slot]] = slotNames.map(_.map(Slot(_)))
     val AllSet: Set[Slot] = AllSequence.flatten.toSet
   }
 
   object Constraints {
-
-    val Obligations: Set[Constraint] = for (t <- Topics.All) yield PersonTopicObligation(random.pick(Persons.All), t)
-
-    val Interdictions: Set[Constraint] = (for (t <- random.pick(Topics.All, 5); p <- random.pick(Persons.All, 2))
-      yield PersonTopicInterdiction(p, t)).toSet
 
     val Absences: Set[Constraint] = (
       random.pick(Persons.All, 5).map(PersonAbsence(_, Slot("d1 am"))) ++
         random.pick(Persons.All, 5).map(PersonAbsence(_, Slot("d3 pm")))
       ).toSet
 
-    val Numbers: Set[Constraint] = {
-      val initial: Set[Constraint] = Topics.All.map(TopicNeedsNumberOfPersons(_, min = 4, max = 12))
-      val toRemove = random.pick(initial, 2)
-      val toAdd = toRemove.map { case TopicNeedsNumberOfPersons(t, min, _) => TopicNeedsNumberOfPersons(t, min, 4) }
-      initial -- toRemove ++ toAdd
-    }
-
     val BasesForced: Set[Constraint] = Slots.AllSet.map { s => TopicForcedSlot(Topic.unassigned(s), Set(s)) }
 
-    val All: Set[Constraint] = Obligations ++ Interdictions ++ Absences ++ Numbers
+    val All: Set[Constraint] = Absences
     val Bases: Set[Constraint] = BasesForced
   }
 
@@ -79,7 +70,7 @@ class ComplexTestModel(seed: Long) {
       PersonGroupAntiPreference(p.head, p.tail.toSet, -strongPreference)
     }
 
-    val All: Set[Preference] = PersonTopics ++ Incompatibilities //+ PersonTopicPreference(Person("brigit kevin"),
+    val All: Set[Preference] = PersonTopics ++ Incompatibilities // + PersonTopicPreference(Person("brigit kevin"),
     // Topic("sigma"), Score(100))
 
     val Bases: Set[Preference] = for {
@@ -90,7 +81,10 @@ class ComplexTestModel(seed: Long) {
 
   object Problems {
     val Complete: Problem = {
-      val p = new ProblemImpl(Slots.AllSequence, Topics.All ++ Topics.Bases, Persons.All, Constraints.All ++ Constraints.Bases, Preferences.All ++ Preferences.Bases)
+      val p = new ProblemImpl(
+        Slots.AllSequence,
+        Topics.All ++ Topics.Bases, Persons.All, Constraints.All ++ Constraints.Bases, Preferences.All ++ Preferences.Bases
+      )
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p
     }
@@ -104,3 +98,5 @@ object ComplexTestModel {
 
   def apply(seed: Long): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
 }
+
+// scalastyle:on magic.number

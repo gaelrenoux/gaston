@@ -90,7 +90,7 @@ private[input] class InputTranscription(input: InputModel) {
     }
 
   /* Slots */
-  lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap(s => s.name -> Slot(s.name))
+  lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap(s => s.name -> Slot(s.name, s.maxTopics.fold(Int.MaxValue)(_.value)))
   lazy val slotSequences: Seq[Seq[Slot]] = slotSequencesWithNames.mapMap(_._2)
   lazy val slotsPerName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
   lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
@@ -137,12 +137,6 @@ private[input] class InputTranscription(input: InputModel) {
 
   /* Constraints */
   object Constraints {
-    lazy val slotMaxTopicCount: Set[SlotMaxTopicCount] =
-      slotsSet.flatMap { inSlot =>
-        val slot = slotsPerName(inSlot.name)
-        val maxOption = inSlot.maxTopics orElse settings.defaultMaxTopicsPerSlot
-        maxOption.map(SlotMaxTopicCount(slot, _))
-      }
 
     lazy val absences: Set[PersonAbsence] =
       input.personsSet.flatMap { ip =>
@@ -158,21 +152,6 @@ private[input] class InputTranscription(input: InputModel) {
         case _ => Set.empty[TopicForcedSlot]
       }
 
-    lazy val obligations: Set[PersonTopicObligation] =
-      for {
-        topic <- topics
-        person <- topic.mandatory
-      } yield PersonTopicObligation(person, topic)
-
-    lazy val interdictions: Set[PersonTopicInterdiction] =
-      for {
-        topic <- topics
-        person <- topic.forbidden
-      } yield PersonTopicInterdiction(person, topic)
-
-    lazy val numbers: Set[TopicNeedsNumberOfPersons] =
-      topics.map { topic => TopicNeedsNumberOfPersons(topic, topic.min, topic.max) }
-
 
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
@@ -186,12 +165,8 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val all: Set[Constraint] =
-      slotMaxTopicCount ++
-        absences ++
+      absences ++
         forcedSlots ++
-        obligations ++
-        interdictions ++
-        numbers ++
         simultaneousTopics ++
         simultaneousMultiple
   }
@@ -246,10 +221,9 @@ private[input] class InputTranscription(input: InputModel) {
   object Unassigned {
     private lazy val dummies = slotsPerName.values.map { s =>
       val topic = Topic.unassigned(s)
-      val countConstraint = TopicNeedsNumberOfPersons(topic, min = 0, max = personsPerName.size)
       val slotConstraint = TopicForcedSlot(topic, Set(s))
       val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
-      (topic, Set(slotConstraint, countConstraint), antiPreferences)
+      (topic, Set(slotConstraint), antiPreferences)
     }
 
     lazy val topics: Set[Topic] = dummies.map(_._1).toSet
@@ -261,18 +235,17 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val enabled: Boolean =
       settings.maxPersonsOnNothing > 0 && settings.maxPersonsOnNothing >= settings.minPersonsOnNothing
 
-    private lazy val elements: Iterable[(Topic, TopicNeedsNumberOfPersons, TopicForcedSlot, Iterable[PersonTopicPreference])] =
+    private lazy val elements: Iterable[(Topic, TopicForcedSlot, Iterable[PersonTopicPreference])] =
       slotsPerName.values.map { s =>
-        val topic = Topic.nothing(s)
-        val countConstraint = TopicNeedsNumberOfPersons(topic, settings.minPersonsOnNothing, settings.maxPersonsOnNothing)
+        val topic = Topic.nothing(s, settings.minPersonsOnNothing, settings.maxPersonsOnNothing)
         val slotConstraint = TopicForcedSlot(topic, Set(s))
         val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, settings.personOnNothingAntiPreference))
-        (topic, countConstraint, slotConstraint, antiPreferences)
+        (topic, slotConstraint, antiPreferences)
       }
 
     lazy val topics: Set[Topic] = if (enabled) elements.map(_._1).toSet else Set.empty
-    lazy val constraints: Set[Constraint] = if (enabled) (elements.map(_._2) ++ elements.map(_._3)).toSet else Set.empty
-    lazy val preferences: Set[PersonTopicPreference] = if (enabled) elements.flatMap(_._4).toSet else Set.empty
+    lazy val constraints: Set[Constraint] = if (enabled) elements.map(_._2).toSet else Set.empty
+    lazy val preferences: Set[PersonTopicPreference] = if (enabled) elements.flatMap(_._3).toSet else Set.empty
   }
 
   lazy val problem: Problem =

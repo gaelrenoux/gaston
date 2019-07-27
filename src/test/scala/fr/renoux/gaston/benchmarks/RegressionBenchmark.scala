@@ -1,8 +1,6 @@
 package fr.renoux.gaston.benchmarks
 
-import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.UdoConTestModel
 import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
@@ -15,11 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class RegressionBenchmark extends FlatSpec with Matchers {
 
-  private val log = Logger[RegressionBenchmark]
-
   private val udoConProblem = problemFromClassPath("udocon2017/uc17-completed.conf").force
-  private val lastYear = UdoConTestModel.Solutions.Actual
-  udoConProblem.constraints.filter(!_.isRespected(lastYear)).foreach(c => log.info(s"Constraint broken $c"))
 
   behavior of "Engine"
 

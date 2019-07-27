@@ -5,3 +5,7 @@ package fr.renoux.gaston.model
 
 /** Someone. */
 case class Person(name: String, weight: Weight = Weight.Default)
+
+object Person {
+  val MaxCount: Int = 10 * 1000
+}

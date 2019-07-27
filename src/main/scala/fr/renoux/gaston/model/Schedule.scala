@@ -27,7 +27,7 @@ case class Schedule(
   lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
   lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = slots.zipWith(SlotSchedule(this, _)).toMap
   lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
-  lazy val countTopicsLeftPerSlot: Map[Slot, Int] = problem.slots.zipWith(s => problem.maxTopicCountPerSlot(s) - countTopicsPerSlot.getOrElse(s, 0)).toMap
+  lazy val countTopicsLeftPerSlot: Map[Slot, Int] = problem.slots.zipWith(s => s.maxTopics - countTopicsPerSlot.getOrElse(s, 0)).toMap
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = recordsPerSlot.mapValuesStrict { x => x.map(_.topic) }

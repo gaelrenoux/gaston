@@ -19,75 +19,6 @@ class ConstraintsSpec extends FlatSpec with Matchers {
 
   def scheduled(s: Slot, ts: Topic*): Schedule = Schedule(s(ts.map(_.apply()): _*))
 
-
-  behavior of "TopicNeedsNumberOfPersons"
-  val fightingNeedsTwoToFourPersons = TopicNeedsNumberOfPersons(Fighting, min = 2, max = 4)
-
-  it should "break on not enough persons" in {
-    fightingNeedsTwoToFourPersons.isRespected(scheduled(Morning, Fighting, Leonardo)
-    ) should be(false)
-  }
-
-  it should "break on too many persons" in {
-    fightingNeedsTwoToFourPersons.isRespected(
-      scheduled(Morning, Fighting, Leonardo, Donatello, Raphael, Michelangelo, Bebop)
-    ) should be(false)
-  }
-
-  it should "not break inside the limits" in {
-    fightingNeedsTwoToFourPersons.isRespected(scheduled(Morning, Fighting, Leonardo, Donatello, Raphael)
-    ) should be(true)
-  }
-
-  it should "not break on the superior limit" in {
-    fightingNeedsTwoToFourPersons.isRespected(scheduled(Morning, Fighting, Leonardo, Donatello, Raphael, Michelangelo)
-    ) should be(true)
-  }
-
-  it should "not break on the inferior limit" in {
-    fightingNeedsTwoToFourPersons.isRespected(scheduled(Morning, Fighting, Leonardo, Raphael)
-    ) should be(true)
-  }
-
-
-  behavior of "PersonTopicObligation"
-  val leonardoLeads = PersonTopicObligation(Leonardo, Leading)
-
-  it should "break if the person is missing" in {
-    leonardoLeads.isRespected(scheduled(Morning, Leading, Michelangelo, Donatello)
-    ) should be(false)
-  }
-
-  it should "break if everyone is missing" in {
-    leonardoLeads.isRespected(scheduled(Morning, Leading)
-    ) should be(false)
-  }
-
-  it should "not break if the person is present" in {
-    leonardoLeads.isRespected(scheduled(Morning, Leading, Leonardo, Donatello)
-    ) should be(true)
-  }
-
-  it should "not break if the person is the only one present" in {
-    leonardoLeads.isRespected(scheduled(Morning, Leading, Leonardo)
-    ) should be(true)
-  }
-
-
-  behavior of "PersonTopicInterdiction"
-  val leonardoDoesNotParty = PersonTopicInterdiction(Leonardo, Party)
-
-  it should "break if the person is present" in {
-    leonardoDoesNotParty.isRespected(scheduled(Morning, Party, Leonardo)
-    ) should be(false)
-  }
-
-  it should "not break if the person is absent" in {
-    leonardoDoesNotParty.isRespected(scheduled(Morning, Party, Michelangelo, Donatello)
-    ) should be(true)
-  }
-
-
   behavior of "PersonAbsence"
   val michelangeloNotInTheMorning = PersonAbsence(Michelangelo, Morning)
 
@@ -141,29 +72,6 @@ class ConstraintsSpec extends FlatSpec with Matchers {
   it should "not break if the topic is missing" in {
     partyMustBeEveningOrNight.isRespected(scheduled(AfterNoon, Fighting, Michelangelo, Donatello, Raphael)
     ) should be(true)
-  }
-
-  behavior of "SlotMaxTopicCount"
-  val nightCanHaveOnlyTwoTopics = SlotMaxTopicCount(Night, 2)
-
-  it should "break with more topics" in {
-    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party, Leading, Fighting)) should be(false)
-  }
-
-  it should "not break with exactly the number of topics" in {
-    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party, Leading)) should be(true)
-  }
-
-  it should "not break with less topics" in {
-    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night, Party)) should be(true)
-  }
-
-  it should "not break with zero topics" in {
-    nightCanHaveOnlyTwoTopics.isRespected(scheduled(Night)) should be(true)
-  }
-
-  it should "not break if the slot has not been scheduled yet" in {
-    nightCanHaveOnlyTwoTopics.isRespected(Schedule.empty) should be(true)
   }
 
 }

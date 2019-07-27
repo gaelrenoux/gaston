@@ -13,8 +13,8 @@ class InputSpec extends FlatSpec with Matchers {
   object expected {
 
     object slots {
-      val a = Slot("A")
-      val b = Slot("B")
+      val a = Slot("A", maxTopics = 4)
+      val b = Slot("B", maxTopics = Int.MaxValue)
       val all: Set[Slot] = Set(a, b)
     }
 
@@ -50,17 +50,8 @@ class InputSpec extends FlatSpec with Matchers {
 
   it should "contain the correct constraints" in {
     problem.constraints should be(Set(
-      SlotMaxTopicCount(expected.slots.a, 4),
-      SlotMaxTopicCount(expected.slots.b, 5),
-      TopicForcedSlot(Topic.unassigned(expected.slots.a), Set(expected.slots.a)),
-      TopicForcedSlot(Topic.unassigned(expected.slots.b), Set(expected.slots.b)),
-      TopicNeedsNumberOfPersons(Topic.unassigned(expected.slots.a), 0, 3),
-      TopicNeedsNumberOfPersons(Topic.unassigned(expected.slots.b), 0, 3),
-      PersonTopicObligation(expected.persons.bernard, expected.topics.alpha),
-      PersonTopicInterdiction(expected.persons.laverne, expected.topics.beta),
-      TopicNeedsNumberOfPersons(expected.topics.alpha, 5, 5),
-      TopicNeedsNumberOfPersons(expected.topics.gamma, 4, 6),
-      TopicNeedsNumberOfPersons(expected.topics.beta, 4, 5),
+      TopicForcedSlot(expected.topics.unassignedA, Set(expected.slots.a)),
+      TopicForcedSlot(expected.topics.unassignedB, Set(expected.slots.b)),
       TopicForcedSlot(expected.topics.beta, Set(expected.slots.a)),
       TopicsSimultaneous(Set(expected.topics.alpha, expected.topics.beta)),
     ))

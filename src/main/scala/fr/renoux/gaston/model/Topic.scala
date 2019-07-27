@@ -4,7 +4,7 @@ package fr.renoux.gaston.model
   * whatever.
   * @param movable Can the topic be moved to another slot than the one it is on ?
   * @param removable Can the topic be removed from the schedule ?
-  * */
+  **/
 case class Topic(
     name: String,
     mandatory: Set[Person] = Set.empty,
@@ -36,8 +36,8 @@ object Topic {
   val MultipleMarker = "~"
 
   /** Topics for people assigned to doing nothing. */
-  def nothing(slot: Slot): Topic = Topic(s"Nothing (${slot.name})", movable = false)
+  def nothing(slot: Slot, min: Int, max: Int): Topic = Topic(s"Nothing (${slot.name})", min = min, max = max, movable = false)
 
   /** Topics for people not assigned yet on some slot. */
-  def unassigned(slot: Slot): Topic = Topic(s"[${slot.name}]", movable = false, removable = false)
+  def unassigned(slot: Slot): Topic = Topic(s"[${slot.name}]", max = Person.MaxCount, movable = false, removable = false)
 }
