@@ -77,8 +77,16 @@ class PartialScheduleFiller(implicit private val problem: Problem) {
     * @param topicsOpenToMaxDelayed Topics that have there minimum value and which have been delayed
     * @return None if no schedule is possible, Some(schedule) if possible
     */
-  private def backtrackAssignPersonsToTopics(partialSchedule: Schedule)
-    (topicsNeedingMin: List[(Topic, Int)], topicsOpenToMax: List[(Topic, Int)], personsLeft: List[Person], personsSkipped: List[Person], topicsOpenToMaxDelayed: List[(Topic, Int)]): Option[Schedule] =
+  // scalastyle:off cyclomatic.complexity method.length
+  private def backtrackAssignPersonsToTopics(
+      partialSchedule: Schedule
+  )(
+      topicsNeedingMin: List[(Topic, Int)],
+      topicsOpenToMax: List[(Topic, Int)],
+      personsLeft: List[Person],
+      personsSkipped: List[Person],
+      topicsOpenToMaxDelayed: List[(Topic, Int)]
+  ): Option[Schedule] =
     (topicsNeedingMin, topicsOpenToMax, personsLeft) match {
       case (Nil, _, Nil) if personsSkipped.isEmpty =>
         log.trace("Finishing backtrackAssignPersonsToTopics because we have no more persons and all topics have their min numbers")
@@ -86,11 +94,11 @@ class PartialScheduleFiller(implicit private val problem: Problem) {
 
       case (_, _, Nil) =>
         log.trace("Hit a dead end in backtrackAssignPersonsToTopics because we have no more persons and some topics don't have their min numbers")
-        None //no more persons left and min numbers are not reached
+        None // no more persons left and min numbers are not reached
 
       case (Nil, Nil, _) if topicsOpenToMaxDelayed.isEmpty =>
         log.trace("Hit a dead end in backtrackAssignPersonsToTopics because we have more persons and all topics have their max numbers")
-        None //more persons left and max numbers are reached
+        None // more persons left and max numbers are reached
 
       case (Nil, Nil, _) =>
         log.trace("No more topics open to max, go again with all delayed topics")
@@ -131,5 +139,6 @@ class PartialScheduleFiller(implicit private val problem: Problem) {
         }
     }
 
-}
+  // scalastyle:on cyclomatic.complexity method.length
 
+}

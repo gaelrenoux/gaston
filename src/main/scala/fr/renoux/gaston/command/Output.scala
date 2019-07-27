@@ -8,17 +8,17 @@ import fr.renoux.gaston.model.{Problem, Schedule, Score}
 /** Destination of all information in Gaston */
 class Output(silent: Boolean = false)(implicit val problem: Problem) {
 
-  private val SeparatorLine = "*" * 80
+  private val separatorLine = "*" * 80
 
   private val log = Logger[Output]
   private val notSilent = !silent
 
-  private var bestScore: Score = Score.MinValue
+  private var bestScore: Score = Score.MinValue // scalastyle:ignore var.field
 
   private def write(txt: => String): Unit = {
     log.info(txt)
     if (notSilent) {
-      println(s"$SeparatorLine\n$txt\n$SeparatorLine\n")
+      println(s"$separatorLine\n$txt\n$separatorLine\n")
     }
   }
 

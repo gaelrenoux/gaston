@@ -16,9 +16,11 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
 
   private val log = Logger[PersonPlacementImprover]
 
+  val defaultRoundsCount = 1000
+
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
-  def improve(scoredSchedule: Schedule, rounds: Int = 10000)(implicit rand: Random): Schedule =
+  def improve(scoredSchedule: Schedule, rounds: Int = defaultRoundsCount)(implicit rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
       log.trace("Improving persons")
       recImprove(scoredSchedule, rounds)
@@ -46,7 +48,7 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
       val (slot, slotsTail) = slots.dequeue
       goodMoveOnSlot(scoredSchedule, slot) match {
         case None =>
-          recImprove(scoredSchedule, maxRounds - 1, slotsTail) //can't improve this slot any more
+          recImprove(scoredSchedule, maxRounds - 1, slotsTail) // can't improve this slot any more
 
         case Some(candidate) =>
           /* The slot was perfected! If there are rounds left stay on the same slot, otherwise move to the next one */
@@ -69,7 +71,7 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
       /* All schedules on which we swapped two persons */
       lazy val swappedSchedules = for {
         r1 <- records.view
-        r2 <- records.view if r1 < r2 //avoiding duplicates (cases where we just swap r1 and r2)
+        r2 <- records.view if r1 < r2 // avoiding duplicates (cases where we just swap r1 and r2)
         t1 = r1.topic
         t2 = r2.topic
         p1 <- (r1.optionalPersons -- t2.forbidden).view

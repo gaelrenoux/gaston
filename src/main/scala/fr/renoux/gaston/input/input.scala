@@ -10,7 +10,7 @@ package object input {
 
   type InputErrors = NonEmptyList[InputError]
 
-  def InputErrors(hDesc: String, tDesc: String*): InputErrors =
+  def InputErrors(hDesc: String, tDesc: String*): InputErrors = // scalastyle:ignore method.name
     NonEmptyList(InputError(hDesc), tDesc.map(InputError(_)): _*)
 
   /** Loads default values */

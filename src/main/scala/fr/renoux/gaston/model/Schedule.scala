@@ -33,7 +33,7 @@ case class Schedule(
   lazy val countTopicsPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.size)
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
-  lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values //not a Set: we do not want to deduplicate identical groups!
+  lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
 
   lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.max).sum)
   lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
@@ -49,7 +49,7 @@ case class Schedule(
   lazy val score: Score = if (records.isEmpty) Score.MinValue else Scorer.score(this)
 
   /** Get the SlotSchedule for a specific Slot */
-  def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot) //TODO cache this
+  def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot) // TODO cache this
 
   /** Add a new record to this schedule. */
   def add(record: Record): Schedule = updateRecords(_ + record)
@@ -81,7 +81,7 @@ case class Schedule(
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
   def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = partialMapRecords {
-    case Record(s, t, _) if (s, t) == st1 => Record(s, st2._2, st2._2.mandatory) //TODO should probably have a method that corrects the schedule
+    case Record(s, t, _) if (s, t) == st1 => Record(s, st2._2, st2._2.mandatory) // TODO should probably have a method that corrects the schedule
     case Record(s, t, _) if (s, t) == st2 => Record(s, st1._2, st1._2.mandatory)
   }
 
@@ -138,7 +138,7 @@ case class Schedule(
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
     lazy val noUbiquity = recordsPerSlot.values.forall { recordsOnSlot =>
-      val persons = recordsOnSlot.toSeq.flatMap(_.personsSeq) //Seq to keep duplicates, we're looking for them
+      val persons = recordsOnSlot.toSeq.flatMap(_.personsSeq) // Seq to keep duplicates, we're looking for them
       persons.size == persons.toSet.size
     }
     lazy val noDuplicates = {
@@ -164,7 +164,7 @@ case class Schedule(
   lazy val unpersonalScore: Score =
     problem.preferencesSeq.map {
       case _: Preference.Personal => Score.Zero
-      case p => p.score(this)
+      case p: Preference => p.score(this)
     }.sum
 
   /**
@@ -193,7 +193,9 @@ case class Schedule(
       }.toSeq.sortBy(_._1)
     }.toSeq.sortBy(_._1)
 
-    for ((slot, personsPerTopic) <- personsPerTopicPerSlot) {
+    for {
+      (slot, personsPerTopic) <- personsPerTopicPerSlot
+    } {
       builder.append("  ").append(slot).append(": \n")
       for ((topic, persons) <- personsPerTopic) {
         builder.append("    ").append(topic).append(": ").append(persons.mkString("", ", ", "\n"))

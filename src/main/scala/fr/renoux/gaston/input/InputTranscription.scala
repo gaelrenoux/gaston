@@ -26,7 +26,7 @@ private[input] class InputTranscription(input: InputModel) {
     } ++ {
       if (input.settings.minPersonsOnNothing <= input.settings.maxPersonsOnNothing) None
       else Some(s"Settings: Min persons on nothing (${input.settings.minPersonsOnNothing}) " +
-        s"is higher than max persons on nothing  (${input.settings.maxPersonsOnNothing})")
+        s"is higher than max persons on nothing (${input.settings.maxPersonsOnNothing})")
     } ++ {
       input.topics
         .filter { t => (t.min, t.max).zipped.exists(_ > _) }
@@ -106,15 +106,15 @@ private[input] class InputTranscription(input: InputModel) {
     /* Demultiply topics if more than one occurence of the topic */
     val occurringTopics = inTopic.forcedOccurrences.value match {
       case 1 => Set(baseTopic)
-      case c => baseTopic.occurrences(c).toSet
+      case c: Int => baseTopic.occurrences(c).toSet
     }
 
     /* Demultiply topics if topic is multiple */
     val multipleTopics = inTopic.forcedMultiple.value match {
       case 1 => occurringTopics
-      case c if c > 0 => occurringTopics.flatMap { topic =>
+      case c: Int if c > 0 => occurringTopics.flatMap { topic =>
         val instances = topic.multiple(c)
-        val sortedMandatories = baseTopic.mandatory.toSeq.sortBy(_.name) //sorted to be deterministic, therefore more testable
+        val sortedMandatories = baseTopic.mandatory.toSeq.sortBy(_.name) // sorted to be deterministic, therefore more testable
 
         /* dispatch the mandatory persons on the instances */
         val mandatoriesByInstance = sortedMandatories.zip(Stream.continually(instances).flatten).map(_.swap).groupToMap
@@ -151,7 +151,7 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val forcedSlots: Set[TopicForcedSlot] =
       input.topicsSet.flatMap {
-        case inTopic if inTopic.slots.nonEmpty =>
+        case inTopic: InputTopic if inTopic.slots.nonEmpty =>
           val topics = topicsPerName(inTopic.name)
           val slots = inTopic.slots.get.map(slotsPerName)
           topics.map(TopicForcedSlot(_, slots))
@@ -176,7 +176,7 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
-        //TODO Better handling of simultaneous and occurrences is needed. Will return an error above
+        // TODO Better handling of simultaneous and occurrences is needed. Will return an error above
         TopicsSimultaneous(inConstraint.topics.map(topicsPerName(_).head))
       }
 
@@ -216,7 +216,7 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
       input.personsSet.collect {
-        case ip if ip.incompatible.nonEmpty =>
+        case ip: InputPerson if ip.incompatible.nonEmpty =>
           val person = personsPerName(ip.name)
           val group = ip.incompatible.map(personsPerName)
           PersonGroupAntiPreference(person, group, settings.incompatibilityAntiPreference)
@@ -229,7 +229,7 @@ private[input] class InputTranscription(input: InputModel) {
       for {
         inPerson <- input.personsSet
         person = personsPerName(inPerson.name)
-        totalInputScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value //TODO Right now, negative prefs are ignored in the total count
+        totalInputScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value // TODO Right now, negative prefs are ignored in the total count
         scoreFactor = Score.PersonTotalScore.value / totalInputScore
         inWish <- inPerson.wishes
         wishedTopicName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
@@ -246,7 +246,7 @@ private[input] class InputTranscription(input: InputModel) {
   object Unassigned {
     private lazy val dummies = slotsPerName.values.map { s =>
       val topic = Topic.unassigned(s)
-      val countConstraint = TopicNeedsNumberOfPersons(topic, 0, personsPerName.size)
+      val countConstraint = TopicNeedsNumberOfPersons(topic, min = 0, max = personsPerName.size)
       val slotConstraint = TopicForcedSlot(topic, Set(s))
       val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
       (topic, Set(slotConstraint, countConstraint), antiPreferences)

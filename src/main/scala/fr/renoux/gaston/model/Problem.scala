@@ -20,13 +20,13 @@ trait Problem {
   lazy val (slotLevelPreferences: Set[Preference.SlotLevel], globalLevelPreferences: Set[Preference]) =
     preferences.collect {
       case s: Preference.SlotLevel => Left(s)
-      case s => Right(s)
+      case s: Preference => Right(s)
     }.unzipEither
 
   lazy val (slotLevelConstraints: Set[Constraint.SlotLevel], globalLevelConstraints: Set[Constraint]) =
     constraints.collect {
       case s: Constraint.SlotLevel => Left(s)
-      case s => Right(s)
+      case s: Constraint => Right(s)
     }.unzipEither
 
   /** All slot unordered couples, without duplicates. The first element of the couple is always lower than the second. */

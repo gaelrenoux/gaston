@@ -56,7 +56,7 @@ class ProblemImpl(
       slot <- slots
       topic <- topics
       if topic.mandatory.exists(!personsPerSlot(slot).contains(_))
-      //TODO add topic explicitely forbidden on the slot
+      // TODO add topic explicitely forbidden on the slot
     } yield (slot, topic)
     couples.groupToMap.withDefaultValue(Set.empty)
   }
@@ -92,4 +92,3 @@ class ProblemImpl(
     builder.toString
   }
 }
-

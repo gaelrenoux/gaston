@@ -9,6 +9,7 @@ import fr.renoux.gaston.input.InputRefinements._
 import fr.renoux.gaston.model.{Score, Topic, Weight}
 
 /* All line and column indices are zero-based */
+// scalastyle:off magic.number
 
 case class InputModel(
     settings: InputSettings = InputSettings(),
@@ -30,7 +31,7 @@ case class InputSettings(
     maxPersonsOnNothing: NonNegInt = 0,
     minPersonsOnNothing: NonNegInt = 0,
     personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
-    backtrackInitialSchedule: Boolean = true //TODO Should be calculated
+    backtrackInitialSchedule: Boolean = true // TODO Should be calculated
 )
 
 case class InputTableSettings(
@@ -76,7 +77,7 @@ case class InputPerson(
     mandatory: Set[NonEmptyString] = Set(),
     forbidden: Set[NonEmptyString] = Set(),
     incompatible: Set[NonEmptyString] = Set(),
-    wishes: Map[String, Score] = Map() //can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
+    wishes: Map[String, Score] = Map() // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
 )
 
 case class InputGlobalConstraints(
@@ -117,3 +118,5 @@ object InputRefinements {
     def apply(w: PosDouble): PosWeight = refineV[WeightPositive](Weight(w)).right.get
   }
 }
+
+// scalastyle:on magic.number

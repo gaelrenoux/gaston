@@ -32,8 +32,9 @@ class TableReader(input: InputModel) {
   }
 
   /** Read the table as a CSV text */
+  // scalastyle:off method.length
   def read(table: String): InputModel = {
-    //TODO replace calls to unsafeFrom with proper validation
+    // TODO replace calls to unsafeFrom with proper validation
     val lines: Seq[String] = table.split("\n", -1).filter(_.nonEmpty).toSeq
     val cells: Seq[Seq[String]] = lines.map(_.split(tableSettings.separator, -1).map(_.trim).toSeq)
 
@@ -45,9 +46,12 @@ class TableReader(input: InputModel) {
     val topicsSeq: Seq[InputTopic] =
       cellsWithContent.map { row =>
         val topicName: String = row(tableSettings.topicCol)
-        val max: Option[PosInt] = row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
-        val min: Option[PosInt] = tableSettings.minPersonsCol.map(_.value).map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
-        val occurrences: Option[PosInt] = tableSettings.topicOccurrencesCol.map(_.value).map(row).flatMap(_.toIntOption).map(PosInt.unsafeFrom)
+        val max: Option[PosInt] =
+          row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
+        val min: Option[PosInt] =
+          tableSettings.minPersonsCol.map(_.value).map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
+        val occurrences: Option[PosInt] =
+          tableSettings.topicOccurrencesCol.map(_.value).map(row).flatMap(_.toIntOption).map(PosInt.unsafeFrom)
 
         InputTopic(
           name = NonEmptyString.unsafeFrom(topicName),
@@ -106,6 +110,7 @@ class TableReader(input: InputModel) {
       constraints = InputGlobalConstraints()
     )
   }
+  // scalastyle:on method.length
 
   def wishValueToScoreOption(value: String): Option[Score] =
     if (value.isEmpty) None

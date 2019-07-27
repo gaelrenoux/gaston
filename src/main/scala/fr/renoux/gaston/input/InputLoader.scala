@@ -16,7 +16,9 @@ import scalaz._
 /** Load the PureConfig input object from the configuration files. */
 object InputLoader {
 
-  //TODO handle exceptions
+  val Namespace = "gaston"
+
+  // TODO handle exceptions
   private val log = Logger[InputLoader.type]
 
   private lazy val renderConfig = ConfigRenderOptions.defaults()
@@ -26,14 +28,14 @@ object InputLoader {
   import eu.timepit.refined.pureconfig._
   import pureconfig.generic.auto._
 
-  //forces IntelliJ to keep the previous imports, otherwise it marks them as unused
+  // forces IntelliJ to keep the previous imports, otherwise it marks them as unused
   private lazy val _ = {
     exportReader[List[Int]]
     refTypeConfigConvert[Refined, String, NonEmpty]
   }
 
   /** Loads from default values */
-  def fromDefault: InputErrors \/ InputModel = loadConfig[InputModel]("gaston").disjunction.leftMap(transformErrors)
+  def fromDefault: InputErrors \/ InputModel = loadConfig[InputModel](Namespace).disjunction.leftMap(transformErrors)
 
   /** Loads from a specifically-named file if the classpath. */
   def fromClassPath(path: String): InputErrors \/ InputModel = {
@@ -44,12 +46,12 @@ object InputLoader {
   /** Loads from defined files on the filesystem. */
   def fromPath(files: Path*): InputErrors \/ InputModel = {
     log.debug(s"Loading those files: ${files.mkString("; ")}")
-    loadConfigFromFiles[InputModel](files, failOnReadError = true, "gaston").disjunction.leftMap(transformErrors)
+    loadConfigFromFiles[InputModel](files, failOnReadError = true, Namespace).disjunction.leftMap(transformErrors)
   }
 
   /** Loads from a String */
   def fromString(config: String): InputErrors \/ InputModel = {
-    val file = File.createTempFile("gaston-input-", null)
+    val file = File.createTempFile("gaston-input-", null) // scalastyle:ignore null
     new PrintWriter(file) {
       write(config)
       close()

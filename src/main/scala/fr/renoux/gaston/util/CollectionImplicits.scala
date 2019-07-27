@@ -11,7 +11,7 @@ object CollectionImplicits {
   implicit class TraversableOps[A, R](val wrapped: TraversableLike[A, R]) extends AnyVal {
 
     def replace[B >: A, That](pf: PartialFunction[A, B])(implicit bf: CanBuildFrom[R, B, That]): That =
-      wrapped.map(pf.orElse { case a => a })
+      wrapped.map(a => pf.applyOrElse(a, identity[A]))
 
     def zipWith[B, That](f: A => B)(implicit bf: CanBuildFrom[R, (A, B), That]): That =
       wrapped.map(a => a -> f(a))

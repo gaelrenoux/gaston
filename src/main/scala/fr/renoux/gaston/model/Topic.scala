@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-/** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
+/** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
   * @param movable Can the topic be moved to another slot than the one it is on ?
   * @param removable Can the topic be removed from the schedule ?
@@ -36,8 +36,8 @@ object Topic {
   val MultipleMarker = "~"
 
   /** Topics for people assigned to doing nothing. */
-  def nothing(slot: Slot) = Topic(s"Nothing (${slot.name})", movable = false)
+  def nothing(slot: Slot): Topic = Topic(s"Nothing (${slot.name})", movable = false)
 
   /** Topics for people not assigned yet on some slot. */
-  def unassigned(slot: Slot) = Topic(s"[${slot.name}]", movable = false, removable = false)
+  def unassigned(slot: Slot): Topic = Topic(s"[${slot.name}]", movable = false, removable = false)
 }

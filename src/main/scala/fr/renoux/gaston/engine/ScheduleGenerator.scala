@@ -65,7 +65,10 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
     * needed.
     * @return The state of the backtracking, with a schedule that fits.
     */
-  private def backtrackAssignTopicsToSlots(state: State, failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)): BacktrackingFailures \/ State = {
+  private def backtrackAssignTopicsToSlots(
+      state: State,
+      failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)
+  ): BacktrackingFailures \/ State = {
     if (state.isSlotsEmpty) {
       log.debug("Found an initial schedule")
       state.right[BacktrackingFailures]
@@ -94,15 +97,15 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
 
     } else if (!state.isGoodCandidate) {
       /* candidate is not acceptable or lead to a failure, go on to next topic */
-      log.trace(s"Go on with new topic for current slot as the candidate is not OK")
+      log.trace("Go on with new topic for current slot as the candidate is not OK")
       backtrackAssignTopicsToSlots(state.withPassedHeadTopic, failures)
 
     } else {
       /* Finally ! We can try to add the current topic to the current slot */
       log.trace(s"Go on with acceptable candidate and next slot: ${state.candidate}")
-      backtrackAssignTopicsToSlots(state.withCandidateAcknowledged, failures).recoverWith[BacktrackingFailures, State] { case fs =>
+      backtrackAssignTopicsToSlots(state.withCandidateAcknowledged, failures).recoverWith[BacktrackingFailures, State] { case fs: BacktrackingFailures =>
         /* candidate is not acceptable or lead to a failure, backtrack and try again with next topic */
-        log.trace(s"Go on with new topic for current slot as the candidate is not OK")
+        log.trace("Go on with new topic for current slot as the candidate is not OK")
         backtrackAssignTopicsToSlots(state.withPassedHeadTopic, fs)
       }
     }
@@ -167,7 +170,7 @@ object ScheduleGenerator {
 
   }
 
-  case class BacktrackingFailures (
+  case class BacktrackingFailures(
       triggerOnFailures: BacktrackingFailures => Unit,
       noTopics: Map[Slot, Int] = Map(),
       maxParallelizationReached: Map[Slot, Int] = Map(),

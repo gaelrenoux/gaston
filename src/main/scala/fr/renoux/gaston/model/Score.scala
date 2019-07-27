@@ -1,27 +1,25 @@
 package fr.renoux.gaston.model
 
-import java.text.DecimalFormat
-
 /** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
-  * when combining preferences. Negative preferences ("I'd rather not…") have a negative score when triggered. */
+  * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
 case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
   /** Adds two scores */
-  def +(s: Score) = Score(value + s.value)
+  def +(s: Score): Score = Score(value + s.value)
 
   /** Multiply a score by a constant factor */
-  def *(i: Int) = Score(value * i)
+  def *(i: Int): Score = Score(value * i)
 
   /** Multiply a score by a constant factor */
-  def *(l: Long) = Score(value * l)
+  def *(l: Long): Score = Score(value * l)
 
   /** Multiply a score by a constant factor */
-  def *(d: Double) = Score(value * d)
+  def *(d: Double): Score = Score(value * d)
 
   /** Divide a score by a weight */
-  def /(w: Weight) = Score(value / w.value)
+  def /(w: Weight): Score = Score(value / w.value)
 
-  def negative = Score(-value)
+  def negative: Score = Score(-value)
 
   override def compare(that: Score): Int = this.value.compare(that.value)
 
@@ -30,7 +28,7 @@ case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
 object Score {
 
-  private val TwoDecimalsFormat = new DecimalFormat("####.00")
+  private val TwoDecimalsFormat = new java.text.DecimalFormat("####.00")
 
   /** What score should a person have if all its preferences are satisfied ? */
   val PersonTotalScore = Score(1000.0)

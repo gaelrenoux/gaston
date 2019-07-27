@@ -26,7 +26,7 @@ object Main {
     }
     log.info(s"Commande line is: $commandLine")
 
-    val _ = run(commandLine).recover { case errors =>
+    val _ = run(commandLine).recover { case errors: InputErrors =>
       val msg = s"Failed to run.\n${
         errors.list.toList.map {
           case InputError(desc, Some(file), Some(line)) => s"$file: line $line: $desc"
@@ -74,7 +74,7 @@ object Main {
       log.info(s"Loading from $path")
       InputLoader.fromPath(path)
     }.getOrElse {
-      log.info(s"Loading from default")
+      log.info("Loading from default")
       InputLoader.fromDefault
     }
     tableInputOption <- commandLine.tableFile.traverse(importTable(baseInput, _))

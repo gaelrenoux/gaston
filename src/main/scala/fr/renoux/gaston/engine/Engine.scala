@@ -13,8 +13,6 @@ class Engine(
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, ctx: Context) {
 
-  //private val log = Logger[Engine]
-
   private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
   private lazy val improver = new SlotImprover(stopAtScore, maxImprovementRounds)
 
@@ -22,7 +20,7 @@ class Engine(
 
   /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
   def lazySeq(seed: Long): Stream[Schedule] = {
-    implicit val _r: Random = new Random(seed)
+    implicit val rand: Random = new Random(seed)
 
     val initial: Option[(Schedule, Move)] =
       if (backtrackInitialSchedule) Some((generator.createOne, Move.Nothing))
@@ -36,7 +34,8 @@ class Engine(
 
   /** Produces a schedule and its score */
   def createOne(seed: Long): Schedule = {
-    implicit val _r: Random = new Random(seed)
+    implicit val rand: Random = new Random(seed)
+
     val initial =
       if (backtrackInitialSchedule) generator.createOne
       else startingSchedule

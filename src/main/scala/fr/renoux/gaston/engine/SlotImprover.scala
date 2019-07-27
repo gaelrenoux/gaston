@@ -33,7 +33,7 @@ class SlotImprover(
     } else improveOnce(schedule, previousMove) match {
       case None =>
         log.debug(s"[$maxRound] Best schedule I can get (score is ${schedule.score})")
-        schedule //can't make it any better
+        schedule // can't make it any better
       case Some((swappedSchedule, move)) =>
         log.debug(s"[$maxRound] Move: $move (new score is ${swappedSchedule.score}\n${swappedSchedule.toFormattedString}")
         improveToMax(swappedSchedule, move, maxRound - 1)
@@ -41,6 +41,7 @@ class SlotImprover(
 
 
   /** Take an already improved schedule, and return the first better schedule it can found by swapping topics. */
+  // scalastyle:off cyclomatic.complexity method.length
   def improveOnce(schedule: Schedule, previousMove: Move)
     (implicit rand: Random): Option[(Schedule, Move)] = chrono("SlotImprover > improveOnce") {
 
@@ -80,20 +81,20 @@ class SlotImprover(
         slotSchedule1 = schedule.on(s1)
         slotSchedule2 = schedule.on(s2)
 
-        t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.hardIncompatibleTopics).view //can't take current topics since we're removing one
-        t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.hardIncompatibleTopics).view //can't take current topics since we're removing one
+        t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.hardIncompatibleTopics).view // can't take current topics since we're removing one
+        t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.hardIncompatibleTopics).view // can't take current topics since we're removing one
         topics1 = linkedTopics(t1)
         topics2 = linkedTopics(t2)
         move = Move.Swap(topics1, topics2)
         if !move.reverts(previousMove)
 
         /* Filter out impossible swaps because of mandatory persons */
-        if !topics1.flatMap(_.mandatory).exists(slotSchedule2.mandatory) //check mandatories of T1 are not already blocked on S2
-        if !topics2.flatMap(_.mandatory).exists(slotSchedule1.mandatory) //check mandatories of T2 are not already blocked on S1
+        if !topics1.flatMap(_.mandatory).exists(slotSchedule2.mandatory) // check mandatories of T1 are not already blocked on S2
+        if !topics2.flatMap(_.mandatory).exists(slotSchedule1.mandatory) // check mandatories of T2 are not already blocked on S1
 
         /* Generate the swap */
         partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> topics1, s2 -> topics2)
-        if partial.isPartialSolution //TODO this rechecks everything, we shouldn't check what has been checked individually before
+        if partial.isPartialSolution // TODO this rechecks everything, we shouldn't check what has been checked individually before
       } yield (partial, move)
     }
 
@@ -154,6 +155,7 @@ class SlotImprover(
       improvedSchedules.headOption
     }
   }
+  // scalastyle:on cyclomatic.complexity method.length
 
   /** Improve the current schedule moving persons only. */
   private def improve(scoredSchedule: Schedule)(implicit rand: Random): Schedule = personImprover.improve(scoredSchedule)
@@ -181,7 +183,7 @@ object SlotImprover {
 
     case class Swap(a: Set[Topic], b: Set[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Swap(a1, b1) if (a, b) == (a1, b1) || (a, b) == (b1, a1) => true
+        case Swap(a1, b1) if (a == a1 && b == b1) || (a == b1 && b == a1) => true
         case _ => false
       }
     }

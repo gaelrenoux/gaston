@@ -52,7 +52,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
 
     val handler = logMinutes(true) // (verbose)
 
-    try {
+    val _ = try {
       val runner = parallelRunCount.toOption match {
         case None => new Runner(engine)(problem, context)
         case Some(prc) => new Runner(engine, parallelRunCount = prc)(problem, context)

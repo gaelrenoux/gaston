@@ -37,7 +37,7 @@ sealed class Chrono(blocking: Boolean = false) {
   }
 
   def timesPretty: String =
-    times.toSeq.sortBy(_._1).map { case (k, v) => s"  $k: $v"}.mkString("(\n", "\n", "\n)")
+    times.toSeq.sortBy(_._1).map { case (k, v) => s"  $k: $v" }.mkString("(\n", "\n", "\n)")
 
 
   def counts: Map[String, Long] = synchronized {
@@ -45,11 +45,12 @@ sealed class Chrono(blocking: Boolean = false) {
   }
 
   def countsPretty: String =
-    counts.toSeq.sortBy(_._1).map { case (k, v) => s"  $k: $v"}.mkString("(\n", "\n", "\n)")
+    counts.toSeq.sortBy(_._1).map { case (k, v) => s"  $k: $v" }.mkString("(\n", "\n", "\n)")
 
 }
 
 object Chrono {
+
   object NoOp extends Chrono {
     override def apply[A](name: String)(a: => A): A = a
 
@@ -61,4 +62,5 @@ object Chrono {
 
     override val countsPretty: String = ""
   }
+
 }
