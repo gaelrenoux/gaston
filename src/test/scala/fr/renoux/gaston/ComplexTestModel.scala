@@ -42,20 +42,13 @@ class ComplexTestModel(seed: Long) {
 
   object Slots {
     private val slotNames = Seq(Seq("d1 am", "d1 pm"), Seq("d2 am", "d2 pm"), Seq("d3 am", "d3 pm"))
-    val AllSequence: Seq[Seq[Slot]] = slotNames.map(_.map(Slot(_)))
+    val AllSequence: Seq[Seq[Slot]] = slotNames.map(_.map(Slot(_, Persons.All -- random.pick(Persons.All, 2))))
     val AllSet: Set[Slot] = AllSequence.flatten.toSet
   }
 
   object Constraints {
-
-    val Absences: Set[Constraint] = (
-      random.pick(Persons.All, 5).map(PersonAbsence(_, Slot("d1 am"))) ++
-        random.pick(Persons.All, 5).map(PersonAbsence(_, Slot("d3 pm")))
-      ).toSet
-
     val BasesForced: Set[Constraint] = Slots.AllSet.map { s => TopicForcedSlot(Topic.unassigned(s), Set(s)) }
 
-    val All: Set[Constraint] = Absences
     val Bases: Set[Constraint] = BasesForced
   }
 
@@ -83,7 +76,7 @@ class ComplexTestModel(seed: Long) {
     val Complete: Problem = {
       val p = new ProblemImpl(
         Slots.AllSequence,
-        Topics.All ++ Topics.Bases, Persons.All, Constraints.All ++ Constraints.Bases, Preferences.All ++ Preferences.Bases
+        Topics.All ++ Topics.Bases, Persons.All, Constraints.Bases, Preferences.All ++ Preferences.Bases
       )
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p

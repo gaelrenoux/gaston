@@ -12,12 +12,6 @@ class InputSpec extends FlatSpec with Matchers {
 
   object expected {
 
-    object slots {
-      val a = Slot("A", maxTopics = 4)
-      val b = Slot("B", maxTopics = Int.MaxValue)
-      val all: Set[Slot] = Set(a, b)
-    }
-
     object topics {
       val unassignedA: Topic = Topic.unassigned(expected.slots.a)
       val unassignedB: Topic = Topic.unassigned(expected.slots.b)
@@ -32,6 +26,12 @@ class InputSpec extends FlatSpec with Matchers {
       val laverne = Person("laverne", Weight(1))
       val hoagie = Person("hoagie", Weight(1.5))
       val all: Set[Person] = Set(bernard, laverne, hoagie)
+    }
+
+    object slots {
+      val a = Slot("A", persons.all, maxTopics = 4)
+      val b = Slot("B", persons.all, maxTopics = Int.MaxValue)
+      val all: Set[Slot] = Set(a, b)
     }
 
   }

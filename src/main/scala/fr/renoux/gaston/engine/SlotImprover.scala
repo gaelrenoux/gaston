@@ -67,8 +67,7 @@ class SlotImprover(
         if !personsMandatoryOnTopic.exists(personsAlreadyMandatoryOnSlot)
 
         /* Filter out impossible adds because mandatory persons are missing */
-        personsMissingOnSlot = problem.personsMissingPerSlot(slot)
-        if !personsMandatoryOnTopic.exists(personsMissingOnSlot)
+        if personsMandatoryOnTopic.forall(slot.personsPresent)
 
         /* Generate the swap */
         records = topicsToAdd.map { t => Record(slot, t, t.mandatory) }
@@ -76,7 +75,7 @@ class SlotImprover(
         if partial.isPartialSolution
 
         /* Filter out impossible adds because of unreachable minimum */
-        if partial.minPersonsOnSlot(slot) <= problem.personsCountPerSlot(slot)
+        if partial.minPersonsOnSlot(slot) <= slot.personsPresentCount
       } yield (partial, move)
     }
 
@@ -108,10 +107,8 @@ class SlotImprover(
         if !personsMandatoryOnT2.exists(personsAlreadyMandatoryOnS1) // check mandatories of T2 are not already blocked on
 
         /* Filter out impossible adds because mandatory persons are missing */
-        personsMissingOnSl = problem.personsMissingPerSlot(s1)
-        personsMissingOnS2 = problem.personsMissingPerSlot(s2)
-        if !personsMandatoryOnT1.exists(personsMissingOnS2)
-        if !personsMandatoryOnT2.exists(personsMissingOnSl)
+        if personsMandatoryOnT1.forall(s2.personsPresent)
+        if personsMandatoryOnT2.forall(s1.personsPresent)
 
         /* Generate the swap */
         partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> topics1, s2 -> topics2)
@@ -142,8 +139,7 @@ class SlotImprover(
         if !personsMandatoryOnNewTs.exists(personsAlreadyMandatoryOnSlot)
 
         /* Filter out impossible adds because mandatory persons are missing */
-        personsMissingOnSlot = problem.personsMissingPerSlot(slot)
-        if !personsMandatoryOnNewTs.exists(personsMissingOnSlot)
+        if personsMandatoryOnNewTs.forall(slot.personsPresent)
 
         /* Generate the swap */
         partial = schedule.clearSlots(slot).replaceTopics(slot, oldTs, newTs)
@@ -168,7 +164,7 @@ class SlotImprover(
         if partial.isPartialSolution
 
         /* Filter out impossible adds because of maximum too low */
-        if partial.maxPersonsOnSlot.getOrElse(slot, 0) >= problem.personsCountPerSlot(slot)
+        if partial.maxPersonsOnSlot.getOrElse(slot, 0) >= slot.personsPresentCount
       } yield (partial, move)
     }
 

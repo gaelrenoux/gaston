@@ -19,21 +19,6 @@ class ConstraintsSpec extends FlatSpec with Matchers {
 
   def scheduled(s: Slot, ts: Topic*): Schedule = Schedule(s(ts.map(_.apply()): _*))
 
-  behavior of "PersonAbsence"
-  val michelangeloNotInTheMorning = PersonAbsence(Michelangelo, Morning)
-
-  it should "break if the person is present" in {
-    michelangeloNotInTheMorning.isRespected(scheduled(Morning, Fighting, Michelangelo, Leonardo)
-    ) should be(false)
-  }
-
-  it should "not break if the person is absent" in {
-    michelangeloNotInTheMorning.isRespected(scheduled(Morning, Fighting, Raphael, Leonardo) ++
-      scheduled(AfterNoon, Machines, Michelangelo, Donatello)
-    ) should be(true)
-  }
-
-
   behavior of "TopicsSimultaneous"
   val leadingFightingMachinesSimultaneous = TopicsSimultaneous(Set(Leading, Fighting, Machines))
 

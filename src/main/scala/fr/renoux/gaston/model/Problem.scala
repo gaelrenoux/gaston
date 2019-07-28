@@ -39,18 +39,6 @@ trait Problem {
 
   val personsCount: Int
 
-  /** For each persons, its available slots */
-  val slotsPerPerson: Map[Person, Set[Slot]]
-
-  /** For each slot, the available persons */
-  val personsPerSlot: Map[Slot, Set[Person]]
-
-  /** For each slot, the missing persons (may be faster) */
-  val personsMissingPerSlot: Map[Slot, Set[Person]]
-
-  /** For each slot, the number of available persons */
-  val personsCountPerSlot: Map[Slot, Int]
-
   val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
 
   val forbiddenTopicsPerPerson: Map[Person, Set[Topic]]

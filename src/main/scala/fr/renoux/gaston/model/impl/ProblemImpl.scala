@@ -24,22 +24,6 @@ class ProblemImpl(
   lazy val forbiddenTopicsPerPerson: Map[Person, Set[Topic]] =
     topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 
-  /** Indicates wether a person is available on a slot or not. */
-  lazy val personSlotsPossibilities: Set[(Person, Slot)] = {
-    val absences = constraints.collect { case PersonAbsence(p, s) => (p, s) }
-    for {p <- persons; s <- slots if !absences((p, s))} yield (p, s)
-  }
-
-  lazy val slotsPerPerson: Map[Person, Set[Slot]] = personSlotsPossibilities.groupToMap
-
-  lazy val personsPerSlot: Map[Slot, Set[Person]] = personSlotsPossibilities.map(_.swap).groupToMap
-
-  lazy val personsMissingPerSlot: Map[Slot, Set[Person]] =
-    slots.map(_ -> Set.empty[Person]).toMap ++
-      constraints.collect { case PersonAbsence(p, s) => s -> p }.groupBy(_._1).mapValuesStrict(_.map(_._2))
-
-  lazy val personsCountPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
-
   lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
     val couples = for {
       topic1 <- topics
@@ -54,7 +38,7 @@ class ProblemImpl(
     val couples = for {
       slot <- slots
       topic <- topics
-      if topic.mandatory.exists(!personsPerSlot(slot).contains(_))
+      if topic.mandatory.exists(!slot.personsPresent.contains(_))
       if forcedSlotsPerTopic.get(topic).exists(!_.contains(slot))
     } yield (slot, topic)
     couples.groupToMap.withDefaultValue(Set.empty)

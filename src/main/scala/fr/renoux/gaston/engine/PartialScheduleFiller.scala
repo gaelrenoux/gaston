@@ -28,7 +28,7 @@ class PartialScheduleFiller(implicit private val problem: Problem) {
       case (slot :: slotsTail, Some(schedule)) =>
         /* Handle current slot */
 
-        val personsLeftSet = problem.personsPerSlot(slot) -- schedule.personsPerSlot.getOrElse(slot, Set.empty)
+        val personsLeftSet = slot.personsPresent -- schedule.personsPerSlot.getOrElse(slot, Set.empty)
         val personsLeft = random.shuffle(personsLeftSet.toSeq)
 
         val topics = schedule.topicsPerSlot.getOrElse(slot, Set.empty)
@@ -52,7 +52,7 @@ class PartialScheduleFiller(implicit private val problem: Problem) {
     val filled = partialSchedule.topicsPerSlot.find { case (slot, topics) =>
       val min = topics.view.map(_.min).sum
       val max = topics.view.map(_.max).sum
-      val pCount = problem.personsCountPerSlot(slot)
+      val pCount = slot.personsPresentCount
       pCount < min || pCount > max
     } match {
       case None => completeForSlots(problem.slots.toList, Some(partialSchedule))

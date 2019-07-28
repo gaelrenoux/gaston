@@ -29,10 +29,10 @@ object MinimalTestModel {
   }
 
   object Slots {
-    val Morning = Slot("morning")
-    val AfterNoon = Slot("afternoon")
-    val Evening = Slot("evening")
-    val Night = Slot("night")
+    val Morning = Slot("morning", Persons.All)
+    val AfterNoon = Slot("afternoon", Persons.All)
+    val Evening = Slot("evening", Persons.All)
+    val Night = Slot("night", Persons.All)
 
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening, Night))
   }

@@ -5,8 +5,8 @@ import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.impl.ProblemImpl
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 
 // scalastyle:off magic.number
 /** 9 persons, 9 topics, 3 slots */
@@ -14,13 +14,6 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   private val strongPreference = Score(5)
   private val weakPreference = Score(1)
-
-  object Slots {
-    val Morning = Slot("morning")
-    val AfterNoon = Slot("afternoon")
-    val Evening = Slot("evening")
-    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
-  }
 
   object Persons {
     val Arthur = Person("Arthur")
@@ -35,11 +28,19 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val All: Set[Person] = Set(Arthur, Bianca, Corwin, Daniela, Eric, Fiona, Garion, Hercule, Iago)
   }
 
+  object Slots {
+    val Morning = Slot("morning", Persons.All - Persons.Eric)
+    val AfterNoon = Slot("afternoon", Persons.All - Persons.Iago)
+    val Evening = Slot("evening", Persons.All - Persons.Arthur)
+    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
+  }
+
   object Topics {
+
     import Persons._
 
-    val BaseMorning: Topic = Topic.unassigned(Slots.Morning)
-    val BaseAfternoon: Topic = Topic.unassigned(Slots.AfterNoon)
+    val BaseMorning: Topic = Topic.unassigned(MinimalTestModel.Slots.Morning)
+    val BaseAfternoon: Topic = Topic.unassigned(MinimalTestModel.Slots.AfterNoon)
     val BaseEvening: Topic = Topic.unassigned(Slots.Evening)
 
     val Acting = Topic("Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
@@ -58,19 +59,11 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Constraints {
 
-    import Persons._
-    import Slots._
     import Topics._
 
-    val EricNotInTheMorning = PersonAbsence(Eric, Morning)
-    val IagoNotInTheAfterNoon = PersonAbsence(Iago, AfterNoon)
-    val ArthurNotInTheEvening = PersonAbsence(Arthur, Evening)
     val BathingAndEatingAreSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
 
     val All: Set[Constraint] = Set(
-      EricNotInTheMorning,
-      IagoNotInTheAfterNoon,
-      ArthurNotInTheEvening,
       BathingAndEatingAreSimultaneous
     )
   }

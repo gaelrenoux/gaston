@@ -92,8 +92,14 @@ private[input] class InputTranscription(input: InputModel) {
         .map(t => s"Simultaneous constraint: topic [$t]: can't be multiple or have several occurrences")
     }
 
+  /* Persons */
+  lazy val personsPerName: Map[NonEmptyString, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
+
   /* Slots */
-  lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap(s => s.name -> Slot(s.name, s.maxTopics.fold(Int.MaxValue)(_.value)))
+  lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap { s =>
+    val personsPresent = input.personsSet.filterNot(_.absences.contains(s.name)).map(p => personsPerName(p.name))
+    s.name -> Slot(s.name, personsPresent, s.maxTopics.fold(Int.MaxValue)(_.value))
+  }
   lazy val slotSequences: Seq[Seq[Slot]] = slotSequencesWithNames.mapMap(_._2)
   lazy val slotsPerName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
   lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
@@ -135,16 +141,8 @@ private[input] class InputTranscription(input: InputModel) {
 
   lazy val topics: Set[Topic] = topicsPerName.values.toSet.flatten
 
-  /* Persons */
-  lazy val personsPerName: Map[NonEmptyString, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
-
   /* Constraints */
   object Constraints {
-
-    lazy val absences: Set[PersonAbsence] =
-      input.personsSet.flatMap { ip =>
-        ip.absences.map(slotsPerName).map(PersonAbsence(personsPerName(ip.name), _))
-      }
 
     lazy val forcedSlots: Set[TopicForcedSlot] =
       input.topicsSet.flatMap {
@@ -168,8 +166,7 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val all: Set[Constraint] =
-      absences ++
-        forcedSlots ++
+      forcedSlots ++
         simultaneousTopics ++
         simultaneousMultiple
   }

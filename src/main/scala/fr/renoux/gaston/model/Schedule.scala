@@ -224,7 +224,7 @@ object Schedule {
   def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = {
     Schedule(
       problem.slots.map { s =>
-        Record(s, Topic.unassigned(s), problem.personsPerSlot(s))
+        Record(s, Topic.unassigned(s), s.personsPresent)
       }
     )
   }
