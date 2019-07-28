@@ -11,6 +11,8 @@ import org.scalatest.{FlatSpec, Matchers}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
+// scalastyle:off magic.number
+
 class RegressionBenchmark extends FlatSpec with Matchers {
   import Ordering.Double.IeeeOrdering
 
@@ -21,7 +23,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
   it should "give an good score when working a short time" in {
     benchmark(
       duration = 5.minutes,
-      expectsScore = 650
+      expectsScore = 700
     )
   }
 
@@ -88,3 +90,5 @@ class RegressionBenchmark extends FlatSpec with Matchers {
     }(ExecutionContext.global)
   }
 }
+
+// scalastyle:on magic.number
