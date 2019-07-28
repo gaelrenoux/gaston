@@ -10,8 +10,8 @@ import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-import scalaz.{NonEmptyList, Validation}
 import scalaz.syntax.validation._
+import scalaz.{NonEmptyList, Validation}
 
 /** Converts the Input object to the Problem object. */
 private[input] class InputTranscription(input: InputModel) {
@@ -29,7 +29,7 @@ private[input] class InputTranscription(input: InputModel) {
         s"is higher than max persons on nothing (${input.settings.maxPersonsOnNothing})")
     } ++ {
       input.topics
-        .filter { t => (t.min, t.max).zipped.exists(_ > _) }
+        .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
         .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
     } ++ {
       input.topics.flatMap { t =>
@@ -57,7 +57,10 @@ private[input] class InputTranscription(input: InputModel) {
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badTopics = p.wishes.keys.map(refineV[NonEmpty](_).right.get).filter(!topicsPerName.contains(_)).map(t => s"[$t]")
+        val badTopics = p.wishes.keys.map(refineV[NonEmpty](_)).collect {
+          case Left(_) => "[]" // empty name
+          case Right(t) if !topicsPerName.contains(t) => s"[$t]"
+        }
         if (badTopics.isEmpty) None
         else Some(s"Person [${p.name}]: undefined wished topics: ${badTopics.mkString(", ")}")
       }
@@ -117,7 +120,7 @@ private[input] class InputTranscription(input: InputModel) {
         val sortedMandatories = baseTopic.mandatory.toSeq.sortBy(_.name) // sorted to be deterministic, therefore more testable
 
         /* dispatch the mandatory persons on the instances */
-        val mandatoriesByInstance = sortedMandatories.zip(Stream.continually(instances).flatten).map(_.swap).groupToMap
+        val mandatoriesByInstance = sortedMandatories.zip(LazyList.continually(instances).flatten).map(_.swap).groupToMap
         instances.map { t => t.copy(mandatory = mandatoriesByInstance.getOrElse(t, Nil).toSet) }
       }
     }

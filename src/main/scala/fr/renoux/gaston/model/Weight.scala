@@ -6,7 +6,7 @@ case class Weight(value: Double) extends AnyVal {
   def *(s: Score): Score = Score(value * s.value) // scalastyle:ignore method.name
 }
 
-object Weight {
+object Weight extends (Double => Weight) {
 
   val Default = Weight(1.0)
 
@@ -40,6 +40,8 @@ object Weight {
     override def compare(x: Weight, y: Weight): Int = x.value.compareTo(y.value)
 
     override def abs(x: Weight): Weight = Weight(math.abs(x.value))
+
+    override def parseString(str: String): Option[Weight] = str.toDoubleOption.map(Weight)
   }
 
 }

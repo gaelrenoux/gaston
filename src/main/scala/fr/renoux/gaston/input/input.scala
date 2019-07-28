@@ -2,6 +2,8 @@ package fr.renoux.gaston
 
 import java.nio.file.Path
 
+import eu.timepit.refined.refineV
+import fr.renoux.gaston.input.InputRefinements.{PosWeight, WeightPositive}
 import fr.renoux.gaston.model._
 import scalaz.{NonEmptyList, _}
 
@@ -26,5 +28,7 @@ package object input {
   def problemFromString(config: String): InputErrors \/ Problem = InputLoader.fromString(config).flatMap(transcribe)
 
   def transcribe(input: InputModel): InputErrors \/ Problem = new InputTranscription(input).result.disjunction
+
+  val DefaultWeightRefined: PosWeight = refineV[WeightPositive](Weight.Default).getOrElse(throw new IllegalStateException(Weight.Default.toString))
 
 }

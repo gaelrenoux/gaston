@@ -26,7 +26,7 @@ case class Score(value: Double) extends AnyVal with Ordered[Score] {
   def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
 }
 
-object Score {
+object Score extends (Double => Score) {
 
   private val TwoDecimalsFormat = new java.text.DecimalFormat("####.00")
 
@@ -62,6 +62,8 @@ object Score {
     override def compare(x: Score, y: Score): Int = x.value.compareTo(y.value)
 
     override def abs(x: Score): Score = Score(math.abs(x.value))
+
+    override def parseString(str: String): Option[Score] = str.toDoubleOption.map(Score)
   }
 
 }

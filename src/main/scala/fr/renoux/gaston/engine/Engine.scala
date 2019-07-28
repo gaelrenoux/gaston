@@ -19,14 +19,14 @@ class Engine(
   lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
 
   /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
-  def lazySeq(seed: Long): Stream[Schedule] = {
+  def lazySeq(seed: Long): LazyList[Schedule] = {
     implicit val rand: Random = new Random(seed)
 
     val initial: Option[(Schedule, Move)] =
       if (backtrackInitialSchedule) Some((generator.createOne, Move.Nothing))
       else Some((startingSchedule, Move.Nothing))
 
-    Stream.iterate(initial) {
+    LazyList.iterate(initial) {
       case None => None
       case Some((ss, move)) => improver.improveOnce(ss, move)
     }.takeWhile(_.isDefined).map(_.get._1)

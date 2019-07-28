@@ -2,41 +2,27 @@ package fr.renoux.gaston.util
 
 import scalaz.Scalaz._
 
-import scala.collection.TraversableLike
-import scala.collection.generic.CanBuildFrom
+import scala.collection.IterableOps
 
 
 object CollectionImplicits {
 
-  implicit class TraversableOps[A, R](val wrapped: TraversableLike[A, R]) extends AnyVal {
+  implicit class RichIterableOps[A, CC[_]](val wrapped: IterableOps[A, CC, _]) extends AnyVal {
+    def replace[B >: A, That](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
 
-    def replace[B >: A, That](pf: PartialFunction[A, B])(implicit bf: CanBuildFrom[R, B, That]): That =
-      wrapped.map(a => pf.applyOrElse(a, identity[A]))
-
-    def zipWith[B, That](f: A => B)(implicit bf: CanBuildFrom[R, (A, B), That]): That =
-      wrapped.map(a => a -> f(a))
-
+    def zipWith[B, That](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
   }
 
-  implicit class TraversableEitherOps[A, B, R](val wrapped: TraversableLike[Either[A, B], R]) extends AnyVal {
-
-    def unzipEither[ThatA, ThatB](implicit af: CanBuildFrom[R, A, ThatA], bf: CanBuildFrom[R, B, ThatB]): (ThatA, ThatB) = {
-      val lefts: ThatA = wrapped.collect {
-        case Left(a) => a
-      }
-      val rights: ThatB = wrapped.collect {
-        case Right(b) => b
-      }
+  implicit class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {
+    def unzipEither: (CC[A], CC[B]) = {
+      val lefts = wrapped.collect { case Left(a) => a }
+      val rights = wrapped.collect { case Right(b) => b }
       (lefts, rights)
     }
-
   }
 
-  implicit class Traversable2Ops[A, RI, RO](val wrapped: TraversableLike[TraversableLike[A, RI], RO]) extends AnyVal {
-
-    def mapMap[B, RIB, ROB](f: A => B)(implicit bfi: CanBuildFrom[RI, B, RIB], bfo: CanBuildFrom[RO, RIB, ROB]): ROB =
-      wrapped.map(_.map(f))
-
+  implicit class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, _], CCO, _]) extends AnyVal {
+    def mapMap[B](f: A => B): CCO[CCI[B]] = wrapped.map(_.map(f))
   }
 
   implicit class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
@@ -58,11 +44,10 @@ object CollectionImplicits {
     def mapKeys[K1](f: K => K1): Map[K1, V] = wrapped.map { case (k, v) => f(k) -> v }
 
     def zipByKeys[K1 >: K, V1](that: Map[K1, V1]): Map[K1, (Option[V], Option[V1])] = {
-      val inWrapped: Map[K, (Option[V], Option[V1])] = wrapped.map { case (k, v) => k -> (Some(v), that.get(k)) }
+      val inWrapped: Map[K1, (Option[V], Option[V1])] = wrapped.map { case (k, v) => k -> (Some(v), that.get(k)) }
       val notInWrapped: Map[K1, (Option[V], Option[V1])] = (that.keySet -- wrapped.keySet).map { k => k -> (None, that.get(k)) }.toMap
       inWrapped ++ notInWrapped
     }
-
   }
 
 }

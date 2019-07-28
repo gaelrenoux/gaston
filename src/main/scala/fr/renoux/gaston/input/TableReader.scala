@@ -2,14 +2,12 @@ package fr.renoux.gaston.input
 
 import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.auto._
-import eu.timepit.refined.refineV
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
-import fr.renoux.gaston.input.InputRefinements.WeightPositive
-import fr.renoux.gaston.model.{Score, Weight}
+import fr.renoux.gaston.model.Score
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.StringImplicits._
+//import fr.renoux.gaston.util.StringImplicits._
 
 import scala.util.Try
 
@@ -92,7 +90,7 @@ class TableReader(input: InputModel) {
 
       InputPerson(
         name = person,
-        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else refineV[WeightPositive](Weight.Default).right.get,
+        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else DefaultWeightRefined,
         mandatory = mandatoryTopics,
         forbidden = forbiddenTopics,
         wishes = scoresByTopic

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import scalaz.Scalaz._
 import scalaz._
 
+import scala.collection.immutable.ArraySeq
 import scala.io.Source
 import scala.util.Try
 
@@ -20,7 +21,7 @@ object Main {
   /** Main method, called from the command line. */
   def main(args: Array[String]): Unit = {
 
-    val commandLine: CommandLine = CommandLine.parse(args)
+    val commandLine: CommandLine = CommandLine.parse(ArraySeq.unsafeWrapArray(args))
     if (commandLine.debug) {
       setDebugLogLevel()
     }

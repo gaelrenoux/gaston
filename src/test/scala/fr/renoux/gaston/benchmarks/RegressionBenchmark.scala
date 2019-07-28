@@ -12,6 +12,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegressionBenchmark extends FlatSpec with Matchers {
+  import Ordering.Double.IeeeOrdering
 
   private val udoConProblem = problemFromClassPath("udocon2017/uc17-completed.conf").force
 

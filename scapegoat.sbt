@@ -1,3 +1,4 @@
+/*
 scapegoatVersion in ThisBuild := "1.3.8"
 
 scapegoatDisabledInspections := Seq(
@@ -8,3 +9,4 @@ scapegoatDisabledInspections := Seq(
 )
 
 scapegoatIgnoredFiles := Seq()
+*/

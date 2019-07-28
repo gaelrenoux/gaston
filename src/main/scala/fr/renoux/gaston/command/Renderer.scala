@@ -11,6 +11,7 @@ class Renderer(
 ) {
 
   import Renderer._
+  import Ordering.Double.IeeeOrdering
 
   /** For each person, preferences */
   private val preferencesByPerson: Map[Person, Set[PersonTopicPreference]] = problem.preferences.collect {

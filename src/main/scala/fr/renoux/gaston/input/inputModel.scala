@@ -45,7 +45,7 @@ case class InputTableSettings(
     minPersonsCol: Option[NonNegInt] = None,
     maxPersonsCol: NonNegInt = 3,
     personsCountAdd: NonNegInt = 0,
-    mandatoryPersonWeight: PosWeight = refineV[WeightPositive](Weight.Default).right.get,
+    mandatoryPersonWeight: PosWeight = DefaultWeightRefined,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
 )
@@ -72,7 +72,7 @@ case class InputTopic(
 
 case class InputPerson(
     name: NonEmptyString,
-    weight: PosWeight = refineV[WeightPositive](Weight.Default).right.get,
+    weight: PosWeight = DefaultWeightRefined,
     absences: Set[NonEmptyString] = Set.empty,
     mandatory: Set[NonEmptyString] = Set.empty,
     forbidden: Set[NonEmptyString] = Set.empty,
@@ -104,7 +104,7 @@ object InputRefinements {
   type NonPosScore = Score Refined ScoreNonPositive
 
   object NonPosScore {
-    def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).right.get
+    def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).getOrElse(throw new IllegalArgumentException(s.toString))
   }
 
   class WeightPositive()
@@ -115,7 +115,7 @@ object InputRefinements {
   type PosWeight = Weight Refined WeightPositive
 
   object PosWeight {
-    def apply(w: PosDouble): PosWeight = refineV[WeightPositive](Weight(w)).right.get
+    def apply(w: PosDouble): PosWeight = refineV[WeightPositive](Weight(w)).getOrElse(throw new IllegalArgumentException(w.toString))
   }
 }
 

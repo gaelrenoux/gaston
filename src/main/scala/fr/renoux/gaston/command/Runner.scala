@@ -60,7 +60,7 @@ class Runner(
       timeout: Option[Instant],
       count: Long,
       current: Schedule,
-      stream: Stream[Schedule] = Stream.Empty
+      nextSchedules: LazyList[Schedule] = LazyList.empty
   )(implicit random: Random): (Schedule, Long) = {
     val now = Instant.now()
 
@@ -78,13 +78,14 @@ class Runner(
 
       /* Run once then recurse */
 
-      val evaluated = if (stream.nonEmpty) stream else engine.lazySeq(random.nextLong())
+      val evaluated: LazyList[Schedule] =
+        if (nextSchedules.nonEmpty) nextSchedules else engine.lazySeq(random.nextLong())
       evaluated match {
-        case Stream.Empty =>
-          runRecursive(newNextLog, timeout, count + 1, current)
-        case ss #:: tail =>
+        case (ss: Schedule) #:: (tail: LazyList[Schedule]) =>
           if (ss.score > current.score) runRecursive(newNextLog, timeout, count + 1, ss, tail)
           else runRecursive(newNextLog, timeout, count + 1, current, tail)
+        case _ =>
+          runRecursive(newNextLog, timeout, count + 1, current)
       }
     }
   }

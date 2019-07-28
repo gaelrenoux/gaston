@@ -1,6 +1,5 @@
 package fr.renoux.gaston.input
 
-import ai.x.diff.DiffShow
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
@@ -97,9 +96,11 @@ class TableReaderSpec extends FlatSpec with Matchers {
     evaluated should be(expected)
   }
 
-  private def printDiff[A: DiffShow](a: A, b: A) = {
-    val diff = DiffShow.diff(a, b)
-    if (!diff.isIdentical) println(diff.string)
+  private def printDiff[A](a: A, b: A): Unit = {
+    if (a != b) {
+      println(a.toString)
+      println(b.toString)
+    }
   }
 
 }

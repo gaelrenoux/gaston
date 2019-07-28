@@ -174,7 +174,7 @@ class SlotImprover(
 
     val improvedSchedules = chrono("SlotImprover > improveOnce > improvedSchedules") {
       for {
-        (partial, move) <- allAdds.toStream #::: allSwaps.toStream #::: allExternalSwaps.toStream #::: allRemovals.toStream
+        (partial, move) <- allAdds ++ allSwaps ++ allExternalSwaps ++ allRemovals
         _ = log.debug(s"Trying that move: $move")
         unimproved <- filler.fill(partial)(rand)
         improved = improve(unimproved)
@@ -186,12 +186,14 @@ class SlotImprover(
       improvedSchedules.headOption
     }
   }
+
   // scalastyle:on cyclomatic.complexity method.length
 
   /** Improve the current schedule moving persons only. */
   private def improve(scoredSchedule: Schedule)(implicit rand: Random): Schedule = personImprover.improve(scoredSchedule)
 
   private def shuffled[A](set: Set[A]): Seq[A] = shuffled(set.toSeq)
+
   private def shuffled[A](seq: Seq[A]): Seq[A] = Random.shuffle(seq)
 
   private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicPerTopic(topic) + topic
