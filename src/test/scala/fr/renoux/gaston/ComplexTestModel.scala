@@ -2,10 +2,9 @@ package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
-import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.impl.ProblemImpl
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.RandomImplicits._
 
 import scala.collection.mutable
@@ -46,12 +45,6 @@ class ComplexTestModel(seed: Long) {
     val AllSet: Set[Slot] = AllSequence.flatten.toSet
   }
 
-  object Constraints {
-    val BasesForced: Set[Constraint] = Slots.AllSet.map { s => TopicForcedSlot(Topic.unassigned(s), Set(s)) }
-
-    val Bases: Set[Constraint] = BasesForced
-  }
-
   object Preferences {
     val PersonTopics: Set[Preference] = for {
       p <- Persons.All
@@ -76,7 +69,10 @@ class ComplexTestModel(seed: Long) {
     val Complete: Problem = {
       val p = new ProblemImpl(
         Slots.AllSequence,
-        Topics.All ++ Topics.Bases, Persons.All, Constraints.Bases, Preferences.All ++ Preferences.Bases
+        Topics.All ++ Topics.Bases,
+        Persons.All,
+        Set.empty,
+        Preferences.All ++ Preferences.Bases
       )
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p

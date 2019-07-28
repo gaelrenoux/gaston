@@ -43,9 +43,6 @@ trait Problem {
 
   val forbiddenTopicsPerPerson: Map[Person, Set[Topic]]
 
-  /** For each topic that can't be on all slots, the slots it can be on. If a topic is not in that Map, then it can be on any slot. */
-  val forcedSlotsPerTopic: Map[Topic, Set[Slot]]
-
   /** For everyone, their personal preferences */
   val preferencesPerPerson: Map[Person, Set[Preference.Personal]]
 

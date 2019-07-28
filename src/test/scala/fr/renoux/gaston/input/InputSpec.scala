@@ -12,15 +12,6 @@ class InputSpec extends FlatSpec with Matchers {
 
   object expected {
 
-    object topics {
-      val unassignedA: Topic = Topic.unassigned(expected.slots.a)
-      val unassignedB: Topic = Topic.unassigned(expected.slots.b)
-      val alpha = Topic("alpha", min = 5, max = 5, mandatory = Set(Person("bernard", Weight.Default)))
-      val beta = Topic("beta", min = 4, max = 5, forbidden = Set(Person("laverne", Weight.Default)))
-      val gamma = Topic("gamma", min = 4, max = 6)
-      val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma)
-    }
-
     object persons {
       val bernard = Person("bernard", Weight.Default)
       val laverne = Person("laverne", Weight(1))
@@ -34,6 +25,15 @@ class InputSpec extends FlatSpec with Matchers {
       val all: Set[Slot] = Set(a, b)
     }
 
+    object topics {
+      val unassignedA: Topic = Topic.unassigned(expected.slots.a)
+      val unassignedB: Topic = Topic.unassigned(expected.slots.b)
+      val alpha = Topic("alpha", min = 5, max = 5, mandatory = Set(Person("bernard", Weight.Default)))
+      val beta = Topic("beta", min = 4, max = 5, forbidden = Set(Person("laverne", Weight.Default)), slots = Some(Set(slots.a)))
+      val gamma = Topic("gamma", min = 4, max = 6)
+      val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma)
+    }
+
   }
 
   "Produced problem" should "contain the correct slots" in {
@@ -41,6 +41,7 @@ class InputSpec extends FlatSpec with Matchers {
   }
 
   it should "contain the correct topics" in {
+    problem.topics.toSeq.sortBy(_.name) should be(expected.topics.all.toSeq.sortBy(_.name))
     problem.topics should be(expected.topics.all)
   }
 
@@ -50,9 +51,6 @@ class InputSpec extends FlatSpec with Matchers {
 
   it should "contain the correct constraints" in {
     problem.constraints should be(Set(
-      TopicForcedSlot(expected.topics.unassignedA, Set(expected.slots.a)),
-      TopicForcedSlot(expected.topics.unassignedB, Set(expected.slots.b)),
-      TopicForcedSlot(expected.topics.beta, Set(expected.slots.a)),
       TopicsSimultaneous(Set(expected.topics.alpha, expected.topics.beta)),
     ))
   }

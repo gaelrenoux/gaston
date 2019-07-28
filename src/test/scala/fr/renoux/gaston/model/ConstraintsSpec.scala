@@ -41,22 +41,4 @@ class ConstraintsSpec extends FlatSpec with Matchers {
     ) should be(true)
   }
 
-  behavior of "TopicForcedSlot"
-  val partyMustBeEveningOrNight = TopicForcedSlot(Party, Set(Evening, Night))
-
-  it should "break if the topic is on the wrong slot" in {
-    partyMustBeEveningOrNight.isRespected(scheduled(AfterNoon, Party, Michelangelo, Donatello, Raphael)
-    ) should be(false)
-  }
-
-  it should "not break if the topic is on the correct slot" in {
-    partyMustBeEveningOrNight.isRespected(scheduled(Evening, Party, Michelangelo, Donatello, Raphael)
-    ) should be(true)
-  }
-
-  it should "not break if the topic is missing" in {
-    partyMustBeEveningOrNight.isRespected(scheduled(AfterNoon, Fighting, Michelangelo, Donatello, Raphael)
-    ) should be(true)
-  }
-
 }

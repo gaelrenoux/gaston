@@ -110,7 +110,8 @@ private[input] class InputTranscription(input: InputModel) {
     val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
     val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max)
+    val slots = inTopic.slots.map(ss => ss.map(slotsPerName))
+    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots)
 
     /* Demultiply topics if more than one occurence of the topic */
     val occurringTopics = inTopic.forcedOccurrences.value match {
@@ -143,17 +144,6 @@ private[input] class InputTranscription(input: InputModel) {
 
   /* Constraints */
   object Constraints {
-
-    lazy val forcedSlots: Set[TopicForcedSlot] =
-      input.topicsSet.flatMap {
-        case inTopic: InputTopic if inTopic.slots.nonEmpty =>
-          val topics = topicsPerName(inTopic.name)
-          val slots = inTopic.slots.get.map(slotsPerName)
-          topics.map(TopicForcedSlot(_, slots))
-        case _ => Set.empty[TopicForcedSlot]
-      }
-
-
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
         // TODO Better handling of simultaneous and occurrences is needed. Will return an error above
@@ -166,7 +156,6 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val all: Set[Constraint] =
-      forcedSlots ++
         simultaneousTopics ++
         simultaneousMultiple
   }
@@ -221,31 +210,27 @@ private[input] class InputTranscription(input: InputModel) {
   object Unassigned {
     private lazy val dummies = slotsPerName.values.map { s =>
       val topic = Topic.unassigned(s)
-      val slotConstraint = TopicForcedSlot(topic, Set(s))
       val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
-      (topic, Set(slotConstraint), antiPreferences)
+      (topic, antiPreferences)
     }
 
     lazy val topics: Set[Topic] = dummies.map(_._1).toSet
-    lazy val constraints: Set[Constraint] = dummies.flatMap(_._2).toSet
-    lazy val preferences: Set[PersonTopicPreference] = dummies.flatMap(_._3).toSet
+    lazy val preferences: Set[PersonTopicPreference] = dummies.flatMap(_._2).toSet
   }
 
   object Nothing {
     lazy val enabled: Boolean =
       settings.maxPersonsOnNothing > 0 && settings.maxPersonsOnNothing >= settings.minPersonsOnNothing
 
-    private lazy val elements: Iterable[(Topic, TopicForcedSlot, Iterable[PersonTopicPreference])] =
+    private lazy val elements: Iterable[(Topic, Iterable[PersonTopicPreference])] =
       slotsPerName.values.map { s =>
         val topic = Topic.nothing(s, settings.minPersonsOnNothing, settings.maxPersonsOnNothing)
-        val slotConstraint = TopicForcedSlot(topic, Set(s))
         val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, settings.personOnNothingAntiPreference))
-        (topic, slotConstraint, antiPreferences)
+        (topic, antiPreferences)
       }
 
     lazy val topics: Set[Topic] = if (enabled) elements.map(_._1).toSet else Set.empty
-    lazy val constraints: Set[Constraint] = if (enabled) elements.map(_._2).toSet else Set.empty
-    lazy val preferences: Set[PersonTopicPreference] = if (enabled) elements.flatMap(_._3).toSet else Set.empty
+    lazy val preferences: Set[PersonTopicPreference] = if (enabled) elements.flatMap(_._2).toSet else Set.empty
   }
 
   lazy val problem: Problem =
@@ -253,7 +238,7 @@ private[input] class InputTranscription(input: InputModel) {
       slotSequences,
       topicsPerName.values.flatten.toSet ++ Unassigned.topics ++ Nothing.topics,
       personsPerName.values.toSet,
-      Constraints.all ++ Unassigned.constraints ++ Nothing.constraints,
+      Constraints.all,
       Preferences.all ++ Unassigned.preferences ++ Nothing.preferences
     )
 

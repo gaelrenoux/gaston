@@ -1,9 +1,8 @@
 package fr.renoux.gaston.model.impl
 
-import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.model.constraints._
+import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
-import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
 class ProblemImpl(
@@ -39,7 +38,7 @@ class ProblemImpl(
       slot <- slots
       topic <- topics
       if topic.mandatory.exists(!slot.personsPresent.contains(_))
-      if forcedSlotsPerTopic.get(topic).exists(!_.contains(slot))
+      if topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
     couples.groupToMap.withDefaultValue(Set.empty)
   }
@@ -49,9 +48,6 @@ class ProblemImpl(
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
     }.flatten.toMap.withDefaultValue(Set.empty)
   }
-
-  lazy val forcedSlotsPerTopic: Map[Topic, Set[Slot]] =
-    constraints.collect { case TopicForcedSlot(t, ss) => t -> ss }.groupBy(_._1).mapValuesStrict(_.map(_._2).reduce(_ intersect _))
 
   lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
