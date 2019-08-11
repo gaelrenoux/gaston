@@ -33,7 +33,7 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
   private def recImprove(
       scoredSchedule: Schedule,
       maxRounds: Int,
-      slots: Queue[Slot] = Queue(problem.slotsSeq: _*),
+      slots: Queue[Slot] = Queue(problem.slotsList: _*),
       slotRoundsLimit: Int = 1000
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {

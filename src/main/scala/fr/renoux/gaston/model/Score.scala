@@ -24,6 +24,8 @@ case class Score(value: Double) extends AnyVal with Ordered[Score] {
   override def compare(that: Score): Int = this.value.compare(that.value)
 
   def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
+
+  def isNegativeInfinity: Boolean = value.isNegInfinity
 }
 
 object Score extends (Double => Score) {
@@ -36,6 +38,8 @@ object Score extends (Double => Score) {
   val Zero = Score(0)
 
   val MinValue = Score(Double.MinValue)
+
+  val NegativeInfinity = Score(Double.NegativeInfinity)
 
   /** Implementation of the Fractional typeclass for Score */
   implicit object ScoreIsFractional extends Fractional[Score] {

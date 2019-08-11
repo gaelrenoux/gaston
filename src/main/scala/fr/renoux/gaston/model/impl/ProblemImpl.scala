@@ -61,15 +61,15 @@ class ProblemImpl(
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
     builder.append("  Slots:\n")
-    slotsSeq.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    slotsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Topics:\n")
-    topicsSeq.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    topicsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Persons:\n")
-    personsSeq.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    personsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Constraints:\n")
-    constraintsSeq.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    constraintsList.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Preferences:\n")
-    preferencesSeq.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    preferencesList.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
     builder.toString
   }
 }

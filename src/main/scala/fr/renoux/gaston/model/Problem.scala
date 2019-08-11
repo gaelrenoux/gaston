@@ -11,11 +11,11 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
-  lazy val slotsSeq: Seq[Slot] = slots.toSeq
-  lazy val topicsSeq: Seq[Topic] = topics.toSeq
-  lazy val personsSeq: Seq[Person] = persons.toSeq
-  lazy val constraintsSeq: Seq[Constraint] = constraints.toSeq
-  lazy val preferencesSeq: Seq[Preference] = preferences.toSeq
+  lazy val slotsList: List[Slot] = slots.toList
+  lazy val topicsList: List[Topic] = topics.toList
+  lazy val personsList: List[Person] = persons.toList
+  lazy val constraintsList: List[Constraint] = constraints.toList
+  lazy val preferencesList: List[Preference] = preferences.toList
 
   lazy val (slotLevelPreferences: Set[Preference.SlotLevel], globalLevelPreferences: Set[Preference]) =
     preferences.collect {

@@ -62,7 +62,8 @@ case class InputTopic(
     max: Option[PosInt] = None,
     occurrences: Option[PosInt] = None,
     multiple: Option[PosInt] = None,
-    slots: Option[Set[NonEmptyString]] = None
+    slots: Option[Set[NonEmptyString]] = None,
+    forced: Boolean = false
 ) {
   /** Occurrence needs to be an Option to not appear when not needed */
   lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1: PosInt)

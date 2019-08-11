@@ -49,7 +49,7 @@ class SlotImprover(
     lazy val allAdds = chrono("SlotImprover > improveOnce > allAdds") {
       /* Add an unscheduled topic */
       for {
-        slot <- shuffled(problem.slotsSeq).view
+        slot <- shuffled(problem.slotsList).view
 
         /* Filter out impossible adds because of incompatibility */
         slotSchedule = schedule.on(slot)
@@ -151,7 +151,7 @@ class SlotImprover(
     lazy val allRemovals = chrono("SlotImprover > improveOnce > allRemovals") {
       /* Remove a scheduled topic */
       for {
-        slot <- shuffled(problem.slotsSeq).view
+        slot <- shuffled(problem.slotsList).view
         slotSchedule = schedule.on(slot)
         topic <- shuffled(slotSchedule.topicsList).view
         topicsToRemove = linkedTopics(topic)

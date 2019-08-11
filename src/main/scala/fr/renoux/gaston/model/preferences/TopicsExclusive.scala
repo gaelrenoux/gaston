@@ -2,11 +2,10 @@ package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model._
 
-/** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list. */
+/** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot). */
 case class TopicsExclusive(topics: Set[Topic], exemptions: Set[Person] = Set.empty, reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.Anti {
 
-  /** Specific implementation, faster than the default */
   override def score(schedule: Schedule): Score = {
     val groups = schedule.personsPerTopic.view.filterKeys(topics.contains).values.map(_.filterNot(exemptions))
     groups.foldLeft((Set.empty[Person], Score.Zero)) { case ((found, score), ps) =>
@@ -14,6 +13,5 @@ case class TopicsExclusive(topics: Set[Topic], exemptions: Set[Person] = Set.emp
       else (found ++ ps, score)
     }._2
   }
-
 }
 

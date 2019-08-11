@@ -4,6 +4,8 @@ import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.engine.Context._
 import fr.renoux.gaston.util.CollectionImplicits._
 
+import scala.annotation.tailrec
+
 /**
   * A schedule is an association of people, to topics, to slots.
   * What we're trying and testing and looking for a good one.
@@ -36,6 +38,7 @@ case class Schedule(
   lazy val countPersonsPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
+  lazy val topics: Set[Topic] = personsPerTopic.keySet
 
   lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.max).sum)
   lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
@@ -153,7 +156,7 @@ case class Schedule(
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = {
     val individualScores = chrono("Schedule > unweightedScoresByPerson > individualScores") {
-      problem.preferencesSeq.collect {
+      problem.preferencesList.collect {
         case p: Preference.Personal => p -> p.score(this)
       }
     }
@@ -163,11 +166,25 @@ case class Schedule(
     }
   }
 
-  lazy val unpersonalScore: Score =
-    problem.preferencesSeq.map {
+  lazy val unpersonalScore: Score = {
+    unpersonalScoreRec(problem.preferencesList, sum = 0)
+
+    problem.preferencesList.map {
       case _: Preference.Personal => Score.Zero
       case p: Preference => p.score(this)
     }.sum
+  }
+
+  @tailrec
+  private def unpersonalScoreRec(prefs: List[Preference], sum: Double): Score = prefs match {
+    case Nil => Score(sum)
+    case h :: t => h match {
+      case _: Preference.Personal => unpersonalScoreRec(t, sum)
+      case p: Preference =>
+        val s = p.score(this)
+        if (s.value == Double.NegativeInfinity) s else unpersonalScoreRec(t, sum + s.value)
+    }
+  }
 
   /**
     * Partial Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.

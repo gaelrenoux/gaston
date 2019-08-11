@@ -7,7 +7,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicsExclusive}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicForced, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 import scalaz.syntax.validation._
@@ -186,9 +186,13 @@ private[input] class InputTranscription(input: InputModel) {
 
   /* Preferences */
   object Preferences {
+
+    lazy val forcedTopics: Set[TopicForced] =
+      input.topicsSet.filter(_.forced).flatMap { inTopic => topicsPerName(inTopic.name).map(TopicForced(_)) }
+
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
-        TopicsExclusive(inConstraint.topics.flatMap(topicsPerName), inConstraint.exemptions.map(personsPerName), Score.PersonTotalScore.negative * 100)
+        TopicsExclusive(inConstraint.topics.flatMap(topicsPerName), inConstraint.exemptions.map(personsPerName))
       }
 
     lazy val exclusiveOccurrencesAndMultiples: Set[TopicsExclusive] =
@@ -199,7 +203,7 @@ private[input] class InputTranscription(input: InputModel) {
         .map { inTopic =>
           val topics = topicsPerName(inTopic.name)
           val mandatoryPersons = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(ip => personsPerName(ip.name))
-          TopicsExclusive(topics, mandatoryPersons, Score.PersonTotalScore.negative * 100)
+          TopicsExclusive(topics, mandatoryPersons)
         }
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
@@ -227,6 +231,7 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val all: Set[Preference] =
       groupDislikes ++
         personTopicPreferences ++
+        forcedTopics ++
         exclusiveTopics ++
         exclusiveOccurrencesAndMultiples
   }

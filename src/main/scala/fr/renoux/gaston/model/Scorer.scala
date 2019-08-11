@@ -13,19 +13,20 @@ object Scorer {
     * person, with the total score as a tie breaker. Personal scores are divided by the person's weight before
     * comparison. */
   def score(solution: Schedule)(implicit ctx: Context): Score = chrono("Scorer > score") {
-    val scoresByPerson = chrono("Scorer > score > scoresByPerson") {
-      solution.unweightedScoresByPerson
-    }
-    val weightedScores = scoresByPerson.toSeq.map { case (p, s) => s / p.weight }
-    val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
 
     val scoreOther = chrono("Scorer > score > scoreOther") {
-      solution.unpersonalScore.value
+      solution.unpersonalScore
     }
 
-    Score(
-      scoreOther + scoreWeightedPersons
-    )
+    if (scoreOther.isNegativeInfinity) scoreOther else {
+      val scoresByPerson = chrono("Scorer > score > scoresByPerson") {
+        solution.unweightedScoresByPerson
+      }
+      val weightedScores = scoresByPerson.toSeq.map { case (p, s) => s / p.weight }
+      val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+
+      scoreOther + Score(scoreWeightedPersons)
+    }
   }
 
   /** Score for each person, divided by that person's weight */
