@@ -155,7 +155,7 @@ object ScheduleGenerator {
         if (topicsSimultaneousWithHeadTopic.isEmpty) {
           topicsLeft.tail ::: topicsPassed
         } else {
-          topicsLeft.tail.filter(topicsSimultaneousWithHeadTopic.contains) ::: topicsPassed.filter(topicsSimultaneousWithHeadTopic.contains)
+          topicsLeft.tail.filterNot(topicsSimultaneousWithHeadTopic.contains) ::: topicsPassed.filterNot(topicsSimultaneousWithHeadTopic.contains)
         }
 
       State(candidate, slotsLeft.tail :+ headSlot, newTopicsLeft)
