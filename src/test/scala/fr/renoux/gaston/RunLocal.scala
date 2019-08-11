@@ -15,16 +15,10 @@ object RunLocal extends App {
   ))
 
   def displayUdoCon2017(): Unit = Main.main(Array(
+    "--from",
+    "/home/gael/Repositories/Gael/gaston/src/test/resources/udocon2017/uc17-settings.conf",
     "--from-table",
     "/home/gael/Repositories/Gael/gaston/src/test/resources/udocon2017/uc17-table.csv",
-    "--generate-input",
-  ))
-
-  def displayUdoCon2019(): Unit = Main.main(Array(
-    "--from",
-    "/home/gael/Repositories/Gael/gaston/src/test/resources/udocon2019/uc19-settings.conf",
-    "--from-table",
-    "/home/gael/Repositories/Gael/gaston/src/test/resources/udocon2019/uc19-table.csv",
     "--generate-input",
   ))
 
@@ -35,7 +29,7 @@ object RunLocal extends App {
 
   def runUdoCon2019(): Unit = Main.main(Array(
     "--from",
-    "src/test/resources/udocon2019/uc19-completed.conf"
+    "src/test/resources/udocon2019/uc19-full.conf"
   ))
 
   log.info("Let's start !!!")
