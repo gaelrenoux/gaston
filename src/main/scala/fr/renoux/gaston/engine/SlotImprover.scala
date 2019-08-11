@@ -153,7 +153,7 @@ class SlotImprover(
       for {
         slot <- shuffled(problem.slotsSeq).view
         slotSchedule = schedule.on(slot)
-        topic <- shuffled(slotSchedule.topicsSeq).view
+        topic <- shuffled(slotSchedule.topicsList).view
         topicsToRemove = linkedTopics(topic)
 
         move = Move.Remove(slot, topicsToRemove)

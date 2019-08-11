@@ -21,6 +21,7 @@ case class InputModel(
 ) {
   lazy val topicsSet: Set[InputTopic] = topics.toSet
   lazy val personsSet: Set[InputPerson] = persons.toSet
+  lazy val multipleTopicsSet: Set[InputTopic] = topicsSet.filter(_.multiple.exists(_ > 1))
 }
 
 case class InputSettings(
@@ -82,6 +83,7 @@ case class InputPerson(
 
 case class InputGlobalConstraints(
     simultaneous: Set[InputSimultaneousConstraint] = Set.empty,
+    notSimultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     exclusive: Set[InputExclusiveConstraint] = Set.empty
 )
 

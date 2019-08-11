@@ -2,7 +2,7 @@ package fr.renoux.gaston.model.constraints
 
 import fr.renoux.gaston.model.{Constraint, Schedule, SlotSchedule, Topic}
 
-/** Those two topics must be on the same slot. I.e., a slot must either contain both or none. */
+/** All those topics must be on the same slot. I.e., a slot must either contain both or none. */
 @hardCoded
 case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotLevel {
 

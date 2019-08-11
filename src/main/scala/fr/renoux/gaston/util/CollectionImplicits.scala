@@ -8,9 +8,14 @@ import scala.collection.IterableOps
 object CollectionImplicits {
 
   implicit class RichIterableOps[A, CC[_]](val wrapped: IterableOps[A, CC, _]) extends AnyVal {
-    def replace[B >: A, That](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
+    def replace[B >: A](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
 
-    def zipWith[B, That](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
+    def zipWith[B](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
+
+    def cross[B](bs: Iterable[B]): CC[(A, B)] = for {
+      a <- wrapped
+      b <- bs
+    } yield (a, b)
   }
 
   implicit class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {

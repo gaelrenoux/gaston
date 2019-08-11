@@ -32,6 +32,10 @@ private[input] class InputTranscription(input: InputModel) {
         .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
         .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
     } ++ {
+      input.topics
+        .filter { t => t.name.contains(Topic.MultipleMarker) || t.name.contains(Topic.OccurrenceMarker) }
+        .map { t => s"Topic [${t.name}]: Name cannot contain characters '${Topic.MultipleMarker}' or '${Topic.OccurrenceMarker}'" }
+    } ++ {
       input.topics.flatMap { t =>
         val badSlots = t.slots.getOrElse(Set.empty).filter(s => !slotsSet.exists(_.name == s)).map(s => s"[$s]")
         if (badSlots.isEmpty) None
@@ -90,6 +94,11 @@ private[input] class InputTranscription(input: InputModel) {
         .flatMap(_.topics)
         .filter(t => topicsPerName(t).size > 1)
         .map(t => s"Simultaneous constraint: topic [$t]: can't be multiple or have several occurrences")
+    } ++ {
+      input.constraints.notSimultaneous
+        .flatMap(_.topics)
+        .filter(!topicsPerName.contains(_))
+        .map(t => s"SNot-simultaneous constraint: unknown topic: [$t]")
     }
 
   /* Persons */
@@ -105,6 +114,15 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
 
   /* Topics */
+  lazy val baseTopics: List[Topic] = input.topics.map { inTopic =>
+    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
+    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
+    val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
+    val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
+    val slots = inTopic.slots.map(ss => ss.map(slotsPerName))
+    Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots)
+  }
+
   lazy val topicsPerName: Map[NonEmptyString, Set[Topic]] = input.topics.map { inTopic =>
     val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
     val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
@@ -113,14 +131,14 @@ private[input] class InputTranscription(input: InputModel) {
     val slots = inTopic.slots.map(ss => ss.map(slotsPerName))
     val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots)
 
-    /* Demultiply topics if more than one occurence of the topic */
+    /* Duplicate topics if more than one occurrence of the topic */
     val occurringTopics = inTopic.forcedOccurrences.value match {
       case 1 => Set(baseTopic)
       case c: Int => baseTopic.occurrences(c).toSet
     }
 
-    /* Demultiply topics if topic is multiple */
-    val multipleTopics = inTopic.forcedMultiple.value match {
+    /* Duplicate topics if topic is multiple. Must be done second, so that he multiple marker appears after the occurence one. */
+    val duplicatedTopics = inTopic.forcedMultiple.value match {
       case 1 => occurringTopics
       case c: Int if c > 0 => occurringTopics.flatMap { topic =>
         val instances = topic.multiple(c)
@@ -132,11 +150,11 @@ private[input] class InputTranscription(input: InputModel) {
       }
     }
 
-    inTopic.name -> multipleTopics
+    inTopic.name -> duplicatedTopics
 
   }.toMap
 
-  /* Topics, but with multiple ones grouped */
+  /* Topics, but with multiple ones (not occurences, just multi-topics!) grouped */
   lazy val topicGroupsPerName: Map[NonEmptyString, Set[Set[Topic]]] =
     topicsPerName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
 
@@ -151,12 +169,18 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val simultaneousMultiple: Set[TopicsSimultaneous] =
-      input.topicsSet.filter(_.multiple.exists(_ > 1)).flatMap { inTopic =>
+      input.multipleTopicsSet.flatMap { inTopic =>
         topicGroupsPerName(inTopic.name).map(TopicsSimultaneous)
       }
 
+    lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
+      input.constraints.notSimultaneous.map { inConstraint =>
+        val topics = inConstraint.topics.flatMap(topicGroupsPerName(_)).flatMap(_.headOption) // Keep only one element for multiple topics
+        TopicsNotSimultaneous(topics)
+      }
+
     lazy val all: Set[Constraint] =
-        simultaneousTopics ++
+      simultaneousTopics ++
         simultaneousMultiple
   }
 

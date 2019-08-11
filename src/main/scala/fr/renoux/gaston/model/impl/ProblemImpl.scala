@@ -3,6 +3,7 @@ package fr.renoux.gaston.model.impl
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
+import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
 class ProblemImpl(
@@ -24,13 +25,17 @@ class ProblemImpl(
     topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 
   lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
-    val couples = for {
+    val conflictingMandatories = for {
       topic1 <- topics
       topic2 <- topics
       if topic1.mandatory.intersect(topic2.mandatory).nonEmpty
     } yield (topic1, topic2)
 
-    couples.groupToMap.withDefaultValue(Set.empty)
+    val notSimultaneous = constraints.collect {
+      case TopicsNotSimultaneous(ts) => ts.cross(ts)
+    }.flatten
+
+    (conflictingMandatories ++ notSimultaneous).groupToMap.withDefaultValue(Set.empty)
   }
 
   lazy val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]] = {
