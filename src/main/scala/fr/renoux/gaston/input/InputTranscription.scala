@@ -7,7 +7,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicForced, TopicsExclusive}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 import scalaz.syntax.validation._
@@ -187,8 +187,14 @@ private[input] class InputTranscription(input: InputModel) {
   /* Preferences */
   object Preferences {
 
-    lazy val forcedTopics: Set[TopicForced] =
-      input.topicsSet.filter(_.forced).flatMap { inTopic => topicsPerName(inTopic.name).map(TopicForced(_)) }
+    lazy val topicScores: Set[TopicDirectPreference] = for {
+      inTopic <- input.topicsSet
+      topic <- topicsPerName(inTopic.name)
+      presenceScore <- inTopic.presence
+    } yield TopicDirectPreference(topic, presenceScore)
+
+    lazy val forcedTopics: Set[TopicDirectPreference] =
+      input.topicsSet.filter(_.forced).flatMap { inTopic => topicsPerName(inTopic.name).map(TopicDirectPreference(_, Score.NegativeInfinity)) }
 
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
@@ -229,11 +235,12 @@ private[input] class InputTranscription(input: InputModel) {
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
     lazy val all: Set[Preference] =
-      groupDislikes ++
-        personTopicPreferences ++
+      topicScores ++
         forcedTopics ++
         exclusiveTopics ++
-        exclusiveOccurrencesAndMultiples
+        exclusiveOccurrencesAndMultiples ++
+        groupDislikes ++
+        personTopicPreferences
   }
 
   object Unassigned {

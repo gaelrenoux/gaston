@@ -63,6 +63,7 @@ case class InputTopic(
     occurrences: Option[PosInt] = None,
     multiple: Option[PosInt] = None,
     slots: Option[Set[NonEmptyString]] = None,
+    presence: Option[Score] = None,
     forced: Boolean = false
 ) {
   /** Occurrence needs to be an Option to not appear when not needed */
