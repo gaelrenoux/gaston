@@ -14,9 +14,6 @@ trait Constraint {
 
   /** Indicates if the constraint is respected on the given schedule. */
   def isRespected(schedule: Schedule): Boolean
-
-  /** Obviously, the opposite of isRespected. */
-  def isBroken(schedule: Schedule): Boolean = !isRespected(schedule)
 }
 
 object Constraint {

@@ -72,7 +72,6 @@ class SlotImprover(
         /* Generate the swap */
         records = topicsToAdd.map { t => Record(slot, t, t.mandatory) }
         partial = schedule.clearSlots(slot).add(records)
-        if partial.isPartialSolution
 
         /* Filter out impossible adds because of unreachable minimum */
         if partial.minPersonsOnSlot(slot) <= slot.personsPresentCount
@@ -112,7 +111,6 @@ class SlotImprover(
 
         /* Generate the swap */
         partial = schedule.clearSlots(s1, s2).swapTopics(s1 -> topics1, s2 -> topics2)
-        if partial.isPartialSolution // TODO this rechecks everything, we shouldn't check what has been checked individually before
       } yield (partial, move)
     }
 
@@ -143,7 +141,6 @@ class SlotImprover(
 
         /* Generate the swap */
         partial = schedule.clearSlots(slot).replaceTopics(slot, oldTs, newTs)
-        if partial.isPartialSolution
       } yield (partial, move)
     }
 
@@ -161,7 +158,6 @@ class SlotImprover(
 
         /* Generate the swap */
         partial = schedule.removeTopics(topicsToRemove)
-        if partial.isPartialSolution
 
         /* Filter out impossible adds because of maximum too low */
         if partial.maxPersonsOnSlot.getOrElse(slot, 0) >= slot.personsPresentCount

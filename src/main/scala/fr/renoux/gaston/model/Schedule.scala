@@ -24,10 +24,9 @@ case class Schedule(
     updateRecords(_.map { r => f.applyOrElse(r, identity[Record]) })
 
   lazy val records: Set[Record] = wrapped
-  lazy val slots: Set[Slot] = records.map(_.slot)
   lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
   lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
-  lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = slots.zipWith(SlotSchedule(this, _)).toMap
+  lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = problem.slots.zipWith(SlotSchedule(this, _)).toMap
   lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
   lazy val countTopicsLeftPerSlot: Map[Slot, Int] = problem.slots.zipWith(s => s.maxTopics - countTopicsPerSlot.getOrElse(s, 0)).toMap
   lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
@@ -38,7 +37,6 @@ case class Schedule(
   lazy val countPersonsPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
-  lazy val topics: Set[Topic] = personsPerTopic.keySet
 
   lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.max).sum)
   lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
@@ -195,16 +193,25 @@ case class Schedule(
     * @return true if this respects all constraints applicable to partial schedules
     */
   lazy val isPartialSolution: Boolean = {
-    problem.constraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
-  }
+    lazy val recordsOk = records.forall { case Record(slot, topic, persons) =>
+      val pCount = persons.size
+      topic.max >= pCount && // topic.min <= pCount &&
+        !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
+        topic.slots.forall(_.contains(slot)) &&
+        persons.forall(slot.personsPresent.contains)
+    }
+    lazy val slotsOk = topicsPerSlot.forall { case (slot, topics) => slot.maxTopics >= topics.size }
+    lazy val topicsOk = problem.topics.filter(_.forced).forall(scheduledTopics.contains)
+    lazy val constraintsOk = problem.constraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
-  lazy val brokenPartialConstraints: Set[Constraint] =
-    problem.constraints.filterNot { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
+    recordsOk && slotsOk && topicsOk && constraintsOk
+  }
 
   /** @return true if this respects all constraints */
-  lazy val isSolution: Boolean = {
-    problem.constraints.forall(_.isRespected(this))
-  }
+  lazy val isSolution: Boolean =
+    isPartialSolution &&
+      problem.constraints.forall { c => c.isApplicableToPartialSchedule || c.isRespected(this) } &&
+      records.forall { case Record(_, topic, persons) => topic.min <= persons.size }
 
   /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {

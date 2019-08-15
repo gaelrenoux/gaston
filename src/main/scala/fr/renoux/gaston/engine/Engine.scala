@@ -29,7 +29,12 @@ class Engine(
     LazyList.iterate(initial) {
       case None => None
       case Some((ss, move)) => improver.improveOnce(ss, move)
-    }.takeWhile(_.isDefined).map(_.get._1)
+    }.takeWhile(_.isDefined).map(_.get._1).map { schedule =>
+      if (schedule.isSolution) schedule else {
+        val message = s"A bad schedule was generated !\n ${schedule.toFormattedString}"
+        throw new IllegalStateException(message)
+      }
+    }
   }
 
   /** Produces a schedule and its score */

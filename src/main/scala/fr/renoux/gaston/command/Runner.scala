@@ -36,7 +36,7 @@ class Runner(
     val timeout: Option[Instant] = maxDuration.map(d => now.plusSeconds(d.toSeconds))
 
     /* Parallelize on the number of cores */
-    val future = Future.sequence {
+    val future: Future[Seq[(Schedule, Long)]] = Future.sequence {
       (0 until parallelRunCount).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
