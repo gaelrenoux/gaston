@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.testOnly
+
 
 /** A Record is a triplet of slot, topic and assigned persons */
 case class Record(slot: Slot, topic: Topic, persons: Set[Person]) extends Ordered[Record] {
@@ -17,6 +19,14 @@ case class Record(slot: Slot, topic: Topic, persons: Set[Person]) extends Ordere
 
   lazy val canRemovePersons: Boolean = persons.size > topic.min && optionalPersons.nonEmpty
   lazy val canAddPersons: Boolean = persons.size < topic.max
+
+
+  /** Merge with another slot schedule's content. Used only in tests. */
+  @testOnly def ++(that: Record): Record = {
+    if (slot != that.slot || topic != that.topic) throw new IllegalArgumentException(s"$this ++ $that")
+    copy(persons = persons ++ that.persons)
+  }
+
 }
 
 object Record {

@@ -1,5 +1,6 @@
 package fr.renoux.gaston.util
 
+import scalaz.Monoid
 import scalaz.Scalaz._
 
 import scala.collection.IterableOps
@@ -52,6 +53,13 @@ object CollectionImplicits {
       val inWrapped: Map[K1, (Option[V], Option[V1])] = wrapped.map { case (k, v) => k -> (Some(v), that.get(k)) }
       val notInWrapped: Map[K1, (Option[V], Option[V1])] = (that.keySet -- wrapped.keySet).map { k => k -> (None, that.get(k)) }.toMap
       inWrapped ++ notInWrapped
+    }
+  }
+
+  @inline final implicit class MonoidMapOps[K, V](val wrapped: Map[K, V])(implicit monoid: Monoid[V]) {
+
+    def addByKeys[K1 >: K](that: Map[K1, V]): Map[K1, V] = {
+      that ++ wrapped.map { case (k, v) => k -> that.get(k).fold(v)(monoid.append(v, _)) }
     }
   }
 

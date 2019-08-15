@@ -2,6 +2,8 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.testOnly
+import scalaz.Scalaz._
 
 import scala.annotation.tailrec
 
@@ -10,30 +12,26 @@ import scala.annotation.tailrec
   * What we're trying and testing and looking for a good one.
   */
 case class Schedule(
-    private val wrapped: Set[Record]
+    private val wrapped: Map[Slot, SlotSchedule]
 )(implicit
     val problem: Problem,
     ctx: Context
 ) {
 
-  @inline private def updateRecords(f: Set[Record] => Set[Record]): Schedule =
-    copy(wrapped = f(records))
+  @inline private def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
+    copy(wrapped = wrapped.updated(slot, f(on(slot))))
 
-  @inline private def partialMapRecords(f: PartialFunction[Record, Record]): Schedule =
-    updateRecords(_.map { r => f.applyOrElse(r, identity[Record]) })
-
-  lazy val records: Set[Record] = wrapped
-  lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
-  lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
-  lazy val slotSchedulesMap: Map[Slot, SlotSchedule] = problem.slots.zipWith(SlotSchedule(this, _)).toMap
-  lazy val slotSchedules: Iterable[SlotSchedule] = slotSchedulesMap.values
-  lazy val countTopicsLeftPerSlot: Map[Slot, Int] = problem.slots.zipWith(s => s.maxTopics - countTopicsPerSlot.getOrElse(s, 0)).toMap
-  lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict { x => x.flatMap(_.persons) }
-  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = recordsPerSlot.mapValuesStrict { x => x.map(_.topic) }
+  // lazy val records: Set[Record] = wrapped
+  // lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
+  // lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
+  lazy val slotSchedules: Iterable[SlotSchedule] = wrapped.values
+  lazy val slotSchedulesSet: Set[SlotSchedule] = slotSchedules.toSet
+  lazy val slotSchedulesList: List[SlotSchedule] = slotSchedules.toList
+  // lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsPerTopic).toMap
+  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = wrapped.mapValuesStrict(_.topics)
   lazy val countTopicsPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.size)
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
-  lazy val countPersonsPerSlot: Map[Slot, Int] = personsPerSlot.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
 
@@ -41,127 +39,92 @@ case class Schedule(
   lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
   lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(_.mandatory))
 
-  lazy val scheduledTopics: Set[Topic] = records.map(_.topic)
+  lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
   lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
   lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)
 
-  lazy val recordsSeq: Seq[Record] = records.toSeq
   lazy val scheduledTopicsSeq: Seq[Topic] = scheduledTopics.toSeq
   lazy val scheduledRealTopicsSeq: Seq[Topic] = scheduledRealTopics.toSeq
   lazy val scheduledRemovableTopicsSeq: Seq[Topic] = scheduledRemovableTopics.toSeq
   lazy val unscheduledTopicsSeq: Seq[Topic] = unscheduledTopics.toSeq
 
-  lazy val score: Score = if (records.isEmpty) Score.MinValue else Scorer.score(this)
-
   /** Get the SlotSchedule for a specific Slot */
-  def on(slot: Slot): SlotSchedule = SlotSchedule(this, slot) // TODO cache this
+  def on(slot: Slot): SlotSchedule = wrapped.getOrElse(slot, SlotSchedule.empty(slot))
+
+  lazy val score: Score = Scorer.score(this)
 
   /** Add a new record to this schedule. */
-  def add(record: Record): Schedule = updateRecords(_ + record)
+  def add(record: Record): Schedule = updateSlotSchedule(record.slot)(_.add(record))
 
-  def +(record: Record): Schedule = updateRecords(_ + record)
-
-  def add(records: Set[Record]): Schedule = if (records.isEmpty) this else updateRecords(_ ++ records)
-
-  def ++(records: Set[Record]): Schedule = if (records.isEmpty) this else updateRecords(_ ++ records)
-
-  /** Merge with another schedule's content. */
-  def merge(that: Schedule): Schedule = {
-    val cumulatedRecords = records ++ that.records
-    val mergedMap = cumulatedRecords.groupBy(t => (t.slot, t.topic)).mapValuesStrict(_.flatMap(_.persons))
-    val mergedRecords = mergedMap.toSet.map(Record.fromTuple2)
-    copy(wrapped = mergedRecords)
+  def addAll(slot: Slot, records: Set[Record]): Schedule = {
+    if (records.isEmpty) this else updateSlotSchedule(slot)(_.addAll(records))
   }
-
-  def ++(that: Schedule): Schedule = merge(that)
 
   /** Clear all non-mandatory persons on the given slots. Returned schedule is partial, obviously. */
   def clearSlots(slots: Slot*): Schedule = {
-    val slotsSet = slots.toSet
-    partialMapRecords {
-      case Record(s, t, _) if slotsSet(s) => Record(s, t, t.mandatory)
-    }
+    val updatedSlots = slots.map { s => s -> on(s).cleared }
+    copy(wrapped = wrapped ++ updatedSlots)
   }
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
-  def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = partialMapRecords {
-    case Record(s, t, _) if (s, t) == st1 => Record(s, st2._2, st2._2.mandatory) // TODO should probably have a method that corrects the schedule
-    case Record(s, t, _) if (s, t) == st2 => Record(s, st1._2, st1._2.mandatory)
+  def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = {
+    val (slot1, topic1) = st1
+    val (slot2, topic2) = st2
+    val modified1 = slot1 -> on(slot1).replaceTopic(topic1, topic2)
+    val modified2 = slot2 -> on(slot2).replaceTopic(topic2, topic1)
+    copy(wrapped = wrapped + modified1 + modified2)
   }
 
   /** Swap two groups of topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
-  def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = updateRecords { records =>
-    val all = st1._2 ++ st2._2
-    records.filterNot(r => all.contains(r.topic)) ++
-      st1._2.map(t => Record(st2._1, t, t.mandatory)) ++
-      st2._2.map(t => Record(st1._1, t, t.mandatory))
+  def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = {
+    val (slot1, topics1) = st1
+    val (slot2, topics2) = st2
+    val modified1 = slot1 -> on(slot1).replaceTopics(topics1, topics2)
+    val modified2 = slot2 -> on(slot2).replaceTopics(topics2, topics1)
+    copy(wrapped = wrapped + modified1 + modified2)
   }
 
   /** Replace an existing topic by a new one (typically unscheduled, on a slot). Mandatory persons are set on the new
     * topic and no one else, so the schedule is probably unsound and/or partial. */
-  def replaceTopic(oldTopic: Topic, newTopic: Topic): Schedule = partialMapRecords {
-    case Record(s, t, _) if t == oldTopic => Record(s, newTopic, newTopic.mandatory)
-  }
+  def replaceTopic(slot: Slot, oldTopic: Topic, newTopic: Topic): Schedule =
+    updateSlotSchedule(slot)(_.replaceTopic(oldTopic, newTopic))
 
-  def replaceTopics(slot: Slot, oldTopics: Set[Topic], newTopics: Set[Topic]): Schedule = updateRecords { records =>
-    records.filterNot(r => oldTopics.contains(r.topic)) ++
-      newTopics.map(t => Record(slot, t, t.mandatory))
-  }
+  def replaceTopics(slot: Slot, oldTopics: Set[Topic], newTopics: Set[Topic]): Schedule =
+    updateSlotSchedule(slot)(_.replaceTopics(oldTopics, newTopics))
 
-  def removeTopic(topic: Topic): Schedule = updateRecords(_.filter(_.topic != topic))
+  def removeTopic(slot: Slot, topic: Topic): Schedule = updateSlotSchedule(slot)(_.removeTopic(topic))
 
-  def removeTopics(topics: Set[Topic]): Schedule = updateRecords(_.filterNot(r => topics.contains(r.topic)))
+  def removeTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.removeTopics(topics))
 
 
-  /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */
-  def addPersonToExistingTopic(topic: Topic, person: Person): Schedule = partialMapRecords {
-    case Record(s, t, ps) if t == topic => Record(s, t, ps + person)
-  }
+  /** Adds a person to some topic already on schedule. If the topic is not on schedule on that slot, returns the same schedule. */
+  def addPersonToExistingTopic(slot: Slot, topic: Topic, person: Person): Schedule =
+    updateSlotSchedule(slot)(_.addPersonToExistingTopic(topic, person))
 
   /** Swap two persons on a slot. Persons are in couple with there current topic. */
-  def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule = updateRecords { records =>
-    val (t1, p1) = tp1
-    val (t2, p2) = tp2
-    val r1 = recordsPerSlotPerTopic(slot)(t1).head
-    val r2 = recordsPerSlotPerTopic(slot)(t2).head
-    val newR1 = r1.copy(persons = r1.persons - p1 + p2)
-    val newR2 = r2.copy(persons = r2.persons - p2 + p1)
-    records - r1 - r2 + newR1 + newR2
-  }
+  def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule =
+    updateSlotSchedule(slot)(_.swapPersons(tp1, tp2))
 
   /** Move a person on some slot, from some topic to another one. */
-  def movePerson(slot: Slot, source: Topic, destination: Topic, person: Person): Schedule = updateRecords { records =>
-    val sourceRecord = recordsPerSlotPerTopic(slot)(source).head
-    val destinationRecord = recordsPerSlotPerTopic(slot)(destination).head
-    val newSourceRecord = sourceRecord.copy(persons = sourceRecord.persons - person)
-    val newDestinationRecord = destinationRecord.copy(persons = destinationRecord.persons + person)
-    records - sourceRecord - destinationRecord + newSourceRecord + newDestinationRecord
-  }
+  def movePerson(slot: Slot, source: Topic, destination: Topic, person: Person): Schedule =
+    updateSlotSchedule(slot)(_.movePerson(source, destination, person))
 
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
-    lazy val noUbiquity = recordsPerSlot.values.forall { recordsOnSlot =>
-      val persons = recordsOnSlot.toSeq.flatMap(_.personsSeq) // Seq to keep duplicates, we're looking for them
-      persons.size == persons.toSet.size
-    }
-    lazy val noDuplicates = {
-      val topicsSeq = topicsPerSlot.values.flatten
-      topicsSeq.size == topicsSeq.toSet.size
-    }
+    lazy val noUbiquity = slotSchedules.forall(_.isSound)
+    lazy val noDuplicates = scheduledTopics.size == slotSchedulesList.flatMap(_.topicsSeq).size
     noUbiquity && noDuplicates
   }
 
-  /** Score for each person, regardless of its weight. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] =
-    problem.personalPreferencesListPerPerson.map[Person, Score] { case (person, prefs) =>
-      val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.score(this)).sum
-      person -> score
-    }
+  /** Score for each person, regardless of its weight. All personal scores are slot-level, so the whole computation is done per slot. */
+  lazy val unweightedScoresByPerson: Map[Person, Score] = slotSchedulesList.map(_.unweightedScoresByPerson).suml
 
-  lazy val impersonalScore: Score = preferencesScoreRec(problem.impersonalPreferencesList)
+  /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
+  lazy val impersonalScore: Score =
+    slotSchedulesList.map(_.impersonalScore).suml + preferencesScoreRec(problem.impersonalGlobalLevelPreferencesList)
 
   @tailrec
   private def preferencesScoreRec(prefs: List[Preference], sum: Double = 0): Score = prefs match {
@@ -176,55 +139,42 @@ case class Schedule(
     * @return true if this respects all constraints applicable to partial schedules
     */
   lazy val isPartialSolution: Boolean = {
-    lazy val recordsOk = records.forall { case Record(slot, topic, persons) =>
-      val pCount = persons.size
-      topic.max >= pCount && // topic.min <= pCount &&
-        !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
-        topic.slots.forall(_.contains(slot)) &&
-        persons.forall(slot.personsPresent.contains)
-    }
-    lazy val slotsOk = topicsPerSlot.forall { case (slot, topics) => slot.maxTopics >= topics.size }
-    lazy val topicsOk = problem.topics.filter(_.forced).forall(scheduledTopics.contains)
-    lazy val constraintsOk = problem.constraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
+    lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
+    lazy val forcedTopicsOk = problem.topics.filter(_.forced).forall(scheduledTopics.contains)
+    lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
-    recordsOk && slotsOk && topicsOk && constraintsOk
+    allSlotsOk && forcedTopicsOk && forcedTopicsOk && constraintsOk
   }
 
   /** @return true if this respects all constraints */
   lazy val isSolution: Boolean =
     isPartialSolution &&
-      problem.constraints.forall { c => c.isApplicableToPartialSchedule || c.isRespected(this) } &&
-      records.forall { case Record(_, topic, persons) => topic.min <= persons.size }
+      slotSchedules.forall(_.isSolution)
+  problem.globalLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespected(this) }
 
   /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
-
-    val personsPerTopicPerSlot = records.groupBy(_.slot.name).mapValuesStrict {
-      _.groupBy(_.topic.name).mapValuesStrict {
-        _.flatMap(_.persons).map(_.name).toSeq.sorted
-      }.toSeq.sortBy(_._1)
-    }.toSeq.sortBy(_._1)
-
-    for {
-      (slot, personsPerTopic) <- personsPerTopicPerSlot
-    } {
-      builder.append("  ").append(slot).append(": \n")
-      for ((topic, persons) <- personsPerTopic) {
-        builder.append("    ").append(topic).append(": ").append(persons.mkString("", ", ", "\n"))
-      }
-    }
-
+    slotSchedules.foreach { ss => builder.append(ss.toFormattedString) }
     builder.append(unscheduledTopics.map(_.name).mkString("Unscheduled topics: ", ", ", "\n"))
-
     builder.toString
   }
+
+  /** Merge with another schedule's content. Used only in tests. */
+  @testOnly def ++(that: Schedule): Schedule = Schedule(
+    wrapped.zipByKeys(that.wrapped).mapValuesStrict {
+      case (Some(a), Some(b)) => a ++ b
+      case (Some(a), None) => a
+      case (None, Some(b)) => b
+      case (None, None) => throw new IllegalStateException
+    }
+  )
 
 }
 
 object Schedule {
 
-  implicit object ScheduleIsOrdered extends Ordering[Schedule] {
+  implicit object ScheduleIsOrdered extends scala.math.Ordering[Schedule] {
     override def compare(x: Schedule, y: Schedule): Int = x.score.compare(y.score)
   }
 
@@ -232,14 +182,13 @@ object Schedule {
   def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule()
 
   /** Schedule where everyone is on an "unassigned" topic */
-  def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = {
-    Schedule(
-      problem.slots.map { s =>
-        Record(s, Topic.unassigned(s), s.personsPresent)
-      }
-    )
-  }
+  def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = Schedule(
+    problem.slots.map { s => s -> SlotSchedule.everyoneUnassigned(s) }.toMap
+  )
 
   /** Commodity method */
-  def apply(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule = new Schedule(entries.flatten.toSet)
+  def apply(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
+    new Schedule(entries.flatten.groupBy(_.slot).map {
+      case (s, rs) => s -> SlotSchedule(s, rs)
+    }.toMap)
 }

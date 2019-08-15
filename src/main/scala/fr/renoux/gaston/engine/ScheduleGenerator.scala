@@ -148,7 +148,7 @@ object ScheduleGenerator {
       val record = Record(headSlot, headTopic, headTopic.mandatory)
 
       val additionalRecords = topicsSimultaneousWithHeadTopic.map(t => Record(headSlot, t, t.mandatory))
-      partialSchedule + record ++ additionalRecords
+      partialSchedule.add( record).addAll(headSlot, additionalRecords)
     }
 
     lazy val withCandidateAcknowledged: State = {

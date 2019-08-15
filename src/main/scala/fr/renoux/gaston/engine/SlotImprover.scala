@@ -71,7 +71,7 @@ class SlotImprover(
 
         /* Generate the swap */
         records = topicsToAdd.map { t => Record(slot, t, t.mandatory) }
-        partial = schedule.clearSlots(slot).add(records)
+        partial = schedule.clearSlots(slot).addAll(slot, records)
 
         /* Filter out impossible adds because of unreachable minimum */
         if partial.minPersonsOnSlot(slot) <= slot.personsPresentCount
@@ -157,7 +157,7 @@ class SlotImprover(
         if !move.reverts(previousMove)
 
         /* Generate the swap */
-        partial = schedule.removeTopics(topicsToRemove)
+        partial = schedule.removeTopics(slot, topicsToRemove)
 
         /* Filter out impossible adds because of maximum too low */
         if partial.maxPersonsOnSlot.getOrElse(slot, 0) >= slot.personsPresentCount

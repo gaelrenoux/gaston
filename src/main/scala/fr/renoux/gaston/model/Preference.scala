@@ -16,11 +16,6 @@ trait Preference {
 
 object Preference {
 
-  trait Personal extends Preference {
-    /** A personal preference always references someone */
-    val person: Person
-  }
-
   trait Anti extends Preference {
     assert(reward.value <= 0, s"AntiPreference $this should have a negative reward")
   }
@@ -33,6 +28,12 @@ object Preference {
 
     /** Score the slot schedule according to this preference */
     def scoreSlot(schedule: SlotSchedule): Score
+  }
+
+  /** Personal preferences are always at slot level */
+  trait Personal extends SlotLevel {
+    /** A personal preference always references someone */
+    val person: Person
   }
 
   val NecessaryPreferenceScore: Score = Score.NegativeInfinity

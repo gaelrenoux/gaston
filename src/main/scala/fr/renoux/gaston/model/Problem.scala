@@ -21,6 +21,7 @@ trait Problem {
   lazy val preferencesList: List[Preference] = preferences.toList
   lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
   lazy val personalPreferencesListPerPerson: Map[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).withDefaultValue(Nil)
+  lazy val impersonalPreferences: Set[Preference] = preferences.filterNot(_.isInstanceOf[Preference.Personal])
   lazy val impersonalPreferencesList: List[Preference] = preferencesList.filterNot(_.isInstanceOf[Preference.Personal])
 
   lazy val (slotLevelPreferences: Set[Preference.SlotLevel], globalLevelPreferences: Set[Preference]) =
@@ -28,6 +29,11 @@ trait Problem {
       case s: Preference.SlotLevel => Left(s)
       case s: Preference => Right(s)
     }.unzipEither
+
+  lazy val impersonalSlotLevelPreferences: Set[Preference.SlotLevel] = slotLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
+  lazy val impersonalSlotLevelPreferencesList: List[Preference.SlotLevel] = impersonalSlotLevelPreferences.toList
+  lazy val impersonalGlobalLevelPreferences: Set[Preference] = globalLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
+  lazy val impersonalGlobalLevelPreferencesList: List[Preference] = impersonalGlobalLevelPreferences.toList
 
   lazy val (slotLevelConstraints: Set[Constraint.SlotLevel], globalLevelConstraints: Set[Constraint]) =
     constraints.collect {

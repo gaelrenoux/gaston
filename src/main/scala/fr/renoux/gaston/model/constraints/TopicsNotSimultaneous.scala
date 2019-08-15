@@ -11,13 +11,13 @@ case class TopicsNotSimultaneous(topics: Set[Topic]) extends Constraint.SlotLeve
   /** Is this constraint respected on the schedule */
   override def isRespected(schedule: Schedule): Boolean =
     schedule.topicsPerSlot.values.forall(ts => check(ts.toList))
-  
+
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = check(schedule.topicsList)
 
   @tailrec
   private def check(ts: List[Topic], foundOne: Boolean = false): Boolean = ts match {
     case Nil => true
-    case h::t =>
+    case h :: t =>
       if (!topics.contains(h)) check(t, foundOne)
       else if (foundOne) false
       else check(t, foundOne = true)
