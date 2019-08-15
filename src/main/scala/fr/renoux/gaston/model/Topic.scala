@@ -4,8 +4,7 @@ package fr.renoux.gaston.model
   * whatever.
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
   * @param forced Topic must be on the schedule.
-  * @param movable Can the topic be moved to another slot than the one it is on ?
-  * @param removable Can the topic be removed from the schedule ?
+  * @param virtual Topic created for technical reasons, not a real topic. Cannot be moved or removed from its slot.
   * */
 case class Topic(
     name: String,
@@ -15,8 +14,7 @@ case class Topic(
     max: Int = Topic.DefaultMax,
     slots: Option[Set[Slot]] = None,
     forced: Boolean = false,
-    movable: Boolean = true,
-    removable: Boolean = true
+    virtual: Boolean = false
 ) {
 
   /** Duplicate this Topic as several occurrences */
@@ -40,8 +38,8 @@ object Topic {
   val MultipleMarker = "~"
 
   /** Topics for people assigned to doing nothing. */
-  def nothing(slot: Slot, min: Int, max: Int): Topic = Topic(s"Nothing (${slot.name})", min = min, max = max, slots = Some(Set(slot)), movable = false)
+  def nothing(slot: Slot, min: Int, max: Int): Topic = Topic(s"Nothing (${slot.name})", min = min, max = max, slots = Some(Set(slot)), virtual = true)
 
   /** Topics for people not assigned yet on some slot. */
-  def unassigned(slot: Slot): Topic = Topic(s"[${slot.name}]", max = Person.MaxCount, slots = Some(Set(slot)), movable = false, removable = false)
+  def unassigned(slot: Slot): Topic = Topic(s"[${slot.name}]", max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
 }

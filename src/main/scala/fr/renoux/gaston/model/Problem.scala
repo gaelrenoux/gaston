@@ -11,8 +11,11 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
+  lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
+
   lazy val slotsList: List[Slot] = slots.toList
   lazy val topicsList: List[Topic] = topics.toList
+  lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val personsList: List[Person] = persons.toList
   lazy val constraintsList: List[Constraint] = constraints.toList
   lazy val preferencesList: List[Preference] = preferences.toList

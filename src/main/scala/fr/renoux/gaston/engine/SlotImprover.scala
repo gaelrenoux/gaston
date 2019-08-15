@@ -81,14 +81,14 @@ class SlotImprover(
 
 
     lazy val allSwaps = chrono("SlotImprover > improveOnce > allSwaps") {
-      /* Swap topics between two scheduled topics */
+      /* Swap two scheduled topics */
       for {
         (s1, s2) <- shuffled(problem.slotCouplesSeq).view
         slotSchedule1 = schedule.on(s1)
         slotSchedule2 = schedule.on(s2)
 
-        t1 <- shuffled(slotSchedule1.topics -- slotSchedule2.permanentlyIncompatibleTopics).view
-        t2 <- shuffled(slotSchedule2.topics -- slotSchedule1.permanentlyIncompatibleTopics).view
+        t1 <- shuffled(slotSchedule1.realTopics -- slotSchedule2.permanentlyIncompatibleTopics).view
+        t2 <- shuffled(slotSchedule2.realTopics -- slotSchedule1.permanentlyIncompatibleTopics).view
         topics1 = linkedTopics(t1)
         topics2 = linkedTopics(t2)
         if slotSchedule1.maxTopicsLeft >= topics2.size - topics1.size

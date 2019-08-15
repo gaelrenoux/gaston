@@ -45,11 +45,13 @@ case class Schedule(
   lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(_.mandatory))
 
   lazy val scheduledTopics: Set[Topic] = records.map(_.topic)
-  lazy val scheduledRemovableTopics: Set[Topic] = scheduledTopics.filterNot(_.forced)
-  lazy val unscheduledTopics: Set[Topic] = (problem.topics -- scheduledTopics).filter(_.removable)
+  lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
+  lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
+  lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)
 
   lazy val recordsSeq: Seq[Record] = records.toSeq
   lazy val scheduledTopicsSeq: Seq[Topic] = scheduledTopics.toSeq
+  lazy val scheduledRealTopicsSeq: Seq[Topic] = scheduledRealTopics.toSeq
   lazy val scheduledRemovableTopicsSeq: Seq[Topic] = scheduledRemovableTopics.toSeq
   lazy val unscheduledTopicsSeq: Seq[Topic] = unscheduledTopics.toSeq
 
