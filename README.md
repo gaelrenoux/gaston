@@ -30,32 +30,34 @@ The input file describes the problem to solve. It follows the HOCON format, and 
 
 - `gaston`: Root element of the configuration.
     - `settings`: Global settings. All fields are optional and have a default value.
-        - `incompatibility-anti-preference`: Negative score for a person forced to share a topic with someone it would rather not. Default value is `-1000`.
-        - `default-max-topics-per-slot`: Max number of topics per slot (default value is no limit.
-        - `default-min-persons-per-topic`: Minimum number of persons per topic, can be overriden on specific topics. Default value is `1`.
-        - `default-max-persons-per-topic`: Maximum number of persons per topic, can be overriden on specific topics. Default value is `10`.
+        - `incompatibility-anti-preference`: Negative score for a person forced to share a topic with someone it would rather not. Default is `-1000`.
+        - `default-max-topics-per-slot`: Max number of topics per slot (default is no limit.
+        - `default-min-persons-per-topic`: Minimum number of persons per topic, can be overriden on specific topics. Default is `1`.
+        - `default-max-persons-per-topic`: Maximum number of persons per topic, can be overriden on specific topics. Default is `10`.
         - `max-persons-on-nothing`: On each slot, maximum number of persons who can have no topic scheduled. Default value is `0`, i.e. everyone must have a topic scheduled on each slot.
-        - `min-persons-on-nothing`: On each slot, minimum number of persons who can have no topic scheduled (the idea being that enough unoccupied persons can do something together). Default value is `0`, i.e. no minimum.
+        - `min-persons-on-nothing`: On each slot, minimum number of persons who can have no topic scheduled (the idea being that enough unoccupied persons can do something together). Default is `0`, i.e. no minimum.
         - `person-on-nothing-anti-preference`: Negative score attached to a person doing nothing on a slot. Default value is `-100`.
-        - `backtrack-initial-schedule`: Technical stuff: should initial schedules be empty or backtracked ? Best answer depends on the schedule being highly constrained or note. Default value is `true`.
+        - `backtrack-initial-schedule`: Technical stuff: should initial schedules be empty or backtracked ? Best answer depends on the schedule being highly constrained or note. Default is `true`.
     - `tableSettings`: Settings for importing a table. Optional (leave that field out if you are not importing a table). See the *Importing a table* section below for details. 
     - `slots`: The slots on which to schedule, as an array of arrays of slots. The inner arrays contain the slots following each other directly (such as one in the morning and the other in the afternoon of the same day), so that mult-slot topics may be handled (WIP). The following lines describe the structure of one slot.
         - `name`: Name of the slot. Must be unique among slots.
         - `max-topics`: Maximum number of topics to schedule on this slot (e.g. because space as limited at that time).
     - `topics`: The topics to schedule. The following lines describe the structure of one topic.
         - `name`: Name of the topic. Must be unique among topics.
-        - `min`: Minimum number of persons on a topic. Default value is empty (will use the settings' value).
-        - `max`: Maximum number of persons on a topic. Default value is empty (will use the settings' value).
-        - `occurrences`: How many sessions of the topic are possible. Default value is 1.
-        - `multiple`: How many parallel sessions this topic represents (all sessions are simultaneous). Note than min and max are for one session. Default value is 1.
-        - `slots`: An array of slot names on which the topic can be scheduled. Default value is empty (can be scheduled on any slot).  
+        - `min`: Minimum number of persons on a topic. Default is empty (will use the settings' value).
+        - `max`: Maximum number of persons on a topic. Default is empty (will use the settings' value).
+        - `occurrences`: How many sessions of the topic are possible. Default is `1`.
+        - `multiple`: How many parallel sessions this topic represents (all sessions are simultaneous). Note than min and max are for one session. Default is `1`.
+        - `slots`: An array of slot names on which the topic can be scheduled. Default is empty (can be scheduled on any slot).
+        - `presence`: A score added for just having this topic present. Can be used to favor a topic, or to set a topic as to avoid if possible (with a negative score). Default is `0`.
+        - `forced`: If `true`, this topic *must* be scheduled. Default is `false`.
     - `persons`: The persons to schedule. The following lines describe the structure of one person.
         - `name`: Name of the person. Must be unique among persons.
-        - `weight`: A person with a higher weight counts more when calculating the global score. Specifically, that person's individual score will be divided by its weight, bringing them down and making the schedule optimizing more for them.. Default value is `1`.
-        - `absences`: An array of slot names on which this person is missing, and therefore cannot be scheduled. Default value is an empty array.
-        - `mandatory`: An array of topic names for which this person is mandatory: it must be present on those topics. Default value is an empty array.
-        - `forbidden`: An array of topic names for which this person is forbidden: it cannot be scheduled on those topics. Default value is an empty array.
-        - `incompatible`: An array of person names this person wish not to share a topic with. Default value is an empty array.
+        - `weight`: A person with a higher weight counts more when calculating the global score. Specifically, that person's individual score will be divided by its weight, bringing them down and making the schedule optimizing more for them.. Default is `1`.
+        - `absences`: An array of slot names on which this person is missing, and therefore cannot be scheduled. Default is empty.
+        - `mandatory`: An array of topic names for which this person is mandatory: it must be present on those topics. Default is empty.
+        - `forbidden`: An array of topic names for which this person is forbidden: it cannot be scheduled on those topics. Default is empty.
+        - `incompatible`: An array of person names this person wish not to share a topic with. Default is empty.
         - `wishes`: A mapping of topic names to scores. The higher the score, the more that persons wishes to be on that topic. The scores will be rebalanced so that everyone has a 1000 points total.
     - `constraints`: Global constraints on the schedule.
         - `simultaneous`: An array of simultaneity constraints.
@@ -106,7 +108,7 @@ gaston = {
         "Gamma" = 10
         "Delta" = 10
       }
-    },
+    }
     {
       incompatible = ["Anatole", "Colin"]
       name = "Bernadette"
@@ -115,7 +117,7 @@ gaston = {
       wishes = {
         "Delta" = 10
       }
-    },
+    }
     {
       absences = ["D1-afternoon", "D1-evening"]
       name = "Colin"
@@ -125,7 +127,7 @@ gaston = {
         "Alpha" = 1
         "Delta" = 10
       }
-    },
+    }
     {
       name = "Dominique"
       weight = 1.5
@@ -134,16 +136,16 @@ gaston = {
         "Alpha" = 1
         "Delta" = 10
       }
-    },
+    }
     {
       name = "Eric"
-    },
+    }
     {
       name = "Françoise"
-    },
+    }
     {
       name = "Garfield"
-    },
+    }
     {
       name = "Harley"
     }
@@ -153,33 +155,35 @@ gaston = {
     {
       max = 5
       name = "Alpha"
-    },
+    }
     {
       max = 4
       min = 4
       name = "Beta"
-    },
+    }
     {
       name = "Gamma"
-    },
+    }
     {
       min = 5
       name = "Delta"
-    },
+    }
     {
       max = 6
       min = 3
       name = "Epsilon"
-    },
+    }
     {
       max = 6
       min = 3
       name = "Zeta"
-    },
+      forced = true
+    }
     {
       max = 6
       min = 3
       name = "Eta"
+      presence = -100
     }
   ]
 
@@ -188,7 +192,7 @@ gaston = {
       {topics = ["Eta", "Zeta"]}
     ]
     exclusive = [
-      {topics = ["Eta", "Zeta"]},
+      {topics = ["Eta", "Zeta"]}
       {topics = ["Beta", "Gamma"], exemptions = ["Eric"]}
     ]
   }
