@@ -193,9 +193,6 @@ private[input] class InputTranscription(input: InputModel) {
       presenceScore <- inTopic.presence
     } yield TopicDirectPreference(topic, presenceScore)
 
-    lazy val forcedTopics: Set[TopicDirectPreference] =
-      input.topicsSet.filter(_.forced).flatMap { inTopic => topicsPerName(inTopic.name).map(TopicDirectPreference(_, Score.NegativeInfinity)) }
-
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
         TopicsExclusive(inConstraint.topics.flatMap(topicsPerName), inConstraint.exemptions.map(personsPerName))
