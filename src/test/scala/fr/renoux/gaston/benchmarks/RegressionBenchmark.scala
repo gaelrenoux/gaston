@@ -23,7 +23,8 @@ class RegressionBenchmark extends FlatSpec with Matchers {
   it should "give an good score when working a short time" in {
     benchmark(
       duration = 5.minutes,
-      expectsScore = 700
+      expectsScore = 700,
+      expectsCount = 100
     )
   }
 
@@ -31,7 +32,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
     benchmark(
       duration = 20.minutes,
       expectsScore = 700,
-      parallelRunCount = 1
+      expectsCount = 300
     )
   }
 
@@ -41,7 +42,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
       seed: Long = 0L,
       problem: Problem = udoConProblem,
       context: Context = Context.Default,
-      expectsCount: Long = 0,
+      expectsCount: Long,
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing
   ): Unit = {

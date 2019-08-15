@@ -11,20 +11,23 @@ import scala.concurrent.duration._
 
 object PerformanceAnalysis extends App {
 
-  private val udoConProblem = problemFromClassPath("udocon2017/uc17-completed.conf").force
+  private val udoConProblem = problemFromClassPath("udocon2019/uc19-full.conf").force
   // TODO check a solution
+  // 100+ iterations, 800+ score
 
   val tools: Tools = Tools(new Chrono(blocking = true))
   implicit val problem: Problem = udoConProblem
   implicit val context: Context = Context(tools = tools)
 
-  val duration: FiniteDuration = 1.minutes
+  val duration: FiniteDuration = 5.minutes
   val seed: Long = 0L
 
   val engine = new Engine(backtrackInitialSchedule = true)
-  val runner = new Runner(engine, parallelRunCount = 1)
+  val runner = new Runner(engine)
 
-  val (schedule, count) = runner.run(Some(duration), seed = seed)
+  val (schedule, count) = tools.chrono("Total") {
+    runner.run(Some(duration), seed = seed)
+  }
 
   println(s"${schedule.score} after $count iterations")
   println(s"Times: ${tools.chrono.timesPretty}")

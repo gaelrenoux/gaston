@@ -1,7 +1,6 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.engine.Context
-import fr.renoux.gaston.engine.Context._
 import fr.renoux.gaston.util.CollectionImplicits._
 
 import scala.annotation.tailrec
@@ -156,36 +155,20 @@ case class Schedule(
   }
 
   /** Score for each person, regardless of its weight. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] = {
-    val individualScores = chrono("Schedule > unweightedScoresByPerson > individualScores") {
-      problem.preferencesList.collect {
-        case p: Preference.Personal => p -> p.score(this)
-      }
+  lazy val unweightedScoresByPerson: Map[Person, Score] =
+    problem.personalPreferencesListPerPerson.map[Person, Score] { case (person, prefs) =>
+      val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.score(this)).sum
+      person -> score
     }
 
-    chrono("Schedule > unweightedScoresByPerson > sum") {
-      individualScores.groupBy(_._1.person).mapValuesStrict(_.foldLeft(Score.Zero)(_ + _._2))
-    }
-  }
-
-  lazy val unpersonalScore: Score = {
-    unpersonalScoreRec(problem.preferencesList, sum = 0)
-
-    problem.preferencesList.map {
-      case _: Preference.Personal => Score.Zero
-      case p: Preference => p.score(this)
-    }.sum
-  }
+  lazy val impersonalScore: Score = preferencesScoreRec(problem.impersonalPreferencesList)
 
   @tailrec
-  private def unpersonalScoreRec(prefs: List[Preference], sum: Double): Score = prefs match {
+  private def preferencesScoreRec(prefs: List[Preference], sum: Double = 0): Score = prefs match {
     case Nil => Score(sum)
-    case h :: t => h match {
-      case _: Preference.Personal => unpersonalScoreRec(t, sum)
-      case p: Preference =>
-        val s = p.score(this)
-        if (s.value == Double.NegativeInfinity) s else unpersonalScoreRec(t, sum + s.value)
-    }
+    case p :: ps =>
+      val s = p.score(this)
+      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
   }
 
   /**

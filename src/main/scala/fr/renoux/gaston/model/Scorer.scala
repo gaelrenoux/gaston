@@ -15,7 +15,7 @@ object Scorer {
   def score(solution: Schedule)(implicit ctx: Context): Score = chrono("Scorer > score") {
 
     val scoreOther = chrono("Scorer > score > scoreOther") {
-      solution.unpersonalScore
+      solution.impersonalScore
     }
 
     if (scoreOther.isNegativeInfinity) scoreOther else {

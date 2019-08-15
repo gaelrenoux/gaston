@@ -19,6 +19,9 @@ trait Problem {
   lazy val personsList: List[Person] = persons.toList
   lazy val constraintsList: List[Constraint] = constraints.toList
   lazy val preferencesList: List[Preference] = preferences.toList
+  lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
+  lazy val personalPreferencesListPerPerson: Map[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).withDefaultValue(Nil)
+  lazy val impersonalPreferencesList: List[Preference] = preferencesList.filterNot(_.isInstanceOf[Preference.Personal])
 
   lazy val (slotLevelPreferences: Set[Preference.SlotLevel], globalLevelPreferences: Set[Preference]) =
     preferences.collect {
