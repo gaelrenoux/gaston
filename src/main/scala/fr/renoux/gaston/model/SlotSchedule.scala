@@ -20,6 +20,7 @@ case class SlotSchedule(
   lazy val maxPersons: Option[Int] = schedule.maxPersonsOnSlot.get(slot)
 
   lazy val topicsList: List[Topic] = topics.toList
+  lazy val removableTopicsList: List[Topic] = topicsList.filterNot(_.forced)
   lazy val maxTopicsLeft: Int = slot.maxTopics - topics.size
 
   /** Topics that cannot be added on this slot, because of the slot itself */

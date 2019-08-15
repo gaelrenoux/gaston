@@ -129,7 +129,7 @@ private[input] class InputTranscription(input: InputModel) {
     val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
     val slots = inTopic.slots.map(ss => ss.map(slotsPerName))
-    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots)
+    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots, forced = inTopic.forced)
 
     /* Duplicate topics if more than one occurrence of the topic */
     val occurringTopics = inTopic.forcedOccurrences.value match {
@@ -236,7 +236,6 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val all: Set[Preference] =
       topicScores ++
-        forcedTopics ++
         exclusiveTopics ++
         exclusiveOccurrencesAndMultiples ++
         groupDislikes ++

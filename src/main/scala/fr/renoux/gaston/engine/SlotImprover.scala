@@ -120,7 +120,7 @@ class SlotImprover(
     lazy val allExternalSwaps = chrono("SlotImprover > improveOnce > allExternalSwaps") {
       /* Swap topics between unscheduled and scheduled */
       for {
-        oldT <- shuffled(schedule.scheduledTopicsSeq).view
+        oldT <- shuffled(schedule.scheduledRemovableTopicsSeq).view
         slot = schedule.topicToSlot(oldT)
         slotSchedule = schedule.on(slot)
         newT <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
@@ -153,7 +153,7 @@ class SlotImprover(
       for {
         slot <- shuffled(problem.slotsList).view
         slotSchedule = schedule.on(slot)
-        topic <- shuffled(slotSchedule.topicsList).view
+        topic <- shuffled(slotSchedule.removableTopicsList).view
         topicsToRemove = linkedTopics(topic)
 
         move = Move.Remove(slot, topicsToRemove)

@@ -45,10 +45,12 @@ case class Schedule(
   lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(_.mandatory))
 
   lazy val scheduledTopics: Set[Topic] = records.map(_.topic)
+  lazy val scheduledRemovableTopics: Set[Topic] = scheduledTopics.filterNot(_.forced)
   lazy val unscheduledTopics: Set[Topic] = (problem.topics -- scheduledTopics).filter(_.removable)
 
   lazy val recordsSeq: Seq[Record] = records.toSeq
   lazy val scheduledTopicsSeq: Seq[Topic] = scheduledTopics.toSeq
+  lazy val scheduledRemovableTopicsSeq: Seq[Topic] = scheduledRemovableTopics.toSeq
   lazy val unscheduledTopicsSeq: Seq[Topic] = unscheduledTopics.toSeq
 
   lazy val score: Score = if (records.isEmpty) Score.MinValue else Scorer.score(this)

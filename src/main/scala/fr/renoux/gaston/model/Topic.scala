@@ -3,9 +3,10 @@ package fr.renoux.gaston.model
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
+  * @param forced Topic must be on the schedule.
   * @param movable Can the topic be moved to another slot than the one it is on ?
   * @param removable Can the topic be removed from the schedule ?
-  **/
+  * */
 case class Topic(
     name: String,
     mandatory: Set[Person] = Set.empty,
@@ -13,6 +14,7 @@ case class Topic(
     min: Int = Topic.DefaultMin,
     max: Int = Topic.DefaultMax,
     slots: Option[Set[Slot]] = None,
+    forced: Boolean = false,
     movable: Boolean = true,
     removable: Boolean = true
 ) {
