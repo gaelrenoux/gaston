@@ -84,7 +84,8 @@ libraryDependencies ++= Seq(
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")
 
+Test / fork := true
+Test / testOptions += Tests.Argument("-oD") // show test duration
+
 /* Stays inside the sbt console when we press "ctrl-c" in tests" */
-fork in Test := true
-Test / run / fork := true
 Global / cancelable := true
