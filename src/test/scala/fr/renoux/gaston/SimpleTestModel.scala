@@ -115,7 +115,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     private implicit val problem: Problem = Problems.Complete
     private implicit val context: Context = Context.Default
 
-    val Best = Schedule(
+    val Best = Schedule.from(
       Morning(
         Acting(Arthur, Iago, Hercule),
         Dancing(Daniela, Corwin, Bianca),

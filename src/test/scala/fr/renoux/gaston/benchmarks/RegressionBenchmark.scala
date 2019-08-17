@@ -23,16 +23,16 @@ class RegressionBenchmark extends FlatSpec with Matchers {
   it should "give an good score when working a short time" ignore {
     benchmark(
       duration = 5.minutes,
-      expectsScore = 700,
-      expectsCount = 100
+      expectsScore = 750,
+      expectsCount = 200
     )
   }
 
   it should "give an great score when working a long time" ignore {
     benchmark(
       duration = 20.minutes,
-      expectsScore = 700,
-      expectsCount = 300
+      expectsScore = 750,
+      expectsCount = 800
     )
   }
 

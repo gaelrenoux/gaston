@@ -17,7 +17,7 @@ class PreferencesSpec extends FlatSpec with Matchers {
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default
 
-  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule(s(t(ps: _*)))
+  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps: _*)))
 
 
   behavior of "PersonsTopicPreference"

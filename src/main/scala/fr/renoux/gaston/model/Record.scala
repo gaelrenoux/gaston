@@ -23,6 +23,18 @@ case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val p
   lazy val canRemovePersons: Boolean = countPersons > topic.min && optionalPersons.nonEmpty
   lazy val canAddPersons: Boolean = countPersons < topic.max
 
+  /** Clear all non-mandatory persons. */
+  lazy val cleared: Record = copy(persons = topic.mandatory)
+
+  /** Adds a person to the record. */
+  def addPerson(person: Person): Record = copy(persons = persons + person)
+
+  /** Removes a person from the record. */
+  def removePerson(person: Person): Record = copy(persons = persons - person)
+
+  /** Replace a person by another on the record. */
+  def replacePerson(oldP: Person, newP: Person): Record = copy(persons = persons -oldP + newP)
+
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPerson: Map[Person, Score] =
     problem.personalPreferencesListPerPerson.map[Person, Score] { case (person, prefs) =>

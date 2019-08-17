@@ -18,8 +18,11 @@ case class Schedule(
     ctx: Context
 ) {
 
+  @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =
+    copy(wrapped = w)
+
   @inline private def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
-    copy(wrapped = wrapped.updated(slot, f(on(slot))))
+    updateWrapped(wrapped.updated(slot, f(on(slot))))
 
   lazy val slotSchedules: Iterable[SlotSchedule] = wrapped.values
   lazy val slotSchedulesSet: Set[SlotSchedule] = slotSchedules.toSet
@@ -51,29 +54,29 @@ case class Schedule(
   }
 
   /** Clear all non-mandatory persons on the given slots. Returned schedule is partial, obviously. */
-  def clearSlots(slots: Slot*): Schedule = {
+  def clearSlots(slots: Slot*): Schedule = updateWrapped {
     val updatedSlots = slots.map { s => s -> on(s).cleared }
-    copy(wrapped = wrapped ++ updatedSlots)
+    wrapped ++ updatedSlots
   }
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
-  def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = {
+  def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = updateWrapped {
     val (slot1, topic1) = st1
     val (slot2, topic2) = st2
     val modified1 = slot1 -> on(slot1).replaceTopic(topic1, topic2)
     val modified2 = slot2 -> on(slot2).replaceTopic(topic2, topic1)
-    copy(wrapped = wrapped + modified1 + modified2)
+    wrapped + modified1 + modified2
   }
 
   /** Swap two groups of topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
-  def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = {
+  def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = updateWrapped {
     val (slot1, topics1) = st1
     val (slot2, topics2) = st2
     val modified1 = slot1 -> on(slot1).replaceTopics(topics1, topics2)
     val modified2 = slot2 -> on(slot2).replaceTopics(topics2, topics1)
-    copy(wrapped = wrapped + modified1 + modified2)
+    wrapped + modified1 + modified2
   }
 
   /** Replace an existing topic by a new one (typically unscheduled, on a slot). Mandatory persons are set on the new
@@ -168,7 +171,7 @@ object Schedule {
   }
 
   /** Empty schedule for a problem */
-  def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule()
+  def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty)
 
   /** Schedule where everyone is on an "unassigned" topic */
   def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = Schedule(
@@ -176,8 +179,8 @@ object Schedule {
   )
 
   /** Commodity method */
-  def apply(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
+  @testOnly def from(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
     new Schedule(entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
-      case (s, rs) => s -> SlotSchedule(s, rs)
+      case (s, rs) => s -> SlotSchedule.from(s, rs)
     })
 }

@@ -14,7 +14,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   private implicit val problem: Problem = Complete
   private implicit val context: Context = Context.Default
 
-  private val Simple = Schedule(
+  private val Simple = Schedule.from(
     Morning(
       Acting(Arthur, Bianca),
       Cooking(Corwin, Daniela)
@@ -84,10 +84,9 @@ class ScheduleSpec extends FlatSpec with Matchers {
     ))
   }
 
-  "add" should "add a new record even if one already exists for that slot and topic" in {
-    Simple.add(Record(Morning, Acting, Set(Eric, Fiona))) should be(Schedule(
+  "add" should "replace an existing record if one already exists for that slot and topic" in {
+    Simple.add(Record(Morning, Acting, Set(Eric, Fiona))) should be(Schedule.from(
       Morning(
-        Acting(Arthur, Bianca),
         Acting(Eric, Fiona),
         Cooking(Corwin, Daniela)
       ),
@@ -99,7 +98,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   }
 
   it should "add a new record with an existing slot and a new topic" in {
-    Simple.add(Record(Morning, Eating, Set(Eric, Fiona))) should be(Schedule(
+    Simple.add(Record(Morning, Eating, Set(Eric, Fiona))) should be(Schedule.from(
       Morning(
         Acting(Arthur, Bianca),
         Cooking(Corwin, Daniela),
@@ -113,7 +112,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   }
 
   it should "add a new record with a new slot and a new topic" in {
-    Simple.add(Record(Evening, Eating, Set(Eric, Fiona))) should be(Schedule(
+    Simple.add(Record(Evening, Eating, Set(Eric, Fiona))) should be(Schedule.from(
       Morning(
         Acting(Arthur, Bianca),
         Cooking(Corwin, Daniela)
@@ -165,7 +164,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   } */
 
   "addPersonToExistingTopic" should "add someone to an existing topic" in {
-    Simple.addPersonToExistingTopic(Morning, Acting, Eric) should be(Schedule(
+    Simple.addPersonToExistingTopic(Morning, Acting, Eric) should be(Schedule.from(
       Morning(
         Acting(Arthur, Bianca, Eric),
         Cooking(Corwin, Daniela)
@@ -182,7 +181,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   }
 
   "swapPersons" should "swap two persons on the same slot" in {
-    Simple.swapPersons(Morning, Acting -> Arthur, Cooking -> Daniela) should be(Schedule(
+    Simple.swapPersons(Morning, Acting -> Arthur, Cooking -> Daniela) should be(Schedule.from(
       Morning(
         Acting(Daniela, Bianca),
         Cooking(Corwin, Arthur)
@@ -208,7 +207,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   */
 
   "movePerson" should "move a person from a source topic to a destination topic" in {
-    Simple.movePerson(Morning, Acting, Cooking, Arthur) should be(Schedule(
+    Simple.movePerson(Morning, Acting, Cooking, Arthur) should be(Schedule.from(
       Morning(
         Acting(Bianca),
         Cooking(Corwin, Daniela, Arthur)
@@ -240,7 +239,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   }
 
   it should "reject a schedule demanding ubiquity" in {
-    Schedule(
+    Schedule.from(
       Morning(
         Acting(Arthur, Bianca),
         Cooking(Arthur, Daniela)
@@ -249,7 +248,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   }
 
   it should "reject a schedule with the same topic several times" in {
-    Schedule(
+    Schedule.from(
       Morning(
         Acting(Arthur),
         Cooking(Corwin)
