@@ -120,7 +120,7 @@ object ScheduleGenerator {
     */
   private case class State(partialSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
 
-    private val problem = partialSchedule.problem
+    private implicit val problem = partialSchedule.problem
 
     lazy val isSlotsEmpty: Boolean = slotsLeft.isEmpty
 

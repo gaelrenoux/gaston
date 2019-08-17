@@ -23,12 +23,12 @@ class Renderer(
     val weightedScoresByPerson: Map[Person, Score] = Scorer.weightedScoresByPerson(schedule)
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
-    val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.map {
+    val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.toSeq.map {
       case (person, preferences) =>
         val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
         val mandatoryCount = problem.mandatoryTopicsPerPerson(person).size
         (person.name, weightedScoresByPerson(person).value, satisfied, mandatoryCount)
-    }.toSeq
+    }
 
     val summariesFromBestToWorse = summaryByPerson.sortBy(_._2).reverse
 

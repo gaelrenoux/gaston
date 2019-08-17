@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model
 
+
 /** A slot in the schedule. A person can only have one topic during a slot. */
 case class Slot(
     name: String,
@@ -8,7 +9,7 @@ case class Slot(
 ) {
 
   /** To facilitate writing schedules */
-  def apply(records: (Topic, Set[Person])*): Seq[Record] =
+  def apply(records: (Topic, Set[Person])*)(implicit problem: Problem): Seq[Record] =
     records.map(r => Record(this, r._1, r._2))
 
   lazy val personsPresentCount: Int = personsPresent.size

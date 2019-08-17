@@ -11,21 +11,13 @@ case class PersonGroupAntiPreference(
     person: Person,
     group: Set[Person],
     reward: Score
-) extends Preference.SlotLevel with Preference.Anti with Preference.Personal {
+) extends Preference.RecordLevel with Preference.Anti with Preference.Personal {
 
-  /** Specific implementation, faster than the default */
-  override def score(schedule: Schedule): Score = {
-    schedule.personGroups.filter(_.contains(person)).map { groupWithPerson =>
-      val count = group.intersect(groupWithPerson).size
+  override def scoreRecord(record: Record): Score = {
+    if (record.persons.contains(person)) {
+      val count = group.intersect(record.persons).size
       if (count == 0) Score.Zero else reward * count
-    }.sum
-  }
-
-  override def scoreSlot(schedule: SlotSchedule): Score = {
-    schedule.personGroups.filter(_.contains(person)).map { groupWithPerson =>
-      val count = group.intersect(groupWithPerson).size
-      if (count == 0) Score.Zero else reward * count
-    }.sum
+    } else Score.Zero
   }
 
 }

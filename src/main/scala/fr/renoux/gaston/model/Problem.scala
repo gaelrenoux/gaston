@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.TupleImplicits._
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 trait Problem {
@@ -24,16 +25,22 @@ trait Problem {
   lazy val impersonalPreferences: Set[Preference] = preferences.filterNot(_.isInstanceOf[Preference.Personal])
   lazy val impersonalPreferencesList: List[Preference] = preferencesList.filterNot(_.isInstanceOf[Preference.Personal])
 
-  lazy val (slotLevelPreferences: Set[Preference.SlotLevel], globalLevelPreferences: Set[Preference]) =
+  lazy val (
+    (recordLevelPreferences: Set[Preference.RecordLevel], slotLevelPreferences: Set[Preference.SlotLevel]),
+    globalLevelPreferences: Set[Preference.GlobalLevel]
+    ) =
     preferences.collect {
-      case s: Preference.SlotLevel => Left(s)
-      case s: Preference => Right(s)
-    }.unzipEither
+      case s: Preference.RecordLevel => Left(Left(s))
+      case s: Preference.SlotLevel => Left(Right(s))
+      case s: Preference.GlobalLevel => Right(s)
+    }.unzipEither.map1(_.unzipEither)
 
+  lazy val impersonalGlobalLevelPreferences: Set[Preference.GlobalLevel] = globalLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
+  lazy val impersonalGlobalLevelPreferencesList: List[Preference.GlobalLevel] = impersonalGlobalLevelPreferences.toList
   lazy val impersonalSlotLevelPreferences: Set[Preference.SlotLevel] = slotLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
   lazy val impersonalSlotLevelPreferencesList: List[Preference.SlotLevel] = impersonalSlotLevelPreferences.toList
-  lazy val impersonalGlobalLevelPreferences: Set[Preference] = globalLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
-  lazy val impersonalGlobalLevelPreferencesList: List[Preference] = impersonalGlobalLevelPreferences.toList
+  lazy val impersonalRecordLevelPreferences: Set[Preference.RecordLevel] = recordLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
+  lazy val impersonalRecordLevelPreferencesList: List[Preference.RecordLevel] = impersonalRecordLevelPreferences.toList
 
   lazy val (slotLevelConstraints: Set[Constraint.SlotLevel], globalLevelConstraints: Set[Constraint]) =
     constraints.collect {

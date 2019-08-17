@@ -2,15 +2,12 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.testOnly
+import scalaz.Scalaz._
 
 import scala.annotation.tailrec
 
-/** A view on the schedule, on one specific slot */
-case class SlotSchedule(
-    slot: Slot,
-    records: Set[Record]
-)(implicit
-    val problem: Problem
+/** A schedule for a specific slot */
+case class SlotSchedule(slot: Slot, records: Set[Record])(implicit val problem: Problem
 ) {
 
   @inline private[model] def updateRecords(f: Set[Record] => Set[Record]): SlotSchedule =
@@ -24,7 +21,7 @@ case class SlotSchedule(
 
   lazy val isEmpty: Boolean = records.isEmpty
 
-  lazy val recordsSeq: Seq[Record] = records.toSeq
+  lazy val recordsList: List[Record] = records.toList
   lazy val recordsPerTopic: Map[Topic, Record] = records.map(r => r.topic -> r).toMap
   lazy val recordsThatCanRemovePersons: Set[Record] = records.filter(_.canRemovePersons)
   lazy val recordsThatCanAddPersons: Set[Record] = records.filter(_.canAddPersons)
@@ -65,7 +62,7 @@ case class SlotSchedule(
   lazy val cleared: SlotSchedule = mapRecords { r => r.copy(persons = r.topic.mandatory) }
 
   /** Get the Persons for a specific Topic */
-  def on(t: Topic): Set[Person] = personsPerTopic.getOrElse(t, Set.empty)
+  def on(t: Topic): Record = recordsPerTopic(t)
 
   /** Add a new record to this schedule. */
   def add(record: Record): SlotSchedule = updateRecords(_ + record)
@@ -111,14 +108,11 @@ case class SlotSchedule(
     records - sourceRecord - destinationRecord + newSourceRecord + newDestinationRecord
   }
 
-  /** Score for each person, regardless of its weight. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] =
-    problem.personalPreferencesListPerPerson.map[Person, Score] { case (person, prefs) =>
-      val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.scoreSlot(this)).sum
-      person -> score
-    }
+  /** Score for each person, regardless of its weight. All personal scores are records-level, so the whole computation is done per record. */
+  lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).suml
 
-  lazy val impersonalScore: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
+  lazy val impersonalScore: Score =
+    recordsList.map(_.impersonalScore).suml + preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
 
   @tailrec
   private def preferencesScoreRec(prefs: List[Preference.SlotLevel], sum: Double = 0): Score = prefs match {
@@ -130,7 +124,7 @@ case class SlotSchedule(
 
   /** This schedule makes sense. No person on multiple topics at the same time. */
   lazy val isSound: Boolean = {
-    val persons = recordsSeq.flatMap(_.personsSeq) // Seq to keep duplicates, we're looking for them
+    val persons = recordsList.flatMap(_.personsList) // Seq to keep duplicates, we're looking for them
     persons.size == persons.toSet.size
   }
 
@@ -139,13 +133,7 @@ case class SlotSchedule(
     * @return true if this respects all constraints applicable to partial schedules
     */
   lazy val isPartialSolution: Boolean = {
-    lazy val recordsOk = records.forall { case Record(slot, topic, persons) =>
-      val pCount = persons.size
-      topic.max >= pCount && // topic.min <= pCount &&
-        !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
-        topic.slots.forall(_.contains(slot)) &&
-        persons.forall(slot.personsPresent.contains)
-    }
+    lazy val recordsOk = records.forall(_.isPartialSolution)
     lazy val maxTopicsOk = slot.maxTopics >= topics.size
     lazy val constraintsOk = problem.slotLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
     recordsOk && maxTopicsOk && constraintsOk
@@ -154,18 +142,17 @@ case class SlotSchedule(
   /** @return true if this respects all constraints */
   lazy val isSolution: Boolean =
     isPartialSolution &&
-      problem.slotLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespectedSlot(this) } &&
-      records.forall { r => r.topic.min <= r.persons.size }
+      records.forall(_.isSolution)
+      problem.slotLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
 
   /** Produces a clear, multiline version of this schedule slot, with a 2-space indentation. */
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("  ").append(slot.name).append(": \n")
-    personsPerTopic.foreach { case (topic, persons) =>
-      builder.append("    ").append(topic.name).append(": ").append(persons.map(_.name).mkString("", ", ", "\n"))
+    recordsList.sortBy(_.topic.name).foreach { r =>
+      builder.append("    ").append(r.toFormattedString).append("\n")
     }
     builder.toString
   }
-
 
   /** Merge with another slot schedule's content. Used only in tests. */
   @testOnly def ++(that: SlotSchedule): SlotSchedule = {

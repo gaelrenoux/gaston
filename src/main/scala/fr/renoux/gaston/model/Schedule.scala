@@ -116,10 +116,10 @@ case class Schedule(
     slotSchedulesList.map(_.impersonalScore).suml + preferencesScoreRec(problem.impersonalGlobalLevelPreferencesList)
 
   @tailrec
-  private def preferencesScoreRec(prefs: List[Preference], sum: Double = 0): Score = prefs match {
+  private def preferencesScoreRec(prefs: List[Preference.GlobalLevel], sum: Double = 0): Score = prefs match {
     case Nil => Score(sum)
     case p :: ps =>
-      val s = p.score(this)
+      val s = p.scoreSchedule(this)
       if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
   }
 
