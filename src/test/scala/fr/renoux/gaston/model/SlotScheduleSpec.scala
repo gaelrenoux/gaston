@@ -19,7 +19,7 @@ class SlotScheduleSpec extends FlatSpec with Matchers {
   }
 
   "persons" should "work" in {
-    BestMorning.persons should be(Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona))
+    BestMorning.scheduledPersons should be(Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona))
   }
 
   "countPersonsPerTopic" should "work" in {

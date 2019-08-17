@@ -70,20 +70,6 @@ class ScheduleSpec extends FlatSpec with Matchers {
     ))
   }
 
-  "countPersonsPerTopic" should "work" in {
-    Best.countPersonsPerTopic should be(Map(
-      Acting -> 3,
-      Dancing -> 3,
-      Grinding -> 2,
-      Bathing -> 2,
-      Eating -> 3,
-      Helping -> 3,
-      Cooking -> 2,
-      Fighting -> 3,
-      Inking -> 3
-    ))
-  }
-
   "personGroups" should "work" in {
     Best.personGroups.toSet should be(Set(
       Set(Arthur, Iago, Hercule),

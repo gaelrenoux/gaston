@@ -126,13 +126,15 @@ object ScheduleGenerator {
 
     lazy val isTopicsEmptyOnHeadSlot: Boolean = topicsLeft.isEmpty
 
-    lazy val isHeadSlotMaxPersonsTooLow: Boolean = partialSchedule.on(headSlot).isMaxPersonsTooLow
+    lazy val isHeadSlotMaxPersonsTooLow: Boolean = headSlotSchedule.isMaxPersonsTooLow
 
-    lazy val isMaxTopicsReachedOnHeadSlot: Boolean = partialSchedule.countTopicsPerSlot.getOrElse(headSlot, 0) >= headSlot.maxTopics
+    lazy val isMaxTopicsReachedOnHeadSlot: Boolean = headSlotSchedule.maxTopicsLeft <= 0
 
     lazy val isHeadTopicOkOnHeadSlot: Boolean = headTopic.slots.forall(_.contains(headSlot))
 
     lazy val headSlot: Slot = slotsLeft.head
+
+    lazy val headSlotSchedule: SlotSchedule = partialSchedule.on(headSlot)
 
     lazy val headTopic: Topic = topicsLeft.head
 

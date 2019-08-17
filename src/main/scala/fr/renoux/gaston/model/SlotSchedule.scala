@@ -22,25 +22,18 @@ case class SlotSchedule(
   @inline private[model] def partialMapRecords(f: PartialFunction[Record, Record]): SlotSchedule =
     updateRecords(_.map { r => f.applyOrElse(r, identity[Record]) })
 
+  lazy val isEmpty: Boolean = records.isEmpty
+
   lazy val recordsSeq: Seq[Record] = records.toSeq
   lazy val recordsPerTopic: Map[Topic, Record] = records.map(r => r.topic -> r).toMap
+  lazy val recordsThatCanRemovePersons: Set[Record] = records.filter(_.canRemovePersons)
+  lazy val recordsThatCanAddPersons: Set[Record] = records.filter(_.canAddPersons)
 
-  lazy val isEmpty: Boolean = records.isEmpty
   lazy val topics: Set[Topic] = records.map(_.topic)
-  lazy val topicsSeq: Seq[Topic] = topics.toSeq
-  lazy val persons: Set[Person] = records.flatMap(_.persons)
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
-  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
-  lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
-  lazy val mandatory: Set[Person] = topics.flatMap(_.mandatory)
-  lazy val minPersons: Option[Int] = if (isEmpty) None else Some(topics.view.map(_.min).sum)
-  lazy val maxPersons: Option[Int] = if (isEmpty) None else Some(topics.view.map(_.max).sum)
-
-  lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
   lazy val topicsList: List[Topic] = topics.toList
+  lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
   lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val removableTopicsList: List[Topic] = realTopicsList.filterNot(_.forced)
-  lazy val maxTopicsLeft: Int = slot.maxTopics - topics.size
 
   /** Topics that cannot be added on this slot, because of the slot itself */
   lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
@@ -50,6 +43,20 @@ case class SlotSchedule(
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
   lazy val incompatibleTopics: Set[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics
+
+  lazy val countTopics: Int = topics.size
+  lazy val maxTopicsLeft: Int = slot.maxTopics - countTopics
+
+  lazy val minPersons: Option[Int] = if (isEmpty) None else Some(topics.view.map(_.min).sum)
+  lazy val maxPersons: Option[Int] = if (isEmpty) None else Some(topics.view.map(_.max).sum)
+
+  lazy val scheduledPersons: Set[Person] = records.flatMap(_.persons)
+  lazy val unscheduledPersons: Set[Person] = slot.personsPresent -- scheduledPersons
+  lazy val unscheduledPersonsList: List[Person] = unscheduledPersons.toList
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = records.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
+  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
+  lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
+  lazy val mandatory: Set[Person] = topics.flatMap(_.mandatory)
 
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
@@ -152,9 +159,9 @@ case class SlotSchedule(
 
   /** Produces a clear, multiline version of this schedule slot, with a 2-space indentation. */
   lazy val toFormattedString: String = {
-    val builder = new StringBuilder("  ").append(slot).append(": \n")
+    val builder = new StringBuilder("  ").append(slot.name).append(": \n")
     personsPerTopic.foreach { case (topic, persons) =>
-      builder.append("    ").append(topic).append(": ").append(persons.mkString("", ", ", "\n"))
+      builder.append("    ").append(topic.name).append(": ").append(persons.map(_.name).mkString("", ", ", "\n"))
     }
     builder.toString
   }

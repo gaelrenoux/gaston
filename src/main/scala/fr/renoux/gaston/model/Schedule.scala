@@ -21,33 +21,22 @@ case class Schedule(
   @inline private def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     copy(wrapped = wrapped.updated(slot, f(on(slot))))
 
-  // lazy val records: Set[Record] = wrapped
-  // lazy val recordsPerSlot: Map[Slot, Set[Record]] = records.groupBy(_.slot)
-  // lazy val recordsPerSlotPerTopic: Map[Slot, Map[Topic, Set[Record]]] = recordsPerSlot.mapValuesStrict(_.groupBy(_.topic))
   lazy val slotSchedules: Iterable[SlotSchedule] = wrapped.values
   lazy val slotSchedulesSet: Set[SlotSchedule] = slotSchedules.toSet
   lazy val slotSchedulesList: List[SlotSchedule] = slotSchedules.toList
-  // lazy val personsPerSlot: Map[Slot, Set[Person]] = recordsPerSlot.mapValuesStrict { x => x.flatMap(_.persons) }
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsPerTopic).toMap
+
   lazy val topicsPerSlot: Map[Slot, Set[Topic]] = wrapped.mapValuesStrict(_.topics)
-  lazy val countTopicsPerSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.size)
-  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
   lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
-  lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
-
-  lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.max).sum)
-  lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
-  lazy val mandatoryPersonsOnSlot: Map[Slot, Set[Person]] = topicsPerSlot.mapValuesStrict(_.flatMap(_.mandatory))
-
   lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
   lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
+  lazy val scheduledRemovableTopicsSeq: Seq[Topic] = scheduledRemovableTopics.toSeq
   lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)
 
-  lazy val scheduledTopicsSeq: Seq[Topic] = scheduledTopics.toSeq
-  lazy val scheduledRealTopicsSeq: Seq[Topic] = scheduledRealTopics.toSeq
-  lazy val scheduledRemovableTopicsSeq: Seq[Topic] = scheduledRemovableTopics.toSeq
-  lazy val unscheduledTopicsSeq: Seq[Topic] = unscheduledTopics.toSeq
+  lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
+  lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.max).sum)
+  lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
+  lazy val personsPerTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsPerTopic).toMap
 
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = wrapped.getOrElse(slot, SlotSchedule.empty(slot))
@@ -115,7 +104,7 @@ case class Schedule(
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
     lazy val noUbiquity = slotSchedules.forall(_.isSound)
-    lazy val noDuplicates = scheduledTopics.size == slotSchedulesList.flatMap(_.topicsSeq).size
+    lazy val noDuplicates = scheduledTopics.sizeCompare(slotSchedulesList.flatMap(_.topicsList)) == 0
     noUbiquity && noDuplicates
   }
 
@@ -188,7 +177,7 @@ object Schedule {
 
   /** Commodity method */
   def apply(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
-    new Schedule(entries.flatten.groupBy(_.slot).map {
+    new Schedule(entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
       case (s, rs) => s -> SlotSchedule(s, rs)
-    }.toMap)
+    })
 }

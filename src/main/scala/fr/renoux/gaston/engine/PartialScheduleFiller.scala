@@ -27,21 +27,22 @@ class PartialScheduleFiller(implicit private val problem: Problem) {
 
       case (slot :: slotsTail, Some(schedule)) =>
         /* Handle current slot */
+        val slotSchedule = schedule.on(slot)
 
-        val personsLeftSet = slot.personsPresent -- schedule.on(slot).persons
-        val personsLeft = random.shuffle(personsLeftSet.toSeq)
+        val personsLeft = random.shuffle(slotSchedule.unscheduledPersonsList)
+        val topics = slotSchedule.topics
 
-        val topics = schedule.on(slot).topics
         val (topicsWithNeeded, topicsWithOptional) = topics.map { t =>
-          val count = schedule.countPersonsPerTopic(t)
+          val count = slotSchedule.countPersonsPerTopic(t)
           val needed = t.min - count
           val optional = t.max - math.max(t.min, count)
           (t -> needed, t -> optional)
         }.unzip
+
         val topicsNeedingMin = topicsWithNeeded.filter(c => c._2 > 0)
         val topicsOpenToMax = topicsWithOptional.filter(_._2 > 0)
 
-        val newSchedule = backtrackAssignPersonsToTopics(schedule, slot)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft.toList, Nil, Nil)
+        val newSchedule = backtrackAssignPersonsToTopics(schedule, slot)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft, Nil, Nil)
 
         completeForSlots(slotsTail, newSchedule)
     }

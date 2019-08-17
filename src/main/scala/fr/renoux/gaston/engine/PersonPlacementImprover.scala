@@ -27,7 +27,7 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
     }
 
   /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one (slotRoundsLimit is
-    * the parameter controlling how much we work on a single slot before going on, so that if we it the global limit we
+    * the parameter controlling how much we work on a single slot before going on, so that if we hit the global limit we
     * had a good pass at all slots anyway). */
   @tailrec
   private def recImprove(
@@ -64,8 +64,8 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
       val slotSchedule = currentSchedule.on(slot)
 
       lazy val records = rand.shuffle(slotSchedule.records)
-      lazy val removablePersons = rand.shuffle(slotSchedule.records.filter(_.canRemovePersons))
-      lazy val addablePersons = rand.shuffle(slotSchedule.records.filter(_.canAddPersons))
+      lazy val recordsRemovable = rand.shuffle(slotSchedule.recordsThatCanRemovePersons)
+      lazy val recordsAddable = rand.shuffle(slotSchedule.recordsThatCanAddPersons)
 
       /* All schedules on which we swapped two persons */
       lazy val swappedSchedules = for {
@@ -81,8 +81,8 @@ class PersonPlacementImprover(implicit private val problem: Problem, private val
 
       /* All schedules on which we moved one person from one topic to another */
       lazy val movedSchedules = for {
-        r1 <- removablePersons.view
-        r2 <- addablePersons.view if r1 != r2
+        r1 <- recordsRemovable.view
+        r2 <- recordsAddable.view if r1 != r2
         t1 = r1.topic
         t2 = r2.topic
         p <- (r1.optionalPersons -- t2.forbidden).view
