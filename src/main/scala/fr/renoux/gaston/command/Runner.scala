@@ -79,8 +79,10 @@ class Runner(
 
       /* Run once then recurse */
 
-      val evaluated: LazyList[Schedule] =
-        if (nextSchedules.nonEmpty) nextSchedules else engine.lazySeq(random.nextLong())
+      val evaluated: LazyList[Schedule] = if (nextSchedules.nonEmpty) nextSchedules else {
+        log.info("Starting a new schedule chain")
+        engine.lazySeq(random.nextLong())
+      }
       evaluated match {
         case (ss: Schedule) #:: (tail: LazyList[Schedule]) =>
           if (ss.score > current.score) runRecursive(newNextLog, timeout, count + 1, ss, tail)

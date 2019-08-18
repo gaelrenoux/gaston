@@ -37,7 +37,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="fr.renoux" level="DEBUG"/>
+    <logger name="fr.renoux" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

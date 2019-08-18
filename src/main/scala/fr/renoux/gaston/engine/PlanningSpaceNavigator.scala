@@ -1,5 +1,6 @@
 package fr.renoux.gaston.engine
 
+import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.PlanningSpaceNavigator.Move
 import fr.renoux.gaston.model._
 
@@ -10,6 +11,8 @@ import scala.util.Random
 /** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
   * partial. */
 class PlanningSpaceNavigator(implicit private val problem: Problem) {
+
+  val log = Logger[PlanningSpaceNavigator]
 
   /** Return a LazyList of neighbouring partial schedules to the initial one. */
   def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {
@@ -26,6 +29,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
   private def possibleAdds(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
+    _ = log.debug(s"Checking for possible Additions on slot ${slot.name}")
 
     /* Filter out impossible topics because of incompatibility */
     topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
@@ -57,6 +61,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
     (slot1, slot2) <- shuffled(problem.slotCouplesSeq).view
     slotSchedule1 = schedule.on(slot1)
     slotSchedule2 = schedule.on(slot2)
+    _ = log.debug(s"Checking for possible Swaps between slots ${slot1.name} and ${slot2.name}")
 
     /* Filter out impossible topics because of incompatibility */
     t1 <- shuffled(slotSchedule1.realTopics -- slotSchedule2.permanentlyIncompatibleTopics).view
@@ -100,6 +105,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
   private def possibleExtSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
+    _ = log.debug(s"Checking for possible Ext Swaps on slot ${slot.name}")
     oldTopic <- shuffled(slotSchedule.removableTopicsList).view
 
     /* Filter out impossible topics because of incompatibility */
@@ -137,6 +143,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
   private def possibleRemovals(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
+    _ = log.debug(s"Checking for possible Removals on slot ${slot.name}")
     topic <- shuffled(slotSchedule.removableTopicsList).view
     topicsToRemove = linkedTopics(topic)
 
