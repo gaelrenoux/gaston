@@ -1,8 +1,9 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.engine.assignment
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.Context._
 import fr.renoux.gaston.model.{Problem, Schedule, Slot}
+import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.util.Context.chrono
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -12,9 +13,9 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them.
   */
-class PersonPlacementImprover(implicit private val problem: Problem, private val ctx: Context) {
+class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
 
-  private val log = Logger[PersonPlacementImprover]
+  private val log = Logger[AssignmentImprover]
 
   val defaultRoundsCount = 1000
 

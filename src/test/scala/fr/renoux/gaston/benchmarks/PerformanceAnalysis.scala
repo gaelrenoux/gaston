@@ -5,7 +5,7 @@ import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
-import fr.renoux.gaston.util.{Chrono, Tools}
+import fr.renoux.gaston.util.{Chrono, Context, Tools}
 
 import scala.concurrent.duration._
 
@@ -14,6 +14,8 @@ object PerformanceAnalysis extends App {
   private val udoConProblem = problemFromClassPath("udocon2019/uc19-full.conf").force
   // TODO check a solution
   // 140+ iterations, 850+ score
+  // Score(930.2745614504889) after 162 iterations
+  // Score(933.5346053425618) after 163 iterations
 
   val tools: Tools = Tools(new Chrono(blocking = true))
   implicit val problem: Problem = udoConProblem

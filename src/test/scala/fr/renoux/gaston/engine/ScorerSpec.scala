@@ -2,6 +2,7 @@ package fr.renoux.gaston.engine
 
 import fr.renoux.gaston.SimpleTestModel
 import fr.renoux.gaston.model.Scorer
+import fr.renoux.gaston.util.Context
 import org.scalatest.{FlatSpec, Matchers}
 
 class ScorerSpec extends FlatSpec with Matchers {

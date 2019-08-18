@@ -11,6 +11,7 @@ class Renderer(
 ) {
 
   import Renderer._
+
   import Ordering.Double.IeeeOrdering
 
   /** For each person, preferences */

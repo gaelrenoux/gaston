@@ -1,4 +1,4 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.engine.assignment
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model._
@@ -9,9 +9,9 @@ import scala.util.Random
 /**
   * Fills a partial schedule with persons, ignoring preferences but respecting constraints.
   */
-class PartialScheduleFiller(implicit private val problem: Problem) {
+class ScheduleAssigner(implicit private val problem: Problem) {
 
-  private val log = Logger[PartialScheduleFiller]
+  private val log = Logger[ScheduleAssigner]
 
   /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
     * schedule respecting all constraints. Returns None if such a schedule cannot be constructed (e.g. too many people

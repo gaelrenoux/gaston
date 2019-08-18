@@ -1,8 +1,7 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.testOnly
+import fr.renoux.gaston.util.{Context, testOnly}
 import scalaz.Scalaz._
 
 import scala.annotation.tailrec
@@ -58,6 +57,10 @@ case class Schedule(
     val updatedSlots = slots.map { s => s -> on(s).cleared }
     wrapped ++ updatedSlots
   }
+
+  def addTopic(slot: Slot, topic: Topic): Schedule = updateSlotSchedule(slot)(_.addTopic(topic))
+
+  def addTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */

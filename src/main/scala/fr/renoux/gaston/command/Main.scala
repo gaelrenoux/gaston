@@ -4,8 +4,9 @@ import java.nio.file.Path
 
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.{Context, Engine}
+import fr.renoux.gaston.engine.Engine
 import fr.renoux.gaston.input._
+import fr.renoux.gaston.util.Context
 import org.slf4j.LoggerFactory
 import scalaz.Scalaz._
 import scalaz._

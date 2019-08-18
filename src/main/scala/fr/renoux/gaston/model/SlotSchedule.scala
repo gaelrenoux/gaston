@@ -71,6 +71,10 @@ case class SlotSchedule(
 
   def addAll(records: Set[Record]): SlotSchedule = updateWrapped(wrapped ++ records.map(r => r.topic -> r))
 
+  def addTopic(topic: Topic): SlotSchedule = updateWrapped(wrapped + (topic -> Record(slot, topic, topic.mandatory)))
+
+  def addTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped ++ topics.map(t => t -> Record(slot, t, t.mandatory)))
+
   def removeTopic(topic: Topic): SlotSchedule = updateWrapped(wrapped - topic)
 
   def removeTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped -- topics)

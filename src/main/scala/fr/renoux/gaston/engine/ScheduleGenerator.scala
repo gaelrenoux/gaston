@@ -2,8 +2,10 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
+import fr.renoux.gaston.engine.assignment.{AssignmentImprover, ScheduleAssigner}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.Context
 import scalaz.Scalaz._
 import scalaz.\/
 
@@ -23,8 +25,8 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
 
   import ScheduleGenerator._
 
-  private val filler = new PartialScheduleFiller
-  private val improver = new PersonPlacementImprover
+  private val filler = new ScheduleAssigner
+  private val improver = new AssignmentImprover
 
   /** Generates just one schedule. */
   def createOne(implicit random: Random): Schedule = {

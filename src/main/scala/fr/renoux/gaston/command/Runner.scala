@@ -5,6 +5,7 @@ import java.time.Instant
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.model.{Problem, Schedule}
+import fr.renoux.gaston.util.Context
 
 import scala.Ordering.Implicits._
 import scala.annotation.tailrec

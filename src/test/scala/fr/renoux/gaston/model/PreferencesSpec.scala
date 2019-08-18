@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
+import fr.renoux.gaston.util.Context
 import org.scalatest.{FlatSpec, Matchers}
 
 /**

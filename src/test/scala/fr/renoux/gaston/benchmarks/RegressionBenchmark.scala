@@ -5,7 +5,7 @@ import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
-import fr.renoux.gaston.util.Opt
+import fr.renoux.gaston.util.{Context, Opt}
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.concurrent.duration._
@@ -23,7 +23,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
   it should "give an good score when working a short time" ignore {
     benchmark(
       duration = 5.minutes,
-      expectsScore = 750,
+      expectsScore = 730,
       expectsCount = 200
     )
   }

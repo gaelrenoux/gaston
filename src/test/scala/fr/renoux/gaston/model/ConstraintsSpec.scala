@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.engine.Context
 import fr.renoux.gaston.model.constraints._
+import fr.renoux.gaston.util.Context
 import org.scalatest.{FlatSpec, Matchers}
 
 /** Unit test on constraints */

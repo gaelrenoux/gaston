@@ -1,6 +1,4 @@
-package fr.renoux.gaston.engine
-
-import fr.renoux.gaston.util.Tools
+package fr.renoux.gaston.util
 
 case class Context(
     debugMode: Boolean = false,

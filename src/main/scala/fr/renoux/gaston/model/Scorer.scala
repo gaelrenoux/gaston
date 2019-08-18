@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.engine.Context
-import fr.renoux.gaston.engine.Context.chrono
+import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.util.Context.chrono
 
 /** Scoring utilities for a given Problem. */
 object Scorer {
