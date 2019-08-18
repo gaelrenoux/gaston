@@ -16,6 +16,7 @@ object PerformanceAnalysis extends App {
   // 140+ iterations, 850+ score
   // Score(930.2745614504889) after 162 iterations
   // Score(933.5346053425618) after 163 iterations
+  // Score(933.5346053425618) after 163 iterations
 
   val tools: Tools = Tools(new Chrono(blocking = true))
   implicit val problem: Problem = udoConProblem

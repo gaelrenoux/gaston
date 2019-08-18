@@ -50,7 +50,7 @@ class ScheduleAssigner(implicit private val problem: Problem) {
     log.debug("Starting to fill the partial schedule")
 
     /* check wether it's possible to make it work first */
-    val filled = partialSchedule.topicsPerSlot.find { case (slot, topics) =>
+    val filled = partialSchedule.planning.find { case (slot, topics) =>
       val min = topics.view.map(_.min).sum
       val max = topics.view.map(_.max).sum
       val pCount = slot.personsPresentCount

@@ -17,6 +17,8 @@ case class Schedule(
     ctx: Context
 ) {
 
+  import Schedule._
+
   @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =
     copy(wrapped = w)
 
@@ -27,8 +29,8 @@ case class Schedule(
   lazy val slotSchedulesSet: Set[SlotSchedule] = slotSchedules.toSet
   lazy val slotSchedulesList: List[SlotSchedule] = slotSchedules.toList
 
-  lazy val topicsPerSlot: Map[Slot, Set[Topic]] = wrapped.mapValuesStrict(_.topics)
-  lazy val topicToSlot: Map[Topic, Slot] = topicsPerSlot.flatMap { case (s, ts) => ts.map(_ -> s) }
+  lazy val planning: Planning = wrapped.mapValuesStrict(_.topics)
+  lazy val topicToSlot: Map[Topic, Slot] = planning.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
   lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
@@ -36,8 +38,8 @@ case class Schedule(
   lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsPerTopic.values // not a Set: we do not want to deduplicate identical groups!
-  lazy val maxPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.max).sum)
-  lazy val minPersonsOnSlot: Map[Slot, Int] = topicsPerSlot.mapValuesStrict(_.view.map(_.min).sum)
+  lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.max).sum)
+  lazy val minPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.min).sum)
   lazy val personsPerTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsPerTopic).toMap
 
   /** Get the SlotSchedule for a specific Slot */
@@ -168,6 +170,8 @@ case class Schedule(
 }
 
 object Schedule {
+
+  type Planning = Map[Slot, Set[Topic]]
 
   implicit object ScheduleIsOrdered extends scala.math.Ordering[Schedule] {
     override def compare(x: Schedule, y: Schedule): Int = x.score.compare(y.score)

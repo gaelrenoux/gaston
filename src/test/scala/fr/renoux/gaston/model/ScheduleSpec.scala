@@ -26,7 +26,7 @@ class ScheduleSpec extends FlatSpec with Matchers {
   )
 
   "topicsPerSlot" should "work" in {
-    Best.topicsPerSlot should be(Map(
+    Best.planning should be(Map(
       Morning -> Set(Acting, Dancing, Grinding),
       AfterNoon -> Set(Bathing, Eating, Helping),
       Evening -> Set(Cooking, Fighting, Inking)
