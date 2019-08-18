@@ -17,14 +17,13 @@ object Improver {
 
     /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
     def improvements(schedule: Schedule)(implicit rand: Random): LazyList[Schedule] = {
-      val initial: (Int, State) = (maxImprovementRounds, initialState(schedule))
-      (schedule #:: LazyList.unfold[Schedule, (Int, State)](initial) {
-        case (0, _) => None // max number of rounds reached
-        case (n, state) => step(state).map { case (schedule, newState) =>
-          if (schedule.score.value >= stopAtScore) (schedule, (0, newState))
-          else (schedule, (n - 1, newState))
+      (schedule #:: LazyList.unfold[Schedule, (Option[State])](Some(initialState(schedule))) {
+        case None => None // no state after last schedule
+        case Some(state) => step(state).map { case (schedule, newState) =>
+          if (schedule.score.value >= stopAtScore) (schedule, None) // no state for next round
+          else (schedule, Some(newState))
         }
-      }).distinct
+      }).take(maxImprovementRounds).distinct
     }
 
     protected def initialState(schedule: Schedule): State
