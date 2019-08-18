@@ -16,6 +16,7 @@ class Engine(
 
   private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
   private lazy val improver: Improver = new GreedySlotImprover(stopAtScore, maxImprovementRounds)
+  //private lazy val improver: Improver = new TabuSearchImprover(stopAtScore, maxImprovementRounds)
 
   lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
 

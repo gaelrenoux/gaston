@@ -14,9 +14,13 @@ object PerformanceAnalysis extends App {
   private val udoConProblem = problemFromClassPath("udocon2019/uc19-full.conf").force
   // TODO check a solution
   // 140+ iterations, 850+ score
+
   // Score(930.2745614504889) after 162 iterations
   // Score(933.5346053425618) after 163 iterations
   // Score(933.5346053425618) after 163 iterations
+
+  // with the caches
+  // Score(927.674195444651) after 207 iterations
 
   val tools: Tools = Tools(new Chrono(blocking = true))
   implicit val problem: Problem = udoConProblem

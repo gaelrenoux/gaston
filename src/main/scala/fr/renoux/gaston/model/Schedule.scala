@@ -45,6 +45,8 @@ case class Schedule(
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = wrapped.getOrElse(slot, SlotSchedule.empty(slot))
 
+  def set(slotSchedule: SlotSchedule): Schedule = updateWrapped( wrapped + (slotSchedule.slot -> slotSchedule))
+
   lazy val score: Score = Scorer.score(this)
 
   /** Add a new record to this schedule. */

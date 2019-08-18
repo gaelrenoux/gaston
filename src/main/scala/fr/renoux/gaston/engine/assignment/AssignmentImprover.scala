@@ -1,12 +1,14 @@
 package fr.renoux.gaston.engine.assignment
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.{Problem, Schedule, Slot}
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
 import scala.annotation.tailrec
+import scala.collection.concurrent.TrieMap
 import scala.collection.immutable.Queue
+import scala.collection.mutable
 import scala.util.Random
 
 
@@ -14,6 +16,10 @@ import scala.util.Random
   * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them.
   */
 class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
+
+  private val cache: mutable.Map[Schedule.Planning, Schedule] = TrieMap[Schedule.Planning, Schedule]()
+
+  private val slotCache: mutable.Map[Set[Topic], SlotSchedule] = TrieMap[Set[Topic], SlotSchedule]()
 
   private val log = Logger[AssignmentImprover]
 
@@ -23,8 +29,7 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
     * perfected any more or because the limit number of rounds has been reached. */
   def improve(scoredSchedule: Schedule, rounds: Int = defaultRoundsCount)(implicit rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
-      log.trace("Improving persons")
-      recImprove(scoredSchedule, rounds)
+      cache.getOrElseUpdate(scoredSchedule.planning, recImprove(scoredSchedule, rounds))
     }
 
   /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one (slotRoundsLimit is
@@ -32,29 +37,39 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
     * had a good pass at all slots anyway). */
   @tailrec
   private def recImprove(
-      scoredSchedule: Schedule,
+      schedule: Schedule,
       maxRounds: Int,
       slots: Queue[Slot] = Queue(problem.slotsList: _*),
       slotRoundsLimit: Int = 1000
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {
       log.warn("Stopping improvement because max number of rounds was reached")
-      scoredSchedule
+      schedule
 
     } else if (slots.isEmpty) {
       log.debug(s"Stopping improvement because all slots are perfect ($maxRounds rounds left)")
-      scoredSchedule
+      schedule
 
     } else {
       val (slot, slotsTail) = slots.dequeue
-      goodMoveOnSlot(scoredSchedule, slot) match {
-        case None =>
-          recImprove(scoredSchedule, maxRounds - 1, slotsTail) // can't improve this slot any more
+      val slotSchedule = schedule.on(slot)
 
-        case Some(candidate) =>
-          /* The slot was perfected! If there are rounds left stay on the same slot, otherwise move to the next one */
-          if (slotRoundsLimit > 0) recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot), slotRoundsLimit - 1)
-          else recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot))
+      slotCache.get(slotSchedule.topics) match {
+        case Some(ss) =>
+          recImprove(schedule.set(ss), maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
+
+        case None => goodMoveOnSlot(schedule, slot) match {
+
+          case None =>
+            /* can't improve this slot any more ! Store in cache, then go to next slot */
+            slotCache.update(slotSchedule.topics, slotSchedule)
+            recImprove(schedule, maxRounds - 1, slotsTail)
+
+          case Some(candidate) =>
+            /* The slot was perfected! If there are rounds left stay on the same slot, otherwise move to the next one */
+            if (slotRoundsLimit > 0) recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot), slotRoundsLimit - 1)
+            else recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot))
+        }
       }
     }
 
