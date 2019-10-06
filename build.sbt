@@ -4,7 +4,8 @@ organization := "gael.renoux"
 name := "gaston"
 version := "0.3.0"
 
-scalaVersion := "2.13.0" //waiting on artima supersafe and refined (and a little ai.x.diff, but it's not a big deal)
+// update artima supersafe when a version is released (and check xdotai/diff once in a while)
+scalaVersion := "2.13.1"
 
 scalacOptions ++= Seq(
 

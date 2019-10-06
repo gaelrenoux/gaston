@@ -136,7 +136,7 @@
     <check level="warning" class="org.scalastyle.scalariform.ReturnChecker" enabled="true"/>
     <!-- org.scalastyle.scalariform.ScalaDocChecker -->
     <check level="warning" class="org.scalastyle.scalariform.SimplifyBooleanExpressionChecker" enabled="true"/>
-    <check level="warning" class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" enabled="true"/>
+    <check level="warning" class="org.scalastyle.scalariform.SpaceAfterCommentStartChecker" enabled="false"/>
     <check level="warning" class="org.scalastyle.scalariform.SpacesAfterPlusChecker" enabled="true"/>
     <check level="warning" class="org.scalastyle.scalariform.SpacesBeforePlusChecker" enabled="true"/>
     <!-- org.scalastyle.scalariform.StructuralTypeChecker => Done by scalac -->
