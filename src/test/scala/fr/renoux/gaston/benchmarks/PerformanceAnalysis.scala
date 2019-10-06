@@ -1,10 +1,13 @@
 package fr.renoux.gaston.benchmarks
 
+import java.time.Instant
+
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
+import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.{Chrono, Context, Tools}
 
 import scala.concurrent.duration._
@@ -29,11 +32,13 @@ object PerformanceAnalysis extends App {
   val duration: FiniteDuration = 5.minutes
   val seed: Long = 0L
 
-  val engine = new Engine(backtrackInitialSchedule = true)
-  val runner = new Runner(engine)
+  implicit val improver: GreedySlotImprover = new GreedySlotImprover
+  implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
+  val runner = new Runner
+  val params = OptimParams(timeout = Some(Instant.now() + duration))
 
   val (schedule, count) = tools.chrono("Total") {
-    runner.run(Some(duration), seed = seed)
+    runner.run(seed = seed, params)
   }
 
   println(s"${schedule.score} after $count iterations")

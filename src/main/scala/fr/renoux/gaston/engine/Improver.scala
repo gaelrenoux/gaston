@@ -1,36 +1,35 @@
 package fr.renoux.gaston.engine
 
-import java.time.Instant
-
 import fr.renoux.gaston.model.Schedule
+import fr.renoux.gaston.util.OptionImplicits._
 
 import scala.util.Random
 
 trait Improver {
   /** Lazy sequence of incrementing scored schedules. Non-empty, may be finite or infinite. */
-  def improvements(schedule: Schedule)(implicit rand: Random): LazyList[Schedule]
+  def improvements(schedule: Schedule, params: OptimParams)(implicit rand: Random): LazyList[Schedule]
 }
 
 object Improver {
 
   abstract class Base[State] extends Improver {
-    val stopAtScore: Double
-    val maxImprovementRounds: Int
-    val timeout: Instant
-
-    private val timeoutMs = timeout.toEpochMilli
 
     /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
-    def improvements(schedule: Schedule)(implicit rand: Random): LazyList[Schedule] = {
+    def improvements(
+        schedule: Schedule,
+        params: OptimParams
+    )(implicit rand: Random): LazyList[Schedule] = {
+      val timeoutMs = params.timeout.map(_.toEpochMilli)
       val init: Option[State] = Some(initialState(schedule))
-      (schedule #:: LazyList.unfold(init) {
+      lazy val unfolding = LazyList.unfold(init) {
         case None => None // stop the unfolding here
         case Some(state) => step(state).map { case (schedule, newState) =>
-          if (schedule.score.value >= stopAtScore) (schedule, None) // no state for next step, will stop unfolding
-          else if (System.currentTimeMillis() > timeoutMs) (schedule, None) // no state for next step, will stop unfolding
+          if (params.stopAtScore.exists(schedule.score.value >= _)) (schedule, None) // no state for next step, will stop unfolding
+          else if (timeoutMs.exists(_ < System.currentTimeMillis())) (schedule, None) // no state for next step, will stop unfolding
           else (schedule, Some(newState))
         }
-      }).take(maxImprovementRounds).distinct
+      }
+      (schedule #:: unfolding).distinct.optional(params.maxImprovementRounds)(_.take(_))
     }
 
     protected def initialState(schedule: Schedule): State

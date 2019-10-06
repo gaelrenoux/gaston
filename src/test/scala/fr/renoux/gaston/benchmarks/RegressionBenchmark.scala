@@ -7,6 +7,7 @@ import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
+import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.{Context, Opt}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -16,13 +17,15 @@ import scala.concurrent.{ExecutionContext, Future}
 // scalastyle:off magic.number
 
 class RegressionBenchmark extends FlatSpec with Matchers {
+
   import Ordering.Double.IeeeOrdering
 
-  private val udoConProblem = problemFromClassPath("udocon2017/uc17-completed.conf").force
+  private implicit val udoConProblem: Problem = problemFromClassPath("udocon2017/uc17-completed.conf").force
+  private implicit val context: Context = Context.Default
 
   behavior of "Engine"
 
-  it should "give an good score when working a short time" ignore {
+  it should "give an good score when working a short time" in {
     benchmark(
       duration = 5.minutes,
       expectsScore = 730,
@@ -42,24 +45,22 @@ class RegressionBenchmark extends FlatSpec with Matchers {
   private def benchmark(
       duration: FiniteDuration,
       seed: Long = 0L,
-      problem: Problem = udoConProblem,
-      context: Context = Context.Default,
       expectsCount: Long,
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing
-  ): Unit = {
-    val timeout = Instant.now().plusMillis(duration.toMillis)
-    val engine = new Engine(stopAtScore = expectsScore, backtrackInitialSchedule = true, timeout = timeout)(problem, context)
+  )(implicit improver: Improver = new GreedySlotImprover): Unit = {
+    implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
 
     val handler = logMinutes(true) // (verbose)
 
     val _ = try {
       val runner = parallelRunCount.toOption match {
-        case None => new Runner(engine)(problem, context)
-        case Some(prc) => new Runner(engine, parallelRunCount = prc)(problem, context)
+        case None => new Runner
+        case Some(prc) => new Runner(parallelRunCount = prc)
       }
 
-      val (schedule, count) = runner.run(Some(duration), seed = seed)
+      val params: OptimParams = OptimParams(stopAtScore = Some(expectsScore), timeout = Some(Instant.now() + duration))
+      val (schedule, count) = runner.run(seed = seed, params)
 
       println(s"${schedule.score} after $count iterations")
 

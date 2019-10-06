@@ -8,4 +8,8 @@ object OptionImplicits {
     def flatContains(a: A): Boolean = wrapped.exists(_.contains(a))
   }
 
+  implicit class AnyWithOptionalOps[A](val a: A) extends AnyVal {
+    def optional[B](b: Option[B])(f: (A, B) => A): A = b.fold(a)(f(a, _))
+  }
+
 }

@@ -1,7 +1,5 @@
 package fr.renoux.gaston.engine
 
-import java.time.Instant
-
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, ScheduleAssigner}
 import fr.renoux.gaston.model._
@@ -16,11 +14,7 @@ import scala.util.Random
   *
   * Doesn't seem to be very good.
   */
-class TabuSearchSlotImprover(
-    val stopAtScore: Double = Double.MaxValue,
-    val maxImprovementRounds: Int = 1000,
-    val timeout: Instant = Instant.MAX
-)(implicit private val problem: Problem, ctx: Context) extends Improver.Base[TabuSearchSlotImprover.State] {
+class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[TabuSearchSlotImprover.State] {
 
   import TabuSearchSlotImprover.State
 

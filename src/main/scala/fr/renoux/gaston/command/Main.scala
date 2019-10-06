@@ -1,11 +1,14 @@
 package fr.renoux.gaston.command
 
 import java.nio.file.Path
+import java.time.Instant
 
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.Engine
+import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, Improver, OptimParams}
 import fr.renoux.gaston.input._
+import fr.renoux.gaston.model.Problem
+import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.Context
 import org.slf4j.LoggerFactory
 import scalaz.Scalaz._
@@ -49,21 +52,24 @@ object Main {
     if (commandLine.generateInput) {
       output.writeInput(input)
     } else {
-      val engine = new Engine(
+
+      implicit val _problem: Problem = problem
+      implicit val context: Context = Context.Default
+      implicit val improver: Improver = new GreedySlotImprover
+
+      implicit val engine: Engine = new Engine(
         backtrackInitialSchedule = input.settings.backtrackInitialSchedule,
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
-      )(problem, Context.Default)
+      )
 
-      val runner = new Runner(engine, hook = (ss, count) => {
+      val runner = new Runner(hook = (ss, count) => {
         output.writeScheduleIfBetter(ss)
         output.writeAttempts(count)
-      })(problem, Context.Default)
+      })
 
       output.writeStart(commandLine.seed)
-      val (ss, _) = runner.run(
-        commandLine.maxDuration,
-        seed = commandLine.seed
-      )
+      val timeout = commandLine.maxDuration.map(Instant.now() + _)
+      val (ss, _) = runner.run(seed = commandLine.seed, optimParams = OptimParams(timeout = timeout))
 
       /* Print final result */
       output.writeEnd(ss)
