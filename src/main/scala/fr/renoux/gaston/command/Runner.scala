@@ -27,7 +27,7 @@ class Runner(
 
   private val hookFrequencyMillis = hookFrequency.toMillis
 
-  /** Produces a schedule and the associated score */
+  /** Produces a schedule. Also returns the number of schedule examined */
   def run(
       maxDuration: Option[FiniteDuration] = None,
       seed: Long = Random.nextLong()

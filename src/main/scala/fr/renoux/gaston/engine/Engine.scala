@@ -1,5 +1,7 @@
 package fr.renoux.gaston.engine
 
+import java.time.Instant
+
 import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
@@ -10,13 +12,13 @@ import scala.util.Random
 class Engine(
     stopAtScore: Double = Double.MaxValue,
     maxImprovementRounds: Int = 1000,
+    timeout: Instant = Instant.MAX,
     backtrackInitialSchedule: Boolean = false,
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, ctx: Context) {
 
   private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
-  private lazy val improver: Improver = new GreedySlotImprover(stopAtScore, maxImprovementRounds)
-  //private lazy val improver: Improver = new TabuSearchImprover(stopAtScore, maxImprovementRounds)
+  private lazy val improver: Improver = new GreedySlotImprover(stopAtScore, maxImprovementRounds, timeout)
 
   lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
 

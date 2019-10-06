@@ -1,5 +1,7 @@
 package fr.renoux.gaston.engine
 
+import java.time.Instant
+
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.PlanningSpaceNavigator.Move
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, ScheduleAssigner}
@@ -13,7 +15,8 @@ import scala.util.Random
 /** Improves a whole schedule by moving slots around. */
 class GreedySlotImprover(
     val stopAtScore: Double = Double.MaxValue,
-    val maxImprovementRounds: Int = 1000
+    val maxImprovementRounds: Int = 1000,
+    val timeout: Instant = Instant.MAX
 )(implicit private val problem: Problem, ctx: Context) extends Improver.Base[GreedySlotImprover.State] {
 
   import GreedySlotImprover.State
@@ -30,7 +33,7 @@ class GreedySlotImprover(
   override protected def step(state: State)
     (implicit rand: Random): Option[(Schedule, GreedySlotImprover.State)] = chrono("GreedySlotImprover > improveOnce") {
 
-    val neighbours = navigator.neighbours(state.schedule)
+    val neighbours = navigator.neighbours(state.schedule).distinctBy(_._1.planning)
 
     val improvedSchedules =
       for {

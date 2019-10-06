@@ -1,5 +1,7 @@
 package fr.renoux.gaston.benchmarks
 
+import java.time.Instant
+
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
@@ -46,7 +48,8 @@ class RegressionBenchmark extends FlatSpec with Matchers {
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing
   ): Unit = {
-    val engine = new Engine(stopAtScore = expectsScore, backtrackInitialSchedule = true)(problem, context)
+    val timeout = Instant.now().plusMillis(duration.toMillis)
+    val engine = new Engine(stopAtScore = expectsScore, backtrackInitialSchedule = true, timeout = timeout)(problem, context)
 
     val handler = logMinutes(true) // (verbose)
 
