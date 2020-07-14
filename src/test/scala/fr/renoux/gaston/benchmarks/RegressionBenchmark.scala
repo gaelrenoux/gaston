@@ -25,7 +25,7 @@ class RegressionBenchmark extends FlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give an good score when working a short time" in {
+  it should "give an good score when working a short time" ignore {
     benchmark(
       duration = 5.minutes,
       expectsScore = 730,
