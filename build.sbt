@@ -4,7 +4,7 @@ organization := "gael.renoux"
 name := "gaston"
 version := "0.3.0"
 
-// update artima supersafe when a version is released (and check xdotai/diff once in a while)
+// update artima supersafe when a version is released
 scalaVersion := "2.13.3"
 
 scalacOptions ++= Seq(
@@ -22,7 +22,7 @@ scalacOptions ++= Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-unchecked", // Enable additional warnings where generated code depends on assumptions.
   "-Xcheckinit", // Wrap field accessors to throw an exception on uninitialized access.
-//  "-Xdev", // Indicates user is a developer - issue warnings about anything which seems amiss
+  //  "-Xdev", // Indicates user is a developer - issue warnings about anything which seems amiss
 
   "-Wdead-code", // Warn when dead code is identified.
   "-Wextra-implicit", // Warn when more than one implicit parameter section is defined.
@@ -80,7 +80,7 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 
-  // "ai.x" %% "diff" % "2.0.1",
+  "com.softwaremill.diffx" %% "diffx-core" % "0.3.29",
   "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 )
 

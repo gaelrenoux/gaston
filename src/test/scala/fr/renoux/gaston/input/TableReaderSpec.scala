@@ -6,7 +6,7 @@ import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
 import fr.renoux.gaston.model.Score
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
+import com.softwaremill.diffx
 import scala.io.Source
 
 class TableReaderSpec extends AnyFlatSpec with Matchers {
@@ -61,12 +61,12 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
 
     /* Check all */
     if (input != expected) {
-      printDiff(expected.settings, input.settings)
-      printDiff(expected.tableSettings, input.tableSettings)
-      printDiff(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
-      printDiff(expected.topics, input.topics)
-      printDiff(expected.persons, input.persons)
-      printDiff(expected.constraints, input.constraints)
+      diffx.compare(expected.settings, input.settings)
+      diffx.compare(expected.tableSettings, input.tableSettings)
+      diffx.compare(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
+      diffx.compare(expected.topics, input.topics)
+      diffx.compare(expected.persons, input.persons)
+      diffx.compare(expected.constraints, input.constraints)
     }
     input.settings should be(expected.settings)
     input.tableSettings should be(expected.tableSettings)
@@ -81,27 +81,20 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     val table = Source.fromResource("udocon2017/uc17-table.csv").mkString
     val input = reader.read(table)
     val rendered = InputLoader.render(input)
-
     val evaluated = InputLoader.fromString(rendered).force
     val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check all */
-    if (input != expected) {
-      printDiff(expected.settings, input.settings)
-      printDiff(expected.tableSettings, input.tableSettings)
-      printDiff(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
-      printDiff(expected.topics, input.topics)
-      printDiff(expected.persons, input.persons)
-      printDiff(expected.constraints, input.constraints)
+    if (evaluated != expected) {
+      println(rendered)
+      diffx.compare(evaluated.settings, expected.settings)
+      diffx.compare(evaluated.tableSettings, expected.tableSettings)
+      diffx.compare(evaluated.slots.map(_.toList), expected.slots.map(_.toList)) //diff can't compare Seq
+      diffx.compare(evaluated.topics, expected.topics)
+      diffx.compare(evaluated.persons, expected.persons)
+      diffx.compare(evaluated.constraints, expected.constraints)
     }
     evaluated should be(expected)
-  }
-
-  private def printDiff[A](a: A, b: A): Unit = {
-    if (a != b) {
-      println(a.toString)
-      println(b.toString)
-    }
   }
 
 }
