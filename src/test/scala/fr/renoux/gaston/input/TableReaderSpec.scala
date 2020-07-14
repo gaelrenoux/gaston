@@ -4,11 +4,12 @@ import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
 import fr.renoux.gaston.model.Score
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source
 
-class TableReaderSpec extends FlatSpec with Matchers {
+class TableReaderSpec extends AnyFlatSpec with Matchers {
 
   val tableSettings = InputTableSettings(
     separator = "\t",

@@ -63,24 +63,26 @@ scalacOptions ++= Seq(
   "-Xlint:deprecation" // Enable linted deprecations.
 )
 
+val refinedVersion = "0.9.14"
+
 libraryDependencies ++= Seq(
 
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
 
-  "com.typesafe" % "config" % "1.3.4",
-  "com.github.pureconfig" %% "pureconfig" % "0.11.1",
+  "com.typesafe" % "config" % "1.4.0",
+  "com.github.pureconfig" %% "pureconfig" % "0.13.0",
   "com.github.scopt" %% "scopt" % "3.7.1",
 
-  "org.scalaz" %% "scalaz-core" % "7.2.28",
+  "org.scalaz" %% "scalaz-core" % "7.3.2",
 
-  "eu.timepit" %% "refined" % "0.9.9",
-  "eu.timepit" %% "refined-scalaz" % "0.9.9",
-  "eu.timepit" %% "refined-pureconfig" % "0.9.9",
-  "eu.timepit" %% "refined-scopt" % "0.9.9",
+  "eu.timepit" %% "refined" % refinedVersion,
+  "eu.timepit" %% "refined-scalaz" % refinedVersion,
+  "eu.timepit" %% "refined-pureconfig" % refinedVersion,
+  "eu.timepit" %% "refined-scopt" % refinedVersion,
 
   // "ai.x" %% "diff" % "2.0.1",
-  "org.scalatest" %% "scalatest" % "3.0.8" % "test"
+  "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")

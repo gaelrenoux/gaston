@@ -1,8 +1,9 @@
 package fr.renoux.gaston.util
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class CollectionImplicitsSpec extends FlatSpec with Matchers {
+class CollectionImplicitsSpec extends AnyFlatSpec with Matchers {
 
   import CollectionImplicits._
 

@@ -13,7 +13,7 @@ package object input {
   type InputErrors = NonEmptyList[InputError]
 
   def InputErrors(hDesc: String, tDesc: String*): InputErrors = // scalastyle:ignore method.name
-    NonEmptyList(InputError(hDesc), tDesc.map(InputError(_)): _*)
+    NonEmptyList.fromSeq(InputError(hDesc), tDesc.map(InputError(_)))
 
   /** Loads default values */
   def problemFromDefault: InputErrors \/ Problem = InputLoader.fromDefault.flatMap(transcribe)
@@ -21,13 +21,13 @@ package object input {
   /** Loads from a specifically-named file if the classpath. */
   def problemFromClassPath(path: String): InputErrors \/ Problem = InputLoader.fromClassPath(path).flatMap(transcribe)
 
-  /** Loads from defined files on the filesystem. */
-  def problemFromPath(files: Path*): InputErrors \/ Problem = InputLoader.fromPath(files: _*).flatMap(transcribe)
+  /** Loads from a file on the filesystem. */
+  def problemFromPath(file: Path): InputErrors \/ Problem = InputLoader.fromPath(file).flatMap(transcribe)
 
   /** Loads from a String */
   def problemFromString(config: String): InputErrors \/ Problem = InputLoader.fromString(config).flatMap(transcribe)
 
-  def transcribe(input: InputModel): InputErrors \/ Problem = new InputTranscription(input).result.disjunction
+  def transcribe(input: InputModel): InputErrors \/ Problem = new InputTranscription(input).result.toDisjunction
 
   val DefaultWeightRefined: PosWeight = refineV[WeightPositive](Weight.Default).getOrElse(throw new IllegalStateException(Weight.Default.toString))
 

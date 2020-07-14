@@ -276,7 +276,7 @@ private[input] class InputTranscription(input: InputModel) {
 
   lazy val result: Validation[InputErrors, Problem] = errors.toList.sorted.map(InputError(_)) match {
     case Nil => problem.success
-    case h :: q => NonEmptyList(h, q: _*).failure
+    case h :: q => NonEmptyList.fromSeq(h, q).failure
   }
 
 }

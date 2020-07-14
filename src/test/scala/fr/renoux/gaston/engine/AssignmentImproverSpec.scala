@@ -1,8 +1,9 @@
 package fr.renoux.gaston.engine
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-abstract class AssignmentImproverSpec extends FlatSpec with Matchers {
+abstract class AssignmentImproverSpec extends AnyFlatSpec with Matchers {
 
   "Improver" should "improve a simple problem" ignore {
     //TODO

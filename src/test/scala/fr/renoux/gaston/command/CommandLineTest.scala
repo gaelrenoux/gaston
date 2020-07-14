@@ -2,11 +2,12 @@ package fr.renoux.gaston.command
 
 import java.nio.file.Paths
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 
-class CommandLineTest extends FlatSpec with Matchers {
+class CommandLineTest extends AnyFlatSpec with Matchers {
 
   def parse(str: String*): CommandLine = CommandLine.parse(str)
 

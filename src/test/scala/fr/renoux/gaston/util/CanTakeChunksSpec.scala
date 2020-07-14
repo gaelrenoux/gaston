@@ -1,12 +1,13 @@
 package fr.renoux.gaston.util
 
 import com.typesafe.scalalogging.Logger
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by gael on 07/05/17.
   */
-class CanTakeChunksSpec extends FlatSpec with Matchers {
+class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
   val log = Logger[CanTakeChunksSpec]
 
   import CanTakeChunks._

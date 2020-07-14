@@ -8,7 +8,7 @@ import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.collection.NonEmpty
 import pureconfig.error.ConfigReaderFailures
-import pureconfig.{ConfigWriter, loadConfig, loadConfigFromFiles}
+import pureconfig.{ConfigSource, ConfigWriter}
 import scalaz.Scalaz._
 import scalaz._
 
@@ -35,18 +35,20 @@ object InputLoader {
   }
 
   /** Loads from default values */
-  def fromDefault: InputErrors \/ InputModel = loadConfig[InputModel](Namespace).disjunction.leftMap(transformErrors)
+  def fromDefault: InputErrors \/ InputModel =
+    ConfigSource.default.at(Namespace).load[InputModel].toDisjunction.leftMap(transformErrors)
 
   /** Loads from a specifically-named file if the classpath. */
   def fromClassPath(path: String): InputErrors \/ InputModel = {
-    val tsConfig = ConfigFactory.load(path).getConfig("gaston")
-    loadConfig[InputModel](tsConfig).disjunction.leftMap(transformErrors)
+    val tsConfig = ConfigFactory.load(path)
+    /* Cannot use ConfigSource.resources as it does not add the .conf suffix */
+    ConfigSource.fromConfig(tsConfig).at(Namespace).load[InputModel].toDisjunction.leftMap(transformErrors)
   }
 
-  /** Loads from defined files on the filesystem. */
-  def fromPath(files: Path*): InputErrors \/ InputModel = {
-    log.debug(s"Loading those files: ${files.mkString("; ")}")
-    loadConfigFromFiles[InputModel](files, failOnReadError = true, Namespace).disjunction.leftMap(transformErrors)
+  /** Loads from one defined file on the filesystem. */
+  def fromPath(file: Path): InputErrors \/ InputModel = {
+    log.debug(s"Loading this file: $file")
+    ConfigSource.file(file).at(Namespace).load[InputModel].toDisjunction.leftMap(transformErrors)
   }
 
   /** Loads from a String */
@@ -62,8 +64,8 @@ object InputLoader {
   }
 
   private def transformErrors(configReaderFailures: ConfigReaderFailures) =
-    NonEmptyList(configReaderFailures.head, configReaderFailures.tail: _*).map { f =>
-      InputError(f.description, f.location.map(_.url.toString), f.location.map(_.lineNumber))
+    NonEmptyList.fromSeq(configReaderFailures.head, configReaderFailures.tail).map { f =>
+      InputError(f.description, f.origin.map(_.url.toString), f.origin.map(_.lineNumber))
     }
 
   /** Render a configuration into a String. */

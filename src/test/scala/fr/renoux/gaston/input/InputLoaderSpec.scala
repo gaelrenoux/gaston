@@ -4,9 +4,10 @@ import java.io.File
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class InputLoaderSpec extends FlatSpec with Matchers {
+class InputLoaderSpec extends AnyFlatSpec with Matchers {
 
   "Loading from default" should "load all defaults values" in {
     val input = InputLoader.fromDefault.force

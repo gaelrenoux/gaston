@@ -9,14 +9,15 @@ import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.{Context, Opt}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
 // scalastyle:off magic.number
 
-class RegressionBenchmark extends FlatSpec with Matchers {
+class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   import Ordering.Double.IeeeOrdering
 

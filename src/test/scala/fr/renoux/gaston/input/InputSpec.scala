@@ -4,9 +4,10 @@ import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Slot, _}
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class InputSpec extends FlatSpec with Matchers {
+class InputSpec extends AnyFlatSpec with Matchers {
 
   val problem: Problem = problemFromClassPath("test-application").force
 

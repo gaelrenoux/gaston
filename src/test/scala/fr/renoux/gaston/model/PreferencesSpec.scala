@@ -2,17 +2,18 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.Context
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /**
   * Created by gael on 07/05/17.
   */
-class PreferencesSpec extends FlatSpec with Matchers {
+class PreferencesSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._
+  import fr.renoux.gaston.MinimalTestModel.Problems._
   import fr.renoux.gaston.MinimalTestModel.Slots._
   import fr.renoux.gaston.MinimalTestModel.Topics._
-  import fr.renoux.gaston.MinimalTestModel.Problems._
 
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default

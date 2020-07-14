@@ -2,10 +2,11 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.util.Context
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 /** Unit test on constraints */
-class ConstraintsSpec extends FlatSpec with Matchers {
+class ConstraintsSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._
   import fr.renoux.gaston.MinimalTestModel.Problems._

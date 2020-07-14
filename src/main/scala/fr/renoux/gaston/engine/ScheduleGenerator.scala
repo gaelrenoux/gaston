@@ -101,7 +101,7 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
     } else {
       /* Finally ! We can try to add the current topic to the current slot */
       log.trace(s"Go on with acceptable candidate and next slot: ${state.candidate}")
-      backtrackAssignTopicsToSlots(state.withCandidateAcknowledged, failures).recoverWith[BacktrackingFailures, State] { case fs: BacktrackingFailures =>
+      backtrackAssignTopicsToSlots(state.withCandidateAcknowledged, failures).recoverWith { case fs: BacktrackingFailures =>
         /* candidate is not acceptable or lead to a failure, backtrack and try again with next topic */
         log.trace("Go on with new topic for current slot as the candidate is not OK")
         backtrackAssignTopicsToSlots(state.withPassedHeadTopic, fs)

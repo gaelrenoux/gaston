@@ -1,8 +1,9 @@
 package fr.renoux.gaston.model
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class SlotScheduleSpec extends FlatSpec with Matchers {
+class SlotScheduleSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.SimpleTestModel.Persons._
   import fr.renoux.gaston.SimpleTestModel.Slots._

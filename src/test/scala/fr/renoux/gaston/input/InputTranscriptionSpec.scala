@@ -5,9 +5,10 @@ import fr.renoux.gaston.model.constraints.TopicsSimultaneous
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
 import fr.renoux.gaston.util.CollectionImplicits._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class InputTranscriptionSpec extends FlatSpec with Matchers {
+class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.TestUtils._
 
@@ -24,6 +25,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     ))
 
     val topicNames = Set("alpha #1", "alpha #2", "alpha #3")
+
     def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name))
 
     they should "be different topics" in {
@@ -72,6 +74,7 @@ class InputTranscriptionSpec extends FlatSpec with Matchers {
     ))
 
     val topicNames = Set("alpha ~1", "alpha ~2", "alpha ~3")
+
     def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name))
 
     they should "be transcribed to different topics" in {
