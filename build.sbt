@@ -4,8 +4,14 @@ organization := "gael.renoux"
 name := "gaston"
 version := "0.3.0"
 
-// update artima supersafe when a version is released
 scalaVersion := "2.13.3"
+
+lazy val gaston = (project in file("."))
+  .configs(IntegrationTest)
+  .settings(inConfig(IntegrationTest)(Defaults.testSettings): _*)
+
+/* Those tests are much slower */
+lazy val IntegrationTest = config("it") extend (Test)
 
 scalacOptions ++= Seq(
 
@@ -80,8 +86,8 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 
-  "com.softwaremill.diffx" %% "diffx-core" % "0.3.29",
-  "org.scalatest" %% "scalatest" % "3.2.0" % "test"
+  "com.softwaremill.diffx" %% "diffx-core" % "0.3.29" % "it,test",
+  "org.scalatest" %% "scalatest" % "3.2.0" % "it,test"
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")

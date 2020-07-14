@@ -26,7 +26,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give an good score when working a short time" ignore {
+  it should "give an good score when working a short time" in {
     benchmark(
       duration = 5.minutes,
       expectsScore = 730,

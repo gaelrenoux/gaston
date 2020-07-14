@@ -4,13 +4,13 @@ import java.time.Instant
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.Runner
-import fr.renoux.gaston.engine._
-import fr.renoux.gaston.input._
+import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, OptimParams}
+import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.{Chrono, Context, Tools}
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.{FiniteDuration, _}
 
 object PerformanceAnalysis extends App {
 
