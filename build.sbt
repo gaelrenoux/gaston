@@ -5,7 +5,7 @@ name := "gaston"
 version := "0.3.0"
 
 // update artima supersafe when a version is released (and check xdotai/diff once in a while)
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.3"
 
 scalacOptions ++= Seq(
 
@@ -41,7 +41,6 @@ scalacOptions ++= Seq(
   // "-Xlint:adapted-args", // Warn if an argument list is modified to match the receiver. // this is fine
   "-Xlint:nullary-unit", // Warn when nullary methods return Unit.
   "-Xlint:inaccessible", // Warn about inaccessible types in method signatures.
-  "-Xlint:nullary-override", // Warn when non-nullary `def f()' overrides nullary `def f'.
   "-Xlint:infer-any", // Warn when a type argument is inferred to be `Any`.
   "-Xlint:missing-interpolator", // A string literal appears to be missing an interpolator id.
   "-Xlint:doc-detached", // A Scaladoc comment appears to be detached from its element.

@@ -29,7 +29,7 @@ object InputLoader {
   import pureconfig.generic.auto._
 
   // forces IntelliJ to keep the previous imports, otherwise it marks them as unused
-  private lazy val _ = {
+  locally {
     exportReader[List[Int]]
     refTypeConfigConvert[Refined, String, NonEmpty]
   }
