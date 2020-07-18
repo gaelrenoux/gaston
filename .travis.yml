@@ -4,7 +4,7 @@ jobs:
   include:
     - stage: test
       script: sbt test
-      # Can't run integration tests here as they depend on the machine's performance
+      # Can't run test-perf:test here as they depend on the machine's performance
 
 # These directories are cached at the end of the build
 cache:

@@ -30,7 +30,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
     benchmark(
       duration = 5.minutes,
       expectsScore = 730,
-      expectsCount = 200
+      expectsCount = 600
     )
   }
 
