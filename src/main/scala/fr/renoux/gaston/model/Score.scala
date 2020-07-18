@@ -4,30 +4,30 @@ import scalaz.Monoid
 
 /** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
   * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
-case class Score(value: Double) extends AnyVal with Ordered[Score] {
+final case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
   /** Adds two scores */
-  def +(s: Score): Score = Score(value + s.value)
+  @inline def +(s: Score): Score = Score(value + s.value)
 
   /** Multiply a score by a constant factor */
-  def *(i: Int): Score = Score(value * i)
+  @inline def *(i: Int): Score = Score(value * i)
 
   /** Multiply a score by a constant factor */
-  def *(l: Long): Score = Score(value * l)
+  @inline def *(l: Long): Score = Score(value * l)
 
   /** Multiply a score by a constant factor */
-  def *(d: Double): Score = Score(value * d)
+  @inline def *(d: Double): Score = Score(value * d)
 
   /** Divide a score by a weight */
-  def /(w: Weight): Score = Score(value / w.value)
+  @inline def /(w: Weight): Score = Score(value / w.value)
 
-  def negative: Score = Score(-value)
+  @inline def negative: Score = Score(-value)
 
-  override def compare(that: Score): Int = this.value.compare(that.value)
+  @inline override def compare(that: Score): Int = this.value.compare(that.value)
 
-  def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
+  @inline def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
 
-  def isNegativeInfinity: Boolean = value.isNegInfinity
+  @inline def isNegativeInfinity: Boolean = value.isNegInfinity
 }
 
 object Score extends (Double => Score) {
@@ -35,13 +35,13 @@ object Score extends (Double => Score) {
   private val TwoDecimalsFormat = new java.text.DecimalFormat("####.00")
 
   /** What score should a person have if all its preferences are satisfied ? */
-  val PersonTotalScore = Score(1000.0)
+  val PersonTotalScore: Score = Score(1000.0)
 
-  val Zero = Score(0)
+  val Zero: Score = Score(0)
 
-  val MinValue = Score(Double.MinValue)
+  val MinValue: Score = Score(Double.MinValue)
 
-  val NegativeInfinity = Score(Double.NegativeInfinity)
+  val NegativeInfinity: Score = Score(Double.NegativeInfinity)
 
   implicit object ScoreIsMonoid extends Monoid[Score] {
     override val zero: Score = Score.Zero

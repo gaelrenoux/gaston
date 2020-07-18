@@ -13,6 +13,7 @@ trait Problem {
   val preferences: Set[Preference]
 
   lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
+  lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
 
   lazy val slotsList: List[Slot] = slots.toList
   lazy val topicsList: List[Topic] = topics.toList

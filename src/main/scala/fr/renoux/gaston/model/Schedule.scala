@@ -139,7 +139,7 @@ case class Schedule(
     */
   lazy val isPartialSolution: Boolean = {
     lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
-    lazy val forcedTopicsOk = problem.topics.filter(_.forced).forall(scheduledTopics.contains)
+    lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
     lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
     allSlotsOk && forcedTopicsOk && forcedTopicsOk && constraintsOk

@@ -4,7 +4,7 @@ package fr.renoux.gaston.model
     It is only used during the scoring in Problem. And the Person can be a Value Class. */
 
 /** Someone. */
-case class Person(name: String, weight: Weight = Weight.Default)
+final case class Person(name: String, weight: Weight = Weight.Default)
 
 object Person {
   val MaxCount: Int = 10 * 1000

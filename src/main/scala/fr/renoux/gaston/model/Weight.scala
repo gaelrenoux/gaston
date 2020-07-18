@@ -2,13 +2,13 @@ package fr.renoux.gaston.model
 
 /** The higher the weight of a person, the more its preferences matter when calculating a score for a set of preferences
   * involving multiple persons. */
-case class Weight(value: Double) extends AnyVal {
-  def *(s: Score): Score = Score(value * s.value) // scalastyle:ignore method.name
+final case class Weight(value: Double) extends AnyVal {
+  @inline def *(s: Score): Score = Score(value * s.value) // scalastyle:ignore method.name
 }
 
 object Weight extends (Double => Weight) {
 
-  val Default = Weight(1.0)
+  val Default: Weight = Weight(1.0)
 
   /** Multiply all arguments weights (at least one) together */
   def combine(w: Weight, ws: Weight*): Weight = Weight(
