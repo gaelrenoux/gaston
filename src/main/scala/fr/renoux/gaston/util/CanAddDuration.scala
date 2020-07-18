@@ -14,23 +14,29 @@ trait CanAddDuration[A] {
 
 object CanAddDuration {
 
-  def apply[A](implicit canAddDuration: CanAddDuration[A]): CanAddDuration[A] = implicitly[CanAddDuration[A]]
+  @inline def apply[A](implicit canAddDuration: CanAddDuration[A]): CanAddDuration[A] = implicitly[CanAddDuration[A]]
 
   implicit object InstantCanAddDuration extends CanAddDuration[Instant] {
+    @inline
     override def plus(a: Instant, d: FiniteDuration): Instant = a.plusNanos(d.toNanos)
 
+    @inline
     override def minus(a: Instant, b: Instant): FiniteDuration = (a.toEpochMilli - b.toEpochMilli).milliseconds
   }
 
-  implicit class Ops[A: CanAddDuration](val wrapped: A) {
+  @inline final implicit class Ops[A: CanAddDuration](val wrapped: A) {
 
-    def plus(d: FiniteDuration): A = CanAddDuration[A].plus(wrapped, d)
+    @inline def plus(d: FiniteDuration): A =
+      CanAddDuration[A].plus(wrapped, d)
 
-    def +(d: FiniteDuration): A = plus(d)
+    @inline def +(d: FiniteDuration): A =
+      CanAddDuration[A].plus(wrapped, d)
 
-    def minus(b: A): FiniteDuration = CanAddDuration[A].minus(wrapped, b)
+    @inline def minus(b: A): FiniteDuration =
+      CanAddDuration[A].minus(wrapped, b)
 
-    def -(b: A): FiniteDuration = minus(b)
+    @inline def -(b: A): FiniteDuration =
+      CanAddDuration[A].minus(wrapped, b)
   }
 
 }

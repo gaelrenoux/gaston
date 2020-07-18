@@ -7,6 +7,7 @@ import scala.annotation.tailrec
 trait CanTakeChunks[T[_] <: Iterable[_]] {
 
   /** Commodity method with varargs for [[takeChunks()]] */
+  @inline
   def takeChunks[A](as: T[A], elementsCount: Int*): (T[T[A]], T[A]) = takeChunks(as, elementsCount)
 
   /** Takes chunks from the list, with a specific size for each chunk. Returns a collection of the chunks taken and all
@@ -18,7 +19,7 @@ object CanTakeChunks {
 
   implicit object ListCanTakeChunks extends CanTakeChunks[List] {
 
-    def takeChunks[A](as: List[A], elementsCount: Iterable[Int]): (List[List[A]], List[A]) =
+    @inline def takeChunks[A](as: List[A], elementsCount: Iterable[Int]): (List[List[A]], List[A]) =
       recTake(elementsCount.toList, as)
 
     @tailrec
@@ -34,7 +35,7 @@ object CanTakeChunks {
 
   implicit object SeqCanTakeChunks extends CanTakeChunks[Seq] {
 
-    def takeChunks[A](as: Seq[A], elementsCount: Iterable[Int]): (Seq[Seq[A]], Seq[A]) =
+    @inline def takeChunks[A](as: Seq[A], elementsCount: Iterable[Int]): (Seq[Seq[A]], Seq[A]) =
       recTake(elementsCount.toList, as)
 
     @tailrec
@@ -51,10 +52,12 @@ object CanTakeChunks {
   implicit class Ops[T[_] <: Iterable[_], A](val wrapped: T[A]) extends AnyVal {
 
     /** Takes chunks from the list, with a specific size. */
+    @inline
     def takeChunks(elementsCount: Int*)(implicit canTakeChunks: CanTakeChunks[T]): (T[T[A]], T[A]) =
       canTakeChunks.takeChunks(wrapped, elementsCount)
 
     /** Takes chunks from the list, with a specific size. Returns the elements taken and all elements left */
+    @inline
     def takeChunks(elementsCount: Iterable[Int])(implicit canTakeChunks: CanTakeChunks[T]): (T[T[A]], T[A]) =
       canTakeChunks.takeChunks(wrapped, elementsCount)
 

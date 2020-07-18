@@ -9,7 +9,7 @@ sealed class Chrono(blocking: Boolean = false) {
 
   private val _counts: mutable.Map[String, Long] = mutable.Map[String, Long]().withDefaultValue(0L)
 
-  def apply[A](name: String)(a: => A): A = {
+  @inline def apply[A](name: String)(a: => A): A = {
     val start = System.currentTimeMillis()
     val evaluated = a
     val duration = System.currentTimeMillis() - start
@@ -52,7 +52,7 @@ sealed class Chrono(blocking: Boolean = false) {
 object Chrono {
 
   object NoOp extends Chrono {
-    override def apply[A](name: String)(a: => A): A = a
+    @inline override def apply[A](name: String)(a: => A): A = a
 
     override val times: Map[String, Long] = Map.empty
 
