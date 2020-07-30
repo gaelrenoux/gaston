@@ -169,6 +169,13 @@ case class Schedule(
     }
   )
 
+  override def equals(o: Any): Boolean = o match {
+    case that: Schedule => this.wrapped == that.wrapped
+    case _ => false
+  }
+
+  override lazy val hashCode: Int = wrapped.hashCode
+
 }
 
 object Schedule {

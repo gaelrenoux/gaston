@@ -159,6 +159,12 @@ case class SlotSchedule(
     if (slot != that.slot) throw new IllegalArgumentException
     (records ++ that.records).groupBy(_.topic).mapValuesStrict(_.reduce(_ ++ _))
   }
+
+  override def equals(o: Any): Boolean = o match {
+    case that: SlotSchedule => this.slot == that.slot && this.wrapped == that.wrapped
+  }
+
+  override lazy val hashCode: Int = wrapped.hashCode * 17 + slot.hashCode
 }
 
 object SlotSchedule {
