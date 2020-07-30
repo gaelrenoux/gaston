@@ -17,7 +17,7 @@ import scala.util.Random
   * Uses backtracking to produce a Stream of schedules. Those schedules are not the best you could have, but they are
   * valid and all persons have their optimal slots.
   *
-  * Placing persons on the generated schedule is delegated to the PartialScheduleFiller.
+  * Placing persons on the generated schedule is delegated to the ScheduleAssigner.
   */
 class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
 
