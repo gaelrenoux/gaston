@@ -2,9 +2,6 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{Context, testOnly}
-import scalaz.Scalaz._
-
-import scala.annotation.tailrec
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -24,6 +21,8 @@ case class Schedule(
 
   @inline private def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(slot, f(on(slot))))
+
+  val scoreCalculator: ScoreCalculator = new ScoreCalculator(this)
 
   lazy val slotSchedules: Iterable[SlotSchedule] = wrapped.values
   lazy val slotSchedulesSet: Set[SlotSchedule] = slotSchedules.toSet
@@ -45,9 +44,9 @@ case class Schedule(
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = wrapped.getOrElse(slot, SlotSchedule.empty(slot))
 
-  def set(slotSchedule: SlotSchedule): Schedule = updateWrapped( wrapped + (slotSchedule.slot -> slotSchedule))
+  def set(slotSchedule: SlotSchedule): Schedule = updateWrapped(wrapped + (slotSchedule.slot -> slotSchedule))
 
-  lazy val score: Score = Scorer.score(this)
+  lazy val score: Score = scoreCalculator.globalScore
 
   /** Add a new record to this schedule. */
   def add(record: Record): Schedule = updateSlotSchedule(record.slot)(_.add(record))
@@ -116,21 +115,6 @@ case class Schedule(
     lazy val noUbiquity = slotSchedules.forall(_.isSound)
     lazy val noDuplicates = scheduledTopics.sizeCompare(slotSchedulesList.flatMap(_.topicsList)) == 0
     noUbiquity && noDuplicates
-  }
-
-  /** Score for each person, regardless of its weight. All personal scores are slot-level, so the whole computation is done per slot. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] = slotSchedulesList.map(_.unweightedScoresByPerson).suml
-
-  /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
-  lazy val impersonalScore: Score =
-    slotSchedulesList.map(_.impersonalScore).suml + preferencesScoreRec(problem.impersonalGlobalLevelPreferencesList)
-
-  @tailrec
-  private def preferencesScoreRec(prefs: List[Preference.GlobalLevel], sum: Double = 0): Score = prefs match {
-    case Nil => Score(sum)
-    case p :: ps =>
-      val s = p.scoreSchedule(this)
-      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
   }
 
   /**
