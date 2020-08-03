@@ -79,7 +79,7 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
     chrono("PersonPlacementImprover >  improve > goodMoveOnSlot") {
       val slotSchedule = currentSchedule.on(slot)
 
-      lazy val records = rand.shuffle(slotSchedule.records)
+      lazy val records: Iterable[Record] = rand.shuffle(slotSchedule.records)
       lazy val recordsRemovable = rand.shuffle(slotSchedule.recordsThatCanRemovePersons)
       lazy val recordsAddable = rand.shuffle(slotSchedule.recordsThatCanAddPersons)
 
