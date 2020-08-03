@@ -45,7 +45,6 @@
     <check level="warning" class="org.scalastyle.scalariform.EmptyInterpolatedStringChecker" enabled="true"/>
     <!-- org.scalastyle.scalariform.EnsureSingleSpaceAfterTokenChecker -->
     <!-- org.scalastyle.scalariform.EnsureSingleSpaceBeforeTokenChecker -->
-    <check level="warning" class="org.scalastyle.scalariform.EqualsHashCodeChecker" enabled="true"/>
     <check level="warning" class="org.scalastyle.scalariform.FieldNamesChecker" enabled="true">
         <parameters>
             <parameter name="regex">^_?[a-z][A-Za-z0-9]*$</parameter>
