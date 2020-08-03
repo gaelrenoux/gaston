@@ -2,6 +2,7 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{Context, testOnly}
+import scalaz.Monoid
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -104,6 +105,16 @@ case class Schedule(
   /** Swap two persons on a slot. Persons are in couple with there current topic. */
   def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule =
     updateSlotSchedule(slot)(_.swapPersons(tp1, tp2))
+
+  def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Score = {
+    val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
+    val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
+    import scalaz.Scalaz._
+    val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].append(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
+
+    if (score.isNegativeInfinity) Score.Zero
+    else scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore
+  }
 
   /** Move a person on some slot, from some topic to another one. */
   def movePerson(slot: Slot, source: Topic, destination: Topic, person: Person): Schedule =

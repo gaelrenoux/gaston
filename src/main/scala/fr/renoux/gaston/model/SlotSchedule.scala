@@ -36,6 +36,8 @@ case class SlotSchedule(
   lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val removableTopics: Iterable[Topic] = realTopics.filterNot(_.forced)
 
+  lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)
+
   /** Topics that cannot be added on this slot, because of the slot itself */
   lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
 
@@ -103,6 +105,25 @@ case class SlotSchedule(
     wrapped.updated(t1, newR1).updated(t2, newR2)
   }
 
+  /** Score for this slot schedule if we swap those two persons. Persons are in couple with there current topic. */
+  def deltaScoreIfSwapPersons(tp1: (Topic, Person), tp2: (Topic, Person)): Map[Person, Score] = {
+    val (t1, p1) = tp1
+    val (t2, p2) = tp2
+    val oldR1 = wrapped(t1)
+    val oldR2 = wrapped(t2)
+    val newR1 = oldR1.replacePerson(p1, p2)
+    val newR2 = oldR2.replacePerson(p2, p1)
+    val persons = newR1.persons ++ newR2.persons
+    persons.view.map { p =>
+      val delta =
+        newR1.unweightedScoresByPerson.getOrElse(p, Score.Zero) +
+          newR2.unweightedScoresByPerson.getOrElse(p, Score.Zero) -
+          oldR1.unweightedScoresByPerson.getOrElse(p, Score.Zero) -
+          oldR2.unweightedScoresByPerson.getOrElse(p, Score.Zero)
+      p -> delta
+    }.toMap
+  }
+
   /** Move a person on some slot, from some topic to another one. */
   def movePerson(source: Topic, destination: Topic, person: Person): SlotSchedule = updateWrapped {
     val newSourceRecord = wrapped(source).removePerson(person)
@@ -113,8 +134,12 @@ case class SlotSchedule(
   /** Score for each person, regardless of its weight. All personal scores are records-level, so the whole computation is done per record. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).suml
 
-  lazy val impersonalScore: Score =
-    recordsList.map(_.impersonalScore).suml + preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
+  lazy val impersonalScoreTopicLevel: Score = recordsList.view.map(_.impersonalScore).sum
+
+  /** Impersonal score of the slot, regardless of how persons are assigned to topics on this slot (as long as the same persons are present) */
+  lazy val impersonalScoreSlotLevel: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
+
+  lazy val impersonalScore: Score = impersonalScoreTopicLevel + impersonalScoreSlotLevel
 
   @tailrec
   private def preferencesScoreRec(prefs: List[Preference.SlotLevel], sum: Double = 0): Score = prefs match {

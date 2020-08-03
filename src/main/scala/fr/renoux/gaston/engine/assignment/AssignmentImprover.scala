@@ -91,9 +91,13 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
         t2 = r2.topic
         p1 <- (r1.optionalPersons -- t2.forbidden).view
         p2 <- (r2.optionalPersons -- t1.forbidden).view
-        improvedSchedule = currentSchedule.swapPersons(slot, (t1, p1), (t2, p2))
-        if improvedSchedule.score > currentSchedule.score
-      } yield improvedSchedule
+        scoreImprovement = currentSchedule.deltaScoreIfSwapPerson(slot, (t1, p1), (t2, p2))
+        if scoreImprovement.value > 0
+        /*_ = {
+          if (math.abs(improvedSchedule.score.value - currentSchedule.score.value - scoreImprovement.value) < 0.01) ()
+          else throw new IllegalStateException(s"${improvedSchedule.score} - ${currentSchedule.score} <> $scoreImprovement")
+        }*/
+      } yield currentSchedule.swapPersons(slot, (t1, p1), (t2, p2))
 
       /* All schedules on which we moved one person from one topic to another */
       lazy val movedSchedules = for {

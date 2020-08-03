@@ -20,11 +20,15 @@ class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
   lazy val weightedScoresByPerson: Map[Person, Score] =
     unweightedScoresByPerson.map { case (p, s) => p -> s / p.weight }
 
-  /** Score related to persons */
-  lazy val personalScore: Score = chrono("ScoreCalculator > personalScore") {
+  def personalScoreFrom(unweightedScoresByPerson: Map[Person, Score]): Score = {
     val weightedScores = unweightedScoresByPerson.toSeq.map { case (p, s) => s / p.weight }
     val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
     Score(scoreWeightedPersons)
+  }
+
+  /** Score related to persons */
+  lazy val personalScore: Score = chrono("ScoreCalculator > personalScore") {
+    personalScoreFrom(unweightedScoresByPerson)
   }
 
   /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */

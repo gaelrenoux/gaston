@@ -9,6 +9,9 @@ final case class Score(value: Double) extends AnyVal with Ordered[Score] {
   /** Adds two scores */
   @inline def +(s: Score): Score = Score(value + s.value)
 
+  /** Subtract two scores */
+  def -(s: Score): Score = Score(value - s.value)
+
   /** Multiply a score by a constant factor */
   @inline def *(i: Int): Score = Score(value * i)
 
