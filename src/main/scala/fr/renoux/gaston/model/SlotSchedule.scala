@@ -25,20 +25,22 @@ case class SlotSchedule(
   lazy val records: Iterable[Record] = wrapped.values
   lazy val recordsSet: Set[Record] = records.toSet
   lazy val recordsList: List[Record] = records.toList
-  lazy val recordsThatCanRemovePersons: Set[Record] = recordsSet.filter(_.canRemovePersons)
-  lazy val recordsThatCanAddPersons: Set[Record] = recordsSet.filter(_.canAddPersons)
+  lazy val recordsThatCanRemovePersons: Iterable[Record] = records.filter(_.canRemovePersons)
+  lazy val recordsThatCanAddPersons: Iterable[Record] = records.filter(_.canAddPersons)
 
-  lazy val topics: Set[Topic] = recordsSet.map(_.topic)
+  lazy val topics: Iterable[Topic] = wrapped.keys
+  lazy val topicsSet: Set[Topic] = wrapped.keySet
   lazy val topicsList: List[Topic] = topics.toList
-  lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
+  lazy val realTopics: Iterable[Topic] = topics.filterNot(_.virtual)
+  lazy val realTopicsSet: Set[Topic] = realTopics.toSet
   lazy val realTopicsList: List[Topic] = realTopics.toList
-  lazy val removableTopicsList: List[Topic] = realTopicsList.filterNot(_.forced)
+  lazy val removableTopics: Iterable[Topic] = realTopics.filterNot(_.forced)
 
   /** Topics that cannot be added on this slot, because of the slot itself */
   lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
 
   /** Topics that cannot be added on this slot as it now (but may be added later if the configuration of the slot changes) */
-  lazy val currentlyIncompatibleTopics: Set[Topic] = topics.flatMap(problem.incompatibleTopicsPerTopic)
+  lazy val currentlyIncompatibleTopics: Set[Topic] = topicsSet.flatMap(problem.incompatibleTopicsPerTopic)
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
   lazy val incompatibleTopics: Set[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics
@@ -55,7 +57,7 @@ case class SlotSchedule(
   lazy val personsPerTopic: Map[Topic, Set[Person]] = recordsSet.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
   lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
-  lazy val mandatory: Set[Person] = topics.flatMap(_.mandatory)
+  lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)
 
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)

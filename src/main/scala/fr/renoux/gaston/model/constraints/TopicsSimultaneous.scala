@@ -9,7 +9,7 @@ case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotLevel {
   private val topicsSize = topics.size
 
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = {
-    val missing = topics.diff(schedule.topics)
+    val missing = topics.diff(schedule.topicsSet)
     missing.isEmpty || missing.size == topicsSize
   }
 }

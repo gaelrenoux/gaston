@@ -54,7 +54,7 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
       val (slot, slotsTail) = slots.dequeue
       val slotSchedule = schedule.on(slot)
 
-      slotCache.get(slotSchedule.topics) match {
+      slotCache.get(slotSchedule.topicsSet) match {
         case Some(ss) =>
           recImprove(schedule.set(ss), maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
 
@@ -62,7 +62,7 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
 
           case None =>
             /* can't improve this slot any more ! Store in cache, then go to next slot */
-            slotCache.update(slotSchedule.topics, slotSchedule)
+            slotCache.update(slotSchedule.topicsSet, slotSchedule)
             recImprove(schedule, maxRounds - 1, slotsTail)
 
           case Some(candidate) =>
@@ -80,8 +80,8 @@ class AssignmentImprover(implicit private val problem: Problem, private val ctx:
       val slotSchedule = currentSchedule.on(slot)
 
       lazy val records: Iterable[Record] = rand.shuffle(slotSchedule.records)
-      lazy val recordsRemovable = rand.shuffle(slotSchedule.recordsThatCanRemovePersons)
-      lazy val recordsAddable = rand.shuffle(slotSchedule.recordsThatCanAddPersons)
+      lazy val recordsRemovable: Iterable[Record] = rand.shuffle(slotSchedule.recordsThatCanRemovePersons)
+      lazy val recordsAddable: Iterable[Record] = rand.shuffle(slotSchedule.recordsThatCanAddPersons)
 
       /* All schedules on which we swapped two persons */
       lazy val swappedSchedules = for {

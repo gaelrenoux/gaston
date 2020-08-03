@@ -64,8 +64,8 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
     _ = log.debug(s"Checking for possible Swaps between slots ${slot1.name} and ${slot2.name}")
 
     /* Filter out impossible topics because of incompatibility */
-    t1 <- shuffled(slotSchedule1.realTopics -- slotSchedule2.permanentlyIncompatibleTopics).view
-    t2 <- shuffled(slotSchedule2.realTopics -- slotSchedule1.permanentlyIncompatibleTopics).view
+    t1 <- shuffled(slotSchedule1.realTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics).view
+    t2 <- shuffled(slotSchedule2.realTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics).view
 
     topics1 = linkedTopics(t1)
     topics2 = linkedTopics(t2)
@@ -106,7 +106,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Ext Swaps on slot ${slot.name}")
-    oldTopic <- shuffled(slotSchedule.removableTopicsList).view
+    oldTopic <- shuffled(slotSchedule.removableTopics).view
 
     /* Filter out impossible topics because of incompatibility */
     newTopic <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
@@ -144,7 +144,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Removals on slot ${slot.name}")
-    topic <- shuffled(slotSchedule.removableTopicsList).view
+    topic <- shuffled(slotSchedule.removableTopics).view
     topicsToRemove = linkedTopics(topic)
 
     /* Generate the swap */
@@ -159,6 +159,8 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
   private def shuffled[A](set: Set[A])(implicit rand: Random): Seq[A] = shuffled(set.toSeq)
 
   private def shuffled[A](seq: Seq[A])(implicit rand: Random): Seq[A] = rand.shuffle(seq)
+
+  private def shuffled[A](it: Iterable[A])(implicit rand: Random): Iterable[A] = rand.shuffle(it)
 
   private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicPerTopic(topic) + topic
 
