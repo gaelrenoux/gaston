@@ -14,20 +14,24 @@ object Scorer {
     * comparison. */
   def score(solution: Schedule)(implicit ctx: Context): Score = chrono("Scorer > score") {
 
-    val scoreOther = chrono("Scorer > score > scoreOther") {
+    def impersonalScore = chrono("Scorer > score > scoreOther") {
       solution.impersonalScore
     }
 
-    if (scoreOther.isNegativeInfinity) scoreOther else {
-      val scoresByPerson = chrono("Scorer > score > scoresByPerson") {
-        solution.unweightedScoresByPerson
-      }
-      val weightedScores = scoresByPerson.toSeq.map { case (p, s) => s / p.weight }
-      val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
-
-      scoreOther + Score(scoreWeightedPersons)
+    def unweightedScoresByPerson = chrono("Scorer > score > scoresByPerson") {
+      solution.unweightedScoresByPerson
     }
+
+    calculateGlobalScore(impersonalScore, unweightedScoresByPerson)
   }
+
+  def calculateGlobalScore(impersonalScore: Score, unweightedScoresByPerson: => Map[Person, Score]): Score =
+    if (impersonalScore.isNegativeInfinity) impersonalScore else {
+      val weightedScores = unweightedScoresByPerson.toSeq.map { case (p, s) => s / p.weight }
+      val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+      impersonalScore + Score(scoreWeightedPersons)
+    }
+
 
   /** Score for each person, divided by that person's weight */
   def weightedScoresByPerson(solution: Schedule): Map[Person, Score] = {
