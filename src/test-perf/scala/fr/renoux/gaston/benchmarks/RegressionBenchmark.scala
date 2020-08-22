@@ -26,15 +26,24 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give an good score when working a short time" in {
+  it should "give an good score when working a 5 min on one core" in {
     benchmark(
       duration = 5.minutes,
-      expectsScore = 730,
+      expectsScore = 745,
+      expectsCount = 110,
+      parallelRunCount = 1 // to make sure we always have the same results
+    )
+  }
+
+  it should "give an good score when working 5 min" in {
+    benchmark(
+      duration = 5.minutes,
+      expectsScore = 745,
       expectsCount = 600
     )
   }
 
-  it should "give an great score when working a long time" ignore {
+  it should "give an great score when working 20 min" ignore {
     benchmark(
       duration = 20.minutes,
       expectsScore = 750,
@@ -52,7 +61,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
   )(implicit improver: Improver = new GreedySlotImprover): Unit = {
     implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
 
-    val handler = logMinutes(true) // (verbose)
+    val handler = logMinutes()
 
     val _ = try {
       val runner = parallelRunCount.toOption match {
@@ -76,8 +85,8 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
     def stop(): Unit
   }
 
-  private def logMinutes(verbose: Boolean): Stoppable = new Stoppable {
-    private var continue = verbose
+  private def logMinutes(): Stoppable = new Stoppable {
+    private var continue = true
     var lastMinute = 0
     private val startTime = System.currentTimeMillis()
 
