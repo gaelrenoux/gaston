@@ -17,12 +17,6 @@ final case class Topic(
     virtual: Boolean = false
 ) {
 
-  /** Duplicate this Topic as several occurrences */
-  def occurrences(count: Int): Seq[Topic] = (1 to count).map(i => copy(name = s"$name ${Topic.OccurrenceMarker}$i"))
-
-  /** Duplicate this Topic as multiple */
-  def multiple(count: Int): Seq[Topic] = (1 to count).map(i => copy(name = s"$name ${Topic.MultipleMarker}$i"))
-
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
 }
@@ -32,10 +26,6 @@ object Topic {
   val DefaultMin = 1
 
   val DefaultMax = 10
-
-  val OccurrenceMarker = "#"
-
-  val MultipleMarker = "~"
 
   /** Topics for people assigned to doing nothing. */
   def nothing(slot: Slot, min: Int, max: Int): Topic =

@@ -7,6 +7,7 @@ import eu.timepit.refined.types.numeric._
 import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.input.InputRefinements._
 import fr.renoux.gaston.model.{Score, Topic, Weight}
+import fr.renoux.gaston.util.Opt
 
 /* All line and column indices are zero-based */
 // scalastyle:off magic.number
@@ -61,7 +62,7 @@ case class InputTopic(
     min: Option[PosInt] = None,
     max: Option[PosInt] = None,
     occurrences: Option[PosInt] = None,
-    multiple: Option[PosInt] = None,
+    multiple: Option[PosInt] = None, // multi-topic: on the same slot, occupies several groups of persons
     slots: Option[Set[NonEmptyString]] = None,
     presence: Option[Score] = None,
     forced: Boolean = false
@@ -71,6 +72,42 @@ case class InputTopic(
 
   /** Multiple needs to be an Option to not appear when not needed */
   lazy val forcedMultiple: PosInt = multiple.getOrElse(1: PosInt)
+
+  /** Duplicate this Topic by its number of occurrences */
+  lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
+    if (forcedOccurrences.value == 1) Seq(InputTopic.Occurrence(this)) else {
+      (1 to forcedOccurrences).map(InputTopic.Occurrence(this, _))
+    }
+}
+
+object InputTopic {
+  val OccurrenceMarker = "#"
+
+  val MultipleMarker = "~"
+
+  /** For multi-occurrence topic: the same topic will appear on different slots */
+  case class Occurrence(
+      inputTopic: InputTopic,
+      index: Opt[Int] = Opt.Missing // present only if there are multiple occurrences
+  ) {
+    lazy val name: String =
+      index.fold(inputTopic.name.value)(i => s"${inputTopic.name} $OccurrenceMarker$i")
+
+    /* Duplicate topics if topic is multiple. Must be after the occurrence, so that he multiple marker appears after the occurrence one. */
+    lazy val multipleParts: Seq[InputTopic.Part] =
+      if (inputTopic.forcedMultiple.value == 1) Seq(Part(this))
+      else (1 to inputTopic.forcedMultiple).map(Part(this, _))
+  }
+
+  /** For multiple topics: each part of the topic, which will occupy a group of persons each */
+  case class Part(
+      occurrence: Occurrence,
+      index: Opt[Int] = Opt.Missing // present only if the topic has a multiplicity > 1
+  ) {
+    lazy val name: String =
+      index.fold(occurrence.name)(i => s"${occurrence.name} $MultipleMarker$i")
+  }
+
 }
 
 case class InputPerson(
@@ -121,6 +158,7 @@ object InputRefinements {
   object PosWeight {
     def apply(w: PosDouble): PosWeight = refineV[WeightPositive](Weight(w)).getOrElse(throw new IllegalArgumentException(w.toString))
   }
+
 }
 
 // scalastyle:on magic.number

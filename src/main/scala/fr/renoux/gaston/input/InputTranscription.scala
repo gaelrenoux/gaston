@@ -18,6 +18,8 @@ private[input] class InputTranscription(input: InputModel) {
 
   val settings: InputSettings = input.settings
 
+  // TODO check that names are non-duplicates
+
   lazy val errors: Set[String] =
     Set.empty[String] ++ {
       if (input.settings.defaultMinPersonsPerTopic <= input.settings.defaultMaxPersonsPerTopic) None
@@ -33,8 +35,8 @@ private[input] class InputTranscription(input: InputModel) {
         .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
     } ++ {
       input.topics
-        .filter { t => t.name.contains(Topic.MultipleMarker) || t.name.contains(Topic.OccurrenceMarker) }
-        .map { t => s"Topic [${t.name}]: Name cannot contain characters '${Topic.MultipleMarker}' or '${Topic.OccurrenceMarker}'" }
+        .filter { t => t.name.contains(InputTopic.MultipleMarker) || t.name.contains(InputTopic.OccurrenceMarker) }
+        .map { t => s"Topic [${t.name}]: Name cannot contain characters '${InputTopic.MultipleMarker}' or '${InputTopic.OccurrenceMarker}'" }
     } ++ {
       input.topics.flatMap { t =>
         val badSlots = t.slots.getOrElse(Set.empty).filter(s => !slotsSet.exists(_.name == s)).map(s => s"[$s]")
@@ -114,65 +116,66 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
 
   /* Topics */
-  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = input.topics.map { inTopic =>
-    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
-    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
-    val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
-    val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-    val slots = inTopic.slots.map(ss => ss.map(slotsByName))
-    val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots, forced = inTopic.forced)
+  lazy val topicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] =
+    input.topics.map { inTopic: InputTopic =>
+      val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
+      val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
+      val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
+      val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
+      val slots = inTopic.slots.map(ss => ss.map(slotsByName))
 
-    /* Duplicate topics if more than one occurrence of the topic */
-    val occurringTopics = inTopic.forcedOccurrences.value match {
-      case 1 => Set(baseTopic)
-      case c: Int => baseTopic.occurrences(c).toSet
-    }
+      val multiplesByOccurrenceIndex: Map[Int, Set[Topic]] =
+        inTopic.occurrenceInstances.map { inTopicOccurrence =>
+          val topicParts = inTopicOccurrence.multipleParts
 
-    /* Duplicate topics if topic is multiple. Must be done second, so that he multiple marker appears after the occurence one. */
-    val duplicatedTopics = inTopic.forcedMultiple.value match {
-      case 1 => occurringTopics
-      case c: Int if c > 0 => occurringTopics.flatMap { topic =>
-        val instances = topic.multiple(c)
-        val sortedMandatories = baseTopic.mandatory.toSeq.sortBy(_.name) // sorted to be deterministic, therefore more testable
+          /* dispatch the mandatory persons on the instances. The map may be missing parts if there are not enough mandatory persons. */
+          val sortedMandatories = mandatory.toSeq.sortBy(_.name) // sorted to be deterministic, therefore more testable
+          val mandatoriesByPart = sortedMandatories.zip(LazyList.continually(topicParts).flatten).map(_.swap).groupToMap
 
-        /* dispatch the mandatory persons on the instances */
-        val mandatoriesByInstance = sortedMandatories.zip(LazyList.continually(instances).flatten).map(_.swap).groupToMap
-        instances.map { t => t.copy(mandatory = mandatoriesByInstance.getOrElse(t, Nil).toSet) }
-      }
-    }
+          val topics = topicParts.map { part => // can't iterate on mandatoriesByPart, may be missing parts
+            val thisMandatories = mandatoriesByPart.getOrElse(part, Seq.empty)
+            Topic(part.name, mandatory = thisMandatories.toSet, forbidden = forbidden, min = min, max = max, slots = slots, forced = inTopic.forced)
+          }.toSet
 
-    inTopic.name -> duplicatedTopics
+          inTopicOccurrence.index.getOrElse(0) -> topics
+        }.toMap
 
-  }.toMap
+      inTopic.name -> multiplesByOccurrenceIndex
+    }.toMap
 
-  /* Topics, but with multiple ones (not occurences, just multi-topics!) grouped */
-  lazy val topicGroupsByName: Map[NonEmptyString, Set[Set[Topic]]] =
-    topicsByName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
-
-  lazy val topics: Set[Topic] = topicsByName.values.toSet.flatten
+  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicMultiplesByOccurrenceIndexByName.mapValuesStrict(_.values.flatten.toSet)
+  lazy val topics: Set[Topic] = topicsByName.values.flatten.toSet
 
   /* Constraints */
   object Constraints {
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
-        // TODO Better handling of simultaneous and occurrences is needed. Will return an error above
+        // TODO Better handling of simultaneous and occurrences is needed. Will return an error above.
         TopicsSimultaneous(inConstraint.topics.map(topicsByName(_).head))
       }
 
-    lazy val simultaneousMultiple: Set[TopicsSimultaneous] =
-      input.multipleTopicsSet.flatMap { inTopic =>
-        topicGroupsByName(inTopic.name).map(TopicsSimultaneous)
-      }
+    lazy val simultaneousMultipleParts: Set[TopicsSimultaneous] = {
+      for {
+        topicMultiplesByOccurrenceIndex <- topicMultiplesByOccurrenceIndexByName.values
+        topicMultiples <- topicMultiplesByOccurrenceIndex.values
+        if topicMultiples.size > 1
+      } yield TopicsSimultaneous(topicMultiples)
+    }.toSet
 
     lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
       input.constraints.notSimultaneous.map { inConstraint =>
-        val topics = inConstraint.topics.flatMap(topicGroupsByName(_)).flatMap(_.headOption) // Keep only one element for multiple topics
-        TopicsNotSimultaneous(topics)
+        val inConstraintTopicOccurrences = inConstraint.topics.flatMap { topicName =>
+          topicMultiplesByOccurrenceIndexByName(topicName).values
+        }.map(_.head) // Keep only one element for multiple topics
+        TopicsNotSimultaneous(inConstraintTopicOccurrences)
       }
 
-    lazy val all: Set[Constraint] =
-      simultaneousTopics ++
-        simultaneousMultiple
+    lazy val all: Set[Constraint] = {
+      Set.empty[Constraint] ++ // force the correct type
+        simultaneousTopics ++
+        simultaneousMultipleParts ++
+        notSimultaneousTopics
+    }
   }
 
   /* Preferences */

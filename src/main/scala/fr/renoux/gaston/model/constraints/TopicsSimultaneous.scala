@@ -7,6 +7,7 @@ import fr.renoux.gaston.model.{Constraint, SlotSchedule, Topic}
 case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotLevel {
 
   private val topicsSize = topics.size
+  assert(topicsSize > 1)
 
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = {
     val missing = topics.diff(schedule.topicsSet)
