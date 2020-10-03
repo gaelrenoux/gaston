@@ -114,15 +114,6 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
 
   /* Topics */
-  lazy val baseTopics: List[Topic] = input.topics.map { inTopic =>
-    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
-    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
-    val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
-    val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-    val slots = inTopic.slots.map(ss => ss.map(slotsByName))
-    Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots)
-  }
-
   lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = input.topics.map { inTopic =>
     val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
     val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
