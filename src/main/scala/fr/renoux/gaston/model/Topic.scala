@@ -38,8 +38,10 @@ object Topic {
   val MultipleMarker = "~"
 
   /** Topics for people assigned to doing nothing. */
-  def nothing(slot: Slot, min: Int, max: Int): Topic = Topic(s"Nothing (${slot.name})", min = min, max = max, slots = Some(Set(slot)), virtual = true)
+  def nothing(slot: Slot, min: Int, max: Int): Topic =
+    Topic(s"Nothing (${slot.name})", min = min, max = max, slots = Some(Set(slot)), virtual = true)
 
   /** Topics for people not assigned yet on some slot. */
-  def unassigned(slot: Slot): Topic = Topic(s"[${slot.name}]", max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
+  def unassigned(slot: Slot): Topic =
+    Topic(s"[${slot.name}]", max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
 }
