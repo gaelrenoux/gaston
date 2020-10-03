@@ -33,7 +33,7 @@ class ScheduleAssigner(implicit private val problem: Problem) {
         val topics = slotSchedule.topics
 
         val (topicsWithNeeded, topicsWithOptional) = topics.map { t =>
-          val count = slotSchedule.countPersonsPerTopic(t)
+          val count = slotSchedule.countPersonsByTopic(t)
           val needed = t.min - count
           val optional = t.max - math.max(t.min, count)
           (t -> needed, t -> optional)

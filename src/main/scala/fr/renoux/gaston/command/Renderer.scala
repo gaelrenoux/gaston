@@ -27,7 +27,7 @@ class Renderer(
     val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.toSeq.map {
       case (person, preferences) =>
         val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
-        val mandatoryCount = problem.mandatoryTopicsPerPerson(person).size
+        val mandatoryCount = problem.mandatoryTopicsByPerson(person).size
         (person.name, weightedScoresByPerson(person).value, satisfied, mandatoryCount)
     }
 

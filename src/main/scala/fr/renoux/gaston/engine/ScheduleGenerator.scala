@@ -146,7 +146,7 @@ object ScheduleGenerator {
 
     lazy val withPassedHeadTopic: State = State(partialSchedule, slotsLeft, topicsLeft.tail, headTopic :: topicsPassed)
 
-    private lazy val topicsSimultaneousWithHeadTopic = problem.simultaneousTopicPerTopic(headTopic)
+    private lazy val topicsSimultaneousWithHeadTopic = problem.simultaneousTopicByTopic(headTopic)
 
     lazy val candidate: Schedule = {
       val record = Record(headSlot, headTopic, headTopic.mandatory)

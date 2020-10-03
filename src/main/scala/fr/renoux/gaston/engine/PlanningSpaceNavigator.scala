@@ -162,7 +162,7 @@ class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   private def shuffled[A](it: Iterable[A])(implicit rand: Random): Iterable[A] = rand.shuffle(it)
 
-  private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicPerTopic(topic) + topic
+  private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicByTopic(topic) + topic
 
 }
 

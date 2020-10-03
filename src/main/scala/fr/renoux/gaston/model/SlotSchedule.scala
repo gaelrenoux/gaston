@@ -39,10 +39,10 @@ case class SlotSchedule(
   lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)
 
   /** Topics that cannot be added on this slot, because of the slot itself */
-  lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsPerSlot(slot)
+  lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsBySlot(slot)
 
   /** Topics that cannot be added on this slot as it now (but may be added later if the configuration of the slot changes) */
-  lazy val currentlyIncompatibleTopics: Set[Topic] = topicsSet.flatMap(problem.incompatibleTopicsPerTopic)
+  lazy val currentlyIncompatibleTopics: Set[Topic] = topicsSet.flatMap(problem.incompatibleTopicsByTopic)
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
   lazy val incompatibleTopics: Set[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics
@@ -56,8 +56,8 @@ case class SlotSchedule(
   lazy val scheduledPersons: Set[Person] = recordsSet.flatMap(_.persons)
   lazy val unscheduledPersons: Set[Person] = slot.personsPresent -- scheduledPersons
   lazy val unscheduledPersonsList: List[Person] = unscheduledPersons.toList
-  lazy val personsPerTopic: Map[Topic, Set[Person]] = recordsSet.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
-  lazy val countPersonsPerTopic: Map[Topic, Int] = personsPerTopic.mapValuesStrict(_.size)
+  lazy val personsByTopic: Map[Topic, Set[Person]] = recordsSet.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
+  lazy val countPersonsByTopic: Map[Topic, Int] = personsByTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
   lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)
 

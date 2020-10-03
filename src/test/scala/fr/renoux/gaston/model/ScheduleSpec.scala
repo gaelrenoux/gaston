@@ -26,7 +26,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
     )
   )
 
-  "topicsPerSlot" should "work" in {
+  "planning" should "work" in {
     Best.planning should be(Map(
       Morning -> Set(Acting, Dancing, Grinding),
       AfterNoon -> Set(Bathing, Eating, Helping),
@@ -49,16 +49,16 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   /*
-  "personsPerSlot" should "work" in {
-    Best.personsPerSlot should be(Map(
+  "personsBySlot" should "work" in {
+    Best.personsBySlot should be(Map(
       Morning -> Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona),
       AfterNoon -> Set(Bianca, Arthur, Eric, Daniela, Corwin, Hercule, Garion, Fiona),
       Evening -> Set(Corwin, Bianca, Fiona, Eric, Daniela, Iago, Hercule, Garion)
     ))
   } */
 
-  "personsPerTopic" should "work" in {
-    Best.personsPerTopic should be(Map(
+  "personsByTopic" should "work" in {
+    Best.personsByTopic should be(Map(
       Acting -> Set(Arthur, Iago, Hercule),
       Dancing -> Set(Daniela, Corwin, Bianca),
       Grinding -> Set(Garion, Fiona),

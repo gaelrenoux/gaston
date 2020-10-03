@@ -23,8 +23,8 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
     BestMorning.scheduledPersons should be(Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona))
   }
 
-  "countPersonsPerTopic" should "work" in {
-    BestMorning.countPersonsPerTopic should be(Map(
+  "countPersonsByTopic" should "work" in {
+    BestMorning.countPersonsByTopic should be(Map(
       Acting -> 3,
       Dancing -> 3,
       Grinding -> 2

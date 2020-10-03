@@ -22,7 +22,7 @@ trait Problem {
   lazy val constraintsList: List[Constraint] = constraints.toList
   lazy val preferencesList: List[Preference] = preferences.toList
   lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
-  lazy val personalPreferencesListPerPerson: Map[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).withDefaultValue(Nil)
+  lazy val personalPreferencesListByPerson: Map[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).withDefaultValue(Nil)
   lazy val impersonalPreferences: Set[Preference] = preferences.filterNot(_.isInstanceOf[Preference.Personal])
   lazy val impersonalPreferencesList: List[Preference] = preferencesList.filterNot(_.isInstanceOf[Preference.Personal])
 
@@ -59,21 +59,21 @@ trait Problem {
 
   val personsCount: Int
 
-  val mandatoryTopicsPerPerson: Map[Person, Set[Topic]]
+  val mandatoryTopicsByPerson: Map[Person, Set[Topic]]
 
-  val forbiddenTopicsPerPerson: Map[Person, Set[Topic]]
+  val forbiddenTopicsByPerson: Map[Person, Set[Topic]]
 
   /** For everyone, their personal preferences */
-  val preferencesPerPerson: Map[Person, Set[Preference.Personal]]
+  val preferencesByPerson: Map[Person, Set[Preference.Personal]]
 
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
     * are mandatory). */
-  val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]]
+  val incompatibleTopicsByTopic: Map[Topic, Set[Topic]]
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
     * is missing). */
-  val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]]
+  val incompatibleTopicsBySlot: Map[Slot, Set[Topic]]
 
-  val simultaneousTopicPerTopic: Map[Topic, Set[Topic]]
+  val simultaneousTopicByTopic: Map[Topic, Set[Topic]]
 
 }

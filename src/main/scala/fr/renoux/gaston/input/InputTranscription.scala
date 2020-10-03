@@ -43,19 +43,19 @@ private[input] class InputTranscription(input: InputModel) {
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badSlots = p.absences.filter(!slotsPerName.contains(_)).map(s => s"[$s]")
+        val badSlots = p.absences.filter(!slotsByName.contains(_)).map(s => s"[$s]")
         if (badSlots.isEmpty) None
         else Some(s"Person [${p.name}]: undefined absence slots: ${badSlots.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badTopics = p.mandatory.filter(!topicsPerName.contains(_)).map(t => s"[$t]")
+        val badTopics = p.mandatory.filter(!topicsByName.contains(_)).map(t => s"[$t]")
         if (badTopics.isEmpty) None
         else Some(s"Person [${p.name}]: undefined mandatory topics: ${badTopics.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badTopics = p.forbidden.filter(!topicsPerName.contains(_)).map(t => s"[$t]")
+        val badTopics = p.forbidden.filter(!topicsByName.contains(_)).map(t => s"[$t]")
         if (badTopics.isEmpty) None
         else Some(s"Person [${p.name}]: undefined forbidden topics: ${badTopics.mkString(", ")}")
       }
@@ -63,72 +63,72 @@ private[input] class InputTranscription(input: InputModel) {
       input.persons.flatMap { p =>
         val badTopics = p.wishes.keys.map(refineV[NonEmpty](_)).collect {
           case Left(_) => "[]" // empty name
-          case Right(t) if !topicsPerName.contains(t) => s"[$t]"
+          case Right(t) if !topicsByName.contains(t) => s"[$t]"
         }
         if (badTopics.isEmpty) None
         else Some(s"Person [${p.name}]: undefined wished topics: ${badTopics.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badPersons = p.incompatible.filter(!personsPerName.contains(_)).map(p => s"[$p]")
+        val badPersons = p.incompatible.filter(!personsByName.contains(_)).map(p => s"[$p]")
         if (badPersons.isEmpty) None
         else Some(s"Person [${p.name}]: undefined incompatible persons: ${badPersons.mkString(", ")}")
       }
     } ++ {
       input.constraints.exclusive
         .flatMap(_.topics)
-        .filter(!topicsPerName.contains(_))
+        .filter(!topicsByName.contains(_))
         .map(t => s"Exclusive constraint: unknown topic: [$t]")
     } ++ {
       input.constraints.exclusive
         .flatMap(_.exemptions)
-        .filter(!personsPerName.contains(_))
+        .filter(!personsByName.contains(_))
         .map(p => s"Exclusive constraint: unknown person: [$p]")
     } ++ {
       input.constraints.simultaneous
         .flatMap(_.topics)
-        .filter(!topicsPerName.contains(_))
+        .filter(!topicsByName.contains(_))
         .map(t => s"Simultaneous constraint: unknown topic: [$t]")
     } ++ {
       input.constraints.simultaneous
         .flatMap(_.topics)
-        .filter(t => topicsPerName(t).size > 1)
+        .filter(t => topicsByName(t).size > 1)
         .map(t => s"Simultaneous constraint: topic [$t]: can't be multiple or have several occurrences")
     } ++ {
       input.constraints.notSimultaneous
         .flatMap(_.topics)
-        .filter(!topicsPerName.contains(_))
+        .filter(!topicsByName.contains(_))
         .map(t => s"SNot-simultaneous constraint: unknown topic: [$t]")
     }
 
   /* Persons */
-  lazy val personsPerName: Map[NonEmptyString, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
+  lazy val personsByName: Map[NonEmptyString, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
 
   /* Slots */
   lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap { s =>
-    val personsPresent = input.personsSet.filterNot(_.absences.contains(s.name)).map(p => personsPerName(p.name))
+    val personsPresent = input.personsSet.filterNot(_.absences.contains(s.name)).map(p => personsByName(p.name))
     s.name -> Slot(s.name, personsPresent, s.maxTopics.fold(Int.MaxValue)(_.value))
   }
   lazy val slotSequences: Seq[Seq[Slot]] = slotSequencesWithNames.mapMap(_._2)
-  lazy val slotsPerName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
+  lazy val slotsByName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
   lazy val slotsSet: Set[InputSlot] = input.slots.flatten.toSet
 
   /* Topics */
   lazy val baseTopics: List[Topic] = input.topics.map { inTopic =>
-    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
-    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
+    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
+    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
     val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-    val slots = inTopic.slots.map(ss => ss.map(slotsPerName))
+    val slots = inTopic.slots.map(ss => ss.map(slotsByName))
     Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots)
   }
 
-  lazy val topicsPerName: Map[NonEmptyString, Set[Topic]] = input.topics.map { inTopic =>
-    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsPerName)
-    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsPerName)
+  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = input.topics.map { inTopic =>
+    val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
+    val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
     val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
     val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-    val slots = inTopic.slots.map(ss => ss.map(slotsPerName))
+    val slots = inTopic.slots.map(ss => ss.map(slotsByName))
     val baseTopic = Topic(inTopic.name, mandatory = mandatory, forbidden = forbidden, min = min, max = max, slots = slots, forced = inTopic.forced)
 
     /* Duplicate topics if more than one occurrence of the topic */
@@ -155,27 +155,27 @@ private[input] class InputTranscription(input: InputModel) {
   }.toMap
 
   /* Topics, but with multiple ones (not occurences, just multi-topics!) grouped */
-  lazy val topicGroupsPerName: Map[NonEmptyString, Set[Set[Topic]]] =
-    topicsPerName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
+  lazy val topicGroupsByName: Map[NonEmptyString, Set[Set[Topic]]] =
+    topicsByName.mapValuesStrict(_.groupBy(_.name.split(Topic.MultipleMarker).head).values.toSet)
 
-  lazy val topics: Set[Topic] = topicsPerName.values.toSet.flatten
+  lazy val topics: Set[Topic] = topicsByName.values.toSet.flatten
 
   /* Constraints */
   object Constraints {
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
         // TODO Better handling of simultaneous and occurrences is needed. Will return an error above
-        TopicsSimultaneous(inConstraint.topics.map(topicsPerName(_).head))
+        TopicsSimultaneous(inConstraint.topics.map(topicsByName(_).head))
       }
 
     lazy val simultaneousMultiple: Set[TopicsSimultaneous] =
       input.multipleTopicsSet.flatMap { inTopic =>
-        topicGroupsPerName(inTopic.name).map(TopicsSimultaneous)
+        topicGroupsByName(inTopic.name).map(TopicsSimultaneous)
       }
 
     lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
       input.constraints.notSimultaneous.map { inConstraint =>
-        val topics = inConstraint.topics.flatMap(topicGroupsPerName(_)).flatMap(_.headOption) // Keep only one element for multiple topics
+        val topics = inConstraint.topics.flatMap(topicGroupsByName(_)).flatMap(_.headOption) // Keep only one element for multiple topics
         TopicsNotSimultaneous(topics)
       }
 
@@ -189,13 +189,13 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val topicScores: Set[TopicDirectPreference] = for {
       inTopic <- input.topicsSet
-      topic <- topicsPerName(inTopic.name)
+      topic <- topicsByName(inTopic.name)
       presenceScore <- inTopic.presence
     } yield TopicDirectPreference(topic, presenceScore)
 
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
-        TopicsExclusive(inConstraint.topics.flatMap(topicsPerName), inConstraint.exemptions.map(personsPerName))
+        TopicsExclusive(inConstraint.topics.flatMap(topicsByName), inConstraint.exemptions.map(personsByName))
       }
 
     lazy val exclusiveOccurrencesAndMultiples: Set[TopicsExclusive] =
@@ -204,16 +204,16 @@ private[input] class InputTranscription(input: InputModel) {
           t.occurrences.exists(_ > 1) || t.multiple.exists(_ > 1)
         }
         .map { inTopic =>
-          val topics = topicsPerName(inTopic.name)
-          val mandatoryPersons = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(ip => personsPerName(ip.name))
+          val topics = topicsByName(inTopic.name)
+          val mandatoryPersons = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(ip => personsByName(ip.name))
           TopicsExclusive(topics, mandatoryPersons)
         }
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
       input.personsSet.collect {
         case ip: InputPerson if ip.incompatible.nonEmpty =>
-          val person = personsPerName(ip.name)
-          val group = ip.incompatible.map(personsPerName)
+          val person = personsByName(ip.name)
+          val group = ip.incompatible.map(personsByName)
           PersonGroupAntiPreference(person, group, settings.incompatibilityAntiPreference)
       }
 
@@ -223,12 +223,12 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val personTopicPreferences: Set[PersonTopicPreference] =
       for {
         inPerson <- input.personsSet
-        person = personsPerName(inPerson.name)
+        person = personsByName(inPerson.name)
         totalInputScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value // TODO Right now, negative prefs are ignored in the total count
         scoreFactor = Score.PersonTotalScore.value / totalInputScore
         inWish <- inPerson.wishes
         wishedTopicName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
-        topic <- topicsPerName(wishedTopicName)
+        topic <- topicsByName(wishedTopicName)
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
     lazy val all: Set[Preference] =
@@ -240,9 +240,9 @@ private[input] class InputTranscription(input: InputModel) {
   }
 
   object Unassigned {
-    private lazy val dummies = slotsPerName.values.map { s =>
+    private lazy val dummies = slotsByName.values.map { s =>
       val topic = Topic.unassigned(s)
-      val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
+      val antiPreferences = personsByName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
       (topic, antiPreferences)
     }
 
@@ -255,9 +255,9 @@ private[input] class InputTranscription(input: InputModel) {
       settings.maxPersonsOnNothing > 0 && settings.maxPersonsOnNothing >= settings.minPersonsOnNothing
 
     private lazy val elements: Iterable[(Topic, Iterable[PersonTopicPreference])] =
-      slotsPerName.values.map { s =>
+      slotsByName.values.map { s =>
         val topic = Topic.nothing(s, settings.minPersonsOnNothing, settings.maxPersonsOnNothing)
-        val antiPreferences = personsPerName.values.map(PersonTopicPreference(_, topic, settings.personOnNothingAntiPreference))
+        val antiPreferences = personsByName.values.map(PersonTopicPreference(_, topic, settings.personOnNothingAntiPreference))
         (topic, antiPreferences)
       }
 
@@ -268,8 +268,8 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val problem: Problem =
     new ProblemImpl(
       slotSequences,
-      topicsPerName.values.flatten.toSet ++ Unassigned.topics ++ Nothing.topics,
-      personsPerName.values.toSet,
+      topicsByName.values.flatten.toSet ++ Unassigned.topics ++ Nothing.topics,
+      personsByName.values.toSet,
       Constraints.all,
       Preferences.all ++ Unassigned.preferences ++ Nothing.preferences
     )

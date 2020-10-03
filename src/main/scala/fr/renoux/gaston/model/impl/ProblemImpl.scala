@@ -18,13 +18,13 @@ class ProblemImpl(
 
   lazy val personsCount: Int = persons.size
 
-  lazy val mandatoryTopicsPerPerson: Map[Person, Set[Topic]] =
+  lazy val mandatoryTopicsByPerson: Map[Person, Set[Topic]] =
     topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 
-  lazy val forbiddenTopicsPerPerson: Map[Person, Set[Topic]] =
+  lazy val forbiddenTopicsByPerson: Map[Person, Set[Topic]] =
     topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
 
-  lazy val incompatibleTopicsPerTopic: Map[Topic, Set[Topic]] = {
+  lazy val incompatibleTopicsByTopic: Map[Topic, Set[Topic]] = {
     val conflictingMandatories = for {
       topic1 <- topics
       topic2 <- topics
@@ -38,7 +38,7 @@ class ProblemImpl(
     (conflictingMandatories ++ notSimultaneous).groupToMap.withDefaultValue(Set.empty)
   }
 
-  lazy val incompatibleTopicsPerSlot: Map[Slot, Set[Topic]] = {
+  lazy val incompatibleTopicsBySlot: Map[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slots
       topic <- topics
@@ -48,13 +48,13 @@ class ProblemImpl(
     couples.groupToMap.withDefaultValue(Set.empty)
   }
 
-  lazy val simultaneousTopicPerTopic: Map[Topic, Set[Topic]] = {
+  lazy val simultaneousTopicByTopic: Map[Topic, Set[Topic]] = {
     constraints.collect {
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
     }.flatten.toMap.withDefaultValue(Set.empty)
   }
 
-  lazy val preferencesPerPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
+  lazy val preferencesByPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
   }.groupBy(_.person).withDefaultValue(Set.empty)
 
