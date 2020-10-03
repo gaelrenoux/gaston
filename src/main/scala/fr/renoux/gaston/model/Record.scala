@@ -37,10 +37,11 @@ case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val p
 
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPerson: Map[Person, Score] =
-    problem.personalPreferencesListByPerson.map[Person, Score] { case (person, prefs) =>
+    persons.view.map { person =>
+      val prefs = problem.personalPreferencesListByPerson(person)
       val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.scoreRecord(this)).sum
       person -> score
-    }
+    }.toMap
 
   lazy val impersonalScore: Score = preferencesScoreRec(problem.impersonalRecordLevelPreferencesList)
 
