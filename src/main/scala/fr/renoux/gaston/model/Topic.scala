@@ -5,7 +5,7 @@ package fr.renoux.gaston.model
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
   * @param forced Topic must be on the schedule.
   * @param virtual Topic created for technical reasons, not a real topic. Cannot be moved or removed from its slot.
-  * */
+  **/
 final case class Topic(
     name: String,
     mandatory: Set[Person] = Set.empty,
