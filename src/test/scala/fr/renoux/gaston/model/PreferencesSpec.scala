@@ -51,7 +51,7 @@ class PreferencesSpec extends AnyFlatSpec with Matchers {
 
   it should "sum negative scores on all topics" in {
     LeonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop, Rocksteady)
-      ++ scheduled(AfterNoon, Machines, Leonardo, Donatello)
+      ++ scheduled(Afternoon, Machines, Leonardo, Donatello)
       ++ scheduled(Evening, Party, Leonardo, Michelangelo, Rocksteady)
     ) should be(Score(-150 * 3))
   }

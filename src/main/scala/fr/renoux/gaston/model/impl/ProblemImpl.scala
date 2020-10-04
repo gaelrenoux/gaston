@@ -9,6 +9,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 class ProblemImpl(
     val slotSequences: Seq[Seq[Slot]],
     val topics: Set[Topic],
+    val unassignedTopics: Map[Slot, Topic],
     val persons: Set[Person],
     val constraints: Set[Constraint],
     val preferences: Set[Preference]

@@ -11,7 +11,7 @@ final case class Topic(
     mandatory: Set[Person] = Set.empty,
     forbidden: Set[Person] = Set.empty,
     min: Int = Topic.DefaultMin,
-    max: Int = Topic.DefaultMax,
+    max: Int = Topic.DefaultMax, // TODO bad max, remove default value (Person.MaxCount would be better)
     slots: Option[Set[Slot]] = None,
     forced: Boolean = false,
     virtual: Boolean = false
@@ -26,8 +26,4 @@ object Topic {
   val DefaultMin = 1
 
   val DefaultMax = 10
-
-  /** Topics for people not assigned yet on some slot. */
-  def unassigned(slot: Slot): Topic =
-    Topic(s"[${slot.name}]", max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
 }

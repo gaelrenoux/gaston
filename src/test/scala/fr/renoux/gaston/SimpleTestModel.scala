@@ -1,7 +1,7 @@
 package fr.renoux.gaston
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.input.{InputLoader, InputSettings}
+import fr.renoux.gaston.input.{InputLoader, InputSettings, InputTranscription}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
@@ -39,9 +39,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import Persons._
 
-    val BaseMorning: Topic = Topic.unassigned(MinimalTestModel.Slots.Morning)
-    val BaseAfternoon: Topic = Topic.unassigned(MinimalTestModel.Slots.AfterNoon)
-    val BaseEvening: Topic = Topic.unassigned(Slots.Evening)
+    val UnassignedMorning: Topic = InputTranscription.unassignedTopic(MinimalTestModel.Slots.Morning)
+    val UnassignedAfternoon: Topic = InputTranscription.unassignedTopic(MinimalTestModel.Slots.Afternoon)
+    val UnassignedEvening: Topic = InputTranscription.unassignedTopic(Slots.Evening)
 
     val Acting = Topic("Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
     val Bathing = Topic("Bathing", mandatory = Set(Bianca), forbidden = Set(Corwin), min = 2, max = 5)
@@ -53,8 +53,13 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val Helping = Topic("Helping", mandatory = Set(Hercule), forbidden = Set(Iago), min = 2, max = 5)
     val Inking = Topic("Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
 
-    val Bases = Set(BaseMorning, BaseAfternoon, BaseEvening)
-    val All: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
+    val Unassigned = Map(
+      MinimalTestModel.Slots.Morning -> UnassignedMorning,
+      MinimalTestModel.Slots.Afternoon -> UnassignedAfternoon,
+      MinimalTestModel.Slots.Evening -> UnassignedEvening
+    )
+    val Concrete: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
+    val All: Set[Topic] = Concrete ++ Unassigned.values
   }
 
   object Constraints {
@@ -103,7 +108,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
-    val Complete = new ProblemImpl(Slots.All, Topics.Bases ++ Topics.All, Persons.All, Constraints.All, Preferences.All)
+    val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

@@ -27,8 +27,8 @@ class InputSpec extends AnyFlatSpec with Matchers {
     }
 
     object topics {
-      val unassignedA: Topic = Topic.unassigned(expected.slots.a)
-      val unassignedB: Topic = Topic.unassigned(expected.slots.b)
+      val unassignedA: Topic = InputTranscription.unassignedTopic(expected.slots.a)
+      val unassignedB: Topic = InputTranscription.unassignedTopic(expected.slots.b)
       val alpha = Topic("alpha", min = 5, max = 5, mandatory = Set(Person("bernard", Weight.Default)))
       val beta = Topic("beta", min = 4, max = 5, forbidden = Set(Person("laverne", Weight.Default)), slots = Some(Set(slots.a)))
       val gamma = Topic("gamma", min = 4, max = 6)
@@ -59,15 +59,27 @@ class InputSpec extends AnyFlatSpec with Matchers {
   it should "contain the correct preferences" in {
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
-      t <- Set(Topic.unassigned(expected.slots.a), Topic.unassigned(expected.slots.b))
+      t <- Set(InputTranscription.unassignedTopic(expected.slots.a), InputTranscription.unassignedTopic(expected.slots.b))
       p <- Set(expected.persons.bernard, expected.persons.hoagie, expected.persons.laverne)
     } yield PersonTopicPreference(p, t, Score(-1000))
-    problem.preferences should be(initialTopicsPreferences ++ Set(
+    val additionalPreferences = Set(
       PersonTopicPreference(expected.persons.bernard, expected.topics.alpha, Score(scalingFactor * 5.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.beta, Score(scalingFactor * 1.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.gamma, Score(scalingFactor * 1.0)),
       TopicsExclusive(Set(expected.topics.beta, expected.topics.gamma), Set(expected.persons.laverne))
-    ))
+    )
+    val expectedPreferences = initialTopicsPreferences ++ additionalPreferences
+
+    problem.preferences.filter {
+      case p: PersonTopicPreference if p.topic.virtual => true
+      case _ => false
+    } should be(expectedPreferences.filter {
+      case p: PersonTopicPreference if p.topic.virtual => true
+      case _ => false
+    })
+    problem.preferences.filter(_.isInstanceOf[PersonTopicPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonTopicPreference]))
+    problem.preferences.filter(_.isInstanceOf[TopicsExclusive]) should be(expectedPreferences.filter(_.isInstanceOf[TopicsExclusive]))
+    problem.preferences should be(expectedPreferences)
   }
 
 }

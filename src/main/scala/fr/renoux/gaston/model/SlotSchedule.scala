@@ -199,7 +199,7 @@ object SlotSchedule {
 
   /** Slot schedule where everyone is on an "unassigned" topic */
   def everyoneUnassigned(slot: Slot)(implicit problem: Problem): SlotSchedule = {
-    val t = Topic.unassigned(slot)
+    val t = problem.unassignedTopics(slot)
     SlotSchedule(slot, Map(t -> Record(slot, t, slot.personsPresent)))
   }
 

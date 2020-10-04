@@ -8,6 +8,7 @@ trait Problem {
   val slotSequences: Seq[Seq[Slot]]
   val slots: Set[Slot]
   val topics: Set[Topic]
+  val unassignedTopics: Map[Slot, Topic]
   val persons: Set[Person]
   val constraints: Set[Constraint]
   val preferences: Set[Preference]

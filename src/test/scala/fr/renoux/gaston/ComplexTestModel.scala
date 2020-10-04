@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.impl.ProblemImpl
@@ -31,12 +32,13 @@ class ComplexTestModel(seed: Long) {
     private val topicNames = Set("alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota",
       "kappa", "lambda", "mu", "nu", "ksi", "omicron", "pi", "rho", "sigma", "tau", "upsilon", "phi", "khi", "psi",
       "omega")
-    val All: Set[Topic] = topicNames.map { n =>
+    val Concrete: Set[Topic] = topicNames.map { n =>
       val mand = random.pick(Persons.All)
       val forb = random.pick(Persons.All - mand)
       Topic(n, mandatory = Set(mand), forbidden = Set(forb), min = 4, max = 12)
     }
-    val Bases: Set[Topic] = Slots.AllSet.map(s => Topic.unassigned(s))
+    val Unassigned: Map[Slot, Topic] = Slots.AllSet.map(s => s -> InputTranscription.unassignedTopic(s)).toMap
+    val All: Set[Topic] = Concrete ++ Unassigned.values
   }
 
   object Slots {
@@ -48,7 +50,7 @@ class ComplexTestModel(seed: Long) {
   object Preferences {
     val PersonTopics: Set[Preference] = for {
       p <- Persons.All
-      (t, i) <- random.pick(Topics.All, 9).zipWithIndex
+      (t, i) <- random.pick(Topics.Concrete, 9).zipWithIndex
       str = if (i < 3) strongPreference else weakPreference
     } yield PersonTopicPreference(p, t, str)
     val Incompatibilities: Set[Preference] = Set {
@@ -56,23 +58,23 @@ class ComplexTestModel(seed: Long) {
       PersonGroupAntiPreference(p.head, p.tail.toSet, -strongPreference)
     }
 
-    val All: Set[Preference] = PersonTopics ++ Incompatibilities // + PersonTopicPreference(Person("brigit kevin"),
-    // Topic("sigma"), Score(100))
-
-    val Bases: Set[Preference] = for {
-      t <- Topics.Bases
+    val Unassigned: Set[Preference] = for {
+      t: Topic <- Topics.Unassigned.values.toSet
       p <- Persons.All
     } yield PersonTopicPreference(p, t, Score.PersonTotalScore.negative)
+
+    val All: Set[Preference] = PersonTopics ++ Incompatibilities ++ Unassigned
   }
 
   object Problems {
     val Complete: Problem = {
       val p = new ProblemImpl(
         Slots.AllSequence,
-        Topics.All ++ Topics.Bases,
+        Topics.All,
+        Topics.Unassigned,
         Persons.All,
         Set.empty,
-        Preferences.All ++ Preferences.Bases
+        Preferences.All ++ Preferences.Unassigned
       )
       log.info(s"ComplexTestModel($seed)'s problem is: ${p.toFormattedString}")
       p

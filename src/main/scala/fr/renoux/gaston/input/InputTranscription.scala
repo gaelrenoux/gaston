@@ -39,7 +39,14 @@ private[input] class InputTranscription(input: InputModel) {
 
 
   /* Topics */
-  val nothingTopicsByName: Map[NonEmptyString, Topic] = if (!input.settings.isNothingEnabled) Map.empty[NonEmptyString, Topic] else {
+  lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] = {
+    input.slotsSet.map { inSlot =>
+      val slot = slotsByName(inSlot.name)
+      val name = unassignedTopicName(inSlot.name)
+      (name, slot) -> unassignedTopic(slot)
+    }.toMap
+  }
+  lazy val nothingTopicsByName: Map[NonEmptyString, Topic] = if (!input.settings.isNothingEnabled) Map.empty[NonEmptyString, Topic] else {
     input.slotsSet.map { inSlot =>
       val slot = slotsByName(inSlot.name)
       val name = nothingTopicName(inSlot.name)
@@ -78,7 +85,9 @@ private[input] class InputTranscription(input: InputModel) {
     }.toMap
   }
   lazy val topicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] =
-    nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Set(topic)) } ++ concreteTopicMultiplesByOccurrenceIndexByName
+    concreteTopicMultiplesByOccurrenceIndexByName ++
+      nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Set(topic)) } ++
+      unassignedTopicsByNameAndSlot.mapValuesStrict { topic => Map(0 -> Set(topic)) }.mapKeys(_._1)
 
   lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicMultiplesByOccurrenceIndexByName.mapValuesStrict(_.values.flatten.toSet)
 
@@ -168,6 +177,13 @@ private[input] class InputTranscription(input: InputModel) {
       } yield PersonTopicPreference(person, nothingTopic, settings.personOnNothingAntiPreference)
     }.toSet
 
+    lazy val unassignedTopicPreferences: Set[PersonTopicPreference] = {
+      for {
+        unassignedTopic <- unassignedTopicsByNameAndSlot.values
+        person <- personsByName.values
+      } yield PersonTopicPreference(person, unassignedTopic, Score.PersonTotalScore.negative)
+    }.toSet
+
     lazy val all: Set[Preference] = {
       Set.empty[Preference] ++
         topicScores ++
@@ -175,21 +191,9 @@ private[input] class InputTranscription(input: InputModel) {
         exclusiveOccurrences ++
         groupDislikes ++
         personTopicPreferences ++
-        nothingTopicPreferences
+        nothingTopicPreferences ++
+        unassignedTopicPreferences
     }
-  }
-
-
-  /* Unassigned topics */
-  object Unassigned {
-    private lazy val dummies = slotsByName.values.map { s =>
-      val topic = Topic.unassigned(s)
-      val antiPreferences = personsByName.values.map(PersonTopicPreference(_, topic, Score.PersonTotalScore.negative))
-      (topic, antiPreferences)
-    }
-
-    lazy val topics: Set[Topic] = dummies.map(_._1).toSet
-    lazy val preferences: Set[PersonTopicPreference] = dummies.flatMap(_._2).toSet
   }
 
 
@@ -198,10 +202,11 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val problem: Problem =
     new ProblemImpl(
       slotSequences,
-      topicsByName.values.flatten.toSet ++ Unassigned.topics,
+      topicsByName.values.flatten.toSet,
+      unassignedTopicsByNameAndSlot.mapKeys(_._2),
       personsByName.values.toSet,
       Constraints.all,
-      Preferences.all ++ Unassigned.preferences
+      Preferences.all
     )
 
   lazy val result: Validation[InputErrors, Problem] = errors.toList.sorted.map(InputError(_)) match {
@@ -213,9 +218,13 @@ private[input] class InputTranscription(input: InputModel) {
 
 object InputTranscription {
 
-  private val NothingTopicPrefix = "@Nothing "
+  private val VirtualTopicPrefix = "@"
 
-  def nothingTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"$NothingTopicPrefix($slotName)")
+  def nothingTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}Nothing ($slotName)")
+
+  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}[$slotName]")
+
+  def unassignedTopic(slot: Slot): Topic = Topic(unassignedTopicName(slot.name), max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++
@@ -251,8 +260,8 @@ object InputTranscription {
       duplicates.map { d => s"Duplicate topic name: $d" }
     } ++ {
       input.topics
-        .filter { t => t.name.startsWith(NothingTopicPrefix) }
-        .map { t => s"Topic [${t.name}]: prefix $NothingTopicPrefix is reserved" }
+        .filter { t => t.name.startsWith(VirtualTopicPrefix) }
+        .map { t => s"Topic [${t.name}]: prefix $VirtualTopicPrefix is reserved by the software" }
     } ++ {
       input.topics
         .filter { t => t.min.lazyZip(t.max).exists(_ > _) }

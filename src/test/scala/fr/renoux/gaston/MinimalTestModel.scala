@@ -1,5 +1,6 @@
 package fr.renoux.gaston
 
+import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.{Person, Slot, Topic}
 
@@ -25,20 +26,22 @@ object MinimalTestModel {
     val Machines = Topic("machines")
     val Party = Topic("party")
 
-    val All: Set[Topic] = Set(Leading, Fighting, Machines, Party)
+    val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> InputTranscription.unassignedTopic(s)).toMap
+    val Concrete: Set[Topic] = Set(Leading, Fighting, Machines, Party)
+    val All: Set[Topic] = Concrete ++ Unassigned.values
   }
 
   object Slots {
     val Morning = Slot("morning", Persons.All)
-    val AfterNoon = Slot("afternoon", Persons.All)
+    val Afternoon = Slot("afternoon", Persons.All)
     val Evening = Slot("evening", Persons.All)
     val Night = Slot("night", Persons.All)
 
-    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening, Night))
+    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
   }
 
   object Problems {
-    val Minimal = new ProblemImpl(Slots.All, Topics.All, Persons.All, Set.empty, Set.empty)
+    val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned, Persons.All, Set.empty, Set.empty)
   }
 
 }
