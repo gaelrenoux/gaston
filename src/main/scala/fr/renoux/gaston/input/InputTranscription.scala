@@ -21,7 +21,6 @@ private[input] class InputTranscription(input: InputModel) {
 
 
   /* Checking errors */
-  // TODO check that names are non-duplicates
   lazy val errors: Set[String] = {
     Set.empty[String] ++ {
       if (input.settings.defaultMinPersonsPerTopic <= input.settings.defaultMaxPersonsPerTopic) None
@@ -31,6 +30,12 @@ private[input] class InputTranscription(input: InputModel) {
       if (input.settings.minPersonsOnNothing <= input.settings.maxPersonsOnNothing) None
       else Some(s"Settings: Min persons on nothing (${input.settings.minPersonsOnNothing}) " +
         s"is higher than max persons on nothing (${input.settings.maxPersonsOnNothing})")
+    } ++ {
+      val duplicates = input.slots.flatten.groupBy(_.name).mapValuesStrict(_.size).filter(_._2 > 1).keySet
+      duplicates.map { d => s"Duplicate slot name: $d" }
+    } ++ {
+      val duplicates = input.topics.groupBy(_.name).mapValuesStrict(_.size).filter(_._2 > 1).keySet
+      duplicates.map { d => s"Duplicate topic name: $d" }
     } ++ {
       input.topics
         .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
@@ -45,6 +50,9 @@ private[input] class InputTranscription(input: InputModel) {
         if (badSlots.isEmpty) None
         else Some(s"Topic [${t.name}]: undefined slots: ${badSlots.mkString(", ")}")
       }
+    } ++ {
+      val duplicates = input.persons.groupBy(_.name).mapValuesStrict(_.size).filter(_._2 > 1).keySet
+      duplicates.map { d => s"Duplicate person name: $d" }
     } ++ {
       input.persons.flatMap { p =>
         val badSlots = p.absences.filter(!input.slotsNameSet.contains(_)).map(s => s"[$s]")
