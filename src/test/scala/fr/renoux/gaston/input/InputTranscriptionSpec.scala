@@ -96,18 +96,6 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       } should be(topics.map(_ -> Score.PersonTotalScore))
     }
 
-    they should "be exclusive except for mandatory people" in {
-      implicit val problem = from(InputModel(
-        topics = inputTopics,
-        persons = List(
-          InputPerson("Arnold", mandatory = Set("alpha"))
-        )
-      ))
-      problem.preferences.collect {
-        case TopicsExclusive(ts, ex, _) => (ts, ex)
-      } should be(Set(topics -> Set(p"Arnold")))
-    }
-
     they should "be simultaneous" in {
       implicit val problem = from(InputModel(
         topics = inputTopics,
