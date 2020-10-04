@@ -20,8 +20,12 @@ case class InputModel(
     topics: List[InputTopic] = Nil,
     constraints: InputGlobalConstraints = InputGlobalConstraints()
 ) {
+  lazy val slotsSet: Set[InputSlot] = slots.flatten.toSet
   lazy val topicsSet: Set[InputTopic] = topics.toSet
   lazy val personsSet: Set[InputPerson] = persons.toSet
+  lazy val slotsNameSet: Set[NonEmptyString] = slots.flatten.map(_.name).toSet
+  lazy val topicsNameSet: Set[NonEmptyString] = topics.map(_.name).toSet
+  lazy val personsNameSet: Set[NonEmptyString] = persons.map(_.name).toSet
   lazy val multipleTopicsSet: Set[InputTopic] = topicsSet.filter(_.multiple.exists(_ > 1))
 }
 
