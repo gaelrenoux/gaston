@@ -38,7 +38,9 @@ case class InputSettings(
     minPersonsOnNothing: NonNegInt = 0,
     personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
     backtrackInitialSchedule: Boolean = true // TODO Should be calculated
-)
+) {
+  lazy val isNothingEnabled: Boolean = maxPersonsOnNothing > 0
+}
 
 case class InputTableSettings(
     separator: NonEmptyString = "\t",
