@@ -1,5 +1,7 @@
 package fr.renoux.gaston
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.{InputLoader, InputSettings, InputTranscription}
 import fr.renoux.gaston.model._
@@ -16,42 +18,47 @@ class SimpleTestModel(implicit settings: InputSettings) {
   private val weakPreference = Score(1)
 
   object Persons {
-    val Arthur = Person("Arthur")
-    val Bianca = Person("Bianca")
-    val Corwin = Person("Corwin")
-    val Daniela = Person("Daniela")
-    val Eric = Person("Eric")
-    val Fiona = Person("Fiona")
-    val Garion = Person("Garion")
-    val Hercule = Person("Hercule")
-    val Iago = Person("Iago")
+    private val index = new AtomicInteger(0)
+    val Arthur = Person(index.getAndIncrement(), "Arthur")
+    val Bianca = Person(index.getAndIncrement(), "Bianca")
+    val Corwin = Person(index.getAndIncrement(), "Corwin")
+    val Daniela = Person(index.getAndIncrement(), "Daniela")
+    val Eric = Person(index.getAndIncrement(), "Eric")
+    val Fiona = Person(index.getAndIncrement(), "Fiona")
+    val Garion = Person(index.getAndIncrement(), "Garion")
+    val Hercule = Person(index.getAndIncrement(), "Hercule")
+    val Iago = Person(index.getAndIncrement(), "Iago")
     val All: Set[Person] = Set(Arthur, Bianca, Corwin, Daniela, Eric, Fiona, Garion, Hercule, Iago)
   }
 
   object Slots {
-    val Morning = Slot("morning", Persons.All - Persons.Eric)
-    val AfterNoon = Slot("afternoon", Persons.All - Persons.Iago)
-    val Evening = Slot("evening", Persons.All - Persons.Arthur)
+    private val index = new AtomicInteger(0)
+    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All - Persons.Eric)
+    val AfterNoon = Slot(index.getAndIncrement(), "afternoon", Persons.All - Persons.Iago)
+    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All - Persons.Arthur)
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
+    val Count = All.flatten.size
   }
 
   object Topics {
 
     import Persons._
 
-    val UnassignedMorning: Topic = InputTranscription.unassignedTopic(MinimalTestModel.Slots.Morning)
-    val UnassignedAfternoon: Topic = InputTranscription.unassignedTopic(MinimalTestModel.Slots.Afternoon)
-    val UnassignedEvening: Topic = InputTranscription.unassignedTopic(Slots.Evening)
+    private val index = new AtomicInteger(0)
 
-    val Acting = Topic("Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
-    val Bathing = Topic("Bathing", mandatory = Set(Bianca), forbidden = Set(Corwin), min = 2, max = 5)
-    val Cooking = Topic("Cooking", mandatory = Set(Corwin), forbidden = Set(Daniela), min = 2, max = 5)
-    val Dancing = Topic("Dancing", mandatory = Set(Daniela), forbidden = Set(Eric), min = 2, max = 5)
-    val Eating = Topic("Eating", mandatory = Set(Eric), forbidden = Set(Fiona), min = 2, max = 5)
-    val Fighting = Topic("Fighting", mandatory = Set(Fiona), forbidden = Set(Garion), min = 2, max = 5)
-    val Grinding = Topic("Grinding", mandatory = Set(Garion), forbidden = Set(Hercule), min = 2, max = 5)
-    val Helping = Topic("Helping", mandatory = Set(Hercule), forbidden = Set(Iago), min = 2, max = 5)
-    val Inking = Topic("Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
+    val UnassignedMorning: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), MinimalTestModel.Slots.Morning)
+    val UnassignedAfternoon: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), MinimalTestModel.Slots.Afternoon)
+    val UnassignedEvening: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), Slots.Evening)
+
+    val Acting = Topic(index.getAndIncrement(), "Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
+    val Bathing = Topic(index.getAndIncrement(), "Bathing", mandatory = Set(Bianca), forbidden = Set(Corwin), min = 2, max = 5)
+    val Cooking = Topic(index.getAndIncrement(), "Cooking", mandatory = Set(Corwin), forbidden = Set(Daniela), min = 2, max = 5)
+    val Dancing = Topic(index.getAndIncrement(), "Dancing", mandatory = Set(Daniela), forbidden = Set(Eric), min = 2, max = 5)
+    val Eating = Topic(index.getAndIncrement(), "Eating", mandatory = Set(Eric), forbidden = Set(Fiona), min = 2, max = 5)
+    val Fighting = Topic(index.getAndIncrement(), "Fighting", mandatory = Set(Fiona), forbidden = Set(Garion), min = 2, max = 5)
+    val Grinding = Topic(index.getAndIncrement(), "Grinding", mandatory = Set(Garion), forbidden = Set(Hercule), min = 2, max = 5)
+    val Helping = Topic(index.getAndIncrement(), "Helping", mandatory = Set(Hercule), forbidden = Set(Iago), min = 2, max = 5)
+    val Inking = Topic(index.getAndIncrement(), "Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
 
     val Unassigned = Map(
       MinimalTestModel.Slots.Morning -> UnassignedMorning,
@@ -108,6 +115,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
+    implicit val CompleteCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
     val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned, Persons.All, Constraints.All, Preferences.All)
   }
 

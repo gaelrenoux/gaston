@@ -5,6 +5,8 @@ import fr.renoux.gaston.util.TupleImplicits._
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 trait Problem {
+  implicit val counts: Counts
+
   val slotSequences: Seq[Seq[Slot]]
   val slots: Set[Slot]
   val topics: Set[Topic]

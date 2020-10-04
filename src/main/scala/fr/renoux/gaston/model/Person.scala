@@ -4,6 +4,7 @@ package fr.renoux.gaston.model
 
 /** Someone. */
 final case class Person(
+    id: Int,
     name: String,
     weight: Weight = Weight.Default
 )

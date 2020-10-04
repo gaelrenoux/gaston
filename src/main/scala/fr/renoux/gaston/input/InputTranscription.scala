@@ -1,5 +1,7 @@
 package fr.renoux.gaston.input
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import eu.timepit.refined.auto._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.refineV
@@ -26,24 +28,27 @@ private[input] class InputTranscription(input: InputModel) {
 
 
   /* Persons */
-  lazy val personsByName: Map[NonEmptyString, Person] = input.persons.map { p => p.name -> Person(p.name, p.weight) }.toMap
+  lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (p, ix) => Person(ix, p.name, p.weight) }.toArray
+  lazy val personsByName: Map[NonEmptyString, Person] = personsById.map { p => NonEmptyString.unsafeFrom(p.name) -> p }.toMap
 
 
   /* Slots */
+  private val slotIx = new AtomicInteger(0) // ugly, simpler
   lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap { s =>
     val personsPresent = input.personsSet.filterNot(_.absences.contains(s.name)).map(p => personsByName(p.name))
-    s.name -> Slot(s.name, personsPresent, s.maxTopics.fold(Int.MaxValue)(_.value))
+    s.name -> Slot(slotIx.getAndIncrement(), s.name, personsPresent, s.maxTopics.fold(Int.MaxValue)(_.value))
   }
   lazy val slotSequences: Seq[Seq[Slot]] = slotSequencesWithNames.mapMap(_._2)
   lazy val slotsByName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
 
 
   /* Topics */
+  private val topicIx = new AtomicInteger(0) // ugly, simpler
   lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] = {
     input.slotsSet.map { inSlot =>
       val slot = slotsByName(inSlot.name)
       val name = unassignedTopicName(inSlot.name)
-      (name, slot) -> unassignedTopic(slot)
+      (name, slot) -> unassignedTopic(topicIx.getAndIncrement(), slot)
     }.toMap
   }
   lazy val nothingTopicsByName: Map[NonEmptyString, Topic] = if (!input.settings.isNothingEnabled) Map.empty[NonEmptyString, Topic] else {
@@ -52,9 +57,10 @@ private[input] class InputTranscription(input: InputModel) {
       val name = nothingTopicName(inSlot.name)
       val min = settings.minPersonsOnNothing
       val max = settings.maxPersonsOnNothing
-      name -> Topic(name, min = min, max = max, slots = Some(Set(slot)), virtual = true)
+      name -> Topic(topicIx.getAndIncrement(), name, min = min, max = max, slots = Some(Set(slot)), virtual = true)
     }.toMap
   }
+
   lazy val concreteTopicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] = {
     input.topics.map { inTopic: InputTopic =>
       val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
@@ -73,7 +79,12 @@ private[input] class InputTranscription(input: InputModel) {
 
           val topics = topicParts.map { part => // can't iterate on mandatoriesByPart, may be missing parts
             val thisMandatories = mandatoriesByPart.getOrElse(part, Seq.empty)
-            Topic(part.name, mandatory = thisMandatories.toSet, forbidden = forbidden, min = min, max = max, slots = slots, forced = inTopic.forced)
+            Topic(
+              topicIx.getAndIncrement(), part.name,
+              mandatory = thisMandatories.toSet, forbidden = forbidden,
+              min = min, max = max,
+              slots = slots, forced = inTopic.forced
+            )
           }.toSet
 
           // in the constraint section, we will make parts simultaneous
@@ -84,12 +95,20 @@ private[input] class InputTranscription(input: InputModel) {
       inTopic.name -> multiplesByOccurrenceIndex
     }.toMap
   }
+
   lazy val topicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] =
     concreteTopicMultiplesByOccurrenceIndexByName ++
       nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Set(topic)) } ++
       unassignedTopicsByNameAndSlot.mapValuesStrict { topic => Map(0 -> Set(topic)) }.mapKeys(_._1)
 
   lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicMultiplesByOccurrenceIndexByName.mapValuesStrict(_.values.flatten.toSet)
+
+
+  /* Counts */
+  lazy val slotsCount: Int = slotsByName.size
+  lazy val personsCount: Int = personsByName.size
+  lazy val topicsCount: Int = topicsByName.size
+  implicit lazy val counts: Counts = Counts(slots = slotsCount, topics = topicsCount, persons = personsCount)
 
 
   /* Constraints */
@@ -224,7 +243,7 @@ object InputTranscription {
 
   def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}[$slotName]")
 
-  def unassignedTopic(slot: Slot): Topic = Topic(unassignedTopicName(slot.name), max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
+  def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++

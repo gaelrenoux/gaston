@@ -7,6 +7,7 @@ package fr.renoux.gaston.model
   * @param virtual Topic created for technical reasons, not a real topic. Cannot be moved or removed from its slot.
   **/
 final case class Topic(
+    id: Int,
     name: String,
     mandatory: Set[Person] = Set.empty,
     forbidden: Set[Person] = Set.empty,

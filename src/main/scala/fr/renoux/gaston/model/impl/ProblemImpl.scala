@@ -13,7 +13,7 @@ class ProblemImpl(
     val persons: Set[Person],
     val constraints: Set[Constraint],
     val preferences: Set[Preference]
-) extends Problem {
+)(implicit val counts: Counts) extends Problem {
 
   val slots: Set[Slot] = slotSequences.flatten.toSet
 

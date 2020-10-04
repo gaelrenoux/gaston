@@ -4,7 +4,6 @@ import eu.timepit.refined.auto._
 import fr.renoux.gaston.model.constraints.TopicsSimultaneous
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
-import fr.renoux.gaston.util.CollectionImplicits._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -44,7 +43,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       ))
       problem.mandatoryTopicsByPerson(p"Arnold") should be(topics)
       problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
-      problem.preferencesByPerson.mapKeys(_.name)("Caroline").collect {
+      problem.preferencesByPerson(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
       } should be(topics.map(_ -> Score.PersonTotalScore))
     }

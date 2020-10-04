@@ -14,24 +14,24 @@ class InputSpec extends AnyFlatSpec with Matchers {
   object expected {
 
     object persons {
-      val bernard = Person("bernard", Weight.Default)
-      val laverne = Person("laverne", Weight(1))
-      val hoagie = Person("hoagie", Weight(1.5))
+      val bernard = Person(0, "bernard", Weight.Default)
+      val laverne = Person(1, "laverne", Weight(1))
+      val hoagie = Person(2, "hoagie", Weight(1.5))
       val all: Set[Person] = Set(bernard, laverne, hoagie)
     }
 
     object slots {
-      val a = Slot("A", persons.all, maxTopics = 4)
-      val b = Slot("B", persons.all, maxTopics = Int.MaxValue)
+      val a = Slot(0, "A", persons.all, maxTopics = 4)
+      val b = Slot(1, "B", persons.all, maxTopics = Int.MaxValue)
       val all: Set[Slot] = Set(a, b)
     }
 
     object topics {
-      val unassignedA: Topic = InputTranscription.unassignedTopic(expected.slots.a)
-      val unassignedB: Topic = InputTranscription.unassignedTopic(expected.slots.b)
-      val alpha = Topic("alpha", min = 5, max = 5, mandatory = Set(Person("bernard", Weight.Default)))
-      val beta = Topic("beta", min = 4, max = 5, forbidden = Set(Person("laverne", Weight.Default)), slots = Some(Set(slots.a)))
-      val gamma = Topic("gamma", min = 4, max = 6)
+      val alpha = Topic(0, "alpha", min = 5, max = 5, mandatory = Set(persons.bernard))
+      val beta = Topic(1, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
+      val gamma = Topic(2, "gamma", min = 4, max = 6)
+      val unassignedA: Topic = InputTranscription.unassignedTopic(3, expected.slots.a)
+      val unassignedB: Topic = InputTranscription.unassignedTopic(4, expected.slots.b)
       val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma)
     }
 
@@ -42,6 +42,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "contain the correct topics" in {
+    problem.topics.map(t => (t.id, t.name)).toSeq.sorted should be(expected.topics.all.map(t => (t.id, t.name)).toSeq.sorted)
     problem.topics.toSeq.sortBy(_.name) should be(expected.topics.all.toSeq.sortBy(_.name))
     problem.topics should be(expected.topics.all)
   }
@@ -59,7 +60,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
   it should "contain the correct preferences" in {
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
-      t <- Set(InputTranscription.unassignedTopic(expected.slots.a), InputTranscription.unassignedTopic(expected.slots.b))
+      t <- Set(expected.topics.unassignedA, expected.topics.unassignedB)
       p <- Set(expected.persons.bernard, expected.persons.hoagie, expected.persons.laverne)
     } yield PersonTopicPreference(p, t, Score(-1000))
     val additionalPreferences = Set(
