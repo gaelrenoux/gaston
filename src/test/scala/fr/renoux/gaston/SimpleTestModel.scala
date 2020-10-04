@@ -116,7 +116,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Problems {
     implicit val CompleteCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
-    val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned, Persons.All, Constraints.All, Preferences.All)
+    val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

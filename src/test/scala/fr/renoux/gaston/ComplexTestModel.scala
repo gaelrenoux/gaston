@@ -79,7 +79,7 @@ class ComplexTestModel(seed: Long) {
       val p = new ProblemImpl(
         Slots.AllSequence,
         Topics.All,
-        Topics.Unassigned,
+        Topics.Unassigned.toBitMap,
         Persons.All,
         Set.empty,
         Preferences.All ++ Preferences.Unassigned

@@ -10,7 +10,7 @@ trait Problem {
   val slotSequences: Seq[Seq[Slot]]
   val slots: Set[Slot]
   val topics: Set[Topic]
-  val unassignedTopics: Map[Slot, Topic]
+  val unassignedTopics: BitMap[Slot, Topic]
   val persons: Set[Person]
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
@@ -25,11 +25,9 @@ trait Problem {
   lazy val constraintsList: List[Constraint] = constraints.toList
   lazy val preferencesList: List[Preference] = preferences.toList
   lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
-  lazy val personalPreferencesListByPerson: Map[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).withDefaultValue(Nil)
-  lazy val impersonalPreferences: Set[Preference] = preferences.filterNot(_.isInstanceOf[Preference.Personal])
-  lazy val impersonalPreferencesList: List[Preference] = preferencesList.filterNot(_.isInstanceOf[Preference.Personal])
+  lazy val personalPreferencesListByPerson: BitMap[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap(Nil)
 
-  lazy val (
+  private lazy val (
     (recordLevelPreferences: Set[Preference.RecordLevel], slotLevelPreferences: Set[Preference.SlotLevel]),
     globalLevelPreferences: Set[Preference.GlobalLevel]
     ) =
@@ -62,21 +60,21 @@ trait Problem {
 
   val personsCount: Int
 
-  val mandatoryTopicsByPerson: Map[Person, Set[Topic]]
+  val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]]
 
-  val forbiddenTopicsByPerson: Map[Person, Set[Topic]]
+  val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]]
 
   /** For everyone, their personal preferences */
-  val preferencesByPerson: Map[Person, Set[Preference.Personal]]
+  val preferencesByPerson: BitMap[Person, Set[Preference.Personal]]
 
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
     * are mandatory). */
-  val incompatibleTopicsByTopic: Map[Topic, Set[Topic]]
+  val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]]
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
     * is missing). */
-  val incompatibleTopicsBySlot: Map[Slot, Set[Topic]]
+  val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]]
 
-  val simultaneousTopicByTopic: Map[Topic, Set[Topic]]
+  val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]]
 
 }

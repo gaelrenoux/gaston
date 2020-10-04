@@ -1,14 +1,43 @@
 package fr.renoux.gaston
 
+import scala.reflect.ClassTag
+
 package object model {
 
-  def slotBitSet(it: Iterable[Slot])(implicit counts: Counts): BitSet[Slot] =
-    BitSet.from[Slot](counts.slots)(it)
+  implicit class SlotSetOps(val wrapped: Iterable[Slot]) extends AnyVal {
+    @inline def toBitSet(implicit counts: Counts): BitSet[Slot] =
+      BitSet.from[Slot](counts.slots)(wrapped)
+  }
 
-  def topicBitSet(it: Iterable[Topic])(implicit counts: Counts): BitSet[Topic] =
-    BitSet.from[Topic](counts.topics)(it)
+  implicit class TopicSetOps(val wrapped: Iterable[Topic]) extends AnyVal {
+    @inline def toBitSet(implicit counts: Counts): BitSet[Topic] =
+      BitSet.from[Topic](counts.topics)(wrapped)
+  }
 
-  def personBitSet(it: Iterable[Person])(implicit counts: Counts): BitSet[Person] =
-    BitSet.from[Person](counts.persons)(it)
+  implicit class PersonSetOps(val wrapped: Iterable[Person]) extends AnyVal {
+    @inline def toBitSet(implicit counts: Counts): BitSet[Person] =
+      BitSet.from[Person](counts.persons)(wrapped)
+  }
+
+  implicit class SlotMapOps[A >: Null](val wrapped: Map[Slot, A]) extends AnyVal {
+    @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] = toBitMap()
+
+    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] = // scalastyle:ignore null
+      BitMap.from[Slot, A](counts.slots, default)(wrapped)
+  }
+
+  implicit class TopicMapOps[A >: Null](val wrapped: Map[Topic, A]) extends AnyVal {
+    @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] = toBitMap()
+
+    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] = // scalastyle:ignore null
+      BitMap.from[Topic, A](counts.topics, default)(wrapped)
+  }
+
+  implicit class PersonMapOps[A >: Null](val wrapped: Map[Person, A]) extends AnyVal {
+    @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] = toBitMap()
+
+    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] = // scalastyle:ignore null
+      BitMap.from[Person, A](counts.persons, default)(wrapped)
+  }
 
 }

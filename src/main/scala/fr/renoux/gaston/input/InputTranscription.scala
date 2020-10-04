@@ -222,7 +222,7 @@ private[input] class InputTranscription(input: InputModel) {
     new ProblemImpl(
       slotSequences,
       topicsByName.values.flatten.toSet,
-      unassignedTopicsByNameAndSlot.mapKeys(_._2),
+      unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
       personsByName.values.toSet,
       Constraints.all,
       Preferences.all

@@ -9,7 +9,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 class ProblemImpl(
     val slotSequences: Seq[Seq[Slot]],
     val topics: Set[Topic],
-    val unassignedTopics: Map[Slot, Topic],
+    val unassignedTopics: BitMap[Slot, Topic],
     val persons: Set[Person],
     val constraints: Set[Constraint],
     val preferences: Set[Preference]
@@ -19,13 +19,13 @@ class ProblemImpl(
 
   lazy val personsCount: Int = persons.size
 
-  lazy val mandatoryTopicsByPerson: Map[Person, Set[Topic]] =
-    topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
+  lazy val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]] =
+    topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap(Set.empty)
 
-  lazy val forbiddenTopicsByPerson: Map[Person, Set[Topic]] =
-    topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.withDefaultValue(Set.empty)
+  lazy val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]] =
+    topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap(Set.empty)
 
-  lazy val incompatibleTopicsByTopic: Map[Topic, Set[Topic]] = {
+  lazy val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]] = {
     val conflictingMandatories = for {
       topic1 <- topics
       topic2 <- topics
@@ -36,28 +36,28 @@ class ProblemImpl(
       case TopicsNotSimultaneous(ts) => ts.cross(ts)
     }.flatten
 
-    (conflictingMandatories ++ notSimultaneous).groupToMap.withDefaultValue(Set.empty)
+    (conflictingMandatories ++ notSimultaneous).groupToMap.toBitMap(Set.empty)
   }
 
-  lazy val incompatibleTopicsBySlot: Map[Slot, Set[Topic]] = {
+  lazy val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slots
       topic <- topics
       if topic.mandatory.exists(!slot.personsPresent.contains(_))
       if topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
-    couples.groupToMap.withDefaultValue(Set.empty)
+    couples.groupToMap.toBitMap(Set.empty)
   }
 
-  lazy val simultaneousTopicByTopic: Map[Topic, Set[Topic]] = {
+  lazy val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]] = {
     constraints.collect {
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
-    }.flatten.toMap.withDefaultValue(Set.empty)
+    }.flatten.toMap.toBitMap(Set.empty)
   }
 
-  lazy val preferencesByPerson: Map[Person, Set[Preference.Personal]] = preferences.collect {
+  lazy val preferencesByPerson: BitMap[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
-  }.groupBy(_.person).withDefaultValue(Set.empty)
+  }.groupBy(_.person).toBitMap(Set.empty)
 
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
