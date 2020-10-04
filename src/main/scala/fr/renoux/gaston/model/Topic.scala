@@ -16,7 +16,7 @@ final case class Topic(
     slots: Option[Set[Slot]] = None,
     forced: Boolean = false,
     virtual: Boolean = false
-) {
+) extends Identified {
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet

@@ -7,7 +7,7 @@ final case class Person(
     id: Int,
     name: String,
     weight: Weight = Weight.Default
-)
+) extends Identified
 
 object Person {
   val MaxCount: Int = 10 * 1000

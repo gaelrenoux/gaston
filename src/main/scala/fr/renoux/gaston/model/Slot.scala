@@ -7,7 +7,7 @@ case class Slot(
     name: String,
     personsPresent: Set[Person],
     maxTopics: Int = Int.MaxValue
-) {
+) extends Identified {
 
   /** To facilitate writing schedules */
   def apply(records: (Topic, Set[Person])*)(implicit problem: Problem): Seq[Record] =
