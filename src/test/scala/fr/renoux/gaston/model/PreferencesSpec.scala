@@ -37,7 +37,7 @@ class PreferencesSpec extends AnyFlatSpec with Matchers {
 
 
   behavior of "PersonsIncompatibilityAntiPreference"
-  val LeonardoHatesEnemies = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady), Score(-150))
+  val LeonardoHatesEnemies = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady).toBitSet, Score(-150))
 
   it should "return a negative score for just one hated person" in {
     LeonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop)

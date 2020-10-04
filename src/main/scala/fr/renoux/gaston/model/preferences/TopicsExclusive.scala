@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.preferences
 import fr.renoux.gaston.model._
 
 /** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot). */
-case class TopicsExclusive(topics: Set[Topic], exemptions: Set[Person] = Set.empty, reward: Score = Preference.NecessaryPreferenceScore)
+case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti {
 
   override def scoreSchedule(schedule: Schedule): Score = {
@@ -13,5 +13,12 @@ case class TopicsExclusive(topics: Set[Topic], exemptions: Set[Person] = Set.emp
       else (found ++ ps, score)
     }._2
   }
+
+  override def equals(o: Any): Boolean = o match {
+    case that: TopicsExclusive => this.topics.actualEquals(that.topics) && this.exemptions.actualEquals(that.exemptions) && this.reward == that.reward
+    case _ => false
+  }
+
+  override def hashCode(): Int = (this.topics.actualHashCode, this.exemptions.actualHashCode, reward).hashCode()
 }
 

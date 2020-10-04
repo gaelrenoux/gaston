@@ -33,7 +33,9 @@ class ProblemImpl(
     } yield (topic1, topic2)
 
     val notSimultaneous = constraints.collect {
-      case TopicsNotSimultaneous(ts) => ts.cross(ts)
+      case TopicsNotSimultaneous(ts) =>
+        val topics = this.topics.filter(ts)
+        topics.cross(topics)
     }.flatten
 
     (conflictingMandatories ++ notSimultaneous).groupToMap.toBitMap(Set.empty)

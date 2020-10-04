@@ -107,7 +107,7 @@ private[input] class InputTranscription(input: InputModel) {
   /* Counts */
   lazy val slotsCount: Int = slotsByName.size
   lazy val personsCount: Int = personsByName.size
-  lazy val topicsCount: Int = topicsByName.size
+  lazy val topicsCount: Int = topicsByName.values.flatten.size
   implicit lazy val counts: Counts = Counts(slots = slotsCount, topics = topicsCount, persons = personsCount)
 
 
@@ -132,7 +132,7 @@ private[input] class InputTranscription(input: InputModel) {
         val inConstraintTopicOccurrences = inConstraint.topics.flatMap { topicName =>
           topicMultiplesByOccurrenceIndexByName(topicName).values
         }.map(_.head) // Keep only one element for multiple topics
-        TopicsNotSimultaneous(inConstraintTopicOccurrences)
+        TopicsNotSimultaneous(inConstraintTopicOccurrences.toBitSet)
       }
 
     // TODO Merge simultaneous constraint (ex: Sim(1, 2) and Sim(2, 3) can be merged into Sim(1, 2, 3))
@@ -157,14 +157,14 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
-        TopicsExclusive(inConstraint.topics.flatMap(topicsByName), inConstraint.exemptions.map(personsByName))
+        TopicsExclusive(inConstraint.topics.flatMap(topicsByName).toBitSet, inConstraint.exemptions.map(personsByName).toBitSet)
       }
 
     lazy val exclusiveOccurrences: Set[TopicsExclusive] =
       topicMultiplesByOccurrenceIndexByName.values.view.filter(_.size > 1).map { reoccurringTopic: Map[Int, Set[Topic]] =>
         val mandatoryPersons = reoccurringTopic.head._2.head.mandatory // mandatories are the same on all instances, take the first one
         val allInstancesPart = reoccurringTopic.values.flatten // all instances exclusive (obvious for the multiple parts, but only one constraint is better)
-        TopicsExclusive(allInstancesPart.toSet, mandatoryPersons)
+        TopicsExclusive(allInstancesPart.toBitSet, mandatoryPersons.toBitSet)
       }.toSet
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
@@ -172,7 +172,7 @@ private[input] class InputTranscription(input: InputModel) {
         case ip: InputPerson if ip.incompatible.nonEmpty =>
           val person = personsByName(ip.name)
           val group = ip.incompatible.map(personsByName)
-          PersonGroupAntiPreference(person, group, settings.incompatibilityAntiPreference)
+          PersonGroupAntiPreference(person, group.toBitSet, settings.incompatibilityAntiPreference)
       }
 
     /** Person wishes are scaled so that everyone has the same maximum score. This avoids the problem where someone puts

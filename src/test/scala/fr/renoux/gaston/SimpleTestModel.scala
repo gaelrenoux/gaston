@@ -69,6 +69,10 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val All: Set[Topic] = Concrete ++ Unassigned.values
   }
 
+  object ProblemCounts {
+    implicit val CompleteCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
+  }
+
   object Constraints {
 
     import Topics._
@@ -84,6 +88,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import Persons._
     import Topics._
+    import ProblemCounts.CompleteCounts
 
     val AB = PersonTopicPreference(Arthur, Bathing, strongPreference)
     val BC = PersonTopicPreference(Bianca, Cooking, strongPreference)
@@ -105,7 +110,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val HA = PersonTopicPreference(Hercule, Acting, weakPreference)
     val IB = PersonTopicPreference(Iago, Bathing, weakPreference)
 
-    val ArthurHatesFionaAndDaniela = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela), settings.incompatibilityAntiPreference.value)
+    val ArthurHatesFionaAndDaniela = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference.value)
 
     val All: Set[Preference] = Set(
       AB, BC, CD, DE, EF, FG, GH, HI, IA,
@@ -115,7 +120,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
-    implicit val CompleteCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
+    import ProblemCounts.CompleteCounts
     val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
   }
 

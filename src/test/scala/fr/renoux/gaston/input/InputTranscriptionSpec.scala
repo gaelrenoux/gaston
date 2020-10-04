@@ -52,12 +52,15 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       implicit val problem = from(InputModel(
         topics = inputTopics,
         persons = List(
-          InputPerson("Arnold", mandatory = Set("alpha"))
+          InputPerson("Arnold", mandatory = Set("alpha")),
+          InputPerson("Willy", mandatory = Set())
         )
       ))
+      val expected = Set(Array.fill(3)(true).toSeq -> Array(true, false).toSeq)
       problem.preferences.collect {
-        case TopicsExclusive(ts, ex, _) => (ts, ex)
-      } should be(Set(topics -> Set(p"Arnold")))
+        case TopicsExclusive(ts, ex, _) => (ts.content, ex.content)
+      } should be(expected)
+
     }
 
   }

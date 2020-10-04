@@ -8,7 +8,25 @@ class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVa
 
   @inline def containsId(id: Int): Boolean = wrapped(id)
 
+  @inline def countIntersection(that: BitSet[A]): Int = {
+    // scalastyle:off var.local while (For performance)
+    var i = 0
+    var total = 0
+    while (i <= this.size) {
+      if (wrapped(i) && that.wrapped(i)) total += 1
+      i += 1
+    }
+    total
+    // scalastyle:on var.local while
+  }
+
   @inline def size: Int = wrapped.count(identity)
+
+  @inline def actualEquals(that: BitSet[A]): Boolean = wrapped.toList == that.wrapped.toList
+
+  @inline def actualHashCode: Int = wrapped.toList.##
+
+  @inline def content: Seq[Boolean] = wrapped.toSeq
 }
 
 object BitSet {

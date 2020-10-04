@@ -16,6 +16,7 @@ case class Schedule(
 ) {
 
   import Schedule._
+  import problem.counts
 
   @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =
     copy(wrapped = w)
@@ -32,6 +33,7 @@ case class Schedule(
   lazy val planning: Planning = wrapped.mapValuesStrict(_.topics)
   lazy val topicToSlot: Map[Topic, Slot] = planning.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
+  lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopics.toBitSet
   // lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   // lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
   lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)

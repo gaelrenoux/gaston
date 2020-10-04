@@ -53,7 +53,13 @@ class ComplexTestModel(seed: Long) {
     val Count = AllSet.size
   }
 
+  object ProblemCounts {
+    implicit val CompleteCounts: model.Counts =
+      model.Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
+  }
+
   object Preferences {
+    import ProblemCounts.CompleteCounts
     val PersonTopics: Set[Preference] = for {
       p <- Persons.All
       (t, i) <- random.pick(Topics.Concrete, 9).zipWithIndex
@@ -61,7 +67,7 @@ class ComplexTestModel(seed: Long) {
     } yield PersonTopicPreference(p, t, str)
     val Incompatibilities: Set[Preference] = Set {
       val p = random.pick(Persons.All, 3)
-      PersonGroupAntiPreference(p.head, p.tail.toSet, -strongPreference)
+      PersonGroupAntiPreference(p.head, p.tail.toBitSet, -strongPreference)
     }
 
     val Unassigned: Set[Preference] = for {
@@ -73,9 +79,8 @@ class ComplexTestModel(seed: Long) {
   }
 
   object Problems {
-    implicit val CompleteCounts: Counts =
-      Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
     val Complete: Problem = {
+      import ProblemCounts.CompleteCounts
       val p = new ProblemImpl(
         Slots.AllSequence,
         Topics.All,

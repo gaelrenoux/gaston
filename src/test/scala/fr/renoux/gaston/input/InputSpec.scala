@@ -35,6 +35,8 @@ class InputSpec extends AnyFlatSpec with Matchers {
       val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma)
     }
 
+    implicit val counts = Counts(slots = 2, topics = 5, persons = 3)
+
   }
 
   "Produced problem" should "contain the correct slots" in {
@@ -58,6 +60,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "contain the correct preferences" in {
+    import expected.counts
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
       t <- Set(expected.topics.unassignedA, expected.topics.unassignedB)
@@ -67,7 +70,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
       PersonTopicPreference(expected.persons.bernard, expected.topics.alpha, Score(scalingFactor * 5.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.beta, Score(scalingFactor * 1.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.gamma, Score(scalingFactor * 1.0)),
-      TopicsExclusive(Set(expected.topics.beta, expected.topics.gamma), Set(expected.persons.laverne))
+      TopicsExclusive(Set(expected.topics.beta, expected.topics.gamma).toBitSet, Set(expected.persons.laverne).toBitSet)
     )
     val expectedPreferences = initialTopicsPreferences ++ additionalPreferences
 

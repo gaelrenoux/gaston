@@ -7,6 +7,6 @@ case class TopicDirectPreference(topic: Topic, reward: Score) extends Preference
 
   /** Specific implementation, faster than the default */
   override def scoreSchedule(schedule: Schedule): Score =
-    if (schedule.scheduledTopics.contains(topic)) reward else Score.Zero
+    if (schedule.scheduledTopicsBitSet.contains(topic)) reward else Score.Zero
 }
 

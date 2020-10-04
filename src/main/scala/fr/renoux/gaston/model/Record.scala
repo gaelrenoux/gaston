@@ -7,9 +7,12 @@ import scala.annotation.tailrec
 
 /** A Record is a triplet of slot, topic and assigned persons */
 case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
+  import problem.counts
 
   lazy val personsList: List[Person] = persons.toList
   lazy val countPersons: Int = persons.size
+
+  lazy val personsBitSet: BitSet[Person] = persons.toBitSet
 
   /* No need to compare persons, on a given schedule there is not two records with the same slot and topic */
   override def compare(that: Record): Int = {

@@ -9,15 +9,22 @@ import fr.renoux.gaston.model._
   */
 case class PersonGroupAntiPreference(
     person: Person,
-    group: Set[Person],
+    group: BitSet[Person],
     reward: Score
 ) extends Preference.RecordLevel with Preference.Anti with Preference.Personal {
 
   override def scoreRecord(record: Record): Score = {
     if (record.persons.contains(person)) {
-      val count = group.intersect(record.persons).size
+      val count = record.persons.count(group)
       if (count == 0) Score.Zero else reward * count
     } else Score.Zero
   }
+
+  override def equals(o: Any): Boolean = o match {
+    case that: PersonGroupAntiPreference => this.person == that.person && this.group.actualEquals(that.group) && this.reward == that.reward
+    case _ => false
+  }
+
+  override def hashCode(): Int = (this.person, this.group.actualHashCode, reward).hashCode()
 
 }
