@@ -3,8 +3,8 @@ package fr.renoux.gaston.model
 import scalaz.Scalaz._
 
 /**
-  * The more preferences are satisfied the better, but it's not mandatory. Preferences should implement [[equals()]] and
-  * [[hashCode()]] to allow deduplication.
+  * The more preferences are satisfied the better, but it's not mandatory. Preferences should implement `equals()` and
+  * `hashCode()` to allow deduplication.
   */
 trait Preference {
 

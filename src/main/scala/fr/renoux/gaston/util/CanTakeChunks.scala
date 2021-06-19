@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 /** Typeclass for collections where elements can be taken by chunks rather than one by one */
 trait CanTakeChunks[T[_] <: Iterable[_]] {
 
-  /** Commodity method with varargs for [[takeChunks()]] */
+  /** Commodity method with varargs for `takeChunks(T[A], Iterable[Int])` */
   @inline
   def takeChunks[A](as: T[A], elementsCount: Int*): (T[T[A]], T[A]) = takeChunks(as, elementsCount)
 

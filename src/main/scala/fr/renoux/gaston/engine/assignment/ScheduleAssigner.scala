@@ -19,7 +19,7 @@ class ScheduleAssigner(implicit private val problem: Problem) {
     */
   def fill(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
 
-    /** Iterate over Slots, stop in case there is an incompatibility on some Slot */
+    /* Iterate over Slots, stop in case there is an incompatibility on some Slot */
     @tailrec
     def completeForSlots(slots: List[Slot], scheduleOption: Option[Schedule]): Option[Schedule] = (slots, scheduleOption) match {
       case (Nil, _) => scheduleOption
