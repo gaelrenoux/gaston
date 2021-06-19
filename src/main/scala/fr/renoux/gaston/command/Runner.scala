@@ -56,7 +56,7 @@ class Runner(
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
   @tailrec
   private def runRecursive(
-      nextLog: Instant,
+      nextHookInvocation: Instant,
       count: Long,
       current: Schedule,
       nextSchedules: LazyList[Schedule] = LazyList.empty
@@ -64,16 +64,16 @@ class Runner(
     val now = Instant.now()
 
     /* If time's out, stop now */
-    if (optimParams.timeout.exists(_ isBefore now)) {
+    if (optimParams.timeout.exists(_ isBefore now) || optimParams.maxIterations.exists(_ <= count)) {
       log.info(s"We have tried $count schedules ! It is time to stop !")
       (current, count)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
-      val newNextLog = if (now isAfter nextLog) {
+      val newNextLog = if (now isAfter nextHookInvocation) {
         hook(current, count)
         Instant.now().plusMillis(hookFrequencyMillis)
-      } else nextLog
+      } else nextHookInvocation
 
       /* Run once then recurse */
 
