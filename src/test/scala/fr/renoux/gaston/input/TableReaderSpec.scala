@@ -1,12 +1,14 @@
 package fr.renoux.gaston.input
 
+import com.softwaremill.diffx
+import com.softwaremill.diffx.generic.auto._
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
 import fr.renoux.gaston.model.Score
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.softwaremill.diffx
+
 import scala.io.Source
 
 class TableReaderSpec extends AnyFlatSpec with Matchers {

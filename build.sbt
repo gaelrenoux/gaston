@@ -2,9 +2,9 @@ import sbt.Keys._
 
 organization := "gael.renoux"
 name := "gaston"
-version := "0.3.0"
+version := "0.4.0"
 
-scalaVersion := "2.13.3"
+scalaVersion := "2.13.6"
 
 lazy val gaston = (project in file("."))
   .configs(PerformanceTest)
@@ -68,26 +68,27 @@ scalacOptions ++= Seq(
   "-Xlint:deprecation" // Enable linted deprecations.
 )
 
-val refinedVersion = "0.9.14"
+val refinedVersion = "0.9.26"
 
 libraryDependencies ++= Seq(
 
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
 
-  "com.typesafe" % "config" % "1.4.0",
-  "com.github.pureconfig" %% "pureconfig" % "0.13.0",
-  "com.github.scopt" %% "scopt" % "3.7.1",
+  "com.typesafe" % "config" % "1.4.1",
+  "com.github.pureconfig" %% "pureconfig" % "0.16.0",
+  "com.github.scopt" %% "scopt" % "4.0.1",
 
-  "org.scalaz" %% "scalaz-core" % "7.3.2",
+  "org.scalaz" %% "scalaz-core" % "7.3.3",
 
   "eu.timepit" %% "refined" % refinedVersion,
   "eu.timepit" %% "refined-scalaz" % refinedVersion,
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 
-  "com.softwaremill.diffx" %% "diffx-core" % "0.3.29" % "test,test-perf",
-  "org.scalatest" %% "scalatest" % "3.2.0" % "test,test-perf"
+  /* Tests */
+  "com.softwaremill.diffx" %% "diffx-core" % "0.5.0" % "test,test-perf",
+  "org.scalatest" %% "scalatest" % "3.2.9" % "test,test-perf"
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")
