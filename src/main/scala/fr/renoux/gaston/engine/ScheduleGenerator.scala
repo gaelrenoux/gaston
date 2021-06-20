@@ -1,13 +1,12 @@
 package fr.renoux.gaston.engine
 
+import cats.implicits._
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, ScheduleAssigner}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.Context
-import scalaz.Scalaz._
-import scalaz.\/
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
@@ -61,16 +60,16 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
   private def backtrackAssignTopicsToSlots(
       state: State,
       failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)
-  ): BacktrackingFailures \/ State = {
+  ): Either[BacktrackingFailures, State] = {
     if (state.isSlotsEmpty) {
       log.debug("Found an initial schedule")
-      state.right[BacktrackingFailures]
+      Right(state)
 
     } else if (state.isTopicsEmptyOnHeadSlot) {
       /* No topic left available for the current slot. Fail if the current slot is not satisfied yet. */
       if (state.isHeadSlotMaxPersonsTooLow) {
         log.trace("Fail because no topic available for current slot and it is not satisfied yet")
-        failures.addNoTopics(state.headSlot).left[State]
+        Left(failures.addNoTopics(state.headSlot))
       } else {
         /* Go on without the current slot */
         log.trace("Go on without current slot because no topic available for it and it is already satisfied")
@@ -81,7 +80,7 @@ class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implici
       /* Current slot has reached max parallelization. Fail if the current slot is not satisfied yet. */
       if (state.isHeadSlotMaxPersonsTooLow) {
         log.trace("Fail because current slot has reached max parallelization and it is not satisfied yet")
-        failures.addMaxParallelizationReached(state.headSlot).left[State]
+        Left(failures.addMaxParallelizationReached(state.headSlot))
       } else {
         /* Go on without the current slot */
         log.trace("Go on without current slot because it has reached max parallelization and it is satisfied")
@@ -152,7 +151,7 @@ object ScheduleGenerator {
       val record = Record(headSlot, headTopic, headTopic.mandatory)
 
       val additionalRecords = topicsSimultaneousWithHeadTopic.map(t => Record(headSlot, t, t.mandatory))
-      partialSchedule.add( record).addAll(headSlot, additionalRecords)
+      partialSchedule.add(record).addAll(headSlot, additionalRecords)
     }
 
     lazy val withCandidateAcknowledged: State = {

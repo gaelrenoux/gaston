@@ -1,7 +1,7 @@
 package fr.renoux.gaston.util
 
-import scalaz.Monoid
-import scalaz.Scalaz._
+import cats.Monoid
+import mouse.map._
 
 import scala.collection.IterableOps
 
@@ -33,7 +33,7 @@ object CollectionImplicits {
 
   @inline final implicit class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
 
-    @inline def updatedWith(k: K)(f: V => V): Map[K, V] = wrapped.alter(k)(_.map(f))
+    @inline def updatedWith(k: K)(f: V => V): Map[K, V] = wrapped.updateAtKey(k, f)
 
     @inline def updatedWithOrElse(k: K)(f: V => V, v: => V): Map[K, V] = {
       val newValue = wrapped.get(k).map(f).getOrElse(v)
@@ -59,7 +59,7 @@ object CollectionImplicits {
   @inline final implicit class MonoidMapOps[K, V](val wrapped: Map[K, V])(implicit monoid: Monoid[V]) {
 
     @inline def addByKeys[K1 >: K](that: Map[K1, V]): Map[K1, V] = {
-      that ++ wrapped.map { case (k, v) => k -> that.get(k).fold(v)(monoid.append(v, _)) }
+      that ++ wrapped.map { case (k, v) => k -> that.get(k).fold(v)(monoid.combine(v, _)) }
     }
   }
 

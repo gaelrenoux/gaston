@@ -1,7 +1,7 @@
 package fr.renoux.gaston.input
 
-import java.util.concurrent.atomic.AtomicInteger
-
+import cats.data.{NonEmptyList, ValidatedNel}
+import cats.implicits._
 import eu.timepit.refined.auto._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.refineV
@@ -12,8 +12,8 @@ import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-import scalaz.syntax.validation._
-import scalaz.{NonEmptyList, Validation}
+
+import java.util.concurrent.atomic.AtomicInteger
 
 /** Converts the Input object to the Problem object. */
 private[input] class InputTranscription(input: InputModel) {
@@ -228,9 +228,9 @@ private[input] class InputTranscription(input: InputModel) {
       Preferences.all
     )
 
-  lazy val result: Validation[InputErrors, Problem] = errors.toList.sorted.map(InputError(_)) match {
-    case Nil => problem.success
-    case h :: q => NonEmptyList.fromSeq(h, q).failure
+  lazy val result: ValidatedNel[InputError, Problem] = errors.toList.sorted.map(InputError(_)) match {
+    case Nil => problem.valid
+    case h :: q => NonEmptyList.of(h, q: _*).invalid[Problem]
   }
 
 }

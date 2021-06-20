@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model
 
-import scalaz.Monoid
+import cats.Monoid
+
 
 /** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
   * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
@@ -46,11 +47,13 @@ object Score extends (Double => Score) {
 
   val NegativeInfinity: Score = Score(Double.NegativeInfinity)
 
-  implicit object ScoreIsMonoid extends Monoid[Score] {
-    override val zero: Score = Score.Zero
 
-    override def append(a: Score, b: => Score): Score = a + b
+  implicit object ScoreIsMonoid extends Monoid[Score] {
+    override val empty: Score = Score.Zero
+
+    override def combine(a: Score, b: Score): Score = a + b
   }
+
 
   /** Implementation of the Fractional typeclass for Score */
   implicit object ScoreIsFractional extends Fractional[Score] {

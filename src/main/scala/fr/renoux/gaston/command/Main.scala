@@ -1,8 +1,6 @@
 package fr.renoux.gaston.command
 
-import java.nio.file.Path
-import java.time.Instant
-
+import cats.implicits._
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, Improver, OptimParams}
@@ -11,9 +9,9 @@ import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.Context
 import org.slf4j.LoggerFactory
-import scalaz.Scalaz._
-import scalaz._
 
+import java.nio.file.Path
+import java.time.Instant
 import scala.collection.immutable.ArraySeq
 import scala.io.Source
 import scala.util.Try
@@ -33,7 +31,7 @@ object Main {
 
     val _ = run(commandLine).recover { case errors: InputErrors =>
       val msg = s"Failed to run.\n${
-        errors.list.toList.map {
+        errors.toList.map {
           case InputError(desc, Some(file), Some(line)) => s"$file: line $line: $desc"
           case InputError(desc, _, _) => desc
         }.mkString("\n")
@@ -44,7 +42,7 @@ object Main {
   }
 
   /** Run the application with command line arguments */
-  private def run(commandLine: CommandLine): InputErrors \/ Unit = for {
+  private def run(commandLine: CommandLine): Either[InputErrors, Unit] = for {
     input <- loadInput(commandLine)
     problem <- transcribe(input)
   } yield {
@@ -77,7 +75,7 @@ object Main {
   }
 
   /** Load the requested input, according to the command lines arguments */
-  private def loadInput(commandLine: CommandLine): InputErrors \/ InputModel = for {
+  private def loadInput(commandLine: CommandLine): Either[InputErrors, InputModel] = for {
     baseInput <- commandLine.inputFile.map { path =>
       log.info(s"Loading from $path")
       InputLoader.fromPath(path)
@@ -89,16 +87,16 @@ object Main {
   } yield tableInputOption getOrElse baseInput
 
   /** Import a table */
-  private def importTable(baseInput: InputModel, path: Path): InputErrors \/ InputModel =
+  private def importTable(baseInput: InputModel, path: Path): Either[InputErrors, InputModel] =
     stringFromFile(path).map { table =>
       val reader = new TableReader(baseInput)
       reader.read(table)
     }
 
-  private def stringFromFile(path: Path): InputErrors \/ String = Try {
+  private def stringFromFile(path: Path): Either[InputErrors, String] = Try {
     val src = Source.fromFile(path.toFile)
     try src.mkString finally src.close()
-  }.toDisjunction.leftMap(t => InputErrors(t.toString))
+  }.toEither.leftMap(t => InputErrors(t.toString))
 
 
   /** Set the log level to debuq */

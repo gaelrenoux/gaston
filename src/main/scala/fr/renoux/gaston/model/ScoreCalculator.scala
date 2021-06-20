@@ -1,8 +1,8 @@
 package fr.renoux.gaston.model
 
+import cats.implicits._
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
-import scalaz.Scalaz._
 
 import scala.annotation.tailrec
 
@@ -13,7 +13,7 @@ class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
 
   /** Score for each person, regardless of its weight. All personal scores are slot-level, so the whole computation is done per slot. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = chrono("ScoreCalculator > unweightedScoresByPerson") {
-    schedule.slotSchedulesList.map(_.unweightedScoresByPerson).suml
+    schedule.slotSchedulesList.map(_.unweightedScoresByPerson).combineAll
   }
 
   /** Score for each person, divided by that person's weight */
@@ -33,7 +33,7 @@ class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
 
   /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
   lazy val impersonalScore: Score = chrono("ScoreCalculator > impersonalScore") {
-    schedule.slotSchedulesList.map(_.impersonalScore).suml + preferencesScoreRec(schedule.problem.impersonalGlobalLevelPreferencesList)
+    schedule.slotSchedulesList.map(_.impersonalScore).sum + preferencesScoreRec(schedule.problem.impersonalGlobalLevelPreferencesList)
   }
 
   @tailrec

@@ -1,8 +1,8 @@
 package fr.renoux.gaston.model
 
+import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.testOnly
-import scalaz.Scalaz._
 
 import scala.annotation.tailrec
 
@@ -132,7 +132,7 @@ case class SlotSchedule(
   }
 
   /** Score for each person, regardless of its weight. All personal scores are records-level, so the whole computation is done per record. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).suml
+  lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).combineAll
 
   lazy val impersonalScoreTopicLevel: Score = recordsList.view.map(_.impersonalScore).sum
 

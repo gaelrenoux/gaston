@@ -1,16 +1,16 @@
 package fr.renoux.gaston.input
 
+import cats.data.NonEmptyList
+
 import java.io.{File, PrintWriter}
 import java.nio.file.Path
-
 import com.typesafe.config.{ConfigFactory, ConfigRenderOptions, ConfigValue}
 import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.collection.NonEmpty
 import pureconfig.error.ConfigReaderFailures
 import pureconfig.{ConfigSource, ConfigWriter}
-import scalaz.Scalaz._
-import scalaz._
+import cats.implicits._
 
 
 /** Load the PureConfig input object from the configuration files. */
@@ -35,24 +35,24 @@ object InputLoader {
   }
 
   /** Loads from default values */
-  def fromDefault: InputErrors \/ InputModel =
-    ConfigSource.default.at(Namespace).load[InputModel].toDisjunction.leftMap(transformErrors)
+  def fromDefault: Either[InputErrors, InputModel] =
+    ConfigSource.default.at(Namespace).load[InputModel].leftMap(transformErrors)
 
   /** Loads from a specifically-named file if the classpath. */
-  def fromClassPath(path: String): InputErrors \/ InputModel = {
+  def fromClassPath(path: String): Either[InputErrors, InputModel] = {
     val tsConfig = ConfigFactory.load(path)
     /* Cannot use ConfigSource.resources as it does not add the .conf suffix */
-    ConfigSource.fromConfig(tsConfig).at(Namespace).load[InputModel].toDisjunction.leftMap(transformErrors)
+    ConfigSource.fromConfig(tsConfig).at(Namespace).load[InputModel].leftMap(transformErrors)
   }
 
   /** Loads from one defined file on the filesystem. */
-  def fromPath(file: Path): InputErrors \/ InputModel = {
+  def fromPath(file: Path): Either[InputErrors, InputModel] = {
     log.debug(s"Loading this file: $file")
-    ConfigSource.file(file).at(Namespace).load[InputModel].toDisjunction.leftMap(transformErrors)
+    ConfigSource.file(file).at(Namespace).load[InputModel].leftMap(transformErrors)
   }
 
   /** Loads from a String */
-  def fromString(config: String): InputErrors \/ InputModel = {
+  def fromString(config: String): Either[InputErrors, InputModel] = {
     val file = File.createTempFile("gaston-input-", null) // scalastyle:ignore null
     new PrintWriter(file) {
       write(config)
@@ -63,8 +63,8 @@ object InputLoader {
     r
   }
 
-  private def transformErrors(configReaderFailures: ConfigReaderFailures) =
-    NonEmptyList.fromSeq(configReaderFailures.head, configReaderFailures.tail).map { f =>
+  private def transformErrors(configReaderFailures: ConfigReaderFailures): NonEmptyList[InputError] =
+    NonEmptyList.of(configReaderFailures.head, configReaderFailures.tail: _*).map { f =>
       InputError(f.description, f.origin.map(_.url.toString), f.origin.map(_.lineNumber))
     }
 

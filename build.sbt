@@ -68,6 +68,7 @@ scalacOptions ++= Seq(
   "-Xlint:deprecation" // Enable linted deprecations.
 )
 
+val catsVersion = "2.6.1"
 val refinedVersion = "0.9.26"
 
 libraryDependencies ++= Seq(
@@ -75,14 +76,15 @@ libraryDependencies ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
 
+  "org.typelevel" %% "cats-core" % catsVersion,
+  "org.typelevel" %% "alleycats-core" % catsVersion,
+  "org.typelevel" %% "mouse" % "1.0.3",
+
   "com.typesafe" % "config" % "1.4.1",
   "com.github.pureconfig" %% "pureconfig" % "0.16.0",
   "com.github.scopt" %% "scopt" % "4.0.1",
 
-  "org.scalaz" %% "scalaz-core" % "7.3.3",
-
   "eu.timepit" %% "refined" % refinedVersion,
-  "eu.timepit" %% "refined-scalaz" % refinedVersion,
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 

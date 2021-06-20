@@ -1,8 +1,9 @@
 package fr.renoux.gaston.model
 
+import cats.Monoid
+import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{Context, testOnly}
-import scalaz.Monoid
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -111,8 +112,7 @@ case class Schedule(
   def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Score = {
     val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
     val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
-    import scalaz.Scalaz._
-    val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].append(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
+    val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
 
     if (score.isNegativeInfinity) Score.Zero
     else scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore

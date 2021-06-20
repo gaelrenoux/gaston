@@ -1,8 +1,8 @@
 package fr.renoux.gaston.util
 
+import cats.Functor
+import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
-import scalaz.Functor
-import scalaz.Scalaz._
 
 
 /** Typeclass for collections than can be grouped to a Map. Needs a functor for F when grouping above the level of couples. */

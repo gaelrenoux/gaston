@@ -1,7 +1,5 @@
 package fr.renoux.gaston.model
 
-import scalaz.Scalaz._
-
 /**
   * The more preferences are satisfied the better, but it's not mandatory. Preferences should implement `equals()` and
   * `hashCode()` to allow deduplication.
@@ -35,7 +33,7 @@ object Preference {
     /** Score the slot schedule according to this preference */
     def scoreSlot(schedule: SlotSchedule): Score
 
-    override def score(schedule: Schedule): Score = schedule.slotSchedulesList.map(scoreSlot).suml
+    override def score(schedule: Schedule): Score = schedule.slotSchedulesList.map(scoreSlot).sum
   }
 
   /** Trait for preferences which can be evaluated record by record */
@@ -43,7 +41,7 @@ object Preference {
     /** Score the record according to this preference */
     def scoreRecord(record: Record): Score
 
-    override def score(schedule: Schedule): Score = schedule.slotSchedulesList.flatMap(_.recordsList).map(scoreRecord).suml
+    override def score(schedule: Schedule): Score = schedule.slotSchedulesList.flatMap(_.recordsList).map(scoreRecord).sum
   }
 
   /** Personal preferences are always at record level */
