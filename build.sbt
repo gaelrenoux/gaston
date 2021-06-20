@@ -4,6 +4,9 @@ organization := "gael.renoux"
 name := "gaston"
 version := "0.4.0"
 
+/* Allows to overwrite with publishLocal */
+isSnapshot := true
+
 scalaVersion := "2.13.6"
 
 lazy val gaston = (project in file("."))
