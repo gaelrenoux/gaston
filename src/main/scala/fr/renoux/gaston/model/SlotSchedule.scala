@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.testOnly
 import scala.annotation.tailrec
 
 /** A schedule for a specific slot */
-case class SlotSchedule(
+final case class SlotSchedule(
     slot: Slot,
     private val wrapped: Map[Topic, Record]
 )(implicit val problem: Problem) {

@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
+final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
 
   @inline def apply(a: A): Boolean = wrapped(a.id)
 

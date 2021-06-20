@@ -8,7 +8,7 @@ import java.time.Instant
   * @param timeout Once reached, stop creating schedules and terminate the runner.
   * @param maxIterations Once reached, stop creating schedules and terminate the runner.
   */
-case class OptimParams(
+final case class OptimParams(
     stopAtScore: Option[Double] = None,
     maxImprovementRounds: Option[Int] = None,
     timeout: Option[Instant] = None,
@@ -16,5 +16,5 @@ case class OptimParams(
 )
 
 object OptimParams {
-  val Default = OptimParams()
+  val Default: OptimParams = OptimParams()
 }

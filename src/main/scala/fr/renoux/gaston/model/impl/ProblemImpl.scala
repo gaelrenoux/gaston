@@ -6,7 +6,7 @@ import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
-class ProblemImpl(
+final class ProblemImpl(
     val slotSequences: Seq[Seq[Slot]],
     val topics: Set[Topic],
     val unassignedTopics: BitMap[Slot, Topic],

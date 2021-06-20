@@ -10,9 +10,9 @@ import scala.util.Random
 
 /** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
   * partial. */
-class PlanningSpaceNavigator(implicit private val problem: Problem) {
+final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
-  val log = Logger[PlanningSpaceNavigator]
+  val log: Logger = Logger[PlanningSpaceNavigator]
 
   /** Return a LazyList of neighbouring partial schedules to the initial one. */
   def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {

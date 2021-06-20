@@ -18,7 +18,7 @@ import scala.util.Random
   *
   * Placing persons on the generated schedule is delegated to the ScheduleAssigner.
   */
-class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
+final class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
 
   private val log = Logger[ScheduleGenerator]
 

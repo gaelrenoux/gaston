@@ -9,7 +9,7 @@ import fr.renoux.gaston.util.{Context, testOnly}
   * A schedule is an association of people, to topics, to slots.
   * What we're trying and testing and looking for a good one.
   */
-case class Schedule(
+final case class Schedule(
     private val wrapped: Map[Slot, SlotSchedule]
 )(implicit
     val problem: Problem,

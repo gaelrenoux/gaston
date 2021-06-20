@@ -7,7 +7,7 @@ import fr.renoux.gaston.model._
   * negative, as we count the number of such occurrences. Note that it does not apply on the members of the group, who
   * mah have no anti-preference towards the person.
   */
-case class PersonGroupAntiPreference(
+final case class PersonGroupAntiPreference(
     person: Person,
     group: BitSet[Person],
     reward: Score

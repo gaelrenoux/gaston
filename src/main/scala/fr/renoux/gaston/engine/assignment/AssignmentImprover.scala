@@ -15,7 +15,7 @@ import scala.util.Random
 /**
   * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them.
   */
-class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
+final class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
 
   private val cache: mutable.Map[Schedule.Planning, Schedule] = TrieMap[Schedule.Planning, Schedule]()
 

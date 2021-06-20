@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 
 /** None of those topics may be on the same slot. I.e., a slot may contain one (or none), but not several of them. */
 @hardCoded
-case class TopicsNotSimultaneous(topics: BitSet[Topic]) extends Constraint.SlotLevel {
+final case class TopicsNotSimultaneous(topics: BitSet[Topic]) extends Constraint.SlotLevel {
 
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = check(schedule.topicsList)
 

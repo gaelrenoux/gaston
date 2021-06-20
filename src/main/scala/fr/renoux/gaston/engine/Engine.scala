@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.Context
 import scala.util.Random
 
 
-class Engine(
+final class Engine(
     backtrackInitialSchedule: Boolean = false,
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, improver: Improver, ctx: Context) {

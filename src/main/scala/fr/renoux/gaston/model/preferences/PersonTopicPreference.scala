@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.preferences
 import fr.renoux.gaston.model._
 
 /** Might be an anti-preference if the person really doesn't want to. */
-case class PersonTopicPreference(
+final case class PersonTopicPreference(
     person: Person,
     topic: Topic,
     reward: Score

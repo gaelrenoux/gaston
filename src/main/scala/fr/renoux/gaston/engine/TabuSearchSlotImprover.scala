@@ -14,7 +14,7 @@ import scala.util.Random
   *
   * Doesn't seem to be very good.
   */
-class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[TabuSearchSlotImprover.State] {
+final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[TabuSearchSlotImprover.State] {
 
   import TabuSearchSlotImprover.State
 

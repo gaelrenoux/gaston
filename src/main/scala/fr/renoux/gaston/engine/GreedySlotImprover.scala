@@ -11,7 +11,7 @@ import scala.util.Random
 
 
 /** Improves a whole schedule by moving slots around. */
-class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[GreedySlotImprover.State] {
+final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[GreedySlotImprover.State] {
 
   import GreedySlotImprover.State
 

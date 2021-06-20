@@ -9,7 +9,7 @@ import scala.util.Random
 /**
   * Fills a partial schedule with persons, ignoring preferences but respecting constraints.
   */
-class ScheduleAssigner(implicit private val problem: Problem) {
+final class ScheduleAssigner(implicit private val problem: Problem) {
 
   private val log = Logger[ScheduleAssigner]
 
