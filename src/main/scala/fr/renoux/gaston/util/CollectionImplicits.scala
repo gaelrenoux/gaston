@@ -1,6 +1,5 @@
 package fr.renoux.gaston.util
 
-import cats.Monoid
 import mouse.map._
 
 import scala.collection.IterableOps
@@ -47,19 +46,10 @@ object CollectionImplicits {
     /** Unjike Scala's mapValues, this one is **not** lazily evaluated. */
     @inline def mapValuesStrict[V1](f: V => V1): Map[K, V1] = wrapped.map { case (k, v) => k -> f(v) }
 
-    @inline def mapKeys[K1](f: K => K1): Map[K1, V] = wrapped.map { case (k, v) => f(k) -> v }
-
     @inline def zipByKeys[K1 >: K, V1](that: Map[K1, V1]): Map[K1, (Option[V], Option[V1])] = {
       val inWrapped: Map[K1, (Option[V], Option[V1])] = wrapped.map { case (k, v) => k -> (Some(v), that.get(k)) }
       val notInWrapped: Map[K1, (Option[V], Option[V1])] = (that.keySet -- wrapped.keySet).map { k => k -> (None, that.get(k)) }.toMap
       inWrapped ++ notInWrapped
-    }
-  }
-
-  @inline final implicit class MonoidMapOps[K, V](val wrapped: Map[K, V])(implicit monoid: Monoid[V]) {
-
-    @inline def addByKeys[K1 >: K](that: Map[K1, V]): Map[K1, V] = {
-      that ++ wrapped.map { case (k, v) => k -> that.get(k).fold(v)(monoid.combine(v, _)) }
     }
   }
 

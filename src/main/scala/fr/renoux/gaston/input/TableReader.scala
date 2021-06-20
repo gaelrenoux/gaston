@@ -7,7 +7,6 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model.Score
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-//import fr.renoux.gaston.util.StringImplicits._
 
 import scala.util.Try
 

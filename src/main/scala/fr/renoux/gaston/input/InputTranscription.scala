@@ -12,6 +12,7 @@ import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
+import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -99,7 +100,7 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val topicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] =
     concreteTopicMultiplesByOccurrenceIndexByName ++
       nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Set(topic)) } ++
-      unassignedTopicsByNameAndSlot.mapValuesStrict { topic => Map(0 -> Set(topic)) }.mapKeys(_._1)
+      unassignedTopicsByNameAndSlot.map { case (key, topic) => key._1 -> Map(0 -> Set(topic)) }
 
   lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicMultiplesByOccurrenceIndexByName.mapValuesStrict(_.values.flatten.toSet)
 
