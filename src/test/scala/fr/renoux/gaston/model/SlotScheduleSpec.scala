@@ -1,33 +1,76 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.SimpleTestModel
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class SlotScheduleSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.SimpleTestModel.Persons._
+  import fr.renoux.gaston.SimpleTestModel.Problems._
   import fr.renoux.gaston.SimpleTestModel.Slots._
   import fr.renoux.gaston.SimpleTestModel.Solutions._
   import fr.renoux.gaston.SimpleTestModel.Topics._
-  import fr.renoux.gaston.SimpleTestModel.Problems._
 
   implicit val problem: Problem = Complete
 
-  private val BestMorning = Best.on(Morning)
+  private val bestMorning = Best.on(Morning)
 
   "topics" should "work" in {
-    BestMorning.topics should be(Set(Acting, Dancing, Grinding))
+    bestMorning.topics should be(Set(Acting, Dancing, Grinding))
   }
 
   "persons" should "work" in {
-    BestMorning.scheduledPersons should be(Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona))
+    bestMorning.scheduledPersons should be(Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona))
   }
 
   "countPersonsByTopic" should "work" in {
-    BestMorning.countPersonsByTopic should be(Map(
+    bestMorning.countPersonsByTopic should be(Map(
       Acting -> 3,
       Dancing -> 3,
       Grinding -> 2
     ))
   }
+
+  "unweightedScoresByPerson" should "be correct for a simple case" in {
+    val slots = SimpleTestModel.Solutions.Best.slotSchedulesList.sortBy(_.slot.id).map(_.unweightedScoresByPerson)
+    val slot1 = slots.head
+    val slot2 = slots.tail.head
+    val slot3 = slots.tail.tail.head
+
+    slot1 should be(Map(
+      SimpleTestModel.Persons.Arthur -> Score(0.0),
+      SimpleTestModel.Persons.Bianca -> Score(1.0),
+      SimpleTestModel.Persons.Corwin -> Score(5.0),
+      SimpleTestModel.Persons.Daniela -> Score(0.0),
+      SimpleTestModel.Persons.Fiona -> Score(5.0),
+      // SimpleTestModel.Persons.Eric -> Score(0.0), // missing from this slot
+      SimpleTestModel.Persons.Garion -> Score(0.0),
+      SimpleTestModel.Persons.Hercule -> Score(1.0),
+      SimpleTestModel.Persons.Iago -> Score(5.0),
+    ))
+    slot2 should be(Map(
+      SimpleTestModel.Persons.Arthur -> Score(5.0),
+      SimpleTestModel.Persons.Bianca -> Score(0.0),
+      SimpleTestModel.Persons.Corwin -> Score(1.0),
+      SimpleTestModel.Persons.Daniela -> Score(5.0),
+      SimpleTestModel.Persons.Eric -> Score(0.0),
+      SimpleTestModel.Persons.Fiona -> Score(1.0),
+      SimpleTestModel.Persons.Garion -> Score(5.0),
+      SimpleTestModel.Persons.Hercule -> Score(0.0),
+      // SimpleTestModel.Persons.Iago -> Score(0.0), // missing from this slot
+    ))
+    slot3 should be(Map(
+      // SimpleTestModel.Persons.Arthur -> Score(0.0), // missing from this slot
+      SimpleTestModel.Persons.Bianca -> Score(5.0),
+      SimpleTestModel.Persons.Corwin -> Score(0.0),
+      SimpleTestModel.Persons.Daniela -> Score(1.0),
+      SimpleTestModel.Persons.Eric -> Score(5.0),
+      SimpleTestModel.Persons.Fiona -> Score(0.0),
+      SimpleTestModel.Persons.Garion -> Score(1.0),
+      SimpleTestModel.Persons.Hercule -> Score(5.0),
+      SimpleTestModel.Persons.Iago -> Score(0.0),
+    ))
+  }
+
 }
