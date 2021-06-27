@@ -4,11 +4,12 @@ package fr.renoux.gaston.model
 
 /** Someone. */
 final case class Person(
-    id: Int,
+    id: Person.Id,
     name: String,
     weight: Weight = Weight.Default
 ) extends Identified
 
 object Person {
+  type Id = Int
   val MaxCount: Int = 10 * 1000
 }
