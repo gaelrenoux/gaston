@@ -7,7 +7,6 @@ import org.scalatest.matchers.should.Matchers
 
 //import scala.util.Random
 
-
 class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
   val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
   //private implicit val _r: Random = new Random(0L)
@@ -16,4 +15,5 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
 
   behavior of "run"
   //TODO some tests
+  // TODO: 1000 iterations on an exsting problem with a fixed seed, see the result
 }
