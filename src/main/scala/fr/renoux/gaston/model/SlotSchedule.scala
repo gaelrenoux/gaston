@@ -106,7 +106,7 @@ final case class SlotSchedule(
   }
 
   /** Score for this slot schedule if we swap those two persons. Persons are in couple with there current topic. */
-  def deltaScoreIfSwapPersons(tp1: (Topic, Person), tp2: (Topic, Person)): Map[Person, Score] = {
+  def deltaScoreIfSwapPersons(tp1: (Topic, Person), tp2: (Topic, Person)): Map[Person.Id, Score] = {
     val (t1, p1) = tp1
     val (t2, p2) = tp2
     val oldR1 = wrapped(t1)
@@ -115,12 +115,13 @@ final case class SlotSchedule(
     val newR2 = oldR2.replacePerson(p2, p1)
     val persons = newR1.persons ++ newR2.persons
     persons.view.map { p =>
+      val pid = p.id
       val delta =
-        newR1.unweightedScoresByPerson.getOrElse(p, Score.Zero) +
-          newR2.unweightedScoresByPerson.getOrElse(p, Score.Zero) -
-          oldR1.unweightedScoresByPerson.getOrElse(p, Score.Zero) -
-          oldR2.unweightedScoresByPerson.getOrElse(p, Score.Zero)
-      p -> delta
+        newR1.unweightedScoresByPersonId(pid) +
+          newR2.unweightedScoresByPersonId(pid) -
+          oldR1.unweightedScoresByPersonId(pid) -
+          oldR2.unweightedScoresByPersonId(pid)
+      p.id -> delta
     }.toMap
   }
 
@@ -132,7 +133,8 @@ final case class SlotSchedule(
   }
 
   /** Score for each person, regardless of its weight. All personal scores are records-level, so the whole computation is done per record. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).combineAll
+  lazy val unweightedScoresByPersonId: Array[Score] =
+    Score.combineArrays(recordsList.map(_.unweightedScoresByPersonId), problem.counts.persons)
 
   lazy val impersonalScoreTopicLevel: Score = recordsList.view.map(_.impersonalScore).sum
 

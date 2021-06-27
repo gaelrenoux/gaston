@@ -15,6 +15,8 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
+  lazy val weightsByPersonId: Array[Weight] = persons.toArray.sortBy(_.id).map(_.weight)
+
   lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
   lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
 

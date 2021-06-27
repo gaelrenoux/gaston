@@ -84,4 +84,15 @@ object Score extends (Double => Score) {
     override def parseString(str: String): Option[Score] = str.toDoubleOption.map(Score)
   }
 
+  /** Combine multiple score arrays by adding them together */
+  def combineArrays(scoreArrays: Iterable[Array[Score]], length: Int): Array[Score] = {
+    val totalArray = Array.fill[Score](length)(Score.Zero)
+    scoreArrays.foreach { array =>
+      for (i <- array.indices) {
+        totalArray(i) += array(i)
+      }
+    }
+    totalArray
+  }
+
 }

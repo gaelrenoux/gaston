@@ -21,14 +21,14 @@ class Renderer(
 
   /** Formats the schedule and analysis to a pretty String. Empty lines at the beginning and the end. */
   def apply(schedule: Schedule): String = {
-    val weightedScoresByPerson: Map[Person, Score] = schedule.scoreCalculator.weightedScoresByPerson
+    val weightedScoresByPersonId: Array[Score] = schedule.scoreCalculator.weightedScoresByPersonId
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
     val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.toSeq.map {
       case (person, preferences) =>
         val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
         val mandatoryCount = problem.mandatoryTopicsByPerson(person).size
-        (person.name, weightedScoresByPerson(person).value, satisfied, mandatoryCount)
+        (person.name, weightedScoresByPersonId(person.id).value, satisfied, mandatoryCount)
     }
 
     val summariesFromBestToWorse = summaryByPerson.sortBy(_._2).reverse

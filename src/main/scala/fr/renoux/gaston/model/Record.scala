@@ -39,12 +39,16 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   def replacePerson(oldP: Person, newP: Person): Record = copy(persons = persons -oldP + newP)
 
   /** Score for each person, regardless of its weight. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] =
-    persons.view.map { person =>
+  lazy val unweightedScoresByPersonId: Array[Score] = {
+    // Ugly but optimized for speed
+    val result = Array.fill[Score](counts.persons)(Score.Zero)
+    persons.foreach { person =>
       val prefs = problem.personalPreferencesListByPerson(person)
       val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.scoreRecord(this)).sum
-      person -> score
-    }.toMap
+      result(person.id) = score
+    }
+    result
+  }
 
   lazy val impersonalScore: Score = preferencesScoreRec(problem.impersonalRecordLevelPreferencesList)
 
