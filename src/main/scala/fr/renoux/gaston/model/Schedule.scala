@@ -1,7 +1,5 @@
 package fr.renoux.gaston.model
 
-import cats.Monoid
-import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{BitSet, Context, testOnly}
 
@@ -110,10 +108,13 @@ final case class Schedule(
     updateSlotSchedule(slot)(_.swapPersons(tp1, tp2))
 
   def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Score = {
-    val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
-    val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
-    val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
-
+    val existingUnweightedScoresByPersonId = scoreCalculator.unweightedScoresByPersonId
+    val deltaUnweightedScoresByPersonId = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
+    val newUnweightedScoresByPerson = {
+      Array.tabulate(problem.counts.persons) { i =>
+        existingUnweightedScoresByPersonId(i) + deltaUnweightedScoresByPersonId.getOrElse(i, Score.Zero)
+      }
+    }
     if (score.isNegativeInfinity) Score.Zero
     else scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore
   }

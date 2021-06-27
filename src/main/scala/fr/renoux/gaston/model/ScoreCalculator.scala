@@ -7,28 +7,39 @@ import fr.renoux.gaston.util.Context.chrono
 import scala.annotation.tailrec
 
 /** Calculate scores on a given schedule. */
-final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
+final class ScoreCalculator(val schedule: Schedule)(implicit ctx: Context) {
 
   import ScoreCalculator._
 
+  private val problem = schedule.problem
+
   /** Score for each person, regardless of its weight. All personal scores are slot-level, so the whole computation is done per slot. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] = chrono("ScoreCalculator > unweightedScoresByPerson") {
-    schedule.slotSchedulesList.map(_.unweightedScoresByPerson).combineAll
+  lazy val unweightedScoresByPersonId: Array[Score] = chrono("ScoreCalculator > unweightedScoresByPerson") {
+    Score.combineArrays(schedule.slotSchedulesList.map(_.unweightedScoresByPersonId), problem.counts.persons)
   }
 
   /** Score for each person, divided by that person's weight */
-  lazy val weightedScoresByPerson: Map[Person, Score] =
-    unweightedScoresByPerson.map { case (p, s) => p -> s / p.weight }
+  lazy val weightedScoresByPersonId: Array[Score] = {
+    val result = Array.fill(problem.counts.persons)(Score.Zero)
+    for (id <- unweightedScoresByPersonId.indices) {
+      result(id) = unweightedScoresByPersonId(id) / problem.weightsByPersonId(id)
+    }
+    result
+  }
 
-  def personalScoreFrom(unweightedScoresByPerson: Map[Person, Score]): Score = {
-    val weightedScores = unweightedScoresByPerson.toSeq.map { case (p, s) => s / p.weight }
-    val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+  def personalScoreFrom(unweightedScoresByPersonId: Array[Score]): Score = {
+    val rankedWeightedScores = Array.tabulate(problem.counts.persons) { i =>
+      val weight = problem.weightsByPersonId(i)
+      val score = unweightedScoresByPersonId(i)
+      (score.value / weight.value)
+    }.sorted
+    val scoreWeightedPersons = rankedWeightedScores.foldRight(0.0) { case (s, acc) => s + (acc / RankFactor) }
     Score(scoreWeightedPersons)
   }
 
   /** Score related to persons */
   lazy val personalScore: Score = chrono("ScoreCalculator > personalScore") {
-    personalScoreFrom(unweightedScoresByPerson)
+    personalScoreFrom(unweightedScoresByPersonId)
   }
 
   /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
