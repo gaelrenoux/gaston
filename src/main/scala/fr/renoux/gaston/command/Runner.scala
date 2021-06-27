@@ -19,7 +19,7 @@ import fr.renoux.gaston.util.CanAddDuration._
 class Runner(
     hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
-    parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors * 2 / 3)
+    parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors - 1)
 )(implicit problem: Problem, engine: Engine, ctx: Context) {
 
   private val log = Logger[Runner]
