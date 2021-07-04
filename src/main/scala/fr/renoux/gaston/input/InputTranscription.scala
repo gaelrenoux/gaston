@@ -35,11 +35,11 @@ private[input] class InputTranscription(input: InputModel) {
 
   /* Slots */
   private val slotIx = new AtomicInteger(0) // ugly, simpler
-  lazy val slotSequencesWithNames: Seq[Seq[(NonEmptyString, Slot)]] = input.slots.mapMap { s =>
+  lazy val slotSequencesWithNames: Array[Array[(NonEmptyString, Slot)]] = input.slots.mapMap { s =>
     val personsPresent = input.personsSet.filterNot(_.absences.contains(s.name)).map(p => personsByName(p.name))
     s.name -> Slot(slotIx.getAndIncrement(), s.name, personsPresent, s.maxTopics.fold(Int.MaxValue)(_.value))
-  }
-  lazy val slotSequences: Seq[Seq[Slot]] = slotSequencesWithNames.mapMap(_._2)
+  }.map(_.toArray).toArray
+  lazy val slotSequences: Array[Array[Slot]] = slotSequencesWithNames.mapMap(_._2)
   lazy val slotsByName: Map[NonEmptyString, Slot] = slotSequencesWithNames.flatten.toMap
 
 
@@ -222,11 +222,11 @@ private[input] class InputTranscription(input: InputModel) {
   lazy val problem: Problem =
     new ProblemImpl(
       slotSequences,
-      topicsByName.values.flatten.toSet,
+      topicsByName.values.flatten.toArray,
       unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
-      personsByName.values.toSet,
-      Constraints.all,
-      Preferences.all
+      personsByName.values.toArray,
+      Constraints.all.toArray,
+      Preferences.all.toArray
     )
 
   lazy val result: ValidatedNel[InputError, Problem] = errors.toList.sorted.map(InputError(_)) match {

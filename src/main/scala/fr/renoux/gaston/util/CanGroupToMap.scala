@@ -22,6 +22,13 @@ trait CanGroupToMap[F[_]] {
 object CanGroupToMap {
   @inline def apply[F[_] : CanGroupToMap]: CanGroupToMap[F] = implicitly[CanGroupToMap[F]]
 
+  /*
+  implicit object ArrayCanGroupToMap extends CanGroupToMap[Array] {
+    @inline
+    override def groupToMap[B, C](a: Array[(B, C)]): Map[B, Array[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))
+  }
+  */
+
   implicit object SetCanGroupToMap extends CanGroupToMap[Set] {
     @inline
     override def groupToMap[B, C](a: Set[(B, C)]): Map[B, Set[C]] = a.groupBy(_._1).mapValuesStrict(_.map(_._2))

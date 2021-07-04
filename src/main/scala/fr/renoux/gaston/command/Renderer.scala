@@ -15,16 +15,16 @@ class Renderer(
   import Ordering.Double.IeeeOrdering
 
   /** For each person, preferences */
-  private val preferencesByPerson: Map[Person, Set[PersonTopicPreference]] = problem.preferences.collect {
+  private val personsAndTheirPreferences: Array[(Person, Array[PersonTopicPreference])] = problem.preferences.collect {
     case p: PersonTopicPreference => p
-  }.groupBy(_.person)
+  }.groupBy(_.person).toArray
 
   /** Formats the schedule and analysis to a pretty String. Empty lines at the beginning and the end. */
   def apply(schedule: Schedule): String = {
     val weightedScoresByPersonId: Array[Score] = schedule.scoreCalculator.weightedScoresByPersonId
 
     /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
-    val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.toSeq.map {
+    val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = personsAndTheirPreferences.toSeq.map {
       case (person, preferences) =>
         val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
         val mandatoryCount = problem.mandatoryTopicsByPerson(person).size

@@ -3,12 +3,14 @@ package fr.renoux.gaston.input
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.model.constraints.TopicsSimultaneous
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
-import fr.renoux.gaston.model.{Problem, Score}
+import fr.renoux.gaston.model.{Counts, Person, Preference, Problem, Score}
+import fr.renoux.gaston.util.BitMap
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
+  import InputTranscriptionSpec._
   import fr.renoux.gaston.TestUtils._
 
   private def from(model: InputModel): Problem = {
@@ -25,11 +27,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
     val topicNames = Set("alpha #1", "alpha #2", "alpha #3")
 
-    def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name))
+    def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name)).toSet
 
     they should "be different topics" in {
       val problem = from(InputModel(topics = inputTopics))
-      problem.topics.map(_.name) should be(topicNames)
+      problem.topics.map(_.name).toSet should be(topicNames)
     }
 
     they should "all have the same mandatory, forbidden and wishes" in {
@@ -43,7 +45,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       ))
       problem.mandatoryTopicsByPerson(p"Arnold") should be(topics)
       problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
-      problem.preferencesByPerson(p"Caroline").collect {
+      preferencesByPerson(problem)(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
       } should be(topics.map(_ -> Score.PersonTotalScore))
     }
@@ -59,7 +61,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       val expected = Set(Array.fill(3)(true).toSeq -> Array(true, false).toSeq)
       problem.preferences.collect {
         case TopicsExclusive(ts, ex, _) => (ts.safeContent, ex.safeContent)
-      } should be(expected)
+      }.toSet should be(expected)
 
     }
 
@@ -77,11 +79,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
     val topicNames = Set("alpha ~1", "alpha ~2", "alpha ~3")
 
-    def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name))
+    def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name)).toSet
 
     they should "be transcribed to different topics" in {
       val problem = from(InputModel(topics = inputTopics))
-      problem.topics.map(_.name) should be(topicNames)
+      problem.topics.map(_.name).toSet should be(topicNames)
     }
 
     they should "all have the same forbidden and wishes" in {
@@ -93,9 +95,9 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         )
       ))
       problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
-      problem.preferencesByPerson(p"Caroline").collect {
+      preferencesByPerson(problem)(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
-      } should be(topics.map(_ -> Score.PersonTotalScore))
+      }.toSet should be(topics.map(_ -> Score.PersonTotalScore))
     }
 
     they should "be simultaneous" in {
@@ -107,7 +109,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       ))
       problem.constraints.collect {
         case TopicsSimultaneous(ts) => ts
-      } should be(Set(topics))
+      }.toSet should be(Set(topics))
     }
 
     they should "dispatch mandatory persons" in {
@@ -123,6 +125,18 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       problem.mandatoryTopicsByPerson(p"Bianca") should be(Set(t"alpha ~2"))
     }
 
+  }
+
+}
+
+object InputTranscriptionSpec {
+
+  def preferencesByPerson(pb: Problem): BitMap[Person, Set[Preference.Personal]] = {
+    implicit val counts: Counts = pb.counts
+    val prefsSet = pb.preferences.toSet
+    prefsSet.collect {
+      case p: Preference.Personal => p
+    }.groupBy(_.person).toBitMap(Set.empty)
   }
 
 }

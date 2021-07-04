@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.Context.chrono
 
 import scala.annotation.tailrec
 import scala.collection.concurrent.TrieMap
-import scala.collection.immutable.Queue
+import scala.collection.immutable.{ArraySeq, Queue}
 import scala.collection.mutable
 import scala.util.Random
 
@@ -39,7 +39,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
   private def recImprove(
       schedule: Schedule,
       maxRounds: Int,
-      slots: Queue[Slot] = Queue(problem.slotsList: _*),
+      slots: Queue[Slot] = Queue(ArraySeq.unsafeWrapArray(problem.slots): _*),
       slotRoundsLimit: Int = 1000
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {

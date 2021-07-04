@@ -23,7 +23,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
     object slots {
       val a = Slot(0, "A", persons.all, maxTopics = 4)
       val b = Slot(1, "B", persons.all, maxTopics = Int.MaxValue)
-      val all: Set[Slot] = Set(a, b)
+      val all: Array[Slot] = Array(a, b)
     }
 
     object topics {
@@ -40,21 +40,21 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   "Produced problem" should "contain the correct slots" in {
-    problem.slots should be(expected.slots.all)
+    problem.slots.toSeq should be(expected.slots.all.toSeq)
   }
 
   it should "contain the correct topics" in {
     problem.topics.map(t => (t.id, t.name)).toSeq.sorted should be(expected.topics.all.map(t => (t.id, t.name)).toSeq.sorted)
-    problem.topics.toSeq.sortBy(_.name) should be(expected.topics.all.toSeq.sortBy(_.name))
-    problem.topics should be(expected.topics.all)
+    problem.topics.sortBy(_.name).toSeq should be(expected.topics.all.toSeq.sortBy(_.name))
+    problem.topics.toSet should be(expected.topics.all)
   }
 
   it should "contain the correct persons" in {
-    problem.persons should be(expected.persons.all)
+    problem.persons.toSet should be(expected.persons.all)
   }
 
   it should "contain the correct constraints" in {
-    problem.constraints should be(Set(
+    problem.constraints.toSet should be(Set(
       TopicsSimultaneous(Set(expected.topics.alpha, expected.topics.beta)),
     ))
   }
@@ -77,13 +77,13 @@ class InputSpec extends AnyFlatSpec with Matchers {
     problem.preferences.filter {
       case p: PersonTopicPreference if p.topic.virtual => true
       case _ => false
-    } should be(expectedPreferences.filter {
+    }.toSet should be(expectedPreferences.filter {
       case p: PersonTopicPreference if p.topic.virtual => true
       case _ => false
     })
-    problem.preferences.filter(_.isInstanceOf[PersonTopicPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonTopicPreference]))
-    problem.preferences.filter(_.isInstanceOf[TopicsExclusive]) should be(expectedPreferences.filter(_.isInstanceOf[TopicsExclusive]))
-    problem.preferences should be(expectedPreferences)
+    problem.preferences.toSet.filter(_.isInstanceOf[PersonTopicPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonTopicPreference]))
+    problem.preferences.toSet.filter(_.isInstanceOf[TopicsExclusive]) should be(expectedPreferences.filter(_.isInstanceOf[TopicsExclusive]))
+    problem.preferences.toSet should be(expectedPreferences)
   }
 
 }

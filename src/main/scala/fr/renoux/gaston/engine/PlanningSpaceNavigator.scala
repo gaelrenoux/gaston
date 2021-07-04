@@ -5,6 +5,7 @@ import fr.renoux.gaston.engine.PlanningSpaceNavigator.Move
 import fr.renoux.gaston.model._
 
 import scala.collection.View
+import scala.reflect.ClassTag
 import scala.util.Random
 
 
@@ -27,7 +28,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   /** Add an unscheduled topic */
   private def possibleAdds(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
-    slot <- shuffled(problem.slotsList).view
+    slot <- shuffled(problem.slots).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Additions on slot ${slot.name}")
 
@@ -58,7 +59,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   /** Swap two scheduled topics */
   private def possibleSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
-    (slot1, slot2) <- shuffled(problem.slotCouplesSeq).view
+    (slot1, slot2) <- shuffled(problem.slotCouples).view
     slotSchedule1 = schedule.on(slot1)
     slotSchedule2 = schedule.on(slot2)
     _ = log.debug(s"Checking for possible Swaps between slots ${slot1.name} and ${slot2.name}")
@@ -103,7 +104,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   /** Swap topics between unscheduled and scheduled */
   private def possibleExtSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
-    slot <- shuffled(problem.slotsList).view
+    slot <- shuffled(problem.slots).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Ext Swaps on slot ${slot.name}")
     oldTopic <- shuffled(slotSchedule.removableTopics).view
@@ -141,7 +142,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   /** Remove a scheduled topic */
   private def possibleRemovals(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
-    slot <- shuffled(problem.slotsList).view
+    slot <- shuffled(problem.slots).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Removals on slot ${slot.name}")
     topic <- shuffled(slotSchedule.removableTopics).view
@@ -157,6 +158,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
 
   private def shuffled[A](set: Set[A])(implicit rand: Random): Seq[A] = shuffled(set.toSeq)
+
+  private def shuffled[A: ClassTag](seq: Array[A])(implicit rand: Random): Array[A] = rand.shuffle(seq).toArray
 
   private def shuffled[A](seq: Seq[A])(implicit rand: Random): Seq[A] = rand.shuffle(seq)
 

@@ -4,8 +4,6 @@ import cats.implicits._
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
-import scala.annotation.tailrec
-
 /** Calculate scores on a given schedule. */
 final class ScoreCalculator(val schedule: Schedule)(implicit ctx: Context) {
 
@@ -45,15 +43,20 @@ final class ScoreCalculator(val schedule: Schedule)(implicit ctx: Context) {
 
   /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
   lazy val impersonalScore: Score = chrono("ScoreCalculator > impersonalScore") {
-    schedule.slotSchedulesList.map(_.impersonalScore).sum + preferencesScoreRec(schedule.problem.impersonalGlobalLevelPreferencesList)
+    schedule.slotSchedulesList.map(_.impersonalScore).sum + impersonalGlobalLevelPreferencesScore
   }
 
-  @tailrec
-  private def preferencesScoreRec(prefs: List[Preference.GlobalLevel], sum: Double = 0): Score = prefs match {
-    case Nil => Score(sum)
-    case p :: ps =>
-      val s = p.scoreSchedule(schedule)
-      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
+  private lazy val impersonalGlobalLevelPreferencesScore: Score = {
+    // TODO refactor UglyFastScore
+    val prefs = problem.impersonalGlobalLevelPreferences
+    var score = Score.Zero
+    var i = 0
+    val length = prefs.length
+    while (i < length && !score.isNegativeInfinity) {
+      score += prefs(i).scoreSchedule(schedule)
+      i += 1
+    }
+    score
   }
 
   /** Score that solution for the current problem. Returns a global score prioritizing the score of the least satisfied

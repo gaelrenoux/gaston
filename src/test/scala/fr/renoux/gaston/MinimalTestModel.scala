@@ -18,9 +18,9 @@ object MinimalTestModel {
     val Bebop = Person(index.getAndIncrement(), "Bebop")
     val Rocksteady = Person(index.getAndIncrement(), "Rocksteady")
 
-    val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
-    val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
-    val All: Set[Person] = AllTurtles ++ AllEnemies
+    val AllTurtles: Array[Person] = Array(Leonardo, Raphael, Donatello, Michelangelo)
+    val AllEnemies: Array[Person] = Array(Bebop, Rocksteady)
+    val All: Array[Person] = AllTurtles ++ AllEnemies
   }
 
   object Topics {
@@ -31,24 +31,24 @@ object MinimalTestModel {
     val Party = Topic(index.getAndIncrement(), "party")
 
     val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> InputTranscription.unassignedTopic(index.getAndIncrement(), s)).toMap
-    val Concrete: Set[Topic] = Set(Leading, Fighting, Machines, Party)
-    val All: Set[Topic] = Concrete ++ Unassigned.values
+    val Concrete: Array[Topic] = Array(Leading, Fighting, Machines, Party)
+    val All: Array[Topic] = Concrete ++ Unassigned.values.toArray
   }
 
   object Slots {
     private val index = new AtomicInteger(0)
-    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All)
-    val Afternoon = Slot(index.getAndIncrement(), "afternoon", Persons.All)
-    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All)
-    val Night = Slot(index.getAndIncrement(), "night", Persons.All)
+    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All.toSet)
+    val Afternoon = Slot(index.getAndIncrement(), "afternoon", Persons.All.toSet)
+    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All.toSet)
+    val Night = Slot(index.getAndIncrement(), "night", Persons.All.toSet)
 
-    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
+    val All: Array[Array[Slot]] = Array(Array(Morning, Afternoon, Evening, Night))
     val Count = All.flatten.size
   }
 
   object Problems {
     implicit val MinimalCounts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
-    val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Set.empty, Set.empty)
+    val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Array.empty, Array.empty)
   }
 
 }

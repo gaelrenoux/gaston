@@ -2,11 +2,10 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.{BitSet, testOnly}
 
-import scala.annotation.tailrec
-
 
 /** A Record is a triplet of slot, topic and assigned persons */
 final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
+
   import problem.counts
 
   lazy val personsList: List[Person] = persons.toList
@@ -36,7 +35,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   def removePerson(person: Person): Record = copy(persons = persons - person)
 
   /** Replace a person by another on the record. */
-  def replacePerson(oldP: Person, newP: Person): Record = copy(persons = persons -oldP + newP)
+  def replacePerson(oldP: Person, newP: Person): Record = copy(persons = persons - oldP + newP)
 
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPersonId: Array[Score] = {
@@ -51,14 +50,17 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
     result
   }
 
-  lazy val impersonalScore: Score = preferencesScoreRec(problem.impersonalRecordLevelPreferencesList)
-
-  @tailrec
-  private def preferencesScoreRec(prefs: List[Preference.RecordLevel], sum: Double = 0): Score = prefs match {
-    case Nil => Score(sum)
-    case p :: ps =>
-      val s = p.scoreRecord(this)
-      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
+  lazy val impersonalScore: Score = {
+    // TODO refactor UglyFastScore
+    val prefs = problem.impersonalRecordLevelPreferences
+    var score = Score.Zero
+    var i = 0
+    val length = prefs.length
+    while (i < length && !score.isNegativeInfinity) {
+      score += prefs(i).scoreRecord(this)
+      i += 1
+    }
+    score
   }
 
   /**
