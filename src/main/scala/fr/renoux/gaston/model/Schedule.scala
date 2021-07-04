@@ -1,7 +1,8 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.BitSet.syntax._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{Context, testOnly}
+import fr.renoux.gaston.util.{BitSet, Context, testOnly}
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -15,7 +16,6 @@ final case class Schedule(
 ) {
 
   import Schedule._
-  import problem.counts
 
   @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =
     copy(wrapped = w)
@@ -33,7 +33,7 @@ final case class Schedule(
   lazy val topicToSlot: Map[Topic, Slot] = planning.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val scheduledTopics: Iterable[Topic] = slotSchedules.flatMap(_.topics)
   lazy val scheduledTopicsSet: Set[Topic] = scheduledTopics.toSet
-  lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopicsSet.toBitSet
+  lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopicsSet.toBitSet(problem.topicsCount)
   // lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   // lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
   lazy val unscheduledTopics: Set[Topic] = (problem.realTopicsSet -- scheduledTopics)

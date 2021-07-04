@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.BitSet
 
 /**
   * That one person doesn't want to share a schedule record with any person from that group. The reward here is

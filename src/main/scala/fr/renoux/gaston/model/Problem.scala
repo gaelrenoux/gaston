@@ -1,9 +1,10 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.BitMap.syntax._
+import fr.renoux.gaston.util.{BitMap, Count}
+
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 trait Problem {
-  implicit val counts: Counts
-
   val slotSequences: Array[Array[Slot]]
   val slots: Array[Slot] = slotSequences.flatten
   val topics: Array[Topic]
@@ -12,6 +13,11 @@ trait Problem {
   val constraints: Array[Constraint]
   val preferences: Array[Preference]
 
+  implicit val slotsCount: Count[Slot] = Count[Slot](slots.length)
+  implicit val topicsCount: Count[Topic] = Count[Topic](topics.length)
+  implicit val personsCount: Count[Person] = Count[Person](persons.length)
+  lazy val counts: Counts = Counts(slots = slotsCount.value, topics = topicsCount.value, persons = personsCount.value)
+
   lazy val weightsByPersonId: Array[Weight] = persons.toArray.sortBy(_.id).map(_.weight)
 
   lazy val realTopics: Array[Topic] = topics.filterNot(_.virtual)
@@ -19,7 +25,7 @@ trait Problem {
   lazy val forcedTopics: Array[Topic] = topics.filter(_.forced)
 
   lazy val personalPreferencesList: Array[Preference.Personal] = preferences.collect { case pp: Preference.Personal => pp }
-  lazy val personalPreferencesListByPerson: BitMap[Person, Array[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap
+  lazy val personalPreferencesListByPerson: BitMap[Person, Array[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap()
 
   private lazy val recordLevelPreferences = preferences.collect { case p: Preference.RecordLevel => p }
   private lazy val slotLevelPreferences = preferences.collect { case p: Preference.SlotLevel => p }
@@ -38,8 +44,6 @@ trait Problem {
     s1 <- slots
     s2 <- slots if s1.name < s2.name
   } yield (s1, s2)
-
-  val personsCount: Int
 
   val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]]
 

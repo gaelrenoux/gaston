@@ -12,7 +12,10 @@ import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.BitSet.syntax._
+import fr.renoux.gaston.util.BitMap.syntax._
 import mouse.map._
+import fr.renoux.gaston.util.Count
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -106,10 +109,9 @@ private[input] class InputTranscription(input: InputModel) {
 
 
   /* Counts */
-  lazy val slotsCount: Int = slotsByName.size
-  lazy val personsCount: Int = personsByName.size
-  lazy val topicsCount: Int = topicsByName.values.flatten.size
-  implicit lazy val counts: Counts = Counts(slots = slotsCount, topics = topicsCount, persons = personsCount)
+  implicit lazy val slotsCount: Count[Slot] = Count[Slot](slotsByName.size)
+  implicit lazy val personsCount: Count[Person] = Count[Person](personsByName.size)
+  implicit lazy val topicsCount: Count[Topic] = Count[Topic](topicsByName.values.flatten.size)
 
 
   /* Constraints */

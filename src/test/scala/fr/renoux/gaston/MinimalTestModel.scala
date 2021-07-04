@@ -1,10 +1,11 @@
 package fr.renoux.gaston
 
-import java.util.concurrent.atomic.AtomicInteger
-
 import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.{Counts, Person, Slot, Topic}
+import fr.renoux.gaston.util.BitMap.syntax._
+
+import java.util.concurrent.atomic.AtomicInteger
 
 
 object MinimalTestModel {
@@ -43,12 +44,13 @@ object MinimalTestModel {
     val Night = Slot(index.getAndIncrement(), "night", Persons.All.toSet)
 
     val All: Array[Array[Slot]] = Array(Array(Morning, Afternoon, Evening, Night))
-    val Count = All.flatten.size
+    val Count = All.flatten.length
   }
 
   object Problems {
-    implicit val MinimalCounts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
-    val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Array.empty, Array.empty)
+    val MinimalCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.length, persons = Persons.All.length)
+    import MinimalCounts.implicits._
+    val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap(), Persons.All, Array.empty, Array.empty)
   }
 
 }

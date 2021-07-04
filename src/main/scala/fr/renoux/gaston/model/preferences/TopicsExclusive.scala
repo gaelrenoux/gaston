@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.BitSet
 
 /** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot). */
 final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: Score = Preference.NecessaryPreferenceScore)

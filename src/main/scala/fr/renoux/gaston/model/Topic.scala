@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.Identified
+
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.

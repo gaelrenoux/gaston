@@ -1,12 +1,13 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.util.testOnly
+import fr.renoux.gaston.util.{BitSet, testOnly}
+import fr.renoux.gaston.util.BitSet.syntax._
 
 
 /** A Record is a triplet of slot, topic and assigned persons */
 final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
 
-  import problem.counts
+  import problem.counts.implicits._
 
   lazy val personsList: List[Person] = persons.toList
   lazy val countPersons: Int = persons.size
@@ -40,7 +41,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPersonId: Array[Score] = {
     // Ugly but optimized for speed
-    val result = Array.fill[Score](counts.persons)(Score.Zero)
+    val result = Array.fill[Score](problem.counts.persons)(Score.Zero)
     persons.foreach { person =>
       val prefs = problem.personalPreferencesListByPerson(person)
       val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.scoreRecord(this)).sum

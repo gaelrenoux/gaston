@@ -3,9 +3,12 @@ package fr.renoux.gaston.input
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.model.constraints.TopicsSimultaneous
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
-import fr.renoux.gaston.model.{BitMap, Counts, Person, Preference, Problem, Score}
+import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.BitMap
+import fr.renoux.gaston.util.BitMap.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
 
 class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
@@ -57,9 +60,9 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
           InputPerson("Willy", mandatory = Set())
         )
       ))
-      val expected = Set(Array.fill(3)(true).toSeq -> Array(true, false).toSeq)
+      val expected = Set(Array.fill(3)(true).toSeq -> Seq(true, false).toSeq)
       problem.preferences.collect {
-        case TopicsExclusive(ts, ex, _) => (ts.content, ex.content)
+        case TopicsExclusive(ts, ex, _) => (ts.unsafeContent.toSeq, ex.unsafeContent.toSeq)
       }.toSet should be(expected)
 
     }
@@ -131,11 +134,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 object InputTranscriptionSpec {
 
   def preferencesByPerson(pb: Problem): BitMap[Person, Set[Preference.Personal]] = {
-    implicit val counts: Counts = pb.counts
+    import pb.counts.implicits._
     val prefsSet = pb.preferences.toSet
     prefsSet.collect {
       case p: Preference.Personal => p
-    }.groupBy(_.person).toBitMap(Set.empty)
+    }.groupBy(_.person).toBitMap(Set.empty[Preference.Personal])
   }
 
 }

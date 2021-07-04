@@ -6,6 +6,8 @@ import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
+import fr.renoux.gaston.util.BitMap.syntax._
+import fr.renoux.gaston.util.BitSet.syntax._
 import fr.renoux.gaston.util.RandomImplicits._
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -60,7 +62,7 @@ class ComplexTestModel(seed: Long) {
 
   object Preferences {
 
-    import ProblemCounts.CompleteCounts
+    import ProblemCounts.CompleteCounts.implicits._
 
     val PersonTopics: Array[Preference] = for {
       p <- Persons.All
@@ -82,11 +84,11 @@ class ComplexTestModel(seed: Long) {
 
   object Problems {
     val Complete: Problem = {
-      import ProblemCounts.CompleteCounts
+      import ProblemCounts.CompleteCounts.implicits._
       val p = new ProblemImpl(
         Slots.AllSequence,
         Topics.All,
-        Topics.Unassigned.toBitMap,
+        Topics.Unassigned.toBitMap(),
         Persons.All,
         Array.empty,
         Preferences.All ++ Preferences.Unassigned

@@ -109,7 +109,7 @@
     </check>
     <check level="warning" class="org.scalastyle.scalariform.ObjectNamesChecker" enabled="true">
         <parameters>
-            <parameter name="regex">^[A-Z][A-Za-z0-9]*$</parameter>
+            <parameter name="regex">^[A-Z][A-Za-z0-9]*$|^syntax$|^implicits</parameter>
         </parameters>
     </check>
     <check level="warning" class="org.scalastyle.scalariform.OverrideJavaChecker" enabled="true"/>
