@@ -33,6 +33,7 @@ final class ScoreCalculator(val schedule: Schedule)(implicit ctx: Context) {
       val score = unweightedScoresByPersonId(i)
       (score.value / weight.value)
     }.sorted
+    // TODO sorted is a major (17%) hot-spot
     val scoreWeightedPersons = rankedWeightedScores.foldRight(0.0) { case (s, acc) => s + (acc / RankFactor) }
     Score(scoreWeightedPersons)
   }

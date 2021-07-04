@@ -26,8 +26,8 @@ trait Problem {
   lazy val personsList: List[Person] = persons.toList
   lazy val constraintsList: List[Constraint] = constraints.toList
   lazy val preferencesList: List[Preference] = preferences.toList
-  lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
-  lazy val personalPreferencesListByPerson: BitMap[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap(Nil)
+  lazy val personalPreferencesList: Array[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }.toArray
+  lazy val personalPreferencesListByPerson: BitMap[Person, Array[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap
 
   private lazy val (
     (recordLevelPreferences: Set[Preference.RecordLevel], slotLevelPreferences: Set[Preference.SlotLevel]),

@@ -114,6 +114,7 @@ final case class SlotSchedule(
     val newR1 = oldR1.replacePerson(p1, p2)
     val newR2 = oldR2.replacePerson(p2, p1)
     val persons = newR1.persons ++ newR2.persons
+    // TODO ++ is a minor (6%) hot-spot
     persons.view.map { p =>
       val pid = p.id
       val delta =
@@ -123,6 +124,7 @@ final case class SlotSchedule(
           oldR2.unweightedScoresByPersonId(pid)
       p.id -> delta
     }.toMap
+    // TODO toMap is a major (12%) hot-spot
   }
 
   /** Move a person on some slot, from some topic to another one. */
