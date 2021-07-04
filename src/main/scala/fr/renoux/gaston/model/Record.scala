@@ -43,6 +43,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
     persons.view.map { person =>
       val prefs = problem.personalPreferencesListByPerson(person)
       val score = if (prefs.isEmpty) Score.Zero else prefs.view.map(_.scoreRecord(this)).sum
+      // TODO sum is a major (22%) hot-spot
       person -> score
     }.toMap
 

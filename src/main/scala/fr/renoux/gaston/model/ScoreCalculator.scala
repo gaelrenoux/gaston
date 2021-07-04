@@ -23,6 +23,7 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
   def personalScoreFrom(unweightedScoresByPerson: Map[Person, Score]): Score = {
     val weightedScores = unweightedScoresByPerson.toSeq.map { case (p, s) => s / p.weight }
     val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
+    // TODO sorted is a major (17%) hot-spot
     Score(scoreWeightedPersons)
   }
 

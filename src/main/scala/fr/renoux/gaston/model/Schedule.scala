@@ -109,6 +109,7 @@ final case class Schedule(
   def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule =
     updateSlotSchedule(slot)(_.swapPersons(tp1, tp2))
 
+  // TODO the whole method itself is a minor (5%) hot-spot
   def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Score = {
     val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
     val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
