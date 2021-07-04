@@ -17,3 +17,5 @@ final case class Slot(
 
   lazy val personsPresentCount: Int = personsPresent.size
 }
+
+//TODO call to hashcode is a minor (9%) hot-spot ! Same for topic and person !
