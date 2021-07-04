@@ -4,8 +4,6 @@ import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.testOnly
 
-import scala.annotation.tailrec
-
 /** A schedule for a specific slot */
 final case class SlotSchedule(
     slot: Slot,
@@ -21,6 +19,7 @@ final case class SlotSchedule(
   }
 
   lazy val isEmpty: Boolean = records.isEmpty
+  lazy val size: Int = wrapped.size
 
   lazy val records: Iterable[Record] = wrapped.values
   lazy val recordsSet: Set[Record] = records.toSet
@@ -141,17 +140,20 @@ final case class SlotSchedule(
   lazy val impersonalScoreTopicLevel: Score = recordsList.view.map(_.impersonalScore).sum
 
   /** Impersonal score of the slot, regardless of how persons are assigned to topics on this slot (as long as the same persons are present) */
-  lazy val impersonalScoreSlotLevel: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
+  lazy val impersonalScoreSlotLevel: Score = {
+    // TODO refactor UglyFastScore
+    val prefs = problem.impersonalSlotLevelPreferences
+    var score = Score.Zero
+    var i = 0
+    val length = prefs.length
+    while (i < length && !score.isNegativeInfinity) {
+      score += prefs(i).scoreSlot(this)
+      i += 1
+    }
+    score
+  }
 
   lazy val impersonalScore: Score = impersonalScoreTopicLevel + impersonalScoreSlotLevel
-
-  @tailrec
-  private def preferencesScoreRec(prefs: List[Preference.SlotLevel], sum: Double = 0): Score = prefs match {
-    case Nil => Score(sum)
-    case p :: ps =>
-      val s = p.scoreSlot(this)
-      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
-  }
 
   /** This schedule makes sense. No person on multiple topics at the same time. */
   lazy val isSound: Boolean = {

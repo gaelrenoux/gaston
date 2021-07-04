@@ -18,15 +18,25 @@ trait Constraint {
 
 object Constraint {
 
+  /** Trait for preferences which can be evaluated only on the global level, not slot by slot or record by record */
+  trait GlobalLevel extends Constraint {
+
+    /** Indicates if the constraint is respected on the given schedule. */
+    def isRespectedSchedule(schedule: Schedule): Boolean
+
+    /** Indicates if the constraint is respected on the given schedule. Default implementation can be overriden. */
+    override def isRespected(schedule: Schedule): Boolean = isRespectedSchedule(schedule)
+
+  }
 
   /** Trait for constraints which can be evaluated slot by slot */
   trait SlotLevel extends Constraint {
 
-    /** Indicates if the constraint is respected on the given schedule. Default implementation can be overriden. */
-    override def isRespected(schedule: Schedule): Boolean = schedule.slotSchedules.forall(isRespectedSlot)
-
     /** Indicates if the constraint is respected on the given schedule. */
     def isRespectedSlot(schedule: SlotSchedule): Boolean
+
+    /** Indicates if the constraint is respected on the given schedule. Default implementation can be overriden. */
+    override def isRespected(schedule: Schedule): Boolean = schedule.slotSchedules.forall(isRespectedSlot)
   }
 
 }

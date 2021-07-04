@@ -7,23 +7,23 @@ import fr.renoux.gaston.util.CollectionImplicits._
 
 /** A problem to solve. A schedule solves a problem. */
 final class ProblemImpl(
-    val slotSequences: Seq[Seq[Slot]],
-    val topics: Set[Topic],
+    val slotSequences: Array[Array[Slot]],
+    val topics: Array[Topic],
     val unassignedTopics: BitMap[Slot, Topic],
-    val persons: Set[Person],
-    val constraints: Set[Constraint],
-    val preferences: Set[Preference]
+    val persons: Array[Person],
+    val constraints: Array[Constraint],
+    val preferences: Array[Preference]
 )(implicit val counts: Counts) extends Problem {
 
-  val slots: Set[Slot] = slotSequences.flatten.toSet
+  val topicsSet: Set[Topic] = topics.toSet
 
-  lazy val personsCount: Int = persons.size
+  lazy val personsCount: Int = persons.length
 
   lazy val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topics.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap(Set.empty)
+    topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap(Set.empty)
 
   lazy val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topics.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap(Set.empty)
+    topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap(Set.empty)
 
   lazy val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]] = {
     val conflictingMandatories = for {
@@ -38,7 +38,8 @@ final class ProblemImpl(
         topics.cross(topics)
     }.flatten
 
-    (conflictingMandatories ++ notSimultaneous).groupToMap.toBitMap(Set.empty)
+    val s = (conflictingMandatories ++ notSimultaneous).toSet // compiler needs the intermediate value for some reason
+    s.groupToMap.toBitMap(Set.empty)
   }
 
   lazy val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]] = {
@@ -48,7 +49,8 @@ final class ProblemImpl(
       if topic.mandatory.exists(!slot.personsPresent.contains(_))
       if topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
-    couples.groupToMap.toBitMap(Set.empty)
+    val s = couples.toSet // compiler needs the intermediate value for some reason
+    s.groupToMap.toBitMap(Set.empty)
   }
 
   lazy val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]] = {
@@ -57,22 +59,18 @@ final class ProblemImpl(
     }.flatten.toMap.toBitMap(Set.empty)
   }
 
-  lazy val preferencesByPerson: BitMap[Person, Set[Preference.Personal]] = preferences.collect {
-    case p: Preference.Personal => p
-  }.groupBy(_.person).toBitMap(Set.empty)
-
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
     builder.append("  Slots:\n")
-    slotsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    slots.foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Topics:\n")
-    topicsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    topics.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Persons:\n")
-    personsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    persons.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Constraints:\n")
-    constraintsList.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    constraints.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Preferences:\n")
-    preferencesList.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    preferences.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
     builder.toString
   }
 }

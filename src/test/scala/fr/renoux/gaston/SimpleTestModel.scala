@@ -1,7 +1,5 @@
 package fr.renoux.gaston
 
-import java.util.concurrent.atomic.AtomicInteger
-
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.{InputLoader, InputSettings, InputTranscription}
 import fr.renoux.gaston.model._
@@ -9,6 +7,8 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.Context
+
+import java.util.concurrent.atomic.AtomicInteger
 
 // scalastyle:off magic.number
 /** 9 persons, 9 topics, 3 slots */
@@ -28,15 +28,15 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val Garion = Person(index.getAndIncrement(), "Garion")
     val Hercule = Person(index.getAndIncrement(), "Hercule")
     val Iago = Person(index.getAndIncrement(), "Iago")
-    val All: Set[Person] = Set(Arthur, Bianca, Corwin, Daniela, Eric, Fiona, Garion, Hercule, Iago)
+    val All: Array[Person] = Array(Arthur, Bianca, Corwin, Daniela, Eric, Fiona, Garion, Hercule, Iago)
   }
 
   object Slots {
     private val index = new AtomicInteger(0)
-    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All - Persons.Eric)
-    val AfterNoon = Slot(index.getAndIncrement(), "afternoon", Persons.All - Persons.Iago)
-    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All - Persons.Arthur)
-    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
+    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All.toSet - Persons.Eric)
+    val AfterNoon = Slot(index.getAndIncrement(), "afternoon", Persons.All.toSet - Persons.Iago)
+    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All.toSet - Persons.Arthur)
+    val All: Array[Array[Slot]] = Array(Array(Morning, AfterNoon, Evening))
     val Count = All.flatten.size
   }
 
@@ -65,8 +65,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
       MinimalTestModel.Slots.Afternoon -> UnassignedAfternoon,
       MinimalTestModel.Slots.Evening -> UnassignedEvening
     )
-    val Concrete: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
-    val All: Set[Topic] = Concrete ++ Unassigned.values
+    val Concrete: Array[Topic] = Array(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
+    val All: Array[Topic] = Concrete ++ Unassigned.values.toArray
   }
 
   object ProblemCounts {
@@ -79,7 +79,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     val BathingAndEatingAreSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
 
-    val All: Set[Constraint] = Set(
+    val All: Array[Constraint] = Array(
       BathingAndEatingAreSimultaneous
     )
   }
@@ -87,8 +87,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
   object Preferences {
 
     import Persons._
-    import Topics._
     import ProblemCounts.CompleteCounts
+    import Topics._
 
     val AB = PersonTopicPreference(Arthur, Bathing, strongPreference)
     val BC = PersonTopicPreference(Bianca, Cooking, strongPreference)
@@ -112,7 +112,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     val ArthurHatesFionaAndDaniela = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference.value)
 
-    val All: Set[Preference] = Set(
+    val All: Array[Preference] = Array(
       AB, BC, CD, DE, EF, FG, GH, HI, IA,
       AC, BD, CE, DF, EG, FH, GI, HA, IB,
       ArthurHatesFionaAndDaniela

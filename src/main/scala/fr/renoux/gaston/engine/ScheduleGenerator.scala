@@ -9,8 +9,9 @@ import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.Context
 
 import scala.annotation.tailrec
-import scala.collection.immutable.Queue
+import scala.collection.immutable.{ArraySeq, Queue}
 import scala.util.Random
+import fr.renoux.gaston.util.RandomImplicits._
 
 /**
   * Uses backtracking to produce a Stream of schedules. Those schedules are not the best you could have, but they are
@@ -30,10 +31,10 @@ final class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(i
   /** Generates just one schedule. */
   def createOne(implicit random: Random): Schedule = {
     log.debug("Generating a single schedule")
-    val slots = random.shuffle(problem.slots.toList)
-    val (forcedTopics, unforcedTopics) = problem.realTopicsList.partition(_.forced)
-    val topics = random.shuffle(forcedTopics) ::: random.shuffle(unforcedTopics)
-    val state = State(Schedule.empty, Queue(slots: _*), topics)
+    val slots = random.shuffleArray(problem.slots)
+    val (forcedTopics, unforcedTopics) = problem.realTopics.partition(_.forced)
+    val topics = random.shuffleArray(forcedTopics) ++ random.shuffleArray(unforcedTopics)
+    val state = State(Schedule.empty, Queue(ArraySeq.unsafeWrapArray(slots): _*), topics.toList)
     val unimproved = backtrackAndFill(state)
     improver.improve(unimproved.get)
   }

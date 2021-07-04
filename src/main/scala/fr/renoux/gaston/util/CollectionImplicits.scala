@@ -3,9 +3,33 @@ package fr.renoux.gaston.util
 import mouse.map._
 
 import scala.collection.IterableOps
+import scala.reflect.ClassTag
 
 
 object CollectionImplicits {
+
+  @inline final implicit class ArrayOps[A](val wrapped: Array[A]) extends AnyVal {
+    @inline def replace[B >: A : ClassTag](pf: PartialFunction[A, B]): Array[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
+
+    @inline def zipWith[B](f: A => B): Array[(A, B)] = wrapped.map(a => a -> f(a))
+
+    @inline def cross[B](bs: Iterable[B]): Array[(A, B)] = for {
+      a <- wrapped
+      b <- bs
+    } yield (a, b)
+  }
+
+  @inline final implicit class ArrayEitherOps[A, B](val wrapped: Array[Either[A, B]]) extends AnyVal {
+    @inline def unzipEither(implicit tagA: ClassTag[A], tagB: ClassTag[B]): (Array[A], Array[B]) = {
+      val lefts = wrapped.collect { case Left(a) => a }
+      val rights = wrapped.collect { case Right(b) => b }
+      (lefts, rights)
+    }
+  }
+
+  @inline final implicit class ArrayArrayOps[A](val wrapped: Array[Array[A]]) extends AnyVal {
+    @inline def mapMap[B: ClassTag](f: A => B): Array[Array[B]] = wrapped.map(_.map(f))
+  }
 
   @inline final implicit class RichIterableOps[A, CC[_]](val wrapped: IterableOps[A, CC, _]) extends AnyVal {
     @inline def replace[B >: A](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))

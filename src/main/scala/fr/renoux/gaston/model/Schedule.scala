@@ -31,11 +31,12 @@ final case class Schedule(
 
   lazy val planning: Planning = wrapped.mapValuesStrict(_.topics)
   lazy val topicToSlot: Map[Topic, Slot] = planning.flatMap { case (s, ts) => ts.map(_ -> s) }
-  lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
-  lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopics.toBitSet
+  lazy val scheduledTopics: Iterable[Topic] = slotSchedules.flatMap(_.topics)
+  lazy val scheduledTopicsSet: Set[Topic] = scheduledTopics.toSet
+  lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopicsSet.toBitSet
   // lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   // lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
-  lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)
+  lazy val unscheduledTopics: Set[Topic] = (problem.realTopicsSet -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values // not a Set: we do not want to deduplicate identical groups!
   // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.max).sum)
@@ -127,7 +128,7 @@ final case class Schedule(
   /** The schedule makes sense. No person on multiple topics at the same time. No topic on multiple slots. */
   lazy val isSound: Boolean = {
     lazy val noUbiquity = slotSchedules.forall(_.isSound)
-    lazy val noDuplicates = scheduledTopics.sizeCompare(slotSchedulesList.flatMap(_.topicsList)) == 0
+    lazy val noDuplicates = scheduledTopics.toSet.sizeCompare(slotSchedules.view.map(_.size).sum) == 0
     noUbiquity && noDuplicates
   }
 
@@ -137,7 +138,7 @@ final case class Schedule(
     */
   lazy val isPartialSolution: Boolean = {
     lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
-    lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
+    lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopicsSet.contains)
     lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
     allSlotsOk && forcedTopicsOk && forcedTopicsOk && constraintsOk

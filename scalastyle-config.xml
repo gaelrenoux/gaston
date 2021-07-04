@@ -143,9 +143,9 @@
     <!-- org.scalastyle.scalariform.TokenChecker -->
     <!-- org.scalastyle.scalariform.UnderscoreImportChecker -->
     <check level="warning" class="org.scalastyle.scalariform.UppercaseLChecker" enabled="true"/>
-    <check level="warning" class="org.scalastyle.scalariform.VarFieldChecker" enabled="true"/>
-    <check level="warning" class="org.scalastyle.scalariform.VarLocalChecker" enabled="true"/>
-    <check level="warning" class="org.scalastyle.scalariform.WhileChecker" enabled="true"/>
+    <!-- <check level="warning" class="org.scalastyle.scalariform.VarFieldChecker" enabled="true"/> -->
+    <!-- <check level="warning" class="org.scalastyle.scalariform.VarLocalChecker" enabled="true"/> -->
+    <!-- <check level="warning" class="org.scalastyle.scalariform.WhileChecker" enabled="true"/> -->
     <check level="error" class="org.scalastyle.file.XmlLiteralChecker" enabled="true"/>
 
 </scalastyle>
