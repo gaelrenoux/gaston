@@ -2,7 +2,7 @@ package fr.renoux.gaston.model
 
 import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.testOnly
+import fr.renoux.gaston.util.{ArraySet, testOnly}
 
 /** A schedule for a specific slot */
 final case class SlotSchedule(
@@ -76,7 +76,7 @@ final case class SlotSchedule(
 
   def addTopic(topic: Topic): SlotSchedule = updateWrapped(wrapped + (topic -> Record(slot, topic, topic.mandatory)))
 
-  def addTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped ++ topics.map(t => t -> Record(slot, t, t.mandatory)))
+  def addTopics(topics: ArraySet[Topic]): SlotSchedule = updateWrapped(wrapped ++ topics.map(t => t -> Record(slot, t, t.mandatory)))
 
   def removeTopic(topic: Topic): SlotSchedule = updateWrapped(wrapped - topic)
 

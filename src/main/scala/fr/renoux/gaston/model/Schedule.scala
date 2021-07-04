@@ -2,7 +2,7 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.BitSet.syntax._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{BitSet, Context, testOnly}
+import fr.renoux.gaston.util.{ArraySet, BitSet, Context, testOnly}
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -36,7 +36,7 @@ final case class Schedule(
   lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopicsSet.toBitSet(problem.topicsCount)
   // lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   // lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
-  lazy val unscheduledTopics: Set[Topic] = (problem.realTopicsSet -- scheduledTopics)
+  lazy val unscheduledTopics: ArraySet[Topic] = (problem.realTopicsSet -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values // not a Set: we do not want to deduplicate identical groups!
   // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.max).sum)
@@ -65,7 +65,7 @@ final case class Schedule(
 
   def addTopic(slot: Slot, topic: Topic): Schedule = updateSlotSchedule(slot)(_.addTopic(topic))
 
-  def addTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
+  def addTopics(slot: Slot, topics: ArraySet[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
@@ -154,7 +154,7 @@ final case class Schedule(
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
     slotSchedules.foreach { ss => builder.append(ss.toFormattedString) }
-    builder.append(unscheduledTopics.map(_.name).mkString("Unscheduled topics: ", ", ", "\n"))
+    builder.append(unscheduledTopics.unsafeContent.map(_.name).mkString("Unscheduled topics: ", ", ", "\n"))
     builder.toString
   }
 

@@ -2,10 +2,11 @@ package fr.renoux.gaston.model.impl
 
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.{Preference, _}
-import fr.renoux.gaston.util.BitMap
+import fr.renoux.gaston.util.ArraySet.syntax._
 import fr.renoux.gaston.util.BitMap.syntax._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.{ArraySet, BitMap}
 
 /** A problem to solve. A schedule solves a problem. */
 final class ProblemImpl(
@@ -17,15 +18,13 @@ final class ProblemImpl(
     val preferences: Array[Preference]
 ) extends Problem {
 
-  val topicsSet: Set[Topic] = topics.toSet
+  lazy val mandatoryTopicsByPerson: BitMap[Person, ArraySet[Topic]] =
+    topics.toSeq.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.mapValuesStrict(_.toArraySet).toBitMap(ArraySet.empty[Topic])
 
-  lazy val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap()
+  lazy val forbiddenTopicsByPerson: BitMap[Person, ArraySet[Topic]] =
+    topics.toSeq.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.mapValuesStrict(_.toArraySet).toBitMap(ArraySet.empty[Topic])
 
-  lazy val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap()
-
-  lazy val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]] = {
+  lazy val incompatibleTopicsByTopic: BitMap[Topic, ArraySet[Topic]] = {
     val conflictingMandatories = for {
       topic1 <- topics
       topic2 <- topics
@@ -34,29 +33,29 @@ final class ProblemImpl(
 
     val notSimultaneous = constraints.collect {
       case TopicsNotSimultaneous(ts) =>
-        val topics = this.topics.filter(ts)
+        val topics = this.topics.filter(ts.contains)
         topics.cross(topics)
     }.flatten
 
-    val s = (conflictingMandatories ++ notSimultaneous).toSet // compiler needs the intermediate value for some reason
-    s.groupToMap.toBitMap(Set.empty[Topic])
+    val m: Map[Topic, Seq[Topic]] = (conflictingMandatories ++ notSimultaneous).toSeq.groupToMap
+    m.mapValuesStrict(_.toArraySet).toBitMap(ArraySet.empty[Topic])
   }
 
-  lazy val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]] = {
+  lazy val incompatibleTopicsBySlot: BitMap[Slot, ArraySet[Topic]] = {
     val couples = for {
       slot <- slots
       topic <- topics
       if topic.mandatory.exists(!slot.personsPresent.contains(_))
       if topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
-    val s = couples.toSet // compiler needs the intermediate value for some reason
-    s.groupToMap.toBitMap(Set.empty[Topic])
+    val s: Set[(Slot, Topic)] = couples.toSet
+    s.groupToMap.mapValuesStrict(_.toArraySet).toBitMap(ArraySet.empty[Topic])
   }
 
-  lazy val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]] = {
+  lazy val simultaneousTopicByTopic: BitMap[Topic, ArraySet[Topic]] = {
     constraints.collect {
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
-    }.flatten.toMap.toBitMap(Set.empty[Topic])
+    }.flatten.toMap.mapValuesStrict(_.toArraySet).toBitMap(ArraySet.empty[Topic])
   }
 
   lazy val toFormattedString: String = {

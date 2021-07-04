@@ -16,7 +16,7 @@ final case class PersonGroupAntiPreference(
 
   override def scoreRecord(record: Record): Score = {
     if (record.persons.contains(person)) {
-      val count = record.persons.count(group)
+      val count = record.persons.count(group.contains)
       if (count == 0) Score.Zero else reward * count
     } else Score.Zero
   }

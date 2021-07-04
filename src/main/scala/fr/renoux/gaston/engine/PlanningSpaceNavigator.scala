@@ -3,6 +3,7 @@ package fr.renoux.gaston.engine
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.PlanningSpaceNavigator.Move
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.{ArraySet, Identified}
 
 import scala.collection.View
 import scala.reflect.ClassTag
@@ -40,7 +41,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out topics coming in excessive number */
     if slotSchedule.maxTopicsLeft >= topicsToAdd.size
 
-    personsMandatoryOnTopic = topicsToAdd.flatMap(_.mandatory)
+    personsMandatoryOnTopic = topicsToAdd.unsafeContent.flatMap(_.mandatory)
 
     /* Filter out impossible adds because mandatory persons are already taken */
     if !personsMandatoryOnTopic.exists(slotSchedule.mandatory)
@@ -165,7 +166,9 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   private def shuffled[A](it: Iterable[A])(implicit rand: Random): Iterable[A] = rand.shuffle(it)
 
-  private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicByTopic(topic) + topic
+  private def shuffled[A >: Null <: Identified : ClassTag](s: ArraySet[A])(implicit rand: Random): ArraySet[A] = new ArraySet(shuffled(s.unsafeContent))
+
+  private def linkedTopics(topic: Topic): ArraySet[Topic] = problem.simultaneousTopicByTopic(topic) + topic
 
 }
 

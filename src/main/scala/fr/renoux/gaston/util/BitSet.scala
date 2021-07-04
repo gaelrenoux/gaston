@@ -2,7 +2,8 @@ package fr.renoux.gaston.util
 
 import java.util
 
-/** A set of something with an integer Id. */
+/** A set of something with an integer Id, which can only be used to test if it contains an A (but not iterate on that
+  * A or get it back). */
 final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
 
   @inline def apply(a: A): Boolean = wrapped(a.id)
@@ -39,8 +40,6 @@ object BitSet {
     it.foreach { a => tmp(a.id) = true }
     new BitSet[A](tmp)
   }
-
-  implicit def toFunction[A <: Identified](bitSet: BitSet[A]): Function[A, Boolean] = bitSet.apply
 
   object syntax {
     implicit class BitSetConversionOps[A <: Identified](val wrapped: Iterable[A]) extends AnyVal {
