@@ -1,19 +1,60 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.SimpleTestModel
+import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.command.Runner
+import fr.renoux.gaston.input.problemFromClassPath
+import fr.renoux.gaston.model.{Problem, Schedule}
+import fr.renoux.gaston.util.Context
 import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-//import scala.util.Random
-
-
+// scalastyle:off magic.number
 class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
-  val ComplexTestModel = fr.renoux.gaston.ComplexTestModel(42L)
-  //private implicit val _r: Random = new Random(0L)
 
-  assert(SimpleTestModel.Solutions.Best.isSolution)
+  private implicit val context: Context = Context.Default
+  private val problem17: Problem = problemFromClassPath("udocon2017/uc17-completed.conf").force
+  private val problem19: Problem = problemFromClassPath("udocon2019/uc19-full.conf").force
 
-  behavior of "run"
-  //TODO some tests
+  private def run(problem: Problem, iterations: Long): (Schedule, Long) = {
+    implicit val p: Problem = problem
+    implicit val i: GreedySlotImprover = new GreedySlotImprover
+    implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
+    val runner = new Runner(parallelRunCount = 1)
+    val params: OptimParams = OptimParams(maxIterations = Some(iterations))
+    runner.run(seed = 42, params)
+  }
+
+  "problem 17" should "return a good result after 10 iterations" in {
+    val (result, count) =  run(problem17, 10)
+    println(result)
+    println(count)
+    count should be(10)
+    result.score.value should be > 519.0
+  }
+
+  it should "return a great result after 100 iterations" in {
+    val (result, count) =  run(problem17, 100)
+    println(result)
+    println(count)
+    count should be(100)
+    result.score.value should be > 729.0
+  }
+
+  "problem 19" should "return a good result after 10 iterations" in {
+    val (result, count) =  run(problem19, 10)
+    println(result)
+    println(count)
+    count should be(10)
+    result.score.value should be > 657.0
+  }
+
+  it should "return a great result after 100 iterations" in {
+    val (result, count) =  run(problem19, 100)
+    println(result)
+    println(count)
+    count should be(100)
+    result.score.value should be > 970.0
+  }
+
 }
