@@ -45,8 +45,8 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
           InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
         )
       ))
-      problem.mandatoryTopicsByPerson(p"Arnold") should be(topics)
-      problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
+      problem.mandatoryTopicsByPerson(p"Arnold").toSet should be(topics)
+      problem.forbiddenTopicsByPerson(p"Bianca").toSet should be(topics)
       preferencesByPerson(problem)(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
       } should be(topics.map(_ -> Score.PersonTotalScore))
@@ -96,7 +96,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
           InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
         )
       ))
-      problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
+      problem.forbiddenTopicsByPerson(p"Bianca").toSet should be(topics)
       preferencesByPerson(problem)(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
       }.toSet should be(topics.map(_ -> Score.PersonTotalScore))
@@ -110,7 +110,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         )
       ))
       problem.constraints.collect {
-        case TopicsSimultaneous(ts) => ts
+        case TopicsSimultaneous(ts) => ts.toSet
       }.toSet should be(Set(topics))
     }
 
@@ -123,8 +123,8 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         )
       ))
 
-      problem.mandatoryTopicsByPerson(p"Arnold") should be(Set(t"alpha ~1"))
-      problem.mandatoryTopicsByPerson(p"Bianca") should be(Set(t"alpha ~2"))
+      problem.mandatoryTopicsByPerson(p"Arnold").toSet should be(Set(t"alpha ~1"))
+      problem.mandatoryTopicsByPerson(p"Bianca").toSet should be(Set(t"alpha ~2"))
     }
 
   }

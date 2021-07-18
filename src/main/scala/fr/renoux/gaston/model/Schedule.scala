@@ -2,7 +2,7 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.BitSet.syntax._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{BitSet, Context, testOnly}
+import fr.renoux.gaston.util.{ArraySet, BitSet, Context, testOnly}
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -36,7 +36,7 @@ final case class Schedule(
   lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopicsSet.toBitSet(problem.topicsCount)
   // lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
   // lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
-  lazy val unscheduledTopics: Set[Topic] = (problem.realTopicsSet -- scheduledTopics)
+  lazy val unscheduledTopics: ArraySet[Topic] = (problem.realTopicsSet -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values // not a Set: we do not want to deduplicate identical groups!
   // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.max).sum)
@@ -53,7 +53,7 @@ final case class Schedule(
   /** Add a new record to this schedule. */
   def add(record: Record): Schedule = updateSlotSchedule(record.slot)(_.add(record))
 
-  def addAll(slot: Slot, records: Set[Record]): Schedule = {
+  def addAll(slot: Slot, records: Array[Record]): Schedule = {
     if (records.isEmpty) this else updateSlotSchedule(slot)(_.addAll(records))
   }
 
@@ -65,7 +65,7 @@ final case class Schedule(
 
   def addTopic(slot: Slot, topic: Topic): Schedule = updateSlotSchedule(slot)(_.addTopic(topic))
 
-  def addTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
+  def addTopics(slot: Slot, topics: ArraySet[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
@@ -79,7 +79,7 @@ final case class Schedule(
 
   /** Swap two groups of topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
     * schedule is probably unsound and/or partial. */
-  def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = updateWrapped {
+  def swapTopics(st1: (Slot, ArraySet[Topic]), st2: (Slot, ArraySet[Topic])): Schedule = updateWrapped {
     val (slot1, topics1) = st1
     val (slot2, topics2) = st2
     val modified1 = slot1 -> on(slot1).replaceTopics(topics1, topics2)
@@ -92,12 +92,12 @@ final case class Schedule(
   def replaceTopic(slot: Slot, oldTopic: Topic, newTopic: Topic): Schedule =
     updateSlotSchedule(slot)(_.replaceTopic(oldTopic, newTopic))
 
-  def replaceTopics(slot: Slot, oldTopics: Set[Topic], newTopics: Set[Topic]): Schedule =
+  def replaceTopics(slot: Slot, oldTopics: ArraySet[Topic], newTopics: ArraySet[Topic]): Schedule =
     updateSlotSchedule(slot)(_.replaceTopics(oldTopics, newTopics))
 
   def removeTopic(slot: Slot, topic: Topic): Schedule = updateSlotSchedule(slot)(_.removeTopic(topic))
 
-  def removeTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.removeTopics(topics))
+  def removeTopics(slot: Slot, topics: ArraySet[Topic]): Schedule = updateSlotSchedule(slot)(_.removeTopics(topics))
 
 
   /** Adds a person to some topic already on schedule. If the topic is not on schedule on that slot, returns the same schedule. */
@@ -154,7 +154,7 @@ final case class Schedule(
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
     slotSchedules.foreach { ss => builder.append(ss.toFormattedString) }
-    builder.append(unscheduledTopics.map(_.name).mkString("Unscheduled topics: ", ", ", "\n"))
+    builder.append(unscheduledTopics.mapToArray(_.name).mkString("Unscheduled topics: ", ", ", "\n"))
     builder.toString
   }
 

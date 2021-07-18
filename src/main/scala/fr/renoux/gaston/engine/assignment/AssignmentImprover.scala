@@ -12,14 +12,13 @@ import scala.collection.mutable
 import scala.util.Random
 
 
-/**
-  * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them.
-  */
+/** Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them. */
 final class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
 
   private val cache: mutable.Map[Schedule.Planning, Schedule] = TrieMap[Schedule.Planning, Schedule]()
 
-  private val slotCache: mutable.Map[Set[Topic], SlotSchedule] = TrieMap[Set[Topic], SlotSchedule]()
+  /** For a given set of topics (all topics on a slot), an optimal schedule that was found. Can't make this schedule better. */
+  private val slotsScheduleCache: mutable.Map[Seq[Topic], SlotSchedule] = TrieMap[Seq[Topic], SlotSchedule]()
 
   private val log = Logger[AssignmentImprover]
 
@@ -54,7 +53,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
       val (slot, slotsTail) = slots.dequeue
       val slotSchedule = schedule.on(slot)
 
-      slotCache.get(slotSchedule.topicsSet) match {
+      slotsScheduleCache.get(slotSchedule.topicsSet.toSeq) match {
         case Some(ss) =>
           recImprove(schedule.set(ss), maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
 
@@ -62,7 +61,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
           case None =>
             /* can't improve this slot any more ! Store in cache, then go to next slot */
-            slotCache.update(slotSchedule.topicsSet, slotSchedule)
+            slotsScheduleCache.update(slotSchedule.topicsSet.toSeq, slotSchedule)
             recImprove(schedule, maxRounds - 1, slotsTail)
 
           case Some(candidate) =>

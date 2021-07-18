@@ -10,7 +10,9 @@ final case class PersonTopicPreference(
 ) extends Preference.RecordLevel with Preference.Personal {
 
   override def scoreRecord(record: Record): Score = {
-    if (record.topic == topic && record.personsBitSet.contains(person)) reward
+    val checkTopicEquality = record.topic == topic
+    val checkPersonsContains = record.personsBitSet.contains(person)
+    if (checkTopicEquality && checkPersonsContains) reward
     else Score.Zero
   }
 }

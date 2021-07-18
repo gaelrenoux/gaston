@@ -15,9 +15,11 @@ final class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends An
 
   @inline def getId(id: Int): Option[B] = Option(wrapped(id))
 
-  @inline def map[C: ClassTag](f: B => C): BitMap[A, C] = new BitMap[A, C](wrapped.map(f))
+  @inline def mapValues[C: ClassTag](f: B => C): BitMap[A, C] = new BitMap[A, C](wrapped.map(f))
 
   @inline def contains(a: A): Boolean = wrapped(a.id) != null // scalastyle:ignore null
+
+  @inline def toMap: Map[Int, B] = wrapped.view.zipWithIndex.map(_.swap).toMap
 }
 
 object BitMap {

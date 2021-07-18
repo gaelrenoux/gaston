@@ -8,7 +8,7 @@ import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.BitMap.syntax._
 import fr.renoux.gaston.util.BitSet.syntax._
-import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.util.{ArraySet, Context, Count}
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -69,6 +69,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
     )
     val Concrete: Array[Topic] = Array(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
     val All: Array[Topic] = Concrete ++ Unassigned.values.toArray
+
+    implicit val CountTopics: Count[Topic] = Count[Topic](Concrete.length)
   }
 
   object ProblemCounts {
@@ -79,7 +81,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import Topics._
 
-    val BathingAndEatingAreSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
+    val BathingAndEatingAreSimultaneous = TopicsSimultaneous(ArraySet(Bathing, Eating))
 
     val All: Array[Constraint] = Array(
       BathingAndEatingAreSimultaneous

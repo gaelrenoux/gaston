@@ -1,7 +1,8 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.BitMap.syntax._
-import fr.renoux.gaston.util.{BitMap, Count}
+import fr.renoux.gaston.util.ArraySet.syntax._
+import fr.renoux.gaston.util.{ArraySet, BitMap, Count}
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 trait Problem {
@@ -18,10 +19,10 @@ trait Problem {
   implicit val personsCount: Count[Person] = Count[Person](persons.length)
   lazy val counts: Counts = Counts(slots = slotsCount.value, topics = topicsCount.value, persons = personsCount.value)
 
-  lazy val weightsByPersonId: Array[Weight] = persons.toArray.sortBy(_.id).map(_.weight)
+  lazy val weightsByPersonId: Array[Weight] = persons.sortBy(_.id).map(_.weight)
 
   lazy val realTopics: Array[Topic] = topics.filterNot(_.virtual)
-  lazy val realTopicsSet: Set[Topic] = realTopics.toSet
+  lazy val realTopicsSet: ArraySet[Topic] = realTopics.toArraySet
   lazy val forcedTopics: Array[Topic] = topics.filter(_.forced)
 
   lazy val personalPreferencesList: Array[Preference.Personal] = preferences.collect { case pp: Preference.Personal => pp }
@@ -45,18 +46,22 @@ trait Problem {
     s2 <- slots if s1.name < s2.name
   } yield (s1, s2)
 
-  val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]]
+  val mandatoryTopicsByPerson: BitMap[Person, ArraySet[Topic]]
 
-  val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]]
+  val forbiddenTopicsByPerson: BitMap[Person, ArraySet[Topic]]
 
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
     * are mandatory). */
-  val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]]
+  val incompatibleTopicsByTopic: BitMap[Topic, ArraySet[Topic]]
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
     * is missing). */
-  val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]]
+  val incompatibleTopicsBySlot: BitMap[Slot, ArraySet[Topic]]
 
-  val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]]
+  /** For each topic, all other topics that need to happen simultaneously. */
+  val simultaneousTopicByTopic: BitMap[Topic, ArraySet[Topic]]
+
+  /** For each topic, all linked topics including itself. Same as simultaneousTopicByTopic but the key topic is also in the array. */
+  val linkedTopicsByTopic: BitMap[Topic, ArraySet[Topic]]
 
 }

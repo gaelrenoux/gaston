@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Slot, _}
+import fr.renoux.gaston.util.ArraySet
 import fr.renoux.gaston.util.BitSet.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -57,7 +58,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
 
   it should "contain the correct constraints" in {
     problem.constraints.toSet should be(Set(
-      TopicsSimultaneous(Set(expected.topics.alpha, expected.topics.beta)),
+      TopicsSimultaneous(ArraySet(expected.topics.alpha, expected.topics.beta)),
     ))
   }
 

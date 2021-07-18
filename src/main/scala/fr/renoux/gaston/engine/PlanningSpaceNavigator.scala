@@ -3,15 +3,18 @@ package fr.renoux.gaston.engine
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.PlanningSpaceNavigator.Move
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.{ArraySet, Identified}
 
 import scala.collection.View
 import scala.reflect.ClassTag
 import scala.util.Random
 
 
-/** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
-  * partial. */
+/** Tools to explore the space solution for plannings (ie, not doing the assignment of persons to topics). Schedules
+  * returned are always partial. */
 final class PlanningSpaceNavigator(implicit private val problem: Problem) {
+
+  import problem.counts.implicits._
 
   val log: Logger = Logger[PlanningSpaceNavigator]
 
@@ -40,10 +43,10 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out topics coming in excessive number */
     if slotSchedule.maxTopicsLeft >= topicsToAdd.size
 
-    personsMandatoryOnTopic = topicsToAdd.flatMap(_.mandatory)
+    personsMandatoryOnTopic = topicsToAdd.flatMapToArray(_.mandatory)
 
     /* Filter out impossible adds because mandatory persons are already taken */
-    if !personsMandatoryOnTopic.exists(slotSchedule.mandatory)
+    if !personsMandatoryOnTopic.exists(slotSchedule.mandatory.contains)
 
     /* Filter out impossible adds because mandatory persons are missing */
     if personsMandatoryOnTopic.forall(slot.personsPresent)
@@ -81,8 +84,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible adds because mandatory persons are already taken */
     personsAlreadyMandatoryOnS1 = slotSchedule1.mandatory -- personsMandatoryOnT1 // taking this topic off, they're not mandatory any more on the slot
     personsAlreadyMandatoryOnS2 = slotSchedule2.mandatory -- personsMandatoryOnT2 // taking this topic off, they're not mandatory any more on the slot
-    if !personsMandatoryOnT1.exists(personsAlreadyMandatoryOnS2) // check mandatories of T1 are not already blocked on S2
-    if !personsMandatoryOnT2.exists(personsAlreadyMandatoryOnS1) // check mandatories of T2 are not already blocked on
+    if !personsMandatoryOnT1.exists(personsAlreadyMandatoryOnS2.contains) // check mandatories of T1 are not already blocked on S2
+    if !personsMandatoryOnT2.exists(personsAlreadyMandatoryOnS1.contains) // check mandatories of T2 are not already blocked on
 
     /* Filter out impossible adds because mandatory persons are missing */
     if personsMandatoryOnT1.forall(slot2.personsPresent)
@@ -123,7 +126,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
     /* Filter out impossible swaps because of mandatory persons */
     personsAlreadyMandatoryOnSlot = slotSchedule.mandatory -- personsMandatoryOnOldTs // taking this topic off, they're not mandatory any more on the slot
-    if !personsMandatoryOnNewTs.exists(personsAlreadyMandatoryOnSlot)
+    if !personsMandatoryOnNewTs.exists(personsAlreadyMandatoryOnSlot.contains)
 
     /* Filter out impossible adds because mandatory persons are missing */
     if personsMandatoryOnNewTs.forall(slot.personsPresent)
@@ -165,7 +168,9 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   private def shuffled[A](it: Iterable[A])(implicit rand: Random): Iterable[A] = rand.shuffle(it)
 
-  private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicByTopic(topic) + topic
+  private def shuffled[A >: Null <: Identified : ClassTag](s: ArraySet[A])(implicit rand: Random): Seq[A] = shuffled(s.toSeq)
+
+  private def linkedTopics(topic: Topic): ArraySet[Topic] = problem.linkedTopicsByTopic(topic)
 
 }
 
@@ -182,23 +187,23 @@ object PlanningSpaceNavigator {
       override def reverts(m: Move): Boolean = false
     }
 
-    case class Swap(a: Set[Topic], b: Set[Topic]) extends Move {
+    case class Swap(a: ArraySet[Topic], b: ArraySet[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Swap(a1, b1) if (a == a1 && b == b1) || (a == b1 && b == a1) => true
+        case Swap(a1, b1) if (a === a1 && b === b1) || (a === b1 && b === a1) => true
         case _ => false
       }
     }
 
-    case class Add(s: Slot, t: Set[Topic]) extends Move {
+    case class Add(s: Slot, t: ArraySet[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Remove(s1, t1) if s == s1 && t == t1 => true
+        case Remove(s1, t1) if s == s1 && t === t1 => true
         case _ => false
       }
     }
 
-    case class Remove(s: Slot, t: Set[Topic]) extends Move {
+    case class Remove(s: Slot, t: ArraySet[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Add(s1, t1) if s == s1 && t == t1 => true
+        case Add(s1, t1) if s == s1 && t === t1 => true
         case _ => false
       }
     }

@@ -2,13 +2,16 @@ package fr.renoux.gaston.model
 
 import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.testOnly
+import fr.renoux.gaston.util.{ArraySet, testOnly}
+import fr.renoux.gaston.util.ArraySet.syntax._
 
 /** A schedule for a specific slot */
 final case class SlotSchedule(
     slot: Slot,
     private val wrapped: Map[Topic, Record]
 )(implicit val problem: Problem) {
+
+  import problem.counts.implicits._
 
   @inline private def updateWrapped(w: Map[Topic, Record]): SlotSchedule =
     copy(wrapped = w)
@@ -28,7 +31,7 @@ final case class SlotSchedule(
   lazy val recordsThatCanAddPersons: Iterable[Record] = records.filter(_.canAddPersons)
 
   lazy val topics: Iterable[Topic] = wrapped.keys
-  lazy val topicsSet: Set[Topic] = wrapped.keySet
+  lazy val topicsSet: ArraySet[Topic] = wrapped.keySet.toArraySet
   lazy val topicsList: List[Topic] = topics.toList
   lazy val realTopics: Iterable[Topic] = topics.filterNot(_.virtual)
   lazy val realTopicsSet: Set[Topic] = realTopics.toSet
@@ -38,13 +41,13 @@ final case class SlotSchedule(
   lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)
 
   /** Topics that cannot be added on this slot, because of the slot itself */
-  lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsBySlot(slot)
+  lazy val permanentlyIncompatibleTopics: ArraySet[Topic] = problem.incompatibleTopicsBySlot(slot)
 
   /** Topics that cannot be added on this slot as it now (but may be added later if the configuration of the slot changes) */
-  lazy val currentlyIncompatibleTopics: Set[Topic] = topicsSet.flatMap(problem.incompatibleTopicsByTopic)
+  lazy val currentlyIncompatibleTopics: ArraySet[Topic] = topicsSet.flatMap(problem.incompatibleTopicsByTopic.apply)
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
-  lazy val incompatibleTopics: Set[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics
+  lazy val incompatibleTopics: ArraySet[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics
 
   lazy val countTopics: Int = topics.size
   lazy val maxTopicsLeft: Int = slot.maxTopics - countTopics
@@ -58,7 +61,7 @@ final case class SlotSchedule(
   lazy val personsByTopic: Map[Topic, Set[Person]] = recordsSet.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
   lazy val countPersonsByTopic: Map[Topic, Int] = personsByTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
-  lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)
+  lazy val mandatory: ArraySet[Person] = topicsSet.flatMap(_.mandatory)
 
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.counts.persons)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.counts.persons)
@@ -72,15 +75,17 @@ final case class SlotSchedule(
   /** Add a new record to this schedule. */
   def add(record: Record): SlotSchedule = updateWrapped(wrapped + (record.topic -> record))
 
-  def addAll(records: Set[Record]): SlotSchedule = updateWrapped(wrapped ++ records.map(r => r.topic -> r))
+  def addAll(records: Array[Record]): SlotSchedule = updateWrapped(wrapped ++ records.map(r => r.topic -> r))
 
   def addTopic(topic: Topic): SlotSchedule = updateWrapped(wrapped + (topic -> Record(slot, topic, topic.mandatory)))
 
-  def addTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped ++ topics.map(t => t -> Record(slot, t, t.mandatory)))
+  def addTopics(topics: ArraySet[Topic]): SlotSchedule = updateWrapped {
+    wrapped ++ topics.mapToArray(t => t -> Record(slot, t, t.mandatory))
+  }
 
   def removeTopic(topic: Topic): SlotSchedule = updateWrapped(wrapped - topic)
 
-  def removeTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped -- topics)
+  def removeTopics(topics: ArraySet[Topic]): SlotSchedule = updateWrapped(wrapped -- topics)
 
   /** Replace an existing topic by a new one (typically unscheduled). Mandatory persons are set on the new topic and no
     * one else, so the schedule is probably unsound and/or partial. */
@@ -88,8 +93,8 @@ final case class SlotSchedule(
     wrapped - oldTopic + (newTopic -> Record(slot, newTopic, newTopic.mandatory))
   }
 
-  def replaceTopics(oldTopics: Set[Topic], newTopics: Set[Topic]): SlotSchedule = updateWrapped {
-    wrapped -- oldTopics ++ newTopics.map(t => t -> Record(slot, t, t.mandatory))
+  def replaceTopics(oldTopics: ArraySet[Topic], newTopics: ArraySet[Topic]): SlotSchedule = updateWrapped {
+    wrapped -- oldTopics ++ newTopics.mapToArray(t => t -> Record(slot, t, t.mandatory))
   }
 
   /** Adds a person to some topic already on schedule. If the topic is not on schedule, returns the same schedule. */

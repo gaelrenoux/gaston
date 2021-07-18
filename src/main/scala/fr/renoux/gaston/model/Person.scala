@@ -9,7 +9,15 @@ final case class Person(
     id: Person.Id,
     name: String,
     weight: Weight = Weight.Default
-) extends Identified
+) extends Identified {
+
+  override def equals(o: Any): Boolean = o match {
+    case that: Person => id == that.id
+    case _ => false
+  }
+
+  override def hashCode(): Int = id
+}
 
 object Person {
   type Id = Int

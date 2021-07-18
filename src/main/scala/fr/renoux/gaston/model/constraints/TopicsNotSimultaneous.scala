@@ -21,7 +21,7 @@ final case class TopicsNotSimultaneous(topics: BitSet[Topic]) extends Constraint
   }
 
   override def equals(o: Any): Boolean = o match {
-    case that: TopicsNotSimultaneous => this.topics.actualEquals(that.topics)
+    case that: TopicsNotSimultaneous => this.topics === that.topics
     case _ => false
   }
 

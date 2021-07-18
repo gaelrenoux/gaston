@@ -6,8 +6,9 @@ import scala.reflect.ClassTag
 
 /** A set of something with an integer Id, based on a simple array for performance (at the expense of memory). */
 // scalastyle:off null Null everywhere in here for performance reason. Not visible from the outside.
-final class ArraySet[A >: Null <: Identified](private val wrapped: Array[A]) extends AnyVal {
+final class ArraySet[A >: Null <: Identified](private val wrapped: Array[A]) extends AnyVal with IterableOnce[A] {
 
+  @inline override def iterator: Iterator[A] = wrapped.iterator.filter(_ != null)
 
   @inline private def wrappedAnyRef: Array[AnyRef] = wrapped.asInstanceOf[Array[AnyRef]]
 
@@ -29,13 +30,15 @@ final class ArraySet[A >: Null <: Identified](private val wrapped: Array[A]) ext
     total
   }
 
-  @inline def isEmpty: Boolean = wrapped.exists(_ != null)
+  @inline def isEmpty: Boolean = wrapped.forall(_ == null)
 
   @inline def size: Int = wrapped.count(_ != null)
 
   @inline def actualEquals(that: ArraySet[A]): Boolean = util.Arrays.equals(wrappedAnyRef, that.wrappedAnyRef)
 
   @inline def actualHashCode: Int = util.Arrays.hashCode(wrappedAnyRef)
+
+  @inline def ===(that: ArraySet[A]): Boolean = util.Arrays.equals(wrappedAnyRef, that.wrappedAnyRef)
 
   @inline def +(a: A): ArraySet[A] = {
     val res = util.Arrays.copyOf(wrapped, wrapped.length)
@@ -45,7 +48,11 @@ final class ArraySet[A >: Null <: Identified](private val wrapped: Array[A]) ext
 
   @inline def ++(that: ArraySet[A]): ArraySet[A] = {
     val res = util.Arrays.copyOf(wrapped, wrapped.length)
-    that.wrapped.foreach { a => res(a.id) = a }
+    that.wrapped.foreach { a =>
+      if (a != null) {
+        res(a.id) = a
+      }
+    }
     new ArraySet(res)
   }
 
@@ -63,7 +70,11 @@ final class ArraySet[A >: Null <: Identified](private val wrapped: Array[A]) ext
 
   @inline def --(that: ArraySet[A]): ArraySet[A] = {
     val res = util.Arrays.copyOf(wrapped, wrapped.length)
-    that.wrapped.foreach { a => res(a.id) = null }
+    that.wrapped.foreach { a =>
+      if (a != null) {
+        res(a.id) = null
+      }
+    }
     new ArraySet(res)
   }
 
@@ -73,8 +84,37 @@ final class ArraySet[A >: Null <: Identified](private val wrapped: Array[A]) ext
     new ArraySet(res)
   }
 
-  @inline def map[B >: Null <: Identified : ClassTag](f: A => B): ArraySet[B] = new ArraySet[B](wrapped.map(f))
+  @inline def map[B >: Null <: Identified : ClassTag](f: A => B)(implicit bCount: Count[B], aTag: ClassTag[A]): ArraySet[B] =
+    ArraySet.from[B](bCount.value) {
+      wrapped.view.collect {
+        case a: A if a != null => f(a)
+      }
+    }
 
+  @inline def flatMap[B >: Null <: Identified : ClassTag](f: A => IterableOnce[B])(implicit bCount: Count[B], aTag: ClassTag[A]): ArraySet[B] =
+    ArraySet.from[B](bCount.value) {
+      wrapped.view.flatMap {
+        case null => Nil
+        case a: A => f(a)
+      }
+    }
+
+  @inline def exists(p: A => Boolean): Boolean = wrapped.exists(a => a != null && p(a))
+
+  @inline def forall(p: A => Boolean): Boolean = wrapped.forall(a => a == null || p(a))
+
+  /** Keeps only the elements present */
+  @inline def mapToArray[B: ClassTag](f: A => B)(implicit a: ClassTag[A]): Array[B] = wrapped.collect {
+    case a: A if a != null => f(a)
+  }
+
+  /** Keeps only the elements present */
+  @inline def flatMapToArray[B: ClassTag](f: A => IterableOnce[B])(implicit a: ClassTag[A]): Array[B] = wrapped.flatMap {
+    case a: A if a != null => f(a)
+    case _ => Nil
+  }
+
+  /** Sequence of As, ordered by their id. */
   @inline def toSeq: Seq[A] = wrapped.view.filter(_ != null).toSeq
 
   @inline def toSet: Set[A] = wrapped.view.filter(_ != null).toSet
@@ -91,11 +131,15 @@ object ArraySet {
 
   def empty[A >: Null <: Identified : ClassTag](implicit count: Count[A]): ArraySet[A] = from[A](count.value)(Nil)
 
-  def from[A >: Null <: Identified : ClassTag](size: Int)(it: Iterable[A]): ArraySet[A] = {
+  @inline private def from[A >: Null <: Identified : ClassTag](size: Int)(it: Iterable[A]): ArraySet[A] = {
     val tmp = Array.fill[A](size)(null)
     it.foreach { a => tmp(a.id) = a }
     new ArraySet[A](tmp)
   }
+
+  def apply[A >: Null <: Identified : ClassTag : Count](values: A*): ArraySet[A] = from[A](implicitly[Count[A]].value)(values)
+
+
 
   object syntax {
     implicit class ArraySetConversionOps[A >: Null <: Identified](val wrapped: Iterable[A]) extends AnyVal {

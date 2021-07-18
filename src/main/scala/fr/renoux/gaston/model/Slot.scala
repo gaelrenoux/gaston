@@ -16,6 +16,13 @@ final case class Slot(
     records.map(r => Record(this, r._1, r._2))
 
   lazy val personsPresentCount: Int = personsPresent.size
+
+  override def equals(o: Any): Boolean = o match {
+    case that: Slot => id == that.id
+    case _ => false
+  }
+
+  override def hashCode(): Int = id
 }
 
 //TODO call to hashcode is a minor (9%) hot-spot ! Same for topic and person !

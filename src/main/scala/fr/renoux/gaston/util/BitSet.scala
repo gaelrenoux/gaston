@@ -30,6 +30,8 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
 
   @inline def actualHashCode: Int = util.Arrays.hashCode(wrapped)
 
+  @inline def ===(that: BitSet[A]): Boolean = util.Arrays.equals(wrapped, that.wrapped)
+
   /** Returns the actual array in this BitSet, so changing it would change the set as well! */
   @inline def unsafeContent: Array[Boolean] = wrapped
 

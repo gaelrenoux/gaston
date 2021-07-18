@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.util.{ArraySet, Context}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -15,13 +15,14 @@ class ConstraintsSpec extends AnyFlatSpec with Matchers {
 
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default
+  import Minimal.counts.implicits._
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps: _*)))
 
   def scheduled(s: Slot, ts: Topic*): Schedule = Schedule.from(s(ts.map(_.apply()): _*))
 
   behavior of "TopicsSimultaneous"
-  val leadingFightingMachinesSimultaneous = TopicsSimultaneous(Set(Leading, Fighting, Machines))
+  val leadingFightingMachinesSimultaneous = TopicsSimultaneous(ArraySet(Leading, Fighting, Machines))
 
   it should "break if the topics are on various slots" in {
     leadingFightingMachinesSimultaneous.isRespected(scheduled(Morning, Fighting, Raphael, Leonardo) ++

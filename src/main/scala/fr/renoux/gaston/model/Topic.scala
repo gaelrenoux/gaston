@@ -22,6 +22,13 @@ final case class Topic(
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
+
+  override def equals(o: Any): Boolean = o match {
+    case that: Topic => id == that.id
+    case _ => false
+  }
+
+  override def hashCode(): Int = id
 }
 
 object Topic {

@@ -6,6 +6,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.refineV
 import eu.timepit.refined.types.string.NonEmptyString
+import fr.renoux.gaston.util.ArraySet.syntax._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
@@ -119,7 +120,7 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.map { inConstraint =>
         // Taking the first occurrence only (weird, but that's a weird requirement as well). Taking the first part only, as all parts are simultaneous anyway.
-        TopicsSimultaneous(inConstraint.topics.map(topicMultiplesByOccurrenceIndexByName(_).head._2.head))
+        TopicsSimultaneous(inConstraint.topics.map(topicMultiplesByOccurrenceIndexByName(_).head._2.head).toArraySet)
       }
 
     lazy val simultaneousMultipleParts: Set[TopicsSimultaneous] = {
@@ -127,7 +128,7 @@ private[input] class InputTranscription(input: InputModel) {
         topicMultiplesByOccurrenceIndex <- topicMultiplesByOccurrenceIndexByName.values
         topicMultiples <- topicMultiplesByOccurrenceIndex.values
         if topicMultiples.size > 1
-      } yield TopicsSimultaneous(topicMultiples)
+      } yield TopicsSimultaneous(topicMultiples.toArraySet)
     }.toSet
 
     lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
