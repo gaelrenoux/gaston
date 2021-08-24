@@ -2,13 +2,15 @@ package fr.renoux.gaston.model
 
 import scala.reflect.ClassTag
 
-class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends AnyVal {
+final class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends AnyVal {
 
   @inline def apply(a: A): B = wrapped(a.id)
 
   @inline def get(a: A): Option[B] = Option(wrapped(a.id))
 
   @inline def getId(id: Int): Option[B] = Option(wrapped(id))
+
+  @inline def map[C: ClassTag](f: B => C): BitMap[A, C] = new BitMap[A, C](wrapped.map(f))
 }
 
 object BitMap {
