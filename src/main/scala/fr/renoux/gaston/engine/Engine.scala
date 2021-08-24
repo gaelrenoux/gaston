@@ -7,6 +7,7 @@ import fr.renoux.gaston.util.Context
 import scala.util.Random
 
 
+/** Main class for the engine. Instantiate it and iteratoe on lazySeq to start producing schedules. */
 final class Engine(
     backtrackInitialSchedule: Boolean = false,
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
