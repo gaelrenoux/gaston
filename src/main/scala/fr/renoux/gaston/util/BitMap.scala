@@ -1,4 +1,4 @@
-package fr.renoux.gaston.model
+package fr.renoux.gaston.util
 
 import scala.reflect.ClassTag
 

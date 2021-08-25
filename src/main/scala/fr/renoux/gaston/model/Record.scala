@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.util.testOnly
+import fr.renoux.gaston.util.{BitSet, testOnly}
 
 import scala.annotation.tailrec
 

@@ -2,6 +2,7 @@ package fr.renoux.gaston.model.impl
 
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.{Preference, _}
+import fr.renoux.gaston.util.BitMap
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 

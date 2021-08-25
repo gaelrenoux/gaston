@@ -1,5 +1,7 @@
 package fr.renoux.gaston
 
+import fr.renoux.gaston.util.{BitMap, BitSet}
+
 import scala.reflect.ClassTag
 
 package object model {

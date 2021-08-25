@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model.constraints
 
-import fr.renoux.gaston.model.{BitSet, Constraint, SlotSchedule, Topic}
+import fr.renoux.gaston.model.{Constraint, SlotSchedule, Topic}
+import fr.renoux.gaston.util.BitSet
 
 import scala.annotation.tailrec
 

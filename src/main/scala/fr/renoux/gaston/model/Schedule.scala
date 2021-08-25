@@ -3,7 +3,7 @@ package fr.renoux.gaston.model
 import cats.Monoid
 import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{Context, testOnly}
+import fr.renoux.gaston.util.{BitSet, Context, testOnly}
 
 /**
   * A schedule is an association of people, to topics, to slots.

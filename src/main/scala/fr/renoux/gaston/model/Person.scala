@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.Identified
+
 // TODO get the weight out of person and have the person inside the weight object ? It is only used during the scoring in Problem.
 
 /** Someone. */

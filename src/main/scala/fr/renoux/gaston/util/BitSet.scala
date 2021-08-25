@@ -1,4 +1,4 @@
-package fr.renoux.gaston.model
+package fr.renoux.gaston.util
 
 final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
 

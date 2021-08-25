@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.BitMap
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.TupleImplicits._
 

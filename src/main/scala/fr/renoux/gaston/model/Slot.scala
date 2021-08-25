@@ -1,5 +1,7 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.util.Identified
+
 
 /** A slot in the schedule. A person can only have one topic during a slot. */
 final case class Slot(
