@@ -6,6 +6,8 @@ import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
+import fr.renoux.gaston.util.BitMap.syntax._
+import fr.renoux.gaston.util.BitSet.syntax._
 import fr.renoux.gaston.util.Context
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -86,8 +88,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Preferences {
 
+    import ProblemCounts.CompleteCounts.implicits._
     import Persons._
-    import ProblemCounts.CompleteCounts
     import Topics._
 
     val AB = PersonTopicPreference(Arthur, Bathing, strongPreference)
@@ -120,8 +122,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
-    import ProblemCounts.CompleteCounts
-    val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
+    import ProblemCounts.CompleteCounts.implicits._
+    val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap(), Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

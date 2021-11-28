@@ -3,6 +3,7 @@ package fr.renoux.gaston.model.impl
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.util.BitMap
+import fr.renoux.gaston.util.BitMap.syntax._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 
@@ -14,17 +15,15 @@ final class ProblemImpl(
     val persons: Array[Person],
     val constraints: Array[Constraint],
     val preferences: Array[Preference]
-)(implicit val counts: Counts) extends Problem {
+) extends Problem {
 
   val topicsSet: Set[Topic] = topics.toSet
 
-  lazy val personsCount: Int = persons.length
-
   lazy val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap(Set.empty)
+    topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap()
 
   lazy val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap(Set.empty)
+    topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap()
 
   lazy val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]] = {
     val conflictingMandatories = for {
@@ -40,7 +39,7 @@ final class ProblemImpl(
     }.flatten
 
     val s = (conflictingMandatories ++ notSimultaneous).toSet // compiler needs the intermediate value for some reason
-    s.groupToMap.toBitMap(Set.empty)
+    s.groupToMap.toBitMap(Set.empty[Topic])
   }
 
   lazy val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]] = {
@@ -51,13 +50,13 @@ final class ProblemImpl(
       if topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
     val s = couples.toSet // compiler needs the intermediate value for some reason
-    s.groupToMap.toBitMap(Set.empty)
+    s.groupToMap.toBitMap(Set.empty[Topic])
   }
 
   lazy val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]] = {
     constraints.collect {
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
-    }.flatten.toMap.toBitMap(Set.empty)
+    }.flatten.toMap.toBitMap(Set.empty[Topic])
   }
 
   lazy val toFormattedString: String = {

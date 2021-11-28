@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Slot, _}
+import fr.renoux.gaston.util.BitSet.syntax._
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -35,9 +36,10 @@ class InputSpec extends AnyFlatSpec with Matchers {
       val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma)
     }
 
-    implicit val counts = Counts(slots = 2, topics = 5, persons = 3)
-
+    val counts = Counts(slots = 2, topics = 5, persons = 3)
   }
+
+  import expected.counts.implicits._
 
   "Produced problem" should "contain the correct slots" in {
     problem.slots.toSeq should be(expected.slots.all.toSeq)
@@ -60,7 +62,6 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "contain the correct preferences" in {
-    import expected.counts
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
       t <- Set(expected.topics.unassignedA, expected.topics.unassignedB)

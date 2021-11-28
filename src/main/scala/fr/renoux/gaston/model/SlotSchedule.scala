@@ -60,8 +60,8 @@ final case class SlotSchedule(
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
   lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)
 
-  lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
-  lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
+  lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.counts.persons)
+  lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.counts.persons)
 
   /** Clear all non-mandatory persons. Returned schedule is partial, obviously. */
   lazy val cleared: SlotSchedule = updateWrapped(wrapped.mapValuesStrict(_.cleared))
