@@ -1,5 +1,9 @@
 package fr.renoux.gaston.util
 
+import java.util
+
+/** A set of something with an integer Id, which can only be used to test if it contains an A (but not iterate on that
+  * A or get it back). */
 final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
 
   @inline def apply(a: A): Boolean = wrapped(a.id)
@@ -9,24 +13,28 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
   @inline def containsId(id: Int): Boolean = wrapped(id)
 
   @inline def countIntersection(that: BitSet[A]): Int = {
-    // scalastyle:off var.local while (For performance)
+    // while loop used for performance
     var i = 0
     var total = 0
-    while (i <= this.size) {
+    val thisSize = this.size
+    while (i <= thisSize) {
       if (wrapped(i) && that.wrapped(i)) total += 1
       i += 1
     }
     total
-    // scalastyle:on var.local while
   }
 
   @inline def size: Int = wrapped.count(identity)
 
-  @inline def actualEquals(that: BitSet[A]): Boolean = wrapped.toList == that.wrapped.toList
+  @inline def actualEquals(that: BitSet[A]): Boolean = util.Arrays.equals(wrapped, that.wrapped)
 
-  @inline def actualHashCode: Int = wrapped.toList.##
+  @inline def actualHashCode: Int = util.Arrays.hashCode(wrapped)
 
-  @inline def content: Seq[Boolean] = wrapped.toSeq
+  /** Returns the actual array in this BitSet, so changing it would change the set as well! */
+  @inline def unsafeContent: Array[Boolean] = wrapped
+
+  /** Returns the a wrapped array, so it cannot be changed from the outside. Slower. */
+  @inline def safeContent: Seq[Boolean] = wrapped.toSeq
 }
 
 object BitSet {
@@ -36,5 +44,12 @@ object BitSet {
     new BitSet[A](tmp)
   }
 
-  implicit def toFunction[A <: Identified](bitSet: BitSet[A]): Function[A, Boolean] = bitSet.apply
+  object syntax {
+    implicit class BitSetConversionOps[A <: Identified](val wrapped: Iterable[A]) extends AnyVal {
+      @inline def toBitSet(size: Int): BitSet[A] = BitSet.from[A](size)(wrapped)
+
+      @inline def toBitSet(implicit count: Count[A]): BitSet[A] = BitSet.from[A](count.value)(wrapped)
+    }
+  }
+
 }

@@ -58,7 +58,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       ))
       val expected = Set(Array.fill(3)(true).toSeq -> Array(true, false).toSeq)
       problem.preferences.collect {
-        case TopicsExclusive(ts, ex, _) => (ts.content, ex.content)
+        case TopicsExclusive(ts, ex, _) => (ts.safeContent, ex.safeContent)
       } should be(expected)
 
     }
