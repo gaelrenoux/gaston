@@ -32,7 +32,7 @@ class TableReader(input: InputModel) {
   // scalastyle:off method.length
   def read(table: String): InputModel = {
     // TODO replace calls to unsafeFrom with proper validation
-    val lines: IndexedSeq[String] = table.split("\n", -1).filter(_.nonEmpty).toIndexedSeq
+    val lines: IndexedSeq[String] = table.split("\n", -1).filter(_.trim.nonEmpty).toIndexedSeq
     val cells: IndexedSeq[IndexedSeq[String]] = lines.map(_.split(tableSettings.separator, -1).map(_.trim).toIndexedSeq)
 
     log.debug(s"Cells:\n${cells.mkString("\n")}")
@@ -62,9 +62,11 @@ class TableReader(input: InputModel) {
     val topicNames = topicsSeq.map(_.name)
 
     /* For each person's names, a list of mandatory topic's names */
-    val mandatoryPersonsToTopics: Map[NonEmptyString, Set[NonEmptyString]] = cells.map { row =>
-      val topicName = NonEmptyString.unsafeFrom(row(tableSettings.topicCol))
-      val mandatoryName = NonEmptyString.unsafeFrom(row(tableSettings.mandatoryPersonCol))
+    val mandatoryPersonsToTopics: Map[NonEmptyString, Set[NonEmptyString]] = cellsWithContent.map { row =>
+      val topicName = NonEmptyString.from(row(tableSettings.topicCol))
+        .getOrElse(throw new IllegalArgumentException("Topic column is empty"))
+      val mandatoryName = NonEmptyString.from(row(tableSettings.mandatoryPersonCol))
+        .getOrElse(throw new IllegalArgumentException("Mandatory person column is empty"))
       mandatoryName -> topicName
     }.groupToMap.mapValuesStrict(_.toSet)
 
