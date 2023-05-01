@@ -35,7 +35,7 @@ final class ProblemImpl(
 
     val notSimultaneous = constraints.collect {
       case TopicsNotSimultaneous(ts) =>
-        val topics = this.topics.filter(ts)
+        val topics = this.topics.filter(ts.contains)
         topics.cross(topics)
     }.flatten
 
