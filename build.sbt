@@ -7,7 +7,7 @@ version := "0.5.0"
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
 
-scalaVersion := "2.13.6"
+scalaVersion := "2.13.10"
 
 lazy val gaston = (project in file("."))
   .configs(PerformanceTest)
