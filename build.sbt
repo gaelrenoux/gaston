@@ -86,6 +86,7 @@ libraryDependencies ++= Seq(
   "com.typesafe" % "config" % "1.4.1",
   "com.github.pureconfig" %% "pureconfig" % "0.16.0",
   "com.github.scopt" %% "scopt" % "4.0.1",
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.3",
 
   "eu.timepit" %% "refined" % refinedVersion,
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,

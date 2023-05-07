@@ -37,9 +37,21 @@ case class InputSettings(
     maxPersonsOnNothing: NonNegInt = 0,
     minPersonsOnNothing: NonNegInt = 0,
     personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
+    personOnNothingAntiPreferenceScaling: Option[InputSettings.PersonOnNothingAntiPreferenceScaling] = None,
     backtrackInitialSchedule: Boolean = true // TODO Should be calculated
 ) {
   lazy val isNothingEnabled: Boolean = maxPersonsOnNothing > 0
+}
+
+object InputSettings {
+  /** If this is enabled, the anti-preference for nothing will scale with the number of forbidden topics for each person.
+    * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal (negative) value
+    */
+  case class PersonOnNothingAntiPreferenceScaling(
+      enabled: Boolean = true,
+      forbiddenRatioForMaximum: Double = 0.75,
+      maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
+  )
 }
 
 case class InputTableSettings(
