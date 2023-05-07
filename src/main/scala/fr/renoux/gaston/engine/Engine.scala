@@ -22,6 +22,10 @@ final class Engine(
     implicit val rand: Random = new Random(seed)
 
     val initial: Schedule = if (backtrackInitialSchedule) generator.createOne else startingSchedule
+    if (!initial.isSolution) {
+      val message = s"A bad schedule was generated at startup !\n ${initial.toFormattedString}\n${initial.errors.mkString("\n")}"
+      throw new IllegalStateException(message)
+    }
 
     improver.improvements(initial, params).map { schedule =>
       if (schedule.isSolution) schedule else {
