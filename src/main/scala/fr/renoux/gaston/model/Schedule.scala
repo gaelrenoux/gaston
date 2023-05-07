@@ -139,14 +139,25 @@ final case class Schedule(
     lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
     lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
-    allSlotsOk && forcedTopicsOk && forcedTopicsOk && constraintsOk
+    allSlotsOk && forcedTopicsOk && constraintsOk
   }
 
   /** @return true if this respects all constraints */
-  lazy val isSolution: Boolean =
+  lazy val isSolution: Boolean = {
     isPartialSolution &&
-      slotSchedules.forall(_.isSolution)
-  problem.globalLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespected(this) }
+      slotSchedules.forall(_.isSolution) &&
+      problem.globalLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespected(this) }
+  }
+
+  lazy val errors: Seq[String] = if (isSolution) Nil else {
+    val slotErrors = slotSchedules.flatMap(_.errors).toSeq
+    val missingForcedTopics = problem.forcedTopics.diff(scheduledTopics)
+    val forcedTopicsError = if (missingForcedTopics.nonEmpty) Some(s"Missing forced topics $missingForcedTopics") else None
+    val constraintsError = problem.globalLevelConstraints.flatMap { c =>
+      if (!c.isRespected(this)) Some(s"Constraint $c not respected") else None
+    }.toSeq
+    slotErrors ++ forcedTopicsError ++ constraintsError
+  }
 
   /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {

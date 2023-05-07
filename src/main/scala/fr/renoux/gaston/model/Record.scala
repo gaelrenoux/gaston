@@ -7,6 +7,7 @@ import scala.annotation.tailrec
 
 /** A Record is a triplet of slot, topic and assigned persons */
 final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
+
   import problem.counts
 
   lazy val personsList: List[Person] = persons.toList
@@ -36,7 +37,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   def removePerson(person: Person): Record = copy(persons = persons - person)
 
   /** Replace a person by another on the record. */
-  def replacePerson(oldP: Person, newP: Person): Record = copy(persons = persons -oldP + newP)
+  def replacePerson(oldP: Person, newP: Person): Record = copy(persons = persons - oldP + newP)
 
   /** Score for each person, regardless of its weight. */
   lazy val unweightedScoresByPerson: Map[Person, Score] =
@@ -72,6 +73,15 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   lazy val isSolution: Boolean =
     isPartialSolution && topic.min <= countPersons
 
+  lazy val errors: Seq[String] = if (isSolution) Nil else {
+    val maxError = if (topic.max < countPersons) Some(s"Too many persons in ${slot.name}/${topic.name}") else None
+    val minError = if (topic.min > countPersons) Some(s"Not enough persons in ${slot.name}/${topic.name}") else None
+    val forbiddenError = if (topic.forbidden.exists(persons.contains)) Some(s"Forbidden person in ${slot.name}/${topic.name}") else None
+    val mandatoryError = if (!topic.mandatory.forall(persons.contains)) Some(s"Missing mandatory person in ${slot.name}/${topic.name}") else None
+    val slotError = if (!topic.slots.forall(_.contains(slot))) Some(s"Wrong slot in ${slot.name}/${topic.name}") else None
+    val personPresentError = if (!persons.forall(slot.personsPresent.contains)) Some(s"Absent person in ${slot.name}/${topic.name}") else None
+    Nil ++ maxError ++ minError ++ forbiddenError ++ mandatoryError ++ slotError ++ personPresentError
+  }
 
   /** Merge with another slot schedule's content. Used only in tests. */
   @testOnly def ++(that: Record): Record = {

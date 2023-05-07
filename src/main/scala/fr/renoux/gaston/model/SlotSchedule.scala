@@ -169,10 +169,20 @@ final case class SlotSchedule(
   }
 
   /** @return true if this respects all constraints */
-  lazy val isSolution: Boolean =
+  lazy val isSolution: Boolean = {
     isPartialSolution &&
-      records.forall(_.isSolution)
-  problem.slotLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
+      records.forall(_.isSolution) &&
+      problem.slotLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
+  }
+
+  lazy val errors: Seq[String] = if (isSolution) Nil else {
+    val recordsErrors = records.flatMap(_.errors).toSeq
+    val maxTopicsError = if (slot.maxTopics < topics.size) Some(s"Too many topics in slot ${slot.name}") else None
+    val constraintsError = problem.slotLevelConstraints.flatMap { c =>
+      if (!c.isRespectedSlot(this)) Some(s"Constraint $c not respected in slot ${slot.name}") else None
+    }.toSeq
+    recordsErrors ++ maxTopicsError ++ constraintsError
+  }
 
   /** Produces a clear, multiline version of this schedule slot, with a 2-space indentation. */
   lazy val toFormattedString: String = {

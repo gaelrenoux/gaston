@@ -25,7 +25,7 @@ final class Engine(
 
     improver.improvements(initial, params).map { schedule =>
       if (schedule.isSolution) schedule else {
-        val message = s"A bad schedule was generated !\n ${schedule.toFormattedString}"
+        val message = s"A bad schedule was generated !\n ${schedule.toFormattedString}\n${schedule.errors.mkString("\n")}"
         throw new IllegalStateException(message)
       }
     }
