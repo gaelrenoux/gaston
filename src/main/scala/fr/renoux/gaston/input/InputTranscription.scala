@@ -9,7 +9,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive, TopicsLinked}
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 import mouse.map._
@@ -167,6 +167,11 @@ private[input] class InputTranscription(input: InputModel) {
         val allInstancesPart = reoccurringTopic.values.flatten // all instances exclusive (obvious for the multiple parts, but only one constraint is better)
         TopicsExclusive(allInstancesPart.toBitSet, mandatoryPersons.toBitSet)
       }.toSet
+
+    lazy val linkedTopics: Set[TopicsLinked] =
+      input.constraints.linked.map { inConstraint =>
+        TopicsLinked(inConstraint.topics.flatMap(topicsByName).toBitSet)
+      }
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
       input.personsSet.collect {
@@ -361,6 +366,11 @@ object InputTranscription {
         .flatMap(_.exemptions)
         .filter(!input.personsNameSet.contains(_))
         .map(p => s"Exclusive constraint: unknown person: [$p]")
+    } ++ {
+      input.constraints.linked
+        .flatMap(_.topics)
+        .filter(!input.topicsNameSet.contains(_))
+        .map(t => s"Linked constraint: unknown topic: [$t]")
     } ++ {
       input.constraints.simultaneous
         .flatMap(_.topics)

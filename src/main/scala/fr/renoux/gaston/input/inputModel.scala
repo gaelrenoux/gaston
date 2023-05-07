@@ -141,7 +141,8 @@ case class InputPerson(
 case class InputGlobalConstraints(
     simultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     notSimultaneous: Set[InputSimultaneousConstraint] = Set.empty,
-    exclusive: Set[InputExclusiveConstraint] = Set.empty
+    exclusive: Set[InputExclusiveConstraint] = Set.empty,
+    linked: Set[InputLinkedConstraint] = Set.empty,
 )
 
 case class InputSimultaneousConstraint(
@@ -151,6 +152,10 @@ case class InputSimultaneousConstraint(
 case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
     exemptions: Set[NonEmptyString] = Set.empty
+)
+
+case class InputLinkedConstraint(
+    topics: Set[NonEmptyString]
 )
 
 object InputRefinements {

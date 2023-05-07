@@ -7,6 +7,8 @@ import fr.renoux.gaston.util.BitSet
 final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti {
 
+  assert(topics.size > 1, s"$this should contain more than one topic")
+
   override def scoreSchedule(schedule: Schedule): Score = {
     val groups = schedule.personsByTopic.view.filterKeys(topics.contains).values.map(_.filterNot(exemptions.contains))
     groups.foldLeft((Set.empty[Person], Score.Zero)) { case ((found, score), ps) =>
