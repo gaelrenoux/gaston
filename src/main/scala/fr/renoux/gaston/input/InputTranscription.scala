@@ -229,6 +229,7 @@ private[input] class InputTranscription(input: InputModel) {
         topicScores ++
         exclusiveTopics ++
         exclusiveOccurrences ++
+        linkedTopics ++
         groupDislikes ++
         personTopicPreferences ++
         nothingTopicPreferences ++
