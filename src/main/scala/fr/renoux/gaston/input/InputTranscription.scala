@@ -69,7 +69,7 @@ private[input] class InputTranscription(input: InputModel) {
       val name = nothingTopicName(inSlot.name)
       val min = settings.minPersonsOnNothing
       val max = settings.maxPersonsOnNothing
-      name -> Topic(topicIx.getAndIncrement(), name, min = min, max = max, slots = Some(Set(slot)), virtual = true)
+      name -> Topic(topicIx.getAndIncrement(), name, min = min, max = max, slots = Some(Set(slot)))
     }.toMap
   }
 
