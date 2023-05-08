@@ -26,6 +26,7 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
   /** Take an already improved schedule, and return the first better schedule it can find by swapping topics. */
   override protected def step(state: State)
     (implicit rand: Random): Option[(Schedule, GreedySlotImprover.State)] = chrono("GreedySlotImprover > improveOnce") {
+    log.debug("New improver step")
 
     /* We'll first look into changes that might improve the score of the worst-off person (the loser) */
     val loserPreferredTopics = state.schedule.problem.preferredTopicsByPerson.get(state.schedule.loser._1).get

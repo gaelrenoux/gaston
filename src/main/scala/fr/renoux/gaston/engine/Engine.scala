@@ -1,5 +1,6 @@
 package fr.renoux.gaston.engine
 
+import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
@@ -13,6 +14,8 @@ final class Engine(
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, improver: Improver, ctx: Context) {
 
+  private val log = Logger[Engine]
+
   private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
 
   lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
@@ -25,7 +28,7 @@ final class Engine(
     if (!initial.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initial.toFormattedString}\n${initial.errors.mkString("\n")}"
       throw new IllegalStateException(message)
-    }
+    } else log.debug(s"New initial schedule generated: ${initial.toFormattedString}")
 
     improver.improvements(initial, params).map { schedule =>
       if (schedule.isSolution) schedule else {
