@@ -40,6 +40,8 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
     schedule.slotSchedulesList.map(_.impersonalScore).sum + preferencesScoreRec(schedule.problem.impersonalGlobalLevelPreferencesList)
   }
 
+  lazy val loser: (Person, Score) = weightedScoresByPerson.minBy(_._2)
+
   @tailrec
   private def preferencesScoreRec(prefs: List[Preference.GlobalLevel], sum: Double = 0): Score = prefs match {
     case Nil => Score(sum)

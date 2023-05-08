@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model.impl
 
 import fr.renoux.gaston.model.constraints._
+import fr.renoux.gaston.model.preferences.PersonTopicPreference
 import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.util.BitMap
 import fr.renoux.gaston.util.CanGroupToMap.ops._
@@ -61,6 +62,12 @@ final class ProblemImpl(
   lazy val preferencesByPerson: BitMap[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
   }.groupBy(_.person).toBitMap(Set.empty)
+
+  val preferredTopicsByPerson: BitMap[Person, Seq[Topic]] = preferencesByPerson.map { preferences =>
+    preferences.view.collect {
+      case PersonTopicPreference(_, topic, reward) if reward.isPositive => (topic, reward)
+    }.toSeq.sortBy(_._2).reverse.map(_._1)
+  }
 
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
