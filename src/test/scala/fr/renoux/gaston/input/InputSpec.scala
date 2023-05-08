@@ -75,10 +75,10 @@ class InputSpec extends AnyFlatSpec with Matchers {
     val expectedPreferences = initialTopicsPreferences ++ additionalPreferences
 
     problem.preferences.filter {
-      case p: PersonTopicPreference if p.topic.virtual => true
+      case p: PersonTopicPreference if p.topic.unassigned => true
       case _ => false
     } should be(expectedPreferences.filter {
-      case p: PersonTopicPreference if p.topic.virtual => true
+      case p: PersonTopicPreference if p.topic.unassigned => true
       case _ => false
     })
     problem.preferences.filter(_.isInstanceOf[PersonTopicPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonTopicPreference]))

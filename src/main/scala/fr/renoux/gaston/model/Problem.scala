@@ -19,7 +19,7 @@ trait Problem {
   /** Topics that improve the score just by being there, from highest to lowest reward */
   val generallyPreferredTopics: Seq[Topic]
 
-  lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
+  lazy val realTopics: Set[Topic] = topics.filterNot(_.unassigned)
   lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
 
   lazy val slotsList: List[Slot] = slots.toList
