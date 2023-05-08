@@ -264,7 +264,7 @@ object InputTranscription {
 
   def nothingTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${GeneratedTopicPrefix}Nothing($slotName)")
 
-  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${GeneratedTopicPrefix}[$slotName]")
+  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${GeneratedTopicPrefix}${GeneratedTopicPrefix}[$slotName]")
 
   def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), min = 0, max = Person.MaxCount, slots = Some(Set(slot)), unassigned = true)
 

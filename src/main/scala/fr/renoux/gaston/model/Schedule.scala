@@ -164,7 +164,7 @@ final case class Schedule(
   /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Schedule:\n")
-    slotSchedules.foreach { ss => builder.append(ss.toFormattedString) }
+    slotSchedules.toSeq.sortBy(_.slot.name).foreach { ss => builder.append(ss.toFormattedString) }
     builder.append(unscheduledTopics.view.map(_.name).toSeq.sorted.mkString("Unscheduled topics: ", ", ", "\n"))
     builder.toString
   }
