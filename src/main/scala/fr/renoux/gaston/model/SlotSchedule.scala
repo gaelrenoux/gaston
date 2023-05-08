@@ -31,7 +31,7 @@ final case class SlotSchedule(
   lazy val topics: Iterable[Topic] = wrapped.keys
   lazy val topicsSet: Set[Topic] = wrapped.keySet
   lazy val topicsList: List[Topic] = topics.toList
-  lazy val realTopics: Iterable[Topic] = topics.filterNot(_.virtual)
+  lazy val realTopics: Iterable[Topic] = topics.filterNot(_.unassigned)
   lazy val realTopicsSet: Set[Topic] = realTopics.toSet
   lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val removableTopics: Iterable[Topic] = realTopics.filterNot(_.forced)
@@ -189,7 +189,7 @@ final case class SlotSchedule(
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("  ").append(slot.name).append(": \n")
     recordsList.sortBy(_.topic.name).foreach { r =>
-      if (r.persons.nonEmpty) {
+      if (!r.topic.unassigned || r.persons.nonEmpty) {
         builder.append("    ").append(r.toFormattedString).append("\n")
       }
     }

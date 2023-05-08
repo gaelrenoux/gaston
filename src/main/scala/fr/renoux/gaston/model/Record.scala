@@ -24,8 +24,8 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 
   lazy val optionalPersons: Set[Person] = persons -- topic.mandatory
 
-  lazy val canRemovePersons: Boolean = countPersons > topic.min && optionalPersons.nonEmpty
-  lazy val canAddPersons: Boolean = countPersons < topic.max
+  lazy val canRemovePersons: Boolean = topic.unassigned || (countPersons > topic.min && optionalPersons.nonEmpty)
+  lazy val canAddPersons: Boolean = !topic.unassigned && countPersons < topic.max
 
   /** Clear all non-mandatory persons. */
   lazy val cleared: Record = copy(persons = topic.mandatory)

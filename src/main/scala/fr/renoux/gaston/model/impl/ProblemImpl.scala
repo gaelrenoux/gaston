@@ -47,7 +47,7 @@ final class ProblemImpl(
     val couples = for {
       slot <- slots
       topic <- topics
-      if !topic.virtual // Virtual topics are never moved anyway
+      if !topic.unassigned // Virtual "unassigned" topics are never moved
       if topic.mandatory.exists(!slot.personsPresent.contains(_)) || topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
     couples.groupToMap.toBitMap(Set.empty)

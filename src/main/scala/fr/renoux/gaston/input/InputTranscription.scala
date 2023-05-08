@@ -268,13 +268,13 @@ private[input] class InputTranscription(input: InputModel) {
 
 object InputTranscription {
 
-  private val VirtualTopicPrefix = "@"
+  private val GeneratedTopicPrefix = "@"
 
-  def nothingTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}Nothing ($slotName)")
+  def nothingTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${GeneratedTopicPrefix}Nothing($slotName)")
 
-  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}[$slotName]")
+  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${GeneratedTopicPrefix}[$slotName]")
 
-  def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
+  def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), min = 0, max = Person.MaxCount, slots = Some(Set(slot)), unassigned = true)
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++
@@ -310,8 +310,8 @@ object InputTranscription {
       duplicates.map { d => s"Duplicate topic name: $d" }
     } ++ {
       input.topics
-        .filter { t => t.name.startsWith(VirtualTopicPrefix) }
-        .map { t => s"Topic [${t.name}]: prefix $VirtualTopicPrefix is reserved by the software" }
+        .filter { t => t.name.startsWith(GeneratedTopicPrefix) }
+        .map { t => s"Topic [${t.name}]: prefix $GeneratedTopicPrefix is reserved by the software" }
     } ++ {
       input.topics
         .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
