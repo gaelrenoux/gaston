@@ -23,7 +23,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   private val log = Logger[AssignmentImprover]
 
-  val defaultMaxRoundsCount = 1000
+  val defaultMaxRoundsCount = 100000
 
   private val defaultMaxRoundsCountPerSlot = 1000
 
