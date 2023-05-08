@@ -51,6 +51,8 @@ final case class Schedule(
 
   lazy val score: Score = scoreCalculator.globalScore
 
+  lazy val loser: (Person, Score) = scoreCalculator.loser
+
   /** Add a new record to this schedule. */
   def add(record: Record): Schedule = updateSlotSchedule(record.slot)(_.add(record))
 
