@@ -23,7 +23,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   private val log = Logger[AssignmentImprover]
 
-  val defaultRoundsCount = 1000
+  val defaultRoundsCount = 100000
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
