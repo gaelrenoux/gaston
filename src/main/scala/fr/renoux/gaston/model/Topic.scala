@@ -6,7 +6,7 @@ import fr.renoux.gaston.util.Identified
   * whatever.
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
   * @param forced Topic must be on the schedule.
-  * @param virtual Topic created for technical reasons, not a real topic. Cannot be moved or removed from its slot.
+  * @param unassigned Topic created to hold people still unassigned. We should always remove from this one, never add to it.
   **/
 final case class Topic(
     id: Int,
@@ -17,8 +17,13 @@ final case class Topic(
     max: Int = Topic.DefaultMax, // TODO bad max, remove default value (Person.MaxCount would be better)
     slots: Option[Set[Slot]] = None,
     forced: Boolean = false,
-    virtual: Boolean = false
+    unassigned: Boolean = false
 ) extends Identified {
+  if (unassigned) {
+    assert(mandatory.isEmpty, "Unassigned topic shouldn't have any mandatory person")
+    assert(forbidden.isEmpty, "Unassigned topic shouldn't have any forbidden person")
+    assert(min == 0, "Unassigned topic shouldn't have any min")
+  }
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
