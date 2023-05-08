@@ -43,7 +43,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
       slotRoundsLimit: Int = 1000
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {
-      log.warn("Stopping improvement because max number of rounds was reached")
+      log.warn("Stopping assignment improvement because max number of rounds was reached")
       schedule
 
     } else if (slots.isEmpty) {
