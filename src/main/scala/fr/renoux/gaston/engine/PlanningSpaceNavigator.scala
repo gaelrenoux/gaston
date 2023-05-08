@@ -17,25 +17,28 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   private val log: Logger = Logger[PlanningSpaceNavigator]
 
-  /** Return a LazyList of neighbouring partial schedules to the initial one. */
-  def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {
+  /** Return a LazyList of neighbouring partial schedules to the initial one.
+    * @param preferredTopics Topics we'd like to see added in or moved around, by order of preference.
+    */
+  def neighbours(schedule: Schedule, preferredTopics: Seq[Topic] = Seq.empty)(implicit rand: Random): LazyList[(Schedule, Move)] = {
 
-    lazy val allAdds = possibleAdds(schedule)
-    lazy val allSwaps = possibleSwaps(schedule)
-    lazy val allExternalSwaps = possibleExtSwaps(schedule)
+    lazy val allAdds = possibleAdds(schedule, preferredTopics)
+    lazy val allSwaps = possibleSwaps(schedule, preferredTopics)
+    lazy val allExternalSwaps = possibleExtSwaps(schedule, preferredTopics)
     lazy val allRemovals = possibleRemovals(schedule)
 
     LazyList.from(allAdds ++ allSwaps ++ allExternalSwaps ++ allRemovals)
   }
 
   /** Add an unscheduled topic */
-  private def possibleAdds(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleAdds(schedule: Schedule, preferredTopics: Seq[Topic])(implicit rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Additions on slot ${slot.name}")
 
     /* Filter out impossible topics because of incompatibility */
-    topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
+    availableTopics = schedule.unscheduledTopics -- slotSchedule.incompatibleTopics
+    topic <- (preferredTopics.filter(availableTopics.contains) ++ shuffled(availableTopics -- preferredTopics)).view
 
     topicsToAdd = linkedTopics(topic)
 
@@ -60,15 +63,17 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
 
   /** Swap two scheduled topics */
-  private def possibleSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleSwaps(schedule: Schedule, preferredTopics: Seq[Topic])(implicit rand: Random): View[(Schedule, Move)] = for {
     (slot1, slot2) <- shuffled(problem.slotCouplesSeq).view
     slotSchedule1 = schedule.on(slot1)
     slotSchedule2 = schedule.on(slot2)
     _ = log.debug(s"Checking for possible Swaps between slots ${slot1.name} and ${slot2.name}")
 
     /* Filter out impossible topics because of incompatibility */
-    t1 <- shuffled(slotSchedule1.realTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics).view
-    t2 <- shuffled(slotSchedule2.realTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics).view
+    availableTopics1 = slotSchedule1.realTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics
+    availableTopics2 = slotSchedule2.realTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics
+    t1 <- (preferredTopics.filter(availableTopics1.contains) ++ shuffled(availableTopics1 -- preferredTopics)).view
+    t2 <- (preferredTopics.filter(availableTopics2.contains) ++ shuffled(availableTopics2 -- preferredTopics)).view
 
     topics1 = linkedTopics(t1)
     topics2 = linkedTopics(t2)
@@ -105,14 +110,16 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
 
   /** Swap topics between unscheduled and scheduled */
-  private def possibleExtSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleExtSwaps(schedule: Schedule, preferredTopics: Seq[Topic])(implicit rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Ext Swaps on slot ${slot.name}")
-    oldTopic <- shuffled(slotSchedule.removableTopics).view
+
+    oldTopic <- (shuffled(slotSchedule.removableTopicsSet -- preferredTopics) ++ preferredTopics.reverse.filter(slotSchedule.removableTopicsSet.contains)).view
 
     /* Filter out impossible topics because of incompatibility */
-    newTopic <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
+    availableTopics = schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics
+    newTopic <- (preferredTopics.filter(availableTopics.contains) ++ shuffled(availableTopics -- preferredTopics)).view
 
     oldTopics = linkedTopics(oldTopic)
     newTopics = linkedTopics(newTopic)

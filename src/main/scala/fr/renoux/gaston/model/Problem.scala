@@ -72,6 +72,9 @@ trait Problem {
   /** For everyone, their personal preferences */
   val preferencesByPerson: BitMap[Person, Set[Preference.Personal]]
 
+  /** For everyone, the list of topics they want to play, from highest to lowest priority */
+  val preferredTopicsByPerson: BitMap[Person, Seq[Topic]]
+
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
     * are mandatory). */
   val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]]

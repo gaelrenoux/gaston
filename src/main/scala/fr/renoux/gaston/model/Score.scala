@@ -32,6 +32,8 @@ final case class Score(value: Double) extends AnyVal with Ordered[Score] {
   @inline def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
 
   @inline def isNegativeInfinity: Boolean = value.isNegInfinity
+
+  @inline def isPositive: Boolean = value > 0
 }
 
 object Score extends (Double => Score) {

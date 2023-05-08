@@ -35,6 +35,7 @@ final case class SlotSchedule(
   lazy val realTopicsSet: Set[Topic] = realTopics.toSet
   lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val removableTopics: Iterable[Topic] = realTopics.filterNot(_.forced)
+  lazy val removableTopicsSet: Set[Topic] = realTopics.filterNot(_.forced).toSet
 
   lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)
 
