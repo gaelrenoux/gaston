@@ -27,7 +27,10 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
   override protected def step(state: State)
     (implicit rand: Random): Option[(Schedule, GreedySlotImprover.State)] = chrono("GreedySlotImprover > improveOnce") {
 
-    val neighbours = navigator.neighbours(state.schedule).distinctBy(_._1.planning)
+    /* We'll first look into changes that might improve the score of the worst-off person (the loser) */
+    val loserPreferredTopics = state.schedule.problem.preferredTopicsByPerson.get(state.schedule.loser._1).get
+
+    val neighbours: LazyList[(Schedule, Move)] = navigator.neighbours(state.schedule, loserPreferredTopics).distinctBy(_._1.planning)
 
     val improvedSchedules =
       for {
