@@ -98,7 +98,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     if partial.on(slot1).maxPersons.forall(_ >= slot1.personsPresentCount)
     if partial.on(slot2).maxPersons.forall(_ >= slot2.personsPresentCount)
 
-  } yield (partial, Move.Swap(topics1, topics2))
+  } yield (partial, Move.Swap(topics1, topics2, isExt = false))
 
 
   /** Swap topics between unscheduled and scheduled */
@@ -136,7 +136,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible swaps because of maximum too low */
     if partial.on(slot).maxPersons.forall(_ >= slot.personsPresentCount)
 
-  } yield (partial, Move.Swap(oldTopics, newTopics))
+  } yield (partial, Move.Swap(oldTopics, newTopics, isExt = true))
 
 
   /** Remove a scheduled topic */
@@ -179,9 +179,10 @@ object PlanningSpaceNavigator {
       override def reverts(m: Move): Boolean = false
     }
 
-    case class Swap(a: Set[Topic], b: Set[Topic]) extends Move {
+    /** If the swap is external (swapping scheduled and unscheduled topics, then a are the topics being scheduled in). */
+    case class Swap(a: Set[Topic], b: Set[Topic], isExt: Boolean) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Swap(a1, b1) if (a == a1 && b == b1) || (a == b1 && b == a1) => true
+        case Swap(a1, b1, isExt1) if isExt == isExt1 && ((a == a1 && b == b1) || (a == b1 && b == a1)) => true
         case _ => false
       }
     }
