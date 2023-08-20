@@ -20,6 +20,7 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
   lazy val weightedScoresByPerson: Map[Person, Score] =
     unweightedScoresByPerson.map { case (p, s) => p -> s / p.weight }
 
+  // TODO should weight scores earlier, so as to only have weighted scores in there
   def personalScoreFrom(unweightedScoresByPerson: Map[Person, Score]): Score = {
     val weightedScores = unweightedScoresByPerson.toSeq.map { case (p, s) => s / p.weight }
     val scoreWeightedPersons = weightedScores.sorted.foldRight(0.0) { case (s, acc) => s.value + (acc / RankFactor) }
