@@ -28,10 +28,11 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
     (implicit rand: Random): Option[(Schedule, GreedySlotImprover.State)] = chrono("GreedySlotImprover > improveOnce") {
     log.debug("New improver step")
 
-    /* We'll first look into changes that might improve the score of the worst-off person (the loser) */
+    /* We'll first look into changes that are generally good, or might improve the score of the worst-off person (the loser) */
     val loserPreferredTopics = state.schedule.problem.preferredTopicsByPerson.get(state.schedule.loser._1).get
 
-    val neighbours: LazyList[(Schedule, Move)] = navigator.neighbours(state.schedule, loserPreferredTopics).distinctBy(_._1.planning)
+    val neighbours: LazyList[(Schedule, Move)] =
+      navigator.neighbours(state.schedule, problem.generallyPreferredTopics ++ loserPreferredTopics).distinctBy(_._1.planning)
 
     val improvedSchedules =
       for {

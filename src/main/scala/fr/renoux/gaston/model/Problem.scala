@@ -16,6 +16,9 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
+  /** Topics that improve the score just by being there, from highest to lowest reward */
+  val generallyPreferredTopics: Seq[Topic]
+
   lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
   lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
 
