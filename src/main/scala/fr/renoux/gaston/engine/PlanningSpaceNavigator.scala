@@ -180,7 +180,7 @@ object PlanningSpaceNavigator {
     }
 
     /**
-      * @param isExt Swap is between scheduled and unscheduled topics. If `true`, `left` are the topics being scheduled in.
+      * @param isExt Swap is between scheduled and unscheduled topics. If `true`, `right` are the topics being scheduled in.
       */
     case class Swap(left: Set[Topic], right: Set[Topic], isExt: Boolean) extends Move {
       override def reverts(m: Move): Boolean = m match {
