@@ -13,7 +13,9 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
 
   /** Score for each person, regardless of its weight. All personal scores are slot-level, so the whole computation is done per slot. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = chrono("ScoreCalculator > unweightedScoresByPerson") {
-    schedule.slotSchedulesList.map(_.unweightedScoresByPerson).combineAll
+    val slotScheduleScores: List[Map[Person, Score]] = schedule.slotSchedulesList.map(_.unweightedScoresByPerson)
+    if (schedule.problem.baseScoreByPerson.nonEmpty) (schedule.problem.baseScoreByPerson :: slotScheduleScores).combineAll
+    else slotScheduleScores.combineAll
   }
 
   /** Score for each person, divided by that person's weight */

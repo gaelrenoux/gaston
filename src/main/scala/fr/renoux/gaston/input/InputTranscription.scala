@@ -32,7 +32,7 @@ private[input] class InputTranscription(input: InputModel) {
 
 
   /* Persons */
-  lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (p, ix) => Person(ix, p.name, p.weight) }.toArray
+  lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (p, ix) => Person(ix, p.name, p.weight, p.baseScore) }.toArray
   lazy val personsByName: Map[NonEmptyString, Person] = personsById.map { p => NonEmptyString.unsafeFrom(p.name) -> p }.toMap
 
 

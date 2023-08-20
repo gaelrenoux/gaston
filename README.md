@@ -53,7 +53,8 @@ The input file describes the problem to solve. It follows the HOCON format, and 
         - `forced`: If `true`, this topic *must* be scheduled. Default is `false`.
     - `persons`: The persons to schedule. The following lines describe the structure of one person.
         - `name`: Name of the person. Must be unique among persons.
-        - `weight`: A person with a higher weight counts more when calculating the global score. Specifically, that person's individual score will be divided by its weight, bringing them down and making the schedule optimizing more for them.. Default is `1`.
+        - `weight`: A person with a higher weight counts more when calculating the global score. Specifically, that person's individual score will be divided by its weight, bringing them down and making the schedule optimizing more for them. Default is `1`.
+        - `base-score`: You can add a starting value for this person's score. This is useful only in very specific situations. Default is `0`.
         - `absences`: An array of slot names on which this person is missing, and therefore cannot be scheduled. Default is empty.
         - `mandatory`: An array of topic names for which this person is mandatory: it must be present on those topics. Default is empty.
         - `forbidden`: An array of topic names for which this person is forbidden: it cannot be scheduled on those topics. Default is empty.

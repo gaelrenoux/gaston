@@ -23,22 +23,24 @@ class Renderer(
   def apply(schedule: Schedule): String = {
     val weightedScoresByPerson: Map[Person, Score] = schedule.scoreCalculator.weightedScoresByPerson
 
-    /* For each name, weighted score, descending list of satisfied rewards, number of mandatory topics */
-    val summaryByPerson: Seq[(String, Double, Seq[Double], Int)] = preferencesByPerson.toSeq.map {
+    /* For each name, weighted score, base score, descending list of satisfied rewards, number of mandatory topics */
+    val summaryByPerson: Seq[(String, Double, Double, Seq[Double], Int)] = preferencesByPerson.toSeq.map {
       case (person, preferences) =>
+        val baseScore = problem.baseScoreByPerson.getOrElse(person, Score.Zero).value
         val satisfied = preferences.filter(_.score(schedule) > Score.Zero).toSeq.map(_.reward.value).sorted.reverse
         val mandatoryCount = problem.mandatoryTopicsByPerson(person).intersect(schedule.scheduledTopics).size
-        (person.name, weightedScoresByPerson(person).value, satisfied, mandatoryCount)
+        (person.name, weightedScoresByPerson(person).value, baseScore, satisfied, mandatoryCount)
     }
 
     val summariesFromBestToWorse = summaryByPerson.sortBy(_._2).reverse
 
-    val summaryTextBody = summariesFromBestToWorse.map { case (name, score, satisfied, mandatoryCount) =>
+    val summaryTextBody = summariesFromBestToWorse.map { case (name, score, baseScore, satisfied, mandatoryCount) =>
       val nameTxt = name.padTo(8, ' ').take(8) // scalastyle:ignore magic.number
       val scoreTxt = ScoreDecimalFormat.format(score)
+      val baseScoreTxt = if (baseScore == 0.0) "" else ScoreDecimalFormat.format(baseScore) + " "
       val satisfiedTxt = satisfied.map(ShortScoreDecimalFormat.format).mkString(" ")
       val mandatoryTxt = " MND" * mandatoryCount
-      s"$nameTxt    $scoreTxt    ($satisfiedTxt$mandatoryTxt)"
+      s"$nameTxt    $scoreTxt    ($baseScoreTxt$satisfiedTxt$mandatoryTxt)"
     }.mkString("\n")
 
     s"""

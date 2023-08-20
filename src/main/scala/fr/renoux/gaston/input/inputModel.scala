@@ -131,6 +131,7 @@ object InputTopic {
 case class InputPerson(
     name: NonEmptyString,
     weight: PosWeight = DefaultWeightRefined,
+    baseScore: Score = Score.Zero,
     absences: Set[NonEmptyString] = Set.empty,
     mandatory: Set[NonEmptyString] = Set.empty,
     forbidden: Set[NonEmptyString] = Set.empty,

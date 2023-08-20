@@ -28,6 +28,10 @@ trait Problem {
   lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
   lazy val personalPreferencesListByPerson: BitMap[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap(Nil)
 
+  lazy val baseScoreByPerson: Map[Person, Score] =
+    if (persons.exists(_.baseScore != Score.Zero)) persons.map(p => p -> p.baseScore).toMap
+    else Map.empty
+
   private lazy val (
     (recordLevelPreferences: Set[Preference.RecordLevel], slotLevelPreferences: Set[Preference.SlotLevel]),
     globalLevelPreferences: Set[Preference.GlobalLevel]
