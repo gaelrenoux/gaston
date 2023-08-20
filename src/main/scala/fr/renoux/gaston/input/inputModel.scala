@@ -34,8 +34,8 @@ case class InputSettings(
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
     defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
-    maxPersonsOnNothing: NonNegInt = 0,
     minPersonsOnNothing: NonNegInt = 0,
+    maxPersonsOnNothing: NonNegInt = 0,
     personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
     personOnNothingAntiPreferenceScaling: Option[InputSettings.PersonOnNothingAntiPreferenceScaling] = None,
     backtrackInitialSchedule: Boolean = true // TODO Should be calculated
