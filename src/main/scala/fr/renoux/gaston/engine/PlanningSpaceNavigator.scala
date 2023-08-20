@@ -179,24 +179,26 @@ object PlanningSpaceNavigator {
       override def reverts(m: Move): Boolean = false
     }
 
-    /** If the swap is external (swapping scheduled and unscheduled topics, then a are the topics being scheduled in). */
-    case class Swap(a: Set[Topic], b: Set[Topic], isExt: Boolean) extends Move {
+    /**
+      * @param isExt Swap is between scheduled and unscheduled topics. If `true`, `left` are the topics being scheduled in.
+      */
+    case class Swap(left: Set[Topic], right: Set[Topic], isExt: Boolean) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Swap(a1, b1, isExt1) if isExt == isExt1 && ((a == a1 && b == b1) || (a == b1 && b == a1)) => true
+        case Swap(left2, right2, isExt2) if isExt == isExt2 && ((left == left2 && right == right2) || (left == right2 && right == left2)) => true
         case _ => false
       }
     }
 
-    case class Add(s: Slot, t: Set[Topic]) extends Move {
+    case class Add(slot: Slot, topics: Set[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Remove(s1, t1) if s == s1 && t == t1 => true
+        case Remove(s1, t1) if slot == s1 && topics == t1 => true
         case _ => false
       }
     }
 
-    case class Remove(s: Slot, t: Set[Topic]) extends Move {
+    case class Remove(slot: Slot, topics: Set[Topic]) extends Move {
       override def reverts(m: Move): Boolean = m match {
-        case Add(s1, t1) if s == s1 && t == t1 => true
+        case Add(s1, t1) if slot == s1 && topics == t1 => true
         case _ => false
       }
     }
