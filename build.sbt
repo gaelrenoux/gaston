@@ -94,7 +94,7 @@ libraryDependencies ++= Seq(
 
   /* Tests */
   "com.softwaremill.diffx" %% "diffx-core" % "0.5.0" % "test,test-perf",
-  "org.scalatest" %% "scalatest" % "3.2.9" % "test,test-perf"
+  "org.scalatest" %% "scalatest" % "3.2.16" % "test,test-perf"
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")
