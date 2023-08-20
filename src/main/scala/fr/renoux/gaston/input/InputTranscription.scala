@@ -2,6 +2,7 @@ package fr.renoux.gaston.input
 
 import cats.data.{NonEmptyList, ValidatedNel}
 import cats.implicits._
+import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.auto._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.refineV
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger
 private[input] class InputTranscription(input: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription._
+
+  private val log = Logger[InputTranscription]
 
   val settings: InputSettings = input.settings
 
@@ -53,6 +56,7 @@ private[input] class InputTranscription(input: InputModel) {
     }.toMap
   }
   lazy val nothingTopicsByName: Map[NonEmptyString, Topic] = if (!input.settings.isNothingEnabled) Map.empty[NonEmptyString, Topic] else {
+    log.info("Persons-on-nothing enabled")
     input.slotsSet.map { inSlot =>
       val slot = slotsByName(inSlot.name)
       val name = nothingTopicName(inSlot.name)
@@ -235,8 +239,8 @@ private[input] class InputTranscription(input: InputModel) {
 
 
   /* Construction of the Problem */
-  lazy val problem: Problem =
-    new ProblemImpl(
+  lazy val problem: Problem = {
+    val p = new ProblemImpl(
       slotSequences,
       topicsByName.values.flatten.toSet,
       unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
@@ -244,6 +248,9 @@ private[input] class InputTranscription(input: InputModel) {
       Constraints.all,
       Preferences.all
     )
+    log.debug(p.toFormattedString)
+    p
+  }
 
   lazy val result: ValidatedNel[InputError, Problem] = errors.toList.sorted.map(InputError(_)) match {
     case Nil => problem.valid
