@@ -21,24 +21,30 @@ class ConstraintsSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, ts: Topic*): Schedule = Schedule.from(s(ts.map(_.apply()): _*))
 
   behavior of "TopicsSimultaneous"
-  val leadingFightingMachinesSimultaneous = TopicsSimultaneous(Set(Leading, Fighting, Machines))
+  val leadingFightingMachinesSimultaneous: TopicsSimultaneous = TopicsSimultaneous(Set(Leading, Fighting, Machines))
 
-  it should "break if the topics are on various slots" in {
-    leadingFightingMachinesSimultaneous.isRespected(scheduled(Morning, Fighting, Raphael, Leonardo) ++
-      scheduled(Afternoon, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
+  it should "break if the topics are on different slots" in {
+    leadingFightingMachinesSimultaneous.isRespected(
+      scheduled(Morning, Fighting, Raphael, Leonardo) ++ scheduled(Afternoon, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
     ) should be(false)
   }
 
   it should "break if one of the topics is missing" in {
-    leadingFightingMachinesSimultaneous.isRespected(scheduled(Afternoon, Machines, Donatello) ++
-      scheduled(Afternoon, Leading, Leonardo, Raphael)
+    leadingFightingMachinesSimultaneous.isRespected(
+      scheduled(Afternoon, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
     ) should be(false)
   }
 
   it should "not break if the topics are all on the same slot" in {
-    leadingFightingMachinesSimultaneous.isRespected(scheduled(Afternoon, Fighting, Raphael, Leonardo) ++
-      scheduled(Afternoon, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
-      ++ scheduled(Evening, Party, Leonardo, Raphael, Michelangelo, Donatello)
+    leadingFightingMachinesSimultaneous.isRespected(
+      scheduled(Afternoon, Fighting, Raphael, Leonardo) ++ scheduled(Afternoon, Machines, Donatello)
+        ++ scheduled(Afternoon, Leading, Leonardo, Raphael) ++ scheduled(Evening, Party, Leonardo, Raphael, Michelangelo, Donatello)
+    ) should be(true)
+  }
+
+  it should "not break if the topics are not scheduled" in {
+    leadingFightingMachinesSimultaneous.isRespected(
+      scheduled(Afternoon, Party, Raphael, Leonardo)
     ) should be(true)
   }
 
