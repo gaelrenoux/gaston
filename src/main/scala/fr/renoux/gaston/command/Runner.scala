@@ -45,6 +45,7 @@ class Runner(
       }
     }
 
+    implicit val random: Random = new Random(-seed)
     val results: Seq[(Schedule, Long)] = Await.result(future, maxDuration.map(2 * _).getOrElse(Duration.Inf))
     results.fold((Schedule.everyoneUnassigned, 0L)) {
       case ((best, totalCount), (current, count)) =>

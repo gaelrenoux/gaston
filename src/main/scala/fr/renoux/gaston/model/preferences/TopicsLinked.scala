@@ -17,10 +17,12 @@ final case class TopicsLinked(topics: BitSet[Topic], reward: Score = Preference.
       Score.Zero
     } else if (groups.size < topicsCount) {
       // only some topics are scheduled, that's not good
-      reward
+      throw new IllegalStateException(s"WROOOOOOOONG: ${schedule.toFormattedString}")
     } else {
       val persons = groups.head
-      if (groups.tail.exists(_ != persons)) reward else Score.Zero
+      if (groups.tail.exists(_ != persons)) {
+        throw new IllegalStateException(s"WROOOOOOOONG: ${schedule.toFormattedString}")
+      } else Score.Zero
     }
   }
 

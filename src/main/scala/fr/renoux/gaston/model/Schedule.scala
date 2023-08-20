@@ -4,6 +4,9 @@ import cats.Monoid
 import cats.implicits._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{BitSet, Context, testOnly}
+import fr.renoux.gaston.util.RandomImplicits._
+import scala.util.Random
+import fr.renoux.gaston.util.CanGroupToMap.ops._
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -200,9 +203,19 @@ object Schedule {
   def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty)
 
   /** Schedule where everyone is on an "unassigned" topic */
-  def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = Schedule(
-    problem.slots.map { s => s -> SlotSchedule.everyoneUnassigned(s) }.toMap
-  )
+  def everyoneUnassigned(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
+    val forcedTopicsBySlot: Map[Slot, Set[Topic]] = problem.topics.filter(_.forced).map { topic =>
+      val slots = topic.slots.getOrElse(problem.slots)
+      val slot = rand.pick(slots)
+      slot -> topic
+    }.groupToMap
+
+    Schedule(
+      problem.slots.map { s =>
+        s -> SlotSchedule.everyoneUnassigned(s, forcedTopicsBySlot.getOrElse(s, Set.empty), problem.ttsPersons)
+      }.toMap
+    )
+  }
 
   /** Commodity method */
   @testOnly def from(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =

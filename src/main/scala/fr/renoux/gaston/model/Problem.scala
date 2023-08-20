@@ -16,6 +16,16 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
+  // TODO UGLY, this only work for the current configuration...
+  val ttsPersonNames = Set("Adrien", "Olivier", "Vivien", "Cyril", "Vincent")
+  lazy val ttsPersons: Set[Person] = persons.filter { p =>
+    ttsPersonNames.contains(p.name)
+  }
+  lazy val ttsSlot1 = slots.find(_.name.startsWith("3")).get
+  lazy val ttsSlot2 = slots.find(_.name.startsWith("4")).get
+  lazy val ttsTopic1 = topics.find(_.name.startsWith("Trip to Skye - d")).get
+  lazy val ttsTopic2 = topics.find(_.name.startsWith("Trip to Skye - f")).get
+
   lazy val realTopics: Set[Topic] = topics.filterNot(_.unassigned)
   lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
 

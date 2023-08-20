@@ -18,11 +18,11 @@ final class Engine(
 
   private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
 
-  lazy val startingSchedule: Schedule = Schedule.everyoneUnassigned
-
   /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
   def lazySeq(seed: Long, params: OptimParams): LazyList[Schedule] = {
     implicit val rand: Random = new Random(seed)
+
+    val startingSchedule: Schedule = Schedule.everyoneUnassigned
 
     val initial: Schedule = if (backtrackInitialSchedule) generator.createOne else startingSchedule
     if (!initial.isSolution) {

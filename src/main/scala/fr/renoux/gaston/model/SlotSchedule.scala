@@ -213,9 +213,14 @@ object SlotSchedule {
   def empty(slot: Slot)(implicit problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
 
   /** Slot schedule where everyone is on an "unassigned" topic */
-  def everyoneUnassigned(slot: Slot)(implicit problem: Problem): SlotSchedule = {
-    val t = problem.unassignedTopics(slot)
-    SlotSchedule(slot, Map(t -> Record(slot, t, slot.personsPresent)))
+  def everyoneUnassigned(slot: Slot, forcedTopics: Set[Topic], forcedTopicPersons: Set[Person])(implicit problem: Problem): SlotSchedule = {
+    val unassignedTopic = problem.unassignedTopics(slot)
+
+    val forcedTopicsWithPersons = forcedTopics.map { topic =>
+      println(s"Forced topic persons are: $forcedTopicPersons")
+      topic -> Record(slot, topic, forcedTopicPersons)
+    }.toMap
+    SlotSchedule(slot, forcedTopicsWithPersons + (unassignedTopic -> Record(slot, unassignedTopic, slot.personsPresent -- forcedTopicPersons)))
   }
 
   /** Commodity method */

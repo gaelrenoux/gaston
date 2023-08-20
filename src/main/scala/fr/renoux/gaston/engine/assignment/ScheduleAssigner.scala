@@ -47,16 +47,24 @@ final class ScheduleAssigner(implicit private val problem: Problem) {
         completeForSlots(slotsTail, newSchedule)
     }
 
+    // TODO UGLYYYYYY
+    val partialSchedule1 = problem.ttsPersons.foldLeft(partialSchedule) { (ps, person) =>
+      ps.addPersonToExistingTopic(problem.ttsSlot1, problem.ttsTopic1, person)
+    }
+    val partialSchedule2 = problem.ttsPersons.foldLeft(partialSchedule1) { (ps, person) =>
+      ps.addPersonToExistingTopic(problem.ttsSlot2, problem.ttsTopic2, person)
+    }
+
     log.debug("Starting to fill the partial schedule")
 
     /* check wether it's possible to make it work first */
-    val filled = partialSchedule.planning.find { case (slot, topics) =>
+    val filled = partialSchedule2.planning.find { case (slot, topics) =>
       val min = topics.view.map(_.min).sum
       val max = topics.view.map(_.max).sum
       val pCount = slot.personsPresentCount
       pCount < min || pCount > max
     } match {
-      case None => completeForSlots(problem.slots.toList, Some(partialSchedule))
+      case None => completeForSlots(problem.slots.toList, Some(partialSchedule2))
       case Some((slot, _)) =>
         log.trace(s"Impossible to fill slot $slot")
         None

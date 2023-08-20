@@ -89,6 +89,8 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
         r2 <- records.view if r1 < r2 // avoiding duplicates (cases where we just swap r1 and r2)
         t1 = r1.topic
         t2 = r2.topic
+        if !t1.forced // TODO UGLYYYYYYY
+        if !t2.forced // TODO UGLYYYYYYY
         p1 <- (r1.optionalPersons -- t2.forbidden).view
         p2 <- (r2.optionalPersons -- t1.forbidden).view
         scoreImprovement = currentSchedule.deltaScoreIfSwapPerson(slot, (t1, p1), (t2, p2))
@@ -105,6 +107,8 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
         r2 <- recordsAddable.view if r1 != r2
         t1 = r1.topic
         t2 = r2.topic
+        if !t1.forced // TODO UGLYYYYYYY
+        if !t2.forced // TODO UGLYYYYYYY
         p <- (r1.optionalPersons -- t2.forbidden).view
         improvedSchedule = currentSchedule.movePerson(slot, t1, t2, p)
         if improvedSchedule.score > currentSchedule.score
