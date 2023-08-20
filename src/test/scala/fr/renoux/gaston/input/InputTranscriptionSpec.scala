@@ -194,4 +194,25 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     }
   }
 
+
+
+  behavior of "Incompatible topics per slot"
+
+  {
+    it should "work for slot-specific topics" in {
+      val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+      val inputTopics = List(InputTopic("alpha", slots = Some(Set("two"))), InputTopic("beta"))
+      val inputPersons = List(InputPerson("Arnold", mandatory = Set("alpha")))
+      val inputModel = InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = inputPersons
+      )
+      implicit val problem: Problem = from(inputModel)
+      problem.incompatibleTopicsBySlot.get(slot"one").get should be(Set(t"alpha"))
+      problem.incompatibleTopicsBySlot.get(slot"two").get should be(Set.empty)
+    }
+
+  }
+
 }
