@@ -21,7 +21,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   import Ordering.Double.IeeeOrdering
 
-  private implicit val udoConProblem: Problem = problemFromClassPath("udocon2017/uc17-completed.conf").force
+  private implicit val udoConProblem: Problem = problemFromClassPath("udocon2017/uc17.conf").force
   private implicit val context: Context = Context.Default
 
   behavior of "Engine"

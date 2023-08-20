@@ -13,8 +13,8 @@ import org.scalatest.matchers.should.Matchers
 class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
 
   private implicit val context: Context = Context.Default
-  private val problem17: Problem = problemFromClassPath("udocon2017/uc17-completed.conf").force
-  private val problem19: Problem = problemFromClassPath("udocon2019/uc19-full.conf").force
+  private val problem17: Problem = problemFromClassPath("udocon2017/uc17.conf").force
+  private val problem19: Problem = problemFromClassPath("udocon2019/uc19.conf").force
 
   private def run(problem: Problem, iterations: Long): (Schedule, Long) = {
     implicit val p: Problem = problem

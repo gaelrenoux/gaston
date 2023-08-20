@@ -14,7 +14,7 @@ import scala.concurrent.duration.{FiniteDuration, _}
 
 object PerformanceAnalysis extends App {
 
-  private val udoConProblem = problemFromClassPath("udocon2019/uc19-full.conf").force
+  private val udoConProblem = problemFromClassPath("udocon2019/uc19.conf").force
   // TODO check a solution
   // 140+ iterations, 850+ score
 

@@ -24,12 +24,12 @@ object RunLocal extends App {
 
   def runUdoCon2017(): Unit = Main.main(Array(
     "--from",
-    "src/test/resources/udocon2017/uc17-completed.conf"
+    "src/test/resources/udocon2017/uc17.conf"
   ))
 
   def runUdoCon2019(): Unit = Main.main(Array(
     "--from",
-    "src/test/resources/udocon2019/uc19-full.conf"
+    "src/test/resources/udocon2019/uc19.conf"
   ))
 
   log.info("Let's start !!!")
