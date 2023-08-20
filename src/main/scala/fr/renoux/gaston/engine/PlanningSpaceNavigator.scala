@@ -192,6 +192,8 @@ object PlanningSpaceNavigator {
         case Swap(a1, b1, isExt1) if isExt == isExt1 && ((a == a1 && b == b1) || (a == b1 && b == a1)) => true
         case _ => false
       }
+
+      override def toString: String = s"Swap${if (isExt) "Ext" else ""}(${a.map(_.name).mkString(",")} <-> ${b.map(_.name).mkString(",")})"
     }
 
     case class Add(s: Slot, t: Set[Topic]) extends Move {
@@ -199,6 +201,8 @@ object PlanningSpaceNavigator {
         case Remove(s1, t1) if s == s1 && t == t1 => true
         case _ => false
       }
+
+      override def toString: String = s"Add(${s.name}: ${t.map(_.name).mkString(",")})"
     }
 
     case class Remove(s: Slot, t: Set[Topic]) extends Move {
@@ -206,6 +210,8 @@ object PlanningSpaceNavigator {
         case Add(s1, t1) if s == s1 && t == t1 => true
         case _ => false
       }
+
+      override def toString: String = s"Remove(${s.name}: ${t.map(_.name).mkString(",")})"
     }
 
   }
