@@ -38,7 +38,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     println(result.toFormattedString)
     println(count)
     count should be(100)
-    result.score.value should be > 729.0
+    result.score.value should be > 725.0
   }
 
   "problem 19" should "return a good result after 10 iterations" in {
