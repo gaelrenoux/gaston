@@ -1,4 +1,4 @@
-package fr.renoux.gaston.all
+package fr.renoux.gaston.itests
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.Runner

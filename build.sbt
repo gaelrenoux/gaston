@@ -10,10 +10,13 @@ isSnapshot := true
 scalaVersion := "2.13.10"
 
 lazy val gaston = (project in file("."))
+  .configs(IntegrationTest)
+  .settings(inConfig(IntegrationTest)(Defaults.testSettings): _*)
   .configs(PerformanceTest)
   .settings(inConfig(PerformanceTest)(Defaults.testSettings): _*)
 
 /* Those tests are much slower */
+lazy val IntegrationTest = config("test-int") extend (Test)
 lazy val PerformanceTest = config("test-perf") extend (Test)
 
 scalacOptions ++= Seq(

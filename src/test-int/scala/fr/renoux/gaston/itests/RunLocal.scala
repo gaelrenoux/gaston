@@ -1,4 +1,4 @@
-package fr.renoux.gaston
+package fr.renoux.gaston.itests
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.command.Main

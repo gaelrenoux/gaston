@@ -1,7 +1,5 @@
 package fr.renoux.gaston.benchmarks
 
-import java.time.Instant
-
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.Runner
 import fr.renoux.gaston.engine._
@@ -12,6 +10,7 @@ import fr.renoux.gaston.util.{Context, Opt}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import java.time.Instant
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 

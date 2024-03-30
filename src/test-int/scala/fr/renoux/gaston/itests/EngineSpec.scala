@@ -1,7 +1,8 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.itests
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.Runner
+import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, OptimParams}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Context
