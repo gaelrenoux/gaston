@@ -5,8 +5,13 @@ import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.input.{InputLoader, InputModel}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
-/** Destination of all information in Gaston */
+/** Destination of all information in Gaston. It writes stuff both to the log file and the standard output.
+  *
+  * It has some business-aware method, to make sure it only prints new schedules if they are better than schedules found
+  * previously.
+  */
 class Output(silent: Boolean = false)(implicit val problem: Problem) {
+
   import Ordering.Double.IeeeOrdering
 
   private val separatorLine = "*" * 80
@@ -47,12 +52,12 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
 
   def writeBacktrackingFailure(fs: BacktrackingFailures): Unit = {
     if (fs.total % 50000 == 0) {
-      val noTopicMessages = fs.noTopics.toSeq.map{
+      val noTopicMessages = fs.noTopics.toSeq.map {
         case (slot, count) =>
           val percent = 100.0 * count / fs.total
           percent -> s"[${percent.round}%] Not enough topics on slot ${slot.name}"
       }
-      val maxParaMessages = fs.maxParallelizationReached.toSeq.map{
+      val maxParaMessages = fs.maxParallelizationReached.toSeq.map {
         case (slot, count) =>
           val percent = 100.0 * count / fs.total
           percent -> s"[${percent.round}%] Max number of topics too low on slot ${slot.name}"

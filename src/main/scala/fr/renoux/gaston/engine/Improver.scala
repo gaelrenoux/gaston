@@ -14,6 +14,8 @@ object Improver {
 
   abstract class Base[State] extends Improver {
 
+    // TODO this part could actually be in the Engine itself, removing the need for the parent class of Improver.
+    //  It seems more logical to me to have the improver work by single steps. State is passed through parameters anyway.
     /** Lazy sequence of incrementing scored schedules. Ends when the schedule can't be improved any more. Non-empty. */
     def improvements(
         schedule: Schedule,

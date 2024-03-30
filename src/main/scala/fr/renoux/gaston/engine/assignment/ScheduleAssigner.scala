@@ -2,13 +2,16 @@ package fr.renoux.gaston.engine.assignment
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.immutable
 
 import scala.annotation.tailrec
 import scala.util.Random
 
+// TODO Renames into ScheduleFiller
 /**
   * Fills a partial schedule with persons, ignoring preferences but respecting constraints.
   */
+@immutable
 final class ScheduleAssigner(implicit private val problem: Problem) {
 
   private val log = Logger[ScheduleAssigner]

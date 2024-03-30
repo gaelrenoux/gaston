@@ -82,4 +82,6 @@ trait Problem {
 
   val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]]
 
+  def toFormattedString: String
+
 }

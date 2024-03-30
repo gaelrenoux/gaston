@@ -12,6 +12,10 @@ import fr.renoux.gaston.util.Opt
 /* All line and column indices are zero-based */
 // scalastyle:off magic.number
 
+/* These classes defined the model as it is represented in the canonical input (.conf files). It is made to be as
+user-friendly as possible in the configuration file, and in second to be comfortable to use by the developer. However,
+it is not optimized for performance.
+*/
 case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),

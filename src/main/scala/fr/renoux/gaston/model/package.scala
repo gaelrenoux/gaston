@@ -4,6 +4,7 @@ import fr.renoux.gaston.util.{BitMap, BitSet}
 
 import scala.reflect.ClassTag
 
+/** This package contains the Model, the runtime representation of the problem to solve. */
 package object model {
 
   implicit class SlotSetOps(val wrapped: Iterable[Slot]) extends AnyVal {

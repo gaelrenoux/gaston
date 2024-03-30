@@ -3,16 +3,19 @@ package fr.renoux.gaston.engine
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.PlanningSpaceNavigator.Move
 import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.immutable
 
 import scala.collection.View
 import scala.util.Random
 
 
 /** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
-  * partial. */
+  * partial (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
+  * topics at the same time). */
+@immutable
 final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
-  val log: Logger = Logger[PlanningSpaceNavigator]
+  private val log: Logger = Logger[PlanningSpaceNavigator]
 
   /** Return a LazyList of neighbouring partial schedules to the initial one. */
   def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {

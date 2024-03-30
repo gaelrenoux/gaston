@@ -15,7 +15,13 @@ import scala.concurrent.{Await, Future}
 import scala.util.Random
 import fr.renoux.gaston.util.CanAddDuration._
 
-/** Runs the whole schedule-searching stuff for a fixed amount of time. Can take hooks to do stuff at some frequency, like warn the user. */
+/** Starts multiple Engines, with different seeds, and run them in parallel.
+  *
+  * It can function in two different modes, that can be combined:
+  * - Run for a fixed amount of time, then aggregate the results together and returns the best one.
+  * - Run continuously with a hook to regularly output the best result found.
+  * @param hook Something to do at regular interval, e.g. output current values on the stdout. First argument is the latest schedule, second argument is the number of schedules tried.
+  */
 class Runner(
     hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,

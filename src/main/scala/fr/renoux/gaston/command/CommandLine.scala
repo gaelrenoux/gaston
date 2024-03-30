@@ -7,6 +7,7 @@ import scopt.Read
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.Random
 
+/** Define command-line arguments, using Scopt. */
 case class CommandLine(
     inputFile: Option[Path] = None,
     tableFile: Option[Path] = None,

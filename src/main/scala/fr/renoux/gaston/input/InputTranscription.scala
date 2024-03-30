@@ -10,14 +10,19 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.impl.ProblemImpl
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference, TopicsExclusive, TopicsLinked}
+import fr.renoux.gaston.model.preferences._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
 
-/** Converts the Input object to the Problem object. */
+/** Converts the Input object (canonical input) to the Problem object (internal representation of the problem to
+  * optimize).
+  *
+  * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
+  * result in the `result` field.
+  */
 private[input] class InputTranscription(input: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription._
