@@ -19,7 +19,7 @@ class CommandLineTest extends AnyFlatSpec with Matchers {
     parse("--from", "/tmp/filename.csv").inputFile should be(Some(Paths.get("/tmp/filename.csv")))
   }
 
-  "--duration" should "get the correct value with the short argument" in {
+  "--duration" should "get the correct value" in {
     parse("--from", "/tmp/filename.csv", "-d", "15 minutes").maxDuration should be(Some(15.minutes))
   }
 

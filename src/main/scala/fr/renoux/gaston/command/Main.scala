@@ -62,7 +62,7 @@ object Main {
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
 
-      val runner = new Runner(hook = (ss, count) => {
+      val runner = new Runner(parallelism = commandLine.parallelism,  hook = (ss, count) => {
         output.writeScheduleIfBetter(ss)
         output.writeAttempts(count)
       })

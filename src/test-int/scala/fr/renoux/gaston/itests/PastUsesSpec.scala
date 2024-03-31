@@ -28,7 +28,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     implicit val p: Problem = problem
     implicit val i: GreedySlotImprover = new GreedySlotImprover
     implicit val engine: Engine = new Engine(backtrackInitialSchedule = backtrackInitialSchedule)
-    val runner = new Runner(parallelRunCount = 1)
+    val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
     runner.run(seed = 42, params)
   }

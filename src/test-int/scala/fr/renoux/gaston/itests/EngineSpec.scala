@@ -21,7 +21,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     implicit val p: Problem = problem
     implicit val i: GreedySlotImprover = new GreedySlotImprover
     implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
-    val runner = new Runner(parallelRunCount = 1)
+    val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
     runner.run(seed = 42, params)
   }

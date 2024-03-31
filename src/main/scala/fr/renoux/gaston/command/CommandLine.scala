@@ -15,7 +15,8 @@ case class CommandLine(
     silent: Boolean = false,
     debug: Boolean = false,
     maxDuration: Option[FiniteDuration] = None,
-    seed: Long = math.abs(Random.nextLong())
+    seed: Long = math.abs(Random.nextLong()),
+    parallelism: Int = Runtime.getRuntime.availableProcessors - 1
 )
 
 object CommandLine {
@@ -62,6 +63,14 @@ object CommandLine {
         case _ => failure("Option --duration must be finite")
       }
       .text("Time limit on the execution, the best schedule will be displayed when it expires. Ex: '20 seconds', '15 minutes', '1 hour'")
+
+    opt[Int]('p', "parallelism").optional().valueName("<parallelism>")
+      .action((p, in) => in.copy(parallelism = p))
+      .validate {
+        case p if p >= 1 => success
+        case _ => failure("Option --parallelism must be superior or equal to 1")
+      }
+      .text("How many improvement loops should run in parallel. Default is the number of available CPUs minus 1.")
 
     help("help").text("prints this usage text")
   }

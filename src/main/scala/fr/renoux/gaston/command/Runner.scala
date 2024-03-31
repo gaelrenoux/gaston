@@ -25,7 +25,7 @@ import fr.renoux.gaston.util.CanAddDuration._
 class Runner(
     hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
-    parallelRunCount: Int = math.max(1, Runtime.getRuntime.availableProcessors - 1)
+    parallelism: Int = math.max(1, Runtime.getRuntime.availableProcessors - 1)
 )(implicit problem: Problem, engine: Engine, ctx: Context) {
 
   private val log = Logger[Runner]
@@ -43,7 +43,7 @@ class Runner(
 
     /* Parallelize on the number of cores */
     val future: Future[Seq[(Schedule, Long)]] = Future.sequence {
-      (0 until parallelRunCount).map { i =>
+      (0 until parallelism).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
           runRecursive(now.plusMillis(hookFrequencyMillis), 0, Schedule.everyoneUnassigned)(optimParams)

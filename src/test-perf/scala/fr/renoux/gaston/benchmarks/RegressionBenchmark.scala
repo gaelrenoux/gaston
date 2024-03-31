@@ -64,7 +64,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
     val _ = try {
       val runner = parallelRunCount.toOption match {
         case None => new Runner
-        case Some(prc) => new Runner(parallelRunCount = prc)
+        case Some(prc) => new Runner(parallelism = prc)
       }
 
       val params: OptimParams = OptimParams(stopAtScore = Some(expectsScore), timeout = Some(Instant.now() + duration))
