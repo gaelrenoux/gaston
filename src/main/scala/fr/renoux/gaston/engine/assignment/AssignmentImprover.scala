@@ -23,13 +23,15 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   private val log = Logger[AssignmentImprover]
 
-  val defaultRoundsCount = 1000
+  val defaultMaxRoundsCount = 1000
+
+  private val defaultMaxRoundsCountPerSlot = 1000
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
-  def improve(scoredSchedule: Schedule, rounds: Int = defaultRoundsCount)(implicit rand: Random): Schedule =
+  def improve(scoredSchedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(implicit rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
-      cache.getOrElseUpdate(scoredSchedule.planning, recImprove(scoredSchedule, rounds))
+      cache.getOrElseUpdate(scoredSchedule.planning, recImprove(scoredSchedule, maxRounds))
     }
 
   /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one (slotRoundsLimit is
@@ -40,7 +42,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
       schedule: Schedule,
       maxRounds: Int,
       slots: Queue[Slot] = Queue(problem.slotsList: _*),
-      slotRoundsLimit: Int = 1000
+      slotRoundsLimit: Int = defaultMaxRoundsCountPerSlot
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {
       log.warn("Stopping assignment improvement because max number of rounds was reached")
