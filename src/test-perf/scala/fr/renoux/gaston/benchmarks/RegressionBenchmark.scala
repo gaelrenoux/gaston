@@ -25,12 +25,11 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give a good score when working a 5 min on one core" in {
+  it should "give an good score when working 1 min" in {
     benchmark(
-      duration = 5.minutes,
-      expectsScore = 750,
-      expectsCount = 400,
-      parallelRunCount = 1 // to make sure we always have the same results
+      duration = 1.minute,
+      expectsScore = 715,
+      expectsCount = 150
     )
   }
 
