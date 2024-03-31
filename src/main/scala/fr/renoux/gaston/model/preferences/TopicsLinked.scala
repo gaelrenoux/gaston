@@ -21,5 +21,7 @@ final case class TopicsLinked(topics: BitSet[Topic], reward: Score = Preference.
   }
 
   override def hashCode(): Int = (this.topics.actualHashCode, reward).hashCode()
+
+  override def toLongString: String = s"TopicsLinked($topics, $reward)"
 }
 

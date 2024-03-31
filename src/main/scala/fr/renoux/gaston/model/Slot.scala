@@ -16,6 +16,10 @@ final case class Slot(
     records.map(r => Record(this, r._1, r._2))
 
   lazy val personsPresentCount: Int = personsPresent.size
+
+  def toShortString: String = s"$id -> $name"
+
+  def toLongString: String = s"Slot($id, $name, ${personsPresent.map(_.name)}, $maxTopics"
 }
 
 //TODO call to hashcode is a minor (9%) hot-spot ! Same for topic and person !

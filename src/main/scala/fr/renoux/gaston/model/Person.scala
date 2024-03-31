@@ -12,7 +12,13 @@ final case class Person(
     name: String,
     weight: Weight = Weight.Default,
     baseScore: Score = Score.Zero
-) extends Identified
+) extends Identified {
+
+  def toShortString: String = s"$id -> $name"
+
+  def toLongString: String = s"Person($id, $name, ${weight.value}${if (baseScore == Score.Zero) "" else s", baseScore=$baseScore"})"
+
+}
 
 object Person {
   type Id = Int

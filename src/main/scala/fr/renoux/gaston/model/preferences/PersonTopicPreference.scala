@@ -13,4 +13,6 @@ final case class PersonTopicPreference(
     if (record.topic == topic && record.personsBitSet.contains(person)) reward
     else Score.Zero
   }
+
+  override def toLongString: String = s"PersonTopicPreference(${person.toShortString}, ${topic.toShortString}, $reward)"
 }

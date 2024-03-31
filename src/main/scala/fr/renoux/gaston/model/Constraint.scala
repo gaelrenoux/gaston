@@ -14,6 +14,8 @@ trait Constraint {
 
   /** Indicates if the constraint is respected on the given schedule. */
   def isRespected(schedule: Schedule): Boolean
+
+  def toLongString: String
 }
 
 object Constraint {

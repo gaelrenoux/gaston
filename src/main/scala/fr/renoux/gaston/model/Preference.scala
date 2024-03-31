@@ -11,6 +11,8 @@ trait Preference {
   def reward: Score
 
   def score(schedule: Schedule): Score
+
+  def toLongString: String
 }
 
 object Preference {
@@ -50,6 +52,7 @@ object Preference {
     val person: Person
   }
 
+  /** This is only used for pseudo-constraints: constraints represented as preferences. */
   val NecessaryPreferenceScore: Score = Score.NegativeInfinity
 
 }

@@ -13,5 +13,7 @@ final case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotL
     val missing = topics.diff(schedule.topicsSet)
     missing.isEmpty || missing.size == topicsSize
   }
+
+  override def toLongString: String = s"TopicsSimultaneous(${topics.map(_.toShortString)})"
 }
 

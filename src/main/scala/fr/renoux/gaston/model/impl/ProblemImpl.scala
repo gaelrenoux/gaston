@@ -65,15 +65,15 @@ final class ProblemImpl(
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("Problem:\n")
     builder.append("  Slots:\n")
-    slotsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    slotsList.sortBy(_.name).map(_.toLongString).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Topics:\n")
-    topicsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    topicsList.sortBy(_.name).map(_.toLongString).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Persons:\n")
-    personsList.sortBy(_.name).foreach(builder.append("    ").append(_).append("\n"))
+    personsList.sortBy(_.name).map(_.toLongString).foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Constraints:\n")
-    constraintsList.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    constraintsList.map(_.toLongString).sorted.foreach(builder.append("    ").append(_).append("\n"))
     builder.append("  Preferences:\n")
-    preferencesList.sortBy(_.toString).foreach(builder.append("    ").append(_).append("\n"))
+    preferencesList.map(_.toLongString).sorted.foreach(builder.append("    ").append(_).append("\n"))
     builder.toString
   }
 }

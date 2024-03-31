@@ -24,6 +24,8 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
     total
   }
 
+  @inline def nonEmpty: Boolean = wrapped.exists(identity)
+
   @inline def size: Int = wrapped.count(identity)
 
   @inline def actualEquals(that: BitSet[A]): Boolean = util.Arrays.equals(wrapped, that.wrapped)
@@ -35,6 +37,8 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
 
   /** Returns the a wrapped array, so it cannot be changed from the outside. Slower. */
   @inline def safeContent: Seq[Boolean] = wrapped.toSeq
+
+  override def toString: String = wrapped.view.zipWithIndex.filter(_._1).map(_._2).mkString("[", ", ", "]")
 }
 
 object BitSet {

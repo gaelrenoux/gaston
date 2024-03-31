@@ -22,6 +22,13 @@ final case class Topic(
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
+
+  def toShortString: String = s"$id -> $name"
+
+  def toLongString: String = s"Topic($id, $name, mandatory=${mandatory.map(_.name).mkString("[", ", ", "]")}, " +
+    s"forbidden=${forbidden.map(_.name).mkString("[", ", ", "]")}, $min to $max, " +
+    s"${slots.fold("")(s => s.map(_.name).mkString("forced = [", ", ", "], "))}" +
+    s"forced=$forced, virtual=$virtual"
 }
 
 object Topic {

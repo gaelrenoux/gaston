@@ -23,5 +23,7 @@ final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Perso
   }
 
   override def hashCode(): Int = (this.topics.actualHashCode, this.exemptions.actualHashCode, reward).hashCode()
+
+  override def toLongString: String = s"TopicsExclusive($topics${if (exemptions.nonEmpty) s"$exemptions, " else ""}, $reward)"
 }
 
