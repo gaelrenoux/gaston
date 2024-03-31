@@ -63,14 +63,14 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
         case None => goodMoveOnSlot(schedule, slot) match {
 
           case None =>
-            /* can't improve this slot any more ! Store in cache, then go to next slot */
+            /* can't improve this slot any more ! Store in cache, then continue on the slots left */
             slotCache.update(slotSchedule.topicsSet, slotSchedule)
             recImprove(schedule, maxRounds - 1, slotsTail)
 
           case Some(candidate) =>
-            /* The slot was perfected! If there are rounds left stay on the same slot, otherwise move to the next one */
-            if (slotRoundsLimit > 0) recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot), slotRoundsLimit - 1)
-            else recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot))
+            /* The slot was improved! If there are rounds left stay on the same slot, otherwise move to the next one and come back to this one later. */
+            if (slotRoundsLimit > 0) recImprove(candidate, maxRounds - 1, slots, slotRoundsLimit - 1) // current slot still on top of the queue
+            else recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot)) // current slot moved to the bottom of the queue
         }
       }
     }
