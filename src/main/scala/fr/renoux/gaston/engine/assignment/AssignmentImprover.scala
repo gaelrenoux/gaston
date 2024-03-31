@@ -29,9 +29,9 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */
-  def improve(scoredSchedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(implicit rand: Random): Schedule =
+  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(implicit rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
-      cache.getOrElseUpdate(scoredSchedule.planning, recImprove(scoredSchedule, maxRounds))
+      cache.getOrElseUpdate(schedule.planning, recImprove(schedule, maxRounds))
     }
 
   /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one (slotRoundsLimit is
