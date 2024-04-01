@@ -52,6 +52,7 @@ object Main {
     if (commandLine.generateInput) {
       output.writeInput(input)
     } else {
+      log.info(problem.toFormattedString)
 
       implicit val _problem: Problem = problem
       implicit val context: Context = Context.Default
