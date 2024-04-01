@@ -5,7 +5,7 @@ import fr.renoux.gaston.util.BitSet
 
 /** Every person on any of these topics, must be on all of these topics. */
 final case class TopicsLinked(topics: BitSet[Topic], reward: Score = Preference.NecessaryPreferenceScore)
-  extends Preference.GlobalLevel with Preference.Anti {
+  extends Preference.GlobalLevel with Preference.Anti with Preference.Impersonal {
 
   assert(topics.size > 1, s"$this should contain more than one topic")
 

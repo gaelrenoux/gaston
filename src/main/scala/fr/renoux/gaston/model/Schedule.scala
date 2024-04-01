@@ -109,15 +109,21 @@ final case class Schedule(
   def swapPersons(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Schedule =
     updateSlotSchedule(slot)(_.swapPersons(tp1, tp2))
 
-  // TODO the whole method itself is a minor (5%) hot-spot
-  def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Score = {
-    val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
-    val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
-    val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
 
-    if (score.isNegativeInfinity) Score.Zero
-    else scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore
-  }
+  /** This methods helps by not calculating the whole schedule's score until we're sure it's needed. However, it doesn't
+    * work if there are any global preferences that depends on person assignment, as we still need to recalculate global
+    * score in that case. */
+  // TODO the whole method itself is a minor (5%) hot-spot
+  // TODO can be improved by handling global preferences
+  def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Option[Score] =
+    if (problem.hasGlobalPreferencesWherePersonsMatter) None
+    else if (score.isNegativeInfinity) None // Delta would be positive infinity, which isn't helpful. We need to recalculate to see if we're still NegInf.
+    else Some {
+      val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
+      val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
+      val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
+      scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore
+    }
 
   /** Move a person on some slot, from some topic to another one. */
   def movePerson(slot: Slot, source: Topic, destination: Topic, person: Person): Schedule =

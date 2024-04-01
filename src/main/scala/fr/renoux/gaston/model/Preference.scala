@@ -13,6 +13,9 @@ trait Preference {
   def score(schedule: Schedule): Score
 
   def toLongString: String
+
+  val isPersonal: Boolean
+
 }
 
 object Preference {
@@ -24,6 +27,11 @@ object Preference {
 
   /** Trait for preferences which can be evaluated only on the global level, not slot by slot or record by record */
   trait GlobalLevel extends Preference {
+
+    /** Indicates wether persons assignement matter for this preference. It's true in most case, but there are some
+      * global-level preferences that only looks at how the topics are arranged. */
+    def personsMatter: Boolean = true
+
     /** Score the schedule according to this preference. */
     def scoreSchedule(schedule: Schedule): Score
 
@@ -46,10 +54,17 @@ object Preference {
     override def score(schedule: Schedule): Score = schedule.slotSchedulesList.flatMap(_.recordsList).map(scoreRecord).sum
   }
 
-  /** Personal preferences are always at record level */
+  /** Personal preferences are always at record level, and apply to a specific person. */
   trait Personal extends RecordLevel {
     /** A personal preference always references someone */
     val person: Person
+
+    override val isPersonal: Boolean = true
+  }
+
+  /** Impersonal preferences are not linked to a single, specific person. Persons assignment may still matter though! */
+  trait Impersonal extends Preference {
+    override val isPersonal: Boolean = false
   }
 
   /** This is only used for pseudo-constraints: constraints represented as preferences. */

@@ -14,8 +14,8 @@ import fr.renoux.gaston.util.Context
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
 
-  private val strongPreference = Score(5)
-  private val weakPreference = Score(1)
+  val strongPreference = Score(5)
+  val weakPreference = Score(1)
 
   object Persons {
     private val index = new AtomicInteger(0)

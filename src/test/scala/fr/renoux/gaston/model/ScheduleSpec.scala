@@ -11,6 +11,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Slots._
   import fr.renoux.gaston.SimpleTestModel.Solutions._
   import fr.renoux.gaston.SimpleTestModel.Topics._
+  import fr.renoux.gaston.SimpleTestModel.strongPreference
 
   private implicit val problem: Problem = Complete
   private implicit val context: Context = Context.Default
@@ -259,6 +260,28 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
         Bathing(Arthur)
       )
     ).isSound should be(false)
+  }
+
+
+  "deltaScoreIfSwapPerson" should "work on a simple case" in {
+    val schedule = Schedule.from(
+      Morning(
+        Acting(Arthur, Corwin),
+        Dancing(Daniela, Garion)
+      )
+    )
+    val schedule2 = Schedule.from(
+      Morning(
+        Acting(Arthur, Garion),
+        Dancing(Daniela, Corwin)
+      )
+    )
+    val schedule2bis = schedule.swapPersons(Morning, (Acting, Corwin), (Dancing, Garion))
+    schedule2bis should be (schedule2)
+
+    // Everyone on schedule 1 is at 0. On schedule 2, only Corwin is at 5. Having three persons less happy after him, his score is divided by 2^3
+    (schedule2.score - schedule.score) should be (strongPreference / Weight(8))
+    schedule.deltaScoreIfSwapPerson(Morning, (Acting, Corwin), (Dancing, Garion)) should be (Some(strongPreference / Weight(8)))
   }
 
 }

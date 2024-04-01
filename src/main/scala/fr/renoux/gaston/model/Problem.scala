@@ -49,6 +49,8 @@ trait Problem {
   lazy val impersonalRecordLevelPreferences: Set[Preference.RecordLevel] = recordLevelPreferences.filterNot(_.isInstanceOf[Preference.Personal])
   lazy val impersonalRecordLevelPreferencesList: List[Preference.RecordLevel] = impersonalRecordLevelPreferences.toList
 
+  lazy val hasGlobalPreferencesWherePersonsMatter: Boolean = globalLevelPreferences.exists(_.personsMatter)
+
   lazy val (slotLevelConstraints: Set[Constraint.SlotLevel], globalLevelConstraints: Set[Constraint]) =
     constraints.collect {
       case s: Constraint.SlotLevel => Left(s)

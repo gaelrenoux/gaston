@@ -105,7 +105,7 @@ final case class SlotSchedule(
     wrapped.updated(t1, newR1).updated(t2, newR2)
   }
 
-  /** Score for this slot schedule if we swap those two persons. Persons are in couple with there current topic. */
+  /** Score for this slot schedule if we swap those two persons. Persons are in couple with their current topic. */
   def deltaScoreIfSwapPersons(tp1: (Topic, Person), tp2: (Topic, Person)): Map[Person, Score] = {
     val (t1, p1) = tp1
     val (t2, p2) = tp2
@@ -141,6 +141,7 @@ final case class SlotSchedule(
   /** Impersonal score of the slot, regardless of how persons are assigned to topics on this slot (as long as the same persons are present) */
   lazy val impersonalScoreSlotLevel: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
 
+  /** Total impersonal score in this slot.  */
   lazy val impersonalScore: Score = impersonalScoreTopicLevel + impersonalScoreSlotLevel
 
   @tailrec
