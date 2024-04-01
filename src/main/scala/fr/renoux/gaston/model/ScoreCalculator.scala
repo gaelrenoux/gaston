@@ -45,7 +45,7 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
     case Nil => Score(sum)
     case p :: ps =>
       val s = p.scoreSchedule(schedule)
-      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
+      if (s.isNegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
   }
 
   /** Score that solution for the current problem. Returns a global score prioritizing the score of the least satisfied

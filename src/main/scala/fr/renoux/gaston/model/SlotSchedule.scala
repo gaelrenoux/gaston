@@ -148,7 +148,7 @@ final case class SlotSchedule(
     case Nil => Score(sum)
     case p :: ps =>
       val s = p.scoreSlot(this)
-      if (s.value == Double.NegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
+      if (s.isNegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
   }
 
   /** This schedule makes sense. No person on multiple topics at the same time. */
