@@ -17,6 +17,8 @@ import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
 
+// TODO This class needs a test, big time
+
 /** Converts the Input object (canonical input) to the Problem object (internal representation of the problem to
   * optimize).
   *
