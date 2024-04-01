@@ -37,15 +37,18 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
 
   /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
   lazy val impersonalScore: Score = chrono("ScoreCalculator > impersonalScore") {
-    schedule.slotSchedulesList.map(_.impersonalScore).sum + preferencesScoreRec(schedule.problem.impersonalGlobalLevelPreferencesList)
+    schedule.slotSchedulesList.map(_.impersonalScore).sum + impersonalGlobalPreferencesScore
   }
 
+  /** Those preferences are impersonal in that they are not weighted by a person. But person repartition does matter! */
+  lazy val impersonalGlobalPreferencesScore: Score = globalPreferencesScoreRec(schedule.problem.impersonalGlobalLevelPreferencesList)
+
   @tailrec
-  private def preferencesScoreRec(prefs: List[Preference.GlobalLevel], sum: Double = 0): Score = prefs match {
+  private def globalPreferencesScoreRec(prefs: List[Preference.GlobalLevel], sum: Double = 0): Score = prefs match {
     case Nil => Score(sum)
     case p :: ps =>
       val s = p.scoreSchedule(schedule)
-      if (s.isNegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)
+      if (s.isNegativeInfinity) s else globalPreferencesScoreRec(ps, sum + s.value)
   }
 
   /** Score that solution for the current problem. Returns a global score prioritizing the score of the least satisfied
