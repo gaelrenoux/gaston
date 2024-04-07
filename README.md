@@ -47,7 +47,6 @@ The input file describes the problem to solve. It follows the HOCON format, and 
         - `min`: Minimum number of persons on a topic. Default is empty (will use the settings' value).
         - `max`: Maximum number of persons on a topic. Default is empty (will use the settings' value).
         - `occurrences`: How many sessions of the topic are possible. Default is `1`.
-        - `multiple`: How many parallel sessions this topic represents (all sessions are simultaneous). Note than min and max are for one session. Default is `1`.
         - `slots`: An array of slot names on which the topic can be scheduled. Default is empty (can be scheduled on any slot).
         - `presence`: A score added for just having this topic present. Can be used to favor a topic, or to set a topic as to avoid if possible (with a negative score). Default is `0`.
         - `forced`: If `true`, this topic *must* be scheduled. Default is `false`.

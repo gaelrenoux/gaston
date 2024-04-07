@@ -7,6 +7,7 @@ import eu.timepit.refined.types.numeric._
 import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.input.InputRefinements._
 import fr.renoux.gaston.model.{Score, Topic, Weight}
+import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.Opt
 
 /* All line and column indices are zero-based */
@@ -30,7 +31,7 @@ case class InputModel(
   lazy val slotsNameSet: Set[NonEmptyString] = slots.flatten.map(_.name).toSet
   lazy val topicsNameSet: Set[NonEmptyString] = topics.map(_.name).toSet
   lazy val personsNameSet: Set[NonEmptyString] = persons.map(_.name).toSet
-  lazy val multipleTopicsSet: Set[InputTopic] = topicsSet.filter(_.multiple.exists(_ > 1))
+  lazy val topicsByName: Map[NonEmptyString, InputTopic] = topics.view.zipWith(_.name).map(_.swap).toMap
 }
 
 case class InputSettings(
@@ -84,7 +85,6 @@ case class InputTopic(
     min: Option[PosInt] = None,
     max: Option[PosInt] = None,
     occurrences: Option[PosInt] = None,
-    multiple: Option[PosInt] = None, // multi-topic: on the same slot, occupies several groups of persons
     slots: Option[Set[NonEmptyString]] = None,
     presence: Option[Score] = None,
     forced: Boolean = false
@@ -92,8 +92,6 @@ case class InputTopic(
   /** Occurrence needs to be an Option to not appear when not needed */
   lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1: PosInt)
 
-  /** Multiple needs to be an Option to not appear when not needed */
-  lazy val forcedMultiple: PosInt = multiple.getOrElse(1: PosInt)
 
   /** Duplicate this Topic by its number of occurrences */
   lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
@@ -114,20 +112,6 @@ object InputTopic {
   ) {
     lazy val name: String =
       index.fold(inputTopic.name.value)(i => s"${inputTopic.name} $OccurrenceMarker$i")
-
-    /* Duplicate topics if topic is multiple. Must be after the occurrence, so that he multiple marker appears after the occurrence one. */
-    lazy val multipleParts: Seq[InputTopic.Part] =
-      if (inputTopic.forcedMultiple.value == 1) Seq(Part(this))
-      else (1 to inputTopic.forcedMultiple).map(Part(this, _))
-  }
-
-  /** For multiple topics: each part of the topic, which will occupy a group of persons each */
-  case class Part(
-      occurrence: Occurrence,
-      index: Opt[Int] = Opt.Missing // present only if the topic has a multiplicity > 1
-  ) {
-    lazy val name: String =
-      index.fold(occurrence.name)(i => s"${occurrence.name} $MultipleMarker$i")
   }
 
 }

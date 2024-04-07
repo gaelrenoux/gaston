@@ -80,7 +80,7 @@ private[input] class InputTranscription(input: InputModel) {
     }.toMap
   }
 
-  lazy val concreteTopicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] = {
+  lazy val concreteTopicsByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] = {
     input.topics.map { inTopic: InputTopic =>
       val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
       val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
@@ -88,39 +88,27 @@ private[input] class InputTranscription(input: InputModel) {
       val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val slots = inTopic.slots.map(ss => ss.map(slotsByName))
 
-      val multiplesByOccurrenceIndex: Map[Int, Set[Topic]] =
-        inTopic.occurrenceInstances.map { inTopicOccurrence =>
-          val topicParts = inTopicOccurrence.multipleParts
-
-          /* dispatch the mandatory persons on the instances. The map may be missing parts if there are not enough mandatory persons. */
-          val sortedMandatories = mandatory.toSeq.sortBy(_.name) // sorted to be deterministic, therefore more testable
-          val mandatoriesByPart = sortedMandatories.zip(LazyList.continually(topicParts).flatten).map(_.swap).groupToMap
-
-          val topics = topicParts.map { part => // can't iterate on mandatoriesByPart, may be missing parts
-            val thisMandatories = mandatoriesByPart.getOrElse(part, Seq.empty)
-            Topic(
-              topicIx.getAndIncrement(), part.name,
-              mandatory = thisMandatories.toSet, forbidden = forbidden,
-              min = min, max = max,
-              slots = slots, forced = inTopic.forced
-            )
-          }.toSet
-
-          // in the constraint section, we will make parts simultaneous
-          inTopicOccurrence.index.getOrElse(0) -> topics
-        }.toMap
+      val multiplesByOccurrenceIndex: Map[Int, Topic] = inTopic.occurrenceInstances.map { inTopicOccurrence =>
+        val topic = Topic(
+          topicIx.getAndIncrement(), inTopicOccurrence.name,
+          mandatory = mandatory, forbidden = forbidden,
+          min = min, max = max,
+          slots = slots, forced = inTopic.forced
+        )
+        inTopicOccurrence.index.getOrElse(0) -> topic
+      }.toMap
 
       // in the preferences section, we will make occurrences incompatible (so that one person does not register to the several occurrences)
       inTopic.name -> multiplesByOccurrenceIndex
     }.toMap
   }
 
-  lazy val topicMultiplesByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Set[Topic]]] =
-    concreteTopicMultiplesByOccurrenceIndexByName ++
-      nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Set(topic)) } ++
-      unassignedTopicsByNameAndSlot.map { case (key, topic) => key._1 -> Map(0 -> Set(topic)) }
+  lazy val topicsByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] =
+    concreteTopicsByOccurrenceIndexByName ++
+      nothingTopicsByName.mapValuesStrict { topic => Map(0 -> topic) } ++
+      unassignedTopicsByNameAndSlot.map { case (key, topic) => key._1 -> Map(0 -> topic) }
 
-  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicMultiplesByOccurrenceIndexByName.mapValuesStrict(_.values.flatten.toSet)
+  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicsByOccurrenceIndexByName.mapValuesStrict(_.values.toSet)
 
 
   /* Counts */
@@ -133,25 +121,15 @@ private[input] class InputTranscription(input: InputModel) {
   /* Constraints */
   object Constraints {
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
-      input.constraints.simultaneous.map { inConstraint =>
-        // Taking the first occurrence only (weird, but that's a weird requirement as well). Taking the first part only, as all parts are simultaneous anyway.
-        TopicsSimultaneous(inConstraint.topics.map(topicMultiplesByOccurrenceIndexByName(_).head._2.head))
+      input.constraints.simultaneous.flatMap { inConstraint =>
+        // We already verified that all topics in the constraint have the same number of occurrences => match them one-to-one
+        val topicsByOccurrenceIndex: Map[Int, Set[Topic]] = inConstraint.topics.flatMap(topicsByOccurrenceIndexByName(_)).groupToMap
+        topicsByOccurrenceIndex.values.map(TopicsSimultaneous)
       }
-
-    lazy val simultaneousMultipleParts: Set[TopicsSimultaneous] = {
-      for {
-        topicMultiplesByOccurrenceIndex <- topicMultiplesByOccurrenceIndexByName.values
-        topicMultiples <- topicMultiplesByOccurrenceIndex.values
-        if topicMultiples.size > 1
-      } yield TopicsSimultaneous(topicMultiples)
-    }.toSet
 
     lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
       input.constraints.notSimultaneous.map { inConstraint =>
-        val inConstraintTopicOccurrences = inConstraint.topics.flatMap { topicName =>
-          topicMultiplesByOccurrenceIndexByName(topicName).values
-        }.map(_.head) // Keep only one element for multiple topics
-        TopicsNotSimultaneous(inConstraintTopicOccurrences.toBitSet)
+        TopicsNotSimultaneous(inConstraint.topics.flatMap(topicsByName).toBitSet)
       }
 
     // TODO Merge simultaneous constraint (ex: Sim(1, 2) and Sim(2, 3) can be merged into Sim(1, 2, 3))
@@ -159,7 +137,6 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val all: Set[Constraint] = {
       Set.empty[Constraint] ++ // force the correct type
         simultaneousTopics ++
-        simultaneousMultipleParts ++
         notSimultaneousTopics
     }
   }
@@ -180,10 +157,9 @@ private[input] class InputTranscription(input: InputModel) {
       }
 
     lazy val exclusiveOccurrences: Set[TopicsExclusive] =
-      topicMultiplesByOccurrenceIndexByName.values.view.filter(_.size > 1).map { reoccurringTopic: Map[Int, Set[Topic]] =>
-        val mandatoryPersons = reoccurringTopic.head._2.head.mandatory // mandatories are the same on all instances, take the first one
-        val allInstancesPart = reoccurringTopic.values.flatten // all instances exclusive (obvious for the multiple parts, but only one constraint is better)
-        TopicsExclusive(allInstancesPart.toBitSet, mandatoryPersons.toBitSet)
+      topicsByOccurrenceIndexByName.values.view.filter(_.size > 1).map { reoccurringTopic: Map[Int, Topic] =>
+        val mandatoryPersons = reoccurringTopic.head._2.mandatory // mandatories are the same on all instances, take the first one
+        TopicsExclusive(reoccurringTopic.values.toBitSet, mandatoryPersons.toBitSet)
       }.toSet
 
     lazy val linkedTopics: Set[TopicsLinked] =
@@ -397,6 +373,14 @@ object InputTranscription {
         .flatMap(_.topics)
         .filter(!input.topicsNameSet.contains(_))
         .map(t => s"Simultaneous constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.simultaneous
+        .flatMap { inConstraint =>
+          val topics = inConstraint.topics.flatMap(input.topicsByName.get)
+          if (topics.map(_.forcedOccurrences).toSet.size > 1) {
+            Some(s"Simultaneous constraint: different occurrence count: [${inConstraint.topics.mkString(", ")}]")
+          } else None
+        }
     } ++ {
       input.constraints.notSimultaneous
         .flatMap(_.topics)

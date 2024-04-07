@@ -1,16 +1,18 @@
 package fr.renoux.gaston.input
 
+import com.softwaremill.quicklens._
 import eu.timepit.refined.auto._
-import fr.renoux.gaston.model.constraints.TopicsSimultaneous
+import fr.renoux.gaston.input.InputRefinements.NonPosScore
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.softwaremill.quicklens._
-import fr.renoux.gaston.input.InputRefinements.NonPosScore
 
 // scalastyle:off magic.number
 class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
+  // TODO missing test for Simultaneous
+  // TODO missing test for NotSimultaneous
+
 
   import fr.renoux.gaston.TestUtils._
 
@@ -64,66 +66,6 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         case TopicsExclusive(ts, ex, _) => (ts.safeContent, ex.safeContent)
       } should be(expected)
 
-    }
-
-  }
-
-
-
-  behavior of "Multiple"
-
-  {
-    val inputTopics = List(InputTopic(
-      name = "alpha",
-      multiple = Some(3)
-    ))
-
-    val topicNames = Set("alpha ~1", "alpha ~2", "alpha ~3")
-
-    def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name))
-
-    they should "be transcribed to different topics" in {
-      val problem = from(InputModel(topics = inputTopics))
-      problem.topics.map(_.name) should be(topicNames)
-    }
-
-    they should "all have the same forbidden and wishes" in {
-      implicit val problem = from(InputModel(
-        topics = inputTopics,
-        persons = List(
-          InputPerson("Bianca", forbidden = Set("alpha")),
-          InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
-        )
-      ))
-      problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
-      problem.preferencesByPerson(p"Caroline").collect {
-        case PersonTopicPreference(_, t, s) => (t, s)
-      } should be(topics.map(_ -> Score.PersonTotalScore))
-    }
-
-    they should "be simultaneous" in {
-      implicit val problem = from(InputModel(
-        topics = inputTopics,
-        persons = List(
-          InputPerson("Arnold", mandatory = Set("alpha"))
-        )
-      ))
-      problem.constraints.collect {
-        case TopicsSimultaneous(ts) => ts
-      } should be(Set(topics))
-    }
-
-    they should "dispatch mandatory persons" in {
-      implicit val problem = from(InputModel(
-        topics = inputTopics,
-        persons = List(
-          InputPerson("Arnold", mandatory = Set("alpha")),
-          InputPerson("Bianca", mandatory = Set("alpha"))
-        )
-      ))
-
-      problem.mandatoryTopicsByPerson(p"Arnold") should be(Set(t"alpha ~1"))
-      problem.mandatoryTopicsByPerson(p"Bianca") should be(Set(t"alpha ~2"))
     }
 
   }
