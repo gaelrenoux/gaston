@@ -212,7 +212,7 @@ final case class SlotSchedule(
 object SlotSchedule {
   def empty(slot: Slot)(implicit problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
 
-  /** Slot schedule where everyone is on an "unassigned" topic */
+  /** Slot schedule where everyone is on an "unassigned" topic, no other topic. */
   def everyoneUnassigned(slot: Slot)(implicit problem: Problem): SlotSchedule = {
     val t = problem.unassignedTopics(slot)
     SlotSchedule(slot, Map(t -> Record(slot, t, slot.personsPresent)))
