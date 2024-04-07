@@ -298,7 +298,7 @@ An Engine run (in `Engine.lazySeq`) starts with an initial schedule respecting a
     - This uses the ScheduleGenerator, which is only used for this.
     - This schedule has been assignment-optimized (see below).
 - If not using backtracking (backtrack-initial-schedule option is set to false), we start with an empty schedule. This is recommended if you expect some persons to be unassigned on some slots.
-    - This starts using `Schedule.everyoneUnassigned`.
+    - This starts using `Schedule.startingUnassignedOrForced`.
 
 TODO: Document why backtracking is actually useful. Seems like always starting from an empty schedule would be easier. Maybe it's faster?
 
