@@ -7,7 +7,7 @@ import scala.collection.IterableOps
 
 object CollectionImplicits {
 
-  @inline final implicit class RichIterableOps[A, CC[_]](val wrapped: IterableOps[A, CC, _]) extends AnyVal {
+  @inline final implicit class RichIterableOps[A, CC[_], C <: CC[A]](val wrapped: IterableOps[A, CC, C]) extends AnyVal {
     @inline def replace[B >: A](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
 
     @inline def zipWith[B](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
@@ -16,6 +16,13 @@ object CollectionImplicits {
       a <- wrapped
       b <- bs
     } yield (a, b)
+
+    /** Keeps all elements where the f argument gives the minimum value over the collection. */
+    @inline def filterMinBy[B: Ordering](f: A => B): C = if (wrapped.isEmpty) wrapped.filter(_ => true) else {
+      val min = wrapped.view.map(f).min
+      val w: C = wrapped.filter(a => f(a) == min)
+      w
+    }
   }
 
   @inline final implicit class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {

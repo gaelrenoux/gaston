@@ -46,7 +46,7 @@ class Runner(
       (0 until parallelism).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
-          runRecursive(now.plusMillis(hookFrequencyMillis), 0, Schedule.everyoneUnassigned)(optimParams)
+          runRecursive(now.plusMillis(hookFrequencyMillis), 0, Schedule.startingUnassignedOrForced)(optimParams)
         }
       }
     }

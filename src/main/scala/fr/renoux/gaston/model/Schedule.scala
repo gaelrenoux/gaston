@@ -2,8 +2,12 @@ package fr.renoux.gaston.model
 
 import cats.Monoid
 import cats.implicits._
+import fr.renoux.gaston.util.CanGroupToMap.ops.toCoupleOps
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.RandomImplicits._
 import fr.renoux.gaston.util.{BitSet, Context, testOnly}
+
+import scala.util.Random
 
 /**
   * A schedule is an association of people, to topics, to slots.
@@ -203,10 +207,44 @@ object Schedule {
   /** Empty schedule for a problem */
   def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty)
 
-  /** Schedule where everyone is on an "unassigned" topic */
-  def everyoneUnassigned(implicit problem: Problem, ctx: Context): Schedule = Schedule(
-    problem.slots.map { s => s -> SlotSchedule.everyoneUnassigned(s) }.toMap
-  )
+  /** Schedule where only the forced topics are placed (randomly). Forced topics contain their mandatory persons plus
+    * the minimum number of persons to maket them valid. Other persons are on the "unassigned" topics. */
+  def startingUnassignedOrForced(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
+    /* Everything complicated in here is for the forced-slots */
+    val forcedTopicsPerSlots = Array.fill(problem.slots.size)(0)
+    val forcedTopicsBySlot: Map[Slot, Seq[Topic]] = problem.forcedTopicsMostToLeastConstrained.map { topic =>
+      val possibleSlots = topic.slots.getOrElse(problem.slots).filterMinBy(s => forcedTopicsPerSlots(s.id))
+      val slot = rand.pick(possibleSlots)
+      forcedTopicsPerSlots(slot.id) += 1
+      slot -> topic
+    }.groupToMap
+
+    val slotSchedules = problem.slots.map { slot =>
+      /* For each slot, starts with everyone unassigned */
+      val allPersons = rand.shuffle(slot.personsPresent.toList)
+      val slotScheduleUnassigned = SlotSchedule.everyoneUnassigned(slot)
+      val unassignedTopic = slotScheduleUnassigned.topics.head
+      /* Add forced topics and assing some persons on tem */
+      val slotScheduleWithForcedTopics = forcedTopicsBySlot.get(slot) match {
+        case None => slotScheduleUnassigned
+        case Some(forcedTopics) =>
+          forcedTopics.foldLeft((slotScheduleUnassigned, allPersons)) { case ((slotSchedule, personsAvailable), topic) =>
+            if (topic.mandatory.exists(!personsAvailable.contains(_))) {
+              throw new IllegalStateException(s"Too many forced topics on the same slot ${slot.toShortString}, mandatory persons are conflicting")
+            }
+            val nonMandatoryPersonsToAdd = personsAvailable.filterNot(topic.mandatory).filterNot(topic.forbidden).take(topic.min - topic.mandatory.size)
+            val allPersonsToAdd = topic.mandatory ++ nonMandatoryPersonsToAdd
+            val newSS = allPersonsToAdd.foldLeft(slotSchedule.addTopic(topic)) { (ss, person) =>
+              ss.movePerson(unassignedTopic, topic, person)
+            }
+            (newSS, personsAvailable.filterNot(allPersonsToAdd.contains))
+          }._1
+      }
+      slot -> slotScheduleWithForcedTopics
+    }
+
+    Schedule(slotSchedules.toMap)
+  }
 
   /** Commodity method */
   @testOnly def from(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =

@@ -18,6 +18,9 @@ trait Problem {
 
   lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
   lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
+  /** All forced topics, starting with the ones that are limited to the least number of possible slots, up to the ones that can be on any slot. */
+  lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
+    forcedTopics.toSeq.view.map { topic => topic -> topic.slots.fold(slots.size)(_.size) }.sortBy(_._2).map(_._1).toSeq
 
   lazy val slotsList: List[Slot] = slots.toList
   lazy val topicsList: List[Topic] = topics.toList
