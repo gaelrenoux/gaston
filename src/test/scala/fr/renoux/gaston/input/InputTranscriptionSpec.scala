@@ -10,6 +10,7 @@ import org.scalatest.matchers.should.Matchers
 
 // scalastyle:off magic.number
 class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
+  // TODO Improve this test !
   // TODO missing test for Simultaneous
   // TODO missing test for NotSimultaneous
 

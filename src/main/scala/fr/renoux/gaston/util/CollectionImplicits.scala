@@ -53,6 +53,8 @@ object CollectionImplicits {
 
   @inline final implicit class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
 
+    @inline def getMinKey(implicit o: Ordering[K]): Option[V] = if (wrapped.isEmpty) None else Some(wrapped.minBy(_._1)._2)
+
     @inline def updatedWith(k: K)(f: V => V): Map[K, V] = wrapped.updateAtKey(k, f)
 
     @inline def updatedWithOrElse(k: K)(f: V => V, v: => V): Map[K, V] = {

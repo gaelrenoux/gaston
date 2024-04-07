@@ -84,34 +84,51 @@ case class InputTopic(
     name: NonEmptyString,
     min: Option[PosInt] = None,
     max: Option[PosInt] = None,
+    duration: Option[PosInt] = None,
     occurrences: Option[PosInt] = None,
     slots: Option[Set[NonEmptyString]] = None,
     presence: Option[Score] = None,
     forced: Boolean = false
 ) {
+
   /** Occurrence needs to be an Option to not appear when not needed */
   lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1: PosInt)
 
+  /** Duration needs to be an Option to not appear when not needed */
+  lazy val forcedDuration: PosInt = duration.getOrElse(1: PosInt)
 
-  /** Duplicate this Topic by its number of occurrences */
   lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
-    if (forcedOccurrences.value == 1) Seq(InputTopic.Occurrence(this)) else {
-      (1 to forcedOccurrences).map(InputTopic.Occurrence(this, _))
-    }
+    if (forcedOccurrences.value == 1) Seq(InputTopic.Occurrence(this))
+    else (1 to forcedOccurrences).map(InputTopic.Occurrence(this, _))
+
 }
 
 object InputTopic {
   val OccurrenceMarker = "#"
 
-  val MultipleMarker = "~"
+  val PartMarker = "~"
 
-  /** For multi-occurrence topic: the same topic will appear on different slots */
+  /** For multi-occurrence topic */
   case class Occurrence(
       inputTopic: InputTopic,
       index: Opt[Int] = Opt.Missing // present only if there are multiple occurrences
   ) {
     lazy val name: String =
       index.fold(inputTopic.name.value)(i => s"${inputTopic.name} $OccurrenceMarker$i")
+
+    /** Produce one part per duration unit of the topic */
+    lazy val partInstances: Seq[InputTopic.Part] =
+      if (inputTopic.forcedDuration.value == 1) Seq(Part(this))
+      else (1 to inputTopic.forcedDuration).map(Part(this, _))
+  }
+
+  /** Fo multi-slot topics */
+  case class Part(
+      occurrence: Occurrence,
+      index: Opt[Int] = Opt.Missing // present only if there are multiple parts
+  ) {
+    lazy val name: String =
+      index.fold(occurrence.name)(i => s"${occurrence.name} $PartMarker$i")
   }
 
 }

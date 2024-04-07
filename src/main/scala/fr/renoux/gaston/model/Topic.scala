@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.Identified
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
   * @param forced Topic must be on the schedule.
   * @param virtual Topic created for technical reasons, not a real topic. Cannot be moved or removed from its slot.
-  **/
+  */
 final case class Topic(
     id: Int,
     name: String,
@@ -16,6 +16,7 @@ final case class Topic(
     min: Int = Topic.DefaultMin,
     max: Int = Topic.DefaultMax, // TODO bad max, remove default value (Person.MaxCount would be better)
     slots: Option[Set[Slot]] = None,
+    followup: Option[Topic] = None,
     forced: Boolean = false,
     virtual: Boolean = false
 ) extends Identified {
@@ -27,7 +28,8 @@ final case class Topic(
 
   def toLongString: String = s"Topic($id, $name, mandatory=${mandatory.map(_.name).mkString("[", ", ", "]")}, " +
     s"forbidden=${forbidden.map(_.name).mkString("[", ", ", "]")}, $min to $max, " +
-    s"${slots.fold("")(s => s.map(_.name).mkString("forced = [", ", ", "], "))}" +
+    slots.fold("")(s => s.map(_.name).mkString("forced = [", ", ", "], ")) +
+    followup.fold("")(t => s"followup = ${t.toShortString}, ") +
     s"forced=$forced, virtual=$virtual"
 }
 

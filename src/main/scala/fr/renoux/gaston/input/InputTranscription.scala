@@ -17,8 +17,6 @@ import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
 
-// TODO This class needs a test, big time
-
 /** Converts the Input object (canonical input) to the Problem object (internal representation of the problem to
   * optimize).
   *
@@ -80,7 +78,7 @@ private[input] class InputTranscription(input: InputModel) {
     }.toMap
   }
 
-  lazy val concreteTopicsByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] = {
+  lazy val concreteTopicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] = {
     input.topics.map { inTopic: InputTopic =>
       val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
       val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
@@ -88,28 +86,49 @@ private[input] class InputTranscription(input: InputModel) {
       val max = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val slots = inTopic.slots.map(ss => ss.map(slotsByName))
 
-      val multiplesByOccurrenceIndex: Map[Int, Topic] = inTopic.occurrenceInstances.map { inTopicOccurrence =>
-        val topic = Topic(
-          topicIx.getAndIncrement(), inTopicOccurrence.name,
-          mandatory = mandatory, forbidden = forbidden,
-          min = min, max = max,
-          slots = slots, forced = inTopic.forced
-        )
-        inTopicOccurrence.index.getOrElse(0) -> topic
-      }.toMap
+      val topicsByIndexes: Map[Int, Map[Int, Topic]] =
+        inTopic.occurrenceInstances.reverseIterator.map { inTopicOccurrence =>
+          var followup = Option.empty[Topic]
+          val topicsByPartIndex: Map[Int, Topic] = inTopicOccurrence.partInstances
+            .map { inTopicPart =>
+              val topic = Topic(
+                topicIx.getAndIncrement(), inTopicPart.name,
+                mandatory = mandatory, forbidden = forbidden,
+                min = min, max = max,
+                slots = slots, forced = inTopic.forced
+              )
+              inTopicPart.index.getOrElse(0) -> topic
+            }
+            // second iteration in reverse to add the followup (first one is straight because we prefer id to be increasing with the parts
+            .reverseIterator.map { case (partIndex, topic) =>
+              val topicWithFollowup = topic.copy(followup = followup)
+              followup = Some(topicWithFollowup)
+              partIndex -> topicWithFollowup
+            }
+            .toMap
+          inTopicOccurrence.index.getOrElse(0) -> topicsByPartIndex
+        }.toMap
 
-      // in the preferences section, we will make occurrences incompatible (so that one person does not register to the several occurrences)
-      inTopic.name -> multiplesByOccurrenceIndex
+      // in the preferences section, we will make occurrences incompatible (so that one person does not register to several occurrences of the same input-topic)
+      inTopic.name -> topicsByIndexes
     }.toMap
   }
 
-  lazy val topicsByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] =
-    concreteTopicsByOccurrenceIndexByName ++
-      nothingTopicsByName.mapValuesStrict { topic => Map(0 -> topic) } ++
-      unassignedTopicsByNameAndSlot.map { case (key, topic) => key._1 -> Map(0 -> topic) }
+  lazy val topicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] =
+    concreteTopicsByPartIndexByOccurrenceIndexByName ++
+      nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Map(0 -> topic)) } ++
+      unassignedTopicsByNameAndSlot.map { case (key, topic) => key._1 -> Map(0 -> Map(0 -> topic)) }
 
-  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] = topicsByOccurrenceIndexByName.mapValuesStrict(_.values.toSet)
+  lazy val topicsFirstPartByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] =
+    topicsByPartIndexByOccurrenceIndexByName.mapValuesStrict { topicsByPartIndexByOccurrenceIndex =>
+      topicsByPartIndexByOccurrenceIndex.mapValuesStrict(_.getMinKey.get)
+    }
 
+  lazy val topicsByName: Map[NonEmptyString, Set[Topic]] =
+    topicsByPartIndexByOccurrenceIndexByName.mapValuesStrict(_.values.flatMap(_.values).toSet)
+
+  lazy val topicsFirstPartByName: Map[NonEmptyString, Set[Topic]] =
+    topicsFirstPartByOccurrenceIndexByName.mapValuesStrict(_.values.toSet)
 
   /* Counts */
   lazy val slotsCount: Int = slotsByName.size
@@ -123,7 +142,10 @@ private[input] class InputTranscription(input: InputModel) {
     lazy val simultaneousTopics: Set[TopicsSimultaneous] =
       input.constraints.simultaneous.flatMap { inConstraint =>
         // We already verified that all topics in the constraint have the same number of occurrences => match them one-to-one
-        val topicsByOccurrenceIndex: Map[Int, Set[Topic]] = inConstraint.topics.flatMap(topicsByOccurrenceIndexByName(_)).groupToMap
+        // If they are multi-parts, we only need to impose the constraint on the first part
+        val topicsByOccurrenceIndex: Map[Int, Set[Topic]] = inConstraint.topics.flatMap { topicName =>
+          topicsFirstPartByOccurrenceIndexByName(topicName)
+        }.groupToMap
         topicsByOccurrenceIndex.values.map(TopicsSimultaneous)
       }
 
@@ -153,19 +175,30 @@ private[input] class InputTranscription(input: InputModel) {
 
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
-        TopicsExclusive(inConstraint.topics.flatMap(topicsByName).toBitSet, inConstraint.exemptions.map(personsByName).toBitSet)
+        // topic-parts are always linked, so we only need to mark the exclusivity on the first part
+        TopicsExclusive(inConstraint.topics.flatMap(topicsFirstPartByName).toBitSet, inConstraint.exemptions.map(personsByName).toBitSet)
       }
 
-    lazy val exclusiveOccurrences: Set[TopicsExclusive] =
-      topicsByOccurrenceIndexByName.values.view.filter(_.size > 1).map { reoccurringTopic: Map[Int, Topic] =>
-        val mandatoryPersons = reoccurringTopic.head._2.mandatory // mandatories are the same on all instances, take the first one
-        TopicsExclusive(reoccurringTopic.values.toBitSet, mandatoryPersons.toBitSet)
-      }.toSet
+    lazy val exclusiveOccurrences: Set[TopicsExclusive] = input.topics.view
+      .filter(_.forcedOccurrences > 1)
+      .map { inTopic =>
+        // Because all topic-parts are linked (same persons on each), we can just check exclusivity on the first topic-part (index 1)
+        val topicsByOccurrenceIndex = topicsFirstPartByOccurrenceIndexByName(inTopic.name)
+        val mandatoryPersons = topicsByOccurrenceIndex.head._2.mandatory // mandatories are the same on all instances, take the first one
+        TopicsExclusive(topicsByOccurrenceIndex.values.toBitSet, mandatoryPersons.toBitSet)
+      }
+      .toSet
 
     lazy val linkedTopics: Set[TopicsLinked] =
       input.constraints.linked.map { inConstraint =>
         TopicsLinked(inConstraint.topics.flatMap(topicsByName).toBitSet)
       }
+
+    lazy val linkedParts: Set[TopicsLinked] = input.topics.view
+      .filter(_.forcedDuration > 1)
+      .flatMap { inTopic => topicsByPartIndexByOccurrenceIndexByName(inTopic.name).values }
+      .map { partsInOccurrence: Map[Int, Topic] => TopicsLinked(partsInOccurrence.values.toBitSet) }
+      .toSet
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
       input.personsSet.collect {
@@ -219,6 +252,8 @@ private[input] class InputTranscription(input: InputModel) {
         topicScores ++
         exclusiveTopics ++
         exclusiveOccurrences ++
+        linkedTopics ++
+        linkedParts ++
         groupDislikes ++
         personTopicPreferences ++
         nothingTopicPreferences ++
@@ -301,8 +336,8 @@ object InputTranscription {
         .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
     } ++ {
       input.topics
-        .filter { t => t.name.contains(InputTopic.MultipleMarker) || t.name.contains(InputTopic.OccurrenceMarker) }
-        .map { t => s"Topic [${t.name}]: Name cannot contain characters '${InputTopic.MultipleMarker}' or '${InputTopic.OccurrenceMarker}'" }
+        .filter { t => t.name.contains(InputTopic.PartMarker) || t.name.contains(InputTopic.OccurrenceMarker) }
+        .map { t => s"Topic [${t.name}]: Name cannot contain characters '${InputTopic.PartMarker}' or '${InputTopic.OccurrenceMarker}'" }
     } ++ {
       input.topics.flatMap { t =>
         val badSlots = t.slots.getOrElse(Set.empty).filter(s => !input.slotsSet.exists(_.name == s)).map(s => s"[$s]")
