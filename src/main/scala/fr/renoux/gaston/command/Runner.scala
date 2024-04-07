@@ -52,11 +52,11 @@ class Runner(
     }
 
     val results: Seq[(Schedule, Long)] = Await.result(future, maxDuration.map(2 * _).getOrElse(Duration.Inf))
-    results.fold((Schedule.everyoneUnassigned, 0L)) {
+    results.reduceLeftOption[(Schedule, Long)] {
       case ((best, totalCount), (current, count)) =>
         if (best < current) (current, totalCount + count)
         else (best, totalCount + count)
-    }
+    }.getOrElse(throw new Exception("Could not find a single schedule in the allotted time..."))
   }
 
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
