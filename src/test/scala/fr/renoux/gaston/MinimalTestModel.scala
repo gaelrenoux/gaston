@@ -37,10 +37,10 @@ object MinimalTestModel {
 
   object Slots {
     private val index = new AtomicInteger(0)
-    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All)
-    val Afternoon = Slot(index.getAndIncrement(), "afternoon", Persons.All)
-    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All)
-    val Night = Slot(index.getAndIncrement(), "night", Persons.All)
+    lazy val Morning = Slot(index.getAndIncrement(), "morning", Persons.All, Some(Afternoon))
+    lazy val Afternoon = Slot(index.getAndIncrement(), "afternoon", Persons.All, Some(Evening))
+    lazy val Evening = Slot(index.getAndIncrement(), "evening", Persons.All, Some(Night))
+    lazy val Night = Slot(index.getAndIncrement(), "night", Persons.All, None)
 
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
     val Count = All.flatten.size

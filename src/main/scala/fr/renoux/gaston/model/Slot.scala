@@ -8,6 +8,7 @@ final case class Slot(
     id: Int,
     name: String,
     personsPresent: Set[Person],
+    next: Option[Slot],
     maxTopics: Int = Int.MaxValue
 ) extends Identified {
 
@@ -16,6 +17,8 @@ final case class Slot(
     records.map(r => Record(this, r._1, r._2))
 
   lazy val personsPresentCount: Int = personsPresent.size
+
+  lazy val hasNext: Boolean = next.nonEmpty
 
   def toShortString: String = s"$id -> $name"
 

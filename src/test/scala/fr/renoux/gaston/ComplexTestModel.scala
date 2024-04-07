@@ -48,7 +48,14 @@ class ComplexTestModel(seed: Long) {
   object Slots {
     private val index = new AtomicInteger(0)
     private val slotNames = Seq(Seq("d1 am", "d1 pm"), Seq("d2 am", "d2 pm"), Seq("d3 am", "d3 pm"))
-    val AllSequence: Seq[Seq[Slot]] = slotNames.map(_.map(Slot(index.getAndIncrement(), _, Persons.All -- random.pick(Persons.All, 2))))
+    val AllSequence: Seq[Seq[Slot]] = slotNames.map { sequence =>
+      var nextSlot: Option[Slot] = None
+      sequence.reverseIterator.map { name =>
+        val slot = Slot(index.getAndIncrement(), name, Persons.All -- random.pick(Persons.All, 2), nextSlot)
+        nextSlot = Some(slot)
+        slot
+      }.toSeq
+    }
     val AllSet: Set[Slot] = AllSequence.flatten.toSet
     val Count = AllSet.size
   }
@@ -59,7 +66,9 @@ class ComplexTestModel(seed: Long) {
   }
 
   object Preferences {
+
     import ProblemCounts.CompleteCounts
+
     val PersonTopics: Set[Preference] = for {
       p <- Persons.All
       (t, i) <- random.pick(Topics.Concrete, 9).zipWithIndex

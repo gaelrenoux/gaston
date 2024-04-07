@@ -1,7 +1,5 @@
 package fr.renoux.gaston
 
-import java.util.concurrent.atomic.AtomicInteger
-
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.{InputLoader, InputSettings, InputTranscription}
 import fr.renoux.gaston.model._
@@ -10,7 +8,10 @@ import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.Context
 
+import java.util.concurrent.atomic.AtomicInteger
+
 // scalastyle:off magic.number
+
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
 
@@ -33,9 +34,10 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Slots {
     private val index = new AtomicInteger(0)
-    val Morning = Slot(index.getAndIncrement(), "morning", Persons.All - Persons.Eric)
-    val AfterNoon = Slot(index.getAndIncrement(), "afternoon", Persons.All - Persons.Iago)
-    val Evening = Slot(index.getAndIncrement(), "evening", Persons.All - Persons.Arthur)
+    lazy val Morning = Slot(index.getAndIncrement(), "morning", Persons.All - Persons.Eric, Some(AfterNoon))
+    lazy val AfterNoon = Slot(index.getAndIncrement(), "afternoon", Persons.All - Persons.Iago, Some(Evening))
+    lazy val Evening = Slot(index.getAndIncrement(), "evening", Persons.All - Persons.Arthur, None)
+
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
     val Count = All.flatten.size
   }
@@ -46,8 +48,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     private val index = new AtomicInteger(0)
 
-    val UnassignedMorning: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), MinimalTestModel.Slots.Morning)
-    val UnassignedAfternoon: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), MinimalTestModel.Slots.Afternoon)
+    val UnassignedMorning: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), SimpleTestModel.Slots.Morning)
+    val UnassignedAfternoon: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), SimpleTestModel.Slots.AfterNoon)
     val UnassignedEvening: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), Slots.Evening)
 
     val Acting = Topic(index.getAndIncrement(), "Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
@@ -61,9 +63,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val Inking = Topic(index.getAndIncrement(), "Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
 
     val Unassigned = Map(
-      MinimalTestModel.Slots.Morning -> UnassignedMorning,
-      MinimalTestModel.Slots.Afternoon -> UnassignedAfternoon,
-      MinimalTestModel.Slots.Evening -> UnassignedEvening
+      SimpleTestModel.Slots.Morning -> UnassignedMorning,
+      SimpleTestModel.Slots.AfterNoon -> UnassignedAfternoon,
+      SimpleTestModel.Slots.Evening -> UnassignedEvening
     )
     val Concrete: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
     val All: Set[Topic] = Concrete ++ Unassigned.values
@@ -87,8 +89,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
   object Preferences {
 
     import Persons._
-    import Topics._
     import ProblemCounts.CompleteCounts
+    import Topics._
 
     val AB = PersonTopicPreference(Arthur, Bathing, strongPreference)
     val BC = PersonTopicPreference(Bianca, Cooking, strongPreference)
@@ -120,7 +122,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
   }
 
   object Problems {
+
     import ProblemCounts.CompleteCounts
+
     val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
   }
 

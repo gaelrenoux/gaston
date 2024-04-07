@@ -3,11 +3,12 @@ package fr.renoux.gaston.util
 import mouse.map._
 
 import scala.collection.IterableOps
+import scala.collection.IterableOnceOps
 
 
 object CollectionImplicits {
 
-  @inline final implicit class RichIterableOps[A, CC[_], C <: CC[A]](val wrapped: IterableOps[A, CC, C]) extends AnyVal {
+  @inline final implicit class RichIterableOnceOps[A, CC[_], C <: CC[A]](val wrapped: IterableOnceOps[A, CC, C]) extends AnyVal {
     @inline def replace[B >: A](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
 
     @inline def zipWith[B](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
@@ -16,6 +17,19 @@ object CollectionImplicits {
       a <- wrapped
       b <- bs
     } yield (a, b)
+
+    @inline def mapWithState[B, S](initalState: S)(f: (A, S) => (B, S)): (CC[B], S) = {
+      // TODO this assumes a sequential map, not a parallel map
+      var state = initalState
+      wrapped.map { a =>
+        val (a2, s2) = f(a, state)
+        state = s2
+        a2
+      } -> state
+    }
+  }
+
+  @inline final implicit class RichIterableOps[A, CC[_], C <: CC[A]](val wrapped: IterableOps[A, CC, C]) extends AnyVal {
 
     /** Keeps all elements where the f argument gives the minimum value over the collection. */
     @inline def filterMinBy[B: Ordering](f: A => B): C = if (wrapped.isEmpty) wrapped.filter(_ => true) else {
