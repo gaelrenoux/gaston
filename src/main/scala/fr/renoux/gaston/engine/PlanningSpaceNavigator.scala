@@ -37,26 +37,27 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible topics because of incompatibility */
     topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
 
+    /* Handle simultaneous topics */
     topicsToAdd = simultaneousTopics(topic)
 
-    /* Filter out topics coming in excessive number */
-    if slotSchedule.maxTopicsLeft >= topicsToAdd.size
+    /* Check we can add all those topics */
+    if isAddPossible(slotSchedule, topicsToAdd)
 
-    personsMandatoryOnTopic = topicsToAdd.flatMap(_.mandatory)
-
-    /* Filter out impossible adds because mandatory persons are already taken */
-    if !personsMandatoryOnTopic.exists(slotSchedule.mandatory)
-
-    /* Filter out impossible adds because mandatory persons are missing */
-    if personsMandatoryOnTopic.forall(slot.personsPresent)
-
-    /* Generate the swap */
+    /* Generate the add */
     partial = schedule.clearSlots(slot).addTopics(slot, topicsToAdd)
 
     /* Filter out impossible adds because of unreachable minimum */
     if partial.on(slot).minPersons.forall(_ <= slot.personsPresentCount)
 
   } yield (partial, Move.Add(slot, topicsToAdd))
+
+  private def isAddPossible(slotSchedule: SlotSchedule, topicsToAdd: Set[Topic]): Boolean = {
+    lazy val slotIsNotFull = slotSchedule.maxTopicsLeft >= topicsToAdd.size
+    lazy val mandatories = topicsToAdd.flatMap(_.mandatory)
+    lazy val mandatoriesAreNotTaken = !mandatories.exists(slotSchedule.mandatory)
+    lazy val mandatoriesArePresent = mandatories.forall(slotSchedule.slot.personsPresent)
+    slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent
+  }
 
 
   /** Swap two scheduled topics */
@@ -73,22 +74,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     topics1 = simultaneousTopics(t1)
     topics2 = simultaneousTopics(t2)
 
-    /* Filter out topics coming in excessive number */
-    if slotSchedule1.maxTopicsLeft >= topics2.size - topics1.size
-    if slotSchedule2.maxTopicsLeft >= topics1.size - topics2.size
-
-    personsMandatoryOnT1 = topics1.flatMap(_.mandatory)
-    personsMandatoryOnT2 = topics2.flatMap(_.mandatory)
-
-    /* Filter out impossible adds because mandatory persons are already taken */
-    personsAlreadyMandatoryOnS1 = slotSchedule1.mandatory -- personsMandatoryOnT1 // taking this topic off, they're not mandatory any more on the slot
-    personsAlreadyMandatoryOnS2 = slotSchedule2.mandatory -- personsMandatoryOnT2 // taking this topic off, they're not mandatory any more on the slot
-    if !personsMandatoryOnT1.exists(personsAlreadyMandatoryOnS2) // check mandatories of T1 are not already blocked on S2
-    if !personsMandatoryOnT2.exists(personsAlreadyMandatoryOnS1) // check mandatories of T2 are not already blocked on
-
-    /* Filter out impossible adds because mandatory persons are missing */
-    if personsMandatoryOnT1.forall(slot2.personsPresent)
-    if personsMandatoryOnT2.forall(slot1.personsPresent)
+    /* Check we can indeed swap these topics */
+    if isSwapPossible(slotSchedule1, slotSchedule2, topics1, topics2)
 
     /* Generate the swap */
     partial = schedule.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
@@ -102,6 +89,19 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     if partial.on(slot2).maxPersons.forall(_ >= slot2.personsPresentCount)
 
   } yield (partial, Move.Swap(topics1, topics2, isExt = false))
+
+  private def isSwapPossible(slotSchedule1: SlotSchedule, slotSchedule2: SlotSchedule, topics1: Set[Topic], topics2: Set[Topic]): Boolean = {
+    lazy val slot1IsNotFull = slotSchedule1.maxTopicsLeft >= topics2.size - topics1.size
+    lazy val slot2IsNotFull = slotSchedule2.maxTopicsLeft >= topics1.size - topics2.size
+    lazy val mandatoriesT1 = topics1.flatMap(_.mandatory)
+    lazy val mandatoriesT2 = topics2.flatMap(_.mandatory)
+    lazy val mandatoriesT1AreNotTakenOnS2 = !mandatoriesT1.exists(slotSchedule2.mandatory -- mandatoriesT2) // T2 mandatories are not mandatory anymore
+    lazy val mandatoriesT2AreNotTakenOnS1 = !mandatoriesT2.exists(slotSchedule1.mandatory -- mandatoriesT1) // T1 mandatories are not mandatory anymore
+    lazy val mandatoriesT1ArePresentOnS2 = mandatoriesT1.forall(slotSchedule2.slot.personsPresent)
+    lazy val mandatoriesT2ArePresentOnS1 = mandatoriesT2.forall(slotSchedule1.slot.personsPresent)
+    slot1IsNotFull && mandatoriesT2AreNotTakenOnS1 && mandatoriesT2ArePresentOnS1 &&
+      slot2IsNotFull && mandatoriesT1AreNotTakenOnS2 && mandatoriesT1ArePresentOnS2
+  }
 
 
   /** Swap topics between unscheduled and scheduled */
@@ -117,18 +117,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     oldTopics = simultaneousTopics(oldTopic)
     newTopics = simultaneousTopics(newTopic)
 
-    /* Filter out topics coming in excessive number */
-    if slotSchedule.maxTopicsLeft >= newTopics.size - oldTopics.size
-
-    personsMandatoryOnOldTs = oldTopics.flatMap(_.mandatory)
-    personsMandatoryOnNewTs = newTopics.flatMap(_.mandatory)
-
-    /* Filter out impossible swaps because of mandatory persons */
-    personsAlreadyMandatoryOnSlot = slotSchedule.mandatory -- personsMandatoryOnOldTs // taking this topic off, they're not mandatory any more on the slot
-    if !personsMandatoryOnNewTs.exists(personsAlreadyMandatoryOnSlot)
-
-    /* Filter out impossible adds because mandatory persons are missing */
-    if personsMandatoryOnNewTs.forall(slot.personsPresent)
+    /* Check we can add all those topics */
+    if isExtSwapPossible(slotSchedule, oldTopics, newTopics)
 
     /* Generate the swap */
     partial = schedule.clearSlots(slot).replaceTopics(slot, oldTopics, newTopics)
@@ -140,6 +130,15 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     if partial.on(slot).maxPersons.forall(_ >= slot.personsPresentCount)
 
   } yield (partial, Move.Swap(oldTopics, newTopics, isExt = true))
+
+  private def isExtSwapPossible(slotSchedule: SlotSchedule, oldTopics: Set[Topic], newTopics: Set[Topic]): Boolean = {
+    lazy val slotIsNotFull = slotSchedule.maxTopicsLeft >= newTopics.size - oldTopics.size
+    lazy val mandatoriesOld = oldTopics.flatMap(_.mandatory)
+    lazy val mandatoriesNew = newTopics.flatMap(_.mandatory)
+    lazy val mandatoriesAreNotTaken = !mandatoriesNew.exists(slotSchedule.mandatory -- mandatoriesOld)
+    lazy val mandatoriesArePresent = mandatoriesNew.forall(slotSchedule.slot.personsPresent)
+    slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent
+  }
 
 
   /** Remove a scheduled topic */
