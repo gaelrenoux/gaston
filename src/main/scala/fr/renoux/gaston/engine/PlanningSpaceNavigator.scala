@@ -37,7 +37,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible topics because of incompatibility */
     topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
 
-    topicsToAdd = linkedTopics(topic)
+    topicsToAdd = simultaneousTopics(topic)
 
     /* Filter out topics coming in excessive number */
     if slotSchedule.maxTopicsLeft >= topicsToAdd.size
@@ -70,8 +70,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     t1 <- shuffled(slotSchedule1.realTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics).view
     t2 <- shuffled(slotSchedule2.realTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics).view
 
-    topics1 = linkedTopics(t1)
-    topics2 = linkedTopics(t2)
+    topics1 = simultaneousTopics(t1)
+    topics2 = simultaneousTopics(t2)
 
     /* Filter out topics coming in excessive number */
     if slotSchedule1.maxTopicsLeft >= topics2.size - topics1.size
@@ -114,8 +114,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible topics because of incompatibility */
     newTopic <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
 
-    oldTopics = linkedTopics(oldTopic)
-    newTopics = linkedTopics(newTopic)
+    oldTopics = simultaneousTopics(oldTopic)
+    newTopics = simultaneousTopics(newTopic)
 
     /* Filter out topics coming in excessive number */
     if slotSchedule.maxTopicsLeft >= newTopics.size - oldTopics.size
@@ -148,7 +148,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Removals on slot ${slot.name}")
     topic <- shuffled(slotSchedule.removableTopics).view
-    topicsToRemove = linkedTopics(topic)
+    topicsToRemove = simultaneousTopics(topic)
 
     /* Generate the swap */
     partial = schedule.removeTopics(slot, topicsToRemove)
@@ -165,7 +165,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   private def shuffled[A](it: Iterable[A])(implicit rand: Random): Iterable[A] = rand.shuffle(it)
 
-  private def linkedTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicByTopic(topic) + topic
+  private def simultaneousTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicByTopic(topic) + topic
 
 }
 
