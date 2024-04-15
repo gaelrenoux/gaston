@@ -101,6 +101,8 @@ case class InputTopic(
     if (forcedOccurrences.value == 1) Seq(InputTopic.Occurrence(this))
     else (1 to forcedOccurrences).map(InputTopic.Occurrence(this, _))
 
+  if (forcedDuration > 2) throw new IllegalArgumentException("Currently, Gaston does not handle durations > 2")
+
 }
 
 object InputTopic {
