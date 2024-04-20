@@ -244,7 +244,7 @@ private[input] class InputTranscription(input: InputModel) {
       for {
         unassignedTopic <- unassignedTopicsByNameAndSlot.values
         person <- personsByName.values
-      } yield PersonTopicPreference(person, unassignedTopic, Score.PersonTotalScore.negative)
+      } yield PersonTopicPreference(person, unassignedTopic, input.settings.personUnassignedAntiPreference)
     }.toSet
 
     lazy val all: Set[Preference] = {
