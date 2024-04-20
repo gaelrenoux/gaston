@@ -37,17 +37,26 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible topics because of incompatibility */
     topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
 
+    /* Filter out impossible topics because followup topic can't be added. Also, can't move followup topics directly. */
+    if (topic.followup.isEmpty || slot.hasNext) && !topic.isFollowup
+
     /* Handle simultaneous topics */
     topicsToAdd = simultaneousTopics(topic)
 
     /* Check we can add all those topics */
     if isAddPossible(slotSchedule, topicsToAdd)
 
-    /* Generate the add */
-    partial = schedule.clearSlots(slot).addTopics(slot, topicsToAdd)
+    /* Get followup topics on next slot and check they can be added if needed */
+    followupTopicsToAdd = topicsToAdd.flatMap(_.followup)
+    if followupTopicsToAdd.isEmpty || slot.hasNext
 
-    /* Filter out impossible adds because of unreachable minimum */
-    if partial.on(slot).minPersons.forall(_ <= slot.personsPresentCount)
+    /* Create a new partial schedule with the followup topics added if possible */
+    partialNextSlotModified <-
+      if (followupTopicsToAdd.isEmpty) Some(schedule)
+      else swapFollowupTopics(schedule, slot.next.get, followupTopicsToAdd, Set.empty)
+
+    /* Create a new partial schedule with the added topics */
+    partial = partialNextSlotModified.clearSlots(slot).addTopics(slot, topicsToAdd)
 
   } yield (partial, Move.Add(slot, topicsToAdd))
 
@@ -56,9 +65,10 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     lazy val mandatories = topicsToAdd.flatMap(_.mandatory)
     lazy val mandatoriesAreNotTaken = !mandatories.exists(slotSchedule.mandatory)
     lazy val mandatoriesArePresent = mandatories.forall(slotSchedule.slot.personsPresent)
-    slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent
+    lazy val minPersonsRequired = slotSchedule.topics.view.map(_.min).sum + topicsToAdd.view.map(_.min).sum
+    lazy val enoughPersonsArePresent = slotSchedule.slot.personsPresentCount >= minPersonsRequired
+    slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent && enoughPersonsArePresent
   }
-
 
   /** Swap two scheduled topics */
   private def possibleSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
@@ -71,22 +81,30 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     t1 <- shuffled(slotSchedule1.realTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics).view
     t2 <- shuffled(slotSchedule2.realTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics).view
 
+    /* Filter out impossible topics because followup topic can't be added. Also, can't move followup topics directly. */
+    if (t1.followup.isEmpty || slot2.hasNext) && (t2.followup.isEmpty || slot1.hasNext) && !t1.isFollowup && !t2.isFollowup
+
     topics1 = simultaneousTopics(t1)
     topics2 = simultaneousTopics(t2)
 
     /* Check we can indeed swap these topics */
     if isSwapPossible(slotSchedule1, slotSchedule2, topics1, topics2)
 
+    /* Get followup topics on next slot and check they can be added if needed */
+    followupTopics1 = topics1.flatMap(_.followup)
+    followupTopics2 = topics2.flatMap(_.followup)
+    if (followupTopics1.isEmpty || slot2.hasNext) && (followupTopics2.isEmpty || slot1.hasNext)
+
+    /* Create a new partial schedule with the followup topics swapped if possible */
+    partialNextSlotModified1 <-
+      if (followupTopics1.isEmpty) Some(schedule)
+      else swapFollowupTopics(schedule, slot2.next.get, followupTopics1, followupTopics2)
+    partialNextSlotModified2 <-
+      if (followupTopics2.isEmpty) Some(schedule)
+      else swapFollowupTopics(partialNextSlotModified1, slot1.next.get, followupTopics2, followupTopics1)
+
     /* Generate the swap */
-    partial = schedule.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
-
-    /* Filter out impossible swaps because of unreachable minimum */
-    if partial.on(slot1).minPersons.forall(_ <= slot1.personsPresentCount)
-    if partial.on(slot2).minPersons.forall(_ <= slot2.personsPresentCount)
-
-    /* Filter out impossible swaps because of maximum too low */
-    if partial.on(slot1).maxPersons.forall(_ >= slot1.personsPresentCount)
-    if partial.on(slot2).maxPersons.forall(_ >= slot2.personsPresentCount)
+    partial = partialNextSlotModified2.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
 
   } yield (partial, Move.Swap(topics1, topics2, isExt = false))
 
@@ -99,10 +117,20 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     lazy val mandatoriesT2AreNotTakenOnS1 = !mandatoriesT2.exists(slotSchedule1.mandatory -- mandatoriesT1) // T1 mandatories are not mandatory anymore
     lazy val mandatoriesT1ArePresentOnS2 = mandatoriesT1.forall(slotSchedule2.slot.personsPresent)
     lazy val mandatoriesT2ArePresentOnS1 = mandatoriesT2.forall(slotSchedule1.slot.personsPresent)
-    slot1IsNotFull && mandatoriesT2AreNotTakenOnS1 && mandatoriesT2ArePresentOnS1 &&
-      slot2IsNotFull && mandatoriesT1AreNotTakenOnS2 && mandatoriesT1ArePresentOnS2
-  }
+    lazy val minPersonsMoving1To2 = topics1.view.map(_.min).sum - topics2.view.map(_.min).sum
+    lazy val minPersonsRequiredS1 = slotSchedule1.topics.view.map(_.min).sum - minPersonsMoving1To2
+    lazy val minPersonsRequiredS2 = slotSchedule2.topics.view.map(_.min).sum + minPersonsMoving1To2
+    lazy val enoughPersonsArePresentOnS1 = slotSchedule1.slot.personsPresentCount >= minPersonsRequiredS1
+    lazy val enoughPersonsArePresentOnS2 = slotSchedule2.slot.personsPresentCount >= minPersonsRequiredS2
+    lazy val maxPersonsMoving1To2 = topics1.view.map(_.max).sum - topics2.view.map(_.max).sum
+    lazy val maxPersonsPossibleS1 = slotSchedule1.topics.view.map(_.max).sum - maxPersonsMoving1To2
+    lazy val maxPersonsPossibleS2 = slotSchedule2.topics.view.map(_.max).sum + maxPersonsMoving1To2
+    lazy val notTooManyPersonsAreOnS1 = slotSchedule1.slot.personsPresentCount <= maxPersonsPossibleS1
+    lazy val notTooManyPersonsAreOnS2 = slotSchedule2.slot.personsPresentCount <= maxPersonsPossibleS2
 
+    slot1IsNotFull && mandatoriesT2AreNotTakenOnS1 && mandatoriesT2ArePresentOnS1 && enoughPersonsArePresentOnS1 && notTooManyPersonsAreOnS1 &&
+      slot2IsNotFull && mandatoriesT1AreNotTakenOnS2 && mandatoriesT1ArePresentOnS2 && enoughPersonsArePresentOnS2 && notTooManyPersonsAreOnS2
+  }
 
   /** Swap topics between unscheduled and scheduled */
   private def possibleExtSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
@@ -114,32 +142,45 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Filter out impossible topics because of incompatibility */
     newTopic <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
 
+    /* Filter out impossible topics because followup topic can't be added. Also, can't move followup topics directly. */
+    if (newTopic.followup.isEmpty || slot.hasNext)  && !newTopic.isFollowup && !oldTopic.isFollowup
+
+    /* Handle simultaneous topics */
     oldTopics = simultaneousTopics(oldTopic)
     newTopics = simultaneousTopics(newTopic)
 
     /* Check we can add all those topics */
     if isExtSwapPossible(slotSchedule, oldTopics, newTopics)
 
+    /* Get followup topics on next slot and check they can be added if needed */
+    followupTopicsToRemove = oldTopics.flatMap(_.followup)
+    followupTopicsToAdd = newTopics.flatMap(_.followup)
+    if followupTopicsToAdd.isEmpty || slot.hasNext
+
+    /* Create a new partial schedule with the followup topics added/removed if possible */
+    partialNextSlotModified <-
+      if (followupTopicsToRemove.isEmpty && followupTopicsToAdd.isEmpty) Some(schedule)
+      else swapFollowupTopics(schedule, slot.next.get, followupTopicsToAdd, followupTopicsToRemove)
+
     /* Generate the swap */
-    partial = schedule.clearSlots(slot).replaceTopics(slot, oldTopics, newTopics)
-
-    /* Filter out impossible swaps because of unreachable minimum */
-    if partial.on(slot).minPersons.forall(_ <= slot.personsPresentCount)
-
-    /* Filter out impossible swaps because of maximum too low */
-    if partial.on(slot).maxPersons.forall(_ >= slot.personsPresentCount)
+    partial = partialNextSlotModified.clearSlots(slot).replaceTopics(slot, oldTopics, newTopics)
 
   } yield (partial, Move.Swap(oldTopics, newTopics, isExt = true))
 
-  private def isExtSwapPossible(slotSchedule: SlotSchedule, oldTopics: Set[Topic], newTopics: Set[Topic]): Boolean = {
-    lazy val slotIsNotFull = slotSchedule.maxTopicsLeft >= newTopics.size - oldTopics.size
-    lazy val mandatoriesOld = oldTopics.flatMap(_.mandatory)
-    lazy val mandatoriesNew = newTopics.flatMap(_.mandatory)
+  private def isExtSwapPossible(slotSchedule: SlotSchedule, topicsToRemove: Set[Topic], topicsToAdd: Set[Topic]): Boolean = {
+    lazy val slotIsNotFull = slotSchedule.maxTopicsLeft >= topicsToAdd.size - topicsToRemove.size
+    lazy val mandatoriesOld = topicsToRemove.flatMap(_.mandatory)
+    lazy val mandatoriesNew = topicsToAdd.flatMap(_.mandatory)
     lazy val mandatoriesAreNotTaken = !mandatoriesNew.exists(slotSchedule.mandatory -- mandatoriesOld)
     lazy val mandatoriesArePresent = mandatoriesNew.forall(slotSchedule.slot.personsPresent)
-    slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent
-  }
 
+    lazy val minPersonsRequired = slotSchedule.topics.view.map(_.min).sum - topicsToRemove.view.map(_.min).sum + topicsToAdd.view.map(_.min).sum
+    lazy val enoughPersonsArePresent = slotSchedule.slot.personsPresentCount >= minPersonsRequired
+    lazy val maxPersonsPossible = slotSchedule.topics.view.map(_.max).sum - topicsToRemove.view.map(_.max).sum + topicsToAdd.view.map(_.max).sum
+    lazy val notTooManyPersonsArePresent = slotSchedule.slot.personsPresentCount <= maxPersonsPossible
+
+    slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent && enoughPersonsArePresent && notTooManyPersonsArePresent
+  }
 
   /** Remove a scheduled topic */
   private def possibleRemovals(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
@@ -147,16 +188,52 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Removals on slot ${slot.name}")
     topic <- shuffled(slotSchedule.removableTopics).view
+
     topicsToRemove = simultaneousTopics(topic)
 
-    /* Generate the swap */
-    partial = schedule.removeTopics(slot, topicsToRemove)
+    /* Check we can remove all those topics */
+    if isRemovalPossible(slotSchedule, topicsToRemove)
 
-    /* Filter out impossible removals because of maximum too low */
-    if partial.on(slot).maxPersons.forall(_ >= slot.personsPresentCount)
+    /* Get followup topics on next slot */
+    followupTopicsToRemove = topicsToRemove.flatMap(_.followup)
+
+    /* Create a new partial schedule with the followup topics removed if possible */
+    partialNextSlotModified <-
+      if (followupTopicsToRemove.isEmpty) Some(schedule) else swapFollowupTopics(schedule, slot.next.get, Set.empty, followupTopicsToRemove)
+
+    /* Generate the swap */
+    partial = partialNextSlotModified.removeTopics(slot, topicsToRemove)
 
   } yield (partial, Move.Remove(slot, topicsToRemove))
 
+  private def isRemovalPossible(slotSchedule: SlotSchedule, topicsToRemove: Set[Topic]): Boolean = {
+    lazy val maxPersonsPossible = slotSchedule.topics.view.map(_.max).sum - topicsToRemove.view.map(_.max).sum
+    lazy val notTooManyPersonsArePresent = slotSchedule.slot.personsPresentCount <= maxPersonsPossible
+
+    notTooManyPersonsArePresent
+  }
+
+  private def swapFollowupTopics(schedule: Schedule, nextSlot: Slot, topicsToAdd: Set[Topic], topicsToRemove: Set[Topic]): Option[Schedule] = {
+    val nextSlotSchedule = schedule.on(nextSlot)
+    if (isExtSwapPossible(nextSlotSchedule, topicsToRemove, topicsToAdd)) {
+      Some(schedule.clearSlots(nextSlot).removeTopics(nextSlot, topicsToRemove).addTopics(nextSlot, topicsToAdd))
+    } else {
+      val followupMandatories: Set[Person] = topicsToAdd.flatMap(_.mandatory)
+      // First check cases where it's definitely not possible: the mandatory persons are missing
+      if (followupMandatories.exists(!nextSlot.personsPresent.contains(_))) None
+      else {
+        // Typically, we can't add because mandatory persons are already taken. We'll check that first.
+        val competingTopics = nextSlotSchedule.topics.filter(t => t.mandatory.exists(followupMandatories)).toSet
+        val allTopicsToRemove = topicsToRemove ++ competingTopics
+        if (competingTopics.nonEmpty && isExtSwapPossible(nextSlotSchedule, allTopicsToRemove, topicsToAdd)) {
+          Some(schedule.clearSlots(nextSlot).updateSlotSchedule(nextSlot)(_.removeTopics(allTopicsToRemove).addTopics(topicsToAdd)))
+        } else {
+          // No competing topics, or removing them is not enough. We could try dropping more topics, but let's stop there for now. TODO
+          None
+        }
+      }
+    }
+  }
 
   private def shuffled[A](set: Set[A])(implicit rand: Random): Seq[A] = shuffled(set.toSeq)
 

@@ -31,7 +31,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
       lazy val alpha = Topic(0, "alpha", min = 5, max = 5, mandatory = Set(persons.bernard))
       lazy val beta = Topic(1, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
       lazy val gamma1 = Topic(2, "gamma ~1", min = 4, max = 6, followup = Some(gamma2))
-      lazy val gamma2 = Topic(3, "gamma ~2", min = 4, max = 6)
+      lazy val gamma2 = Topic(3, "gamma ~2", min = 4, max = 6, isFollowup = true)
       val unassignedA: Topic = InputTranscription.unassignedTopic(4, expected.slots.a)
       val unassignedB: Topic = InputTranscription.unassignedTopic(5, expected.slots.b)
       val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma1, gamma2)

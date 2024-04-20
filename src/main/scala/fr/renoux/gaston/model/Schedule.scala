@@ -26,7 +26,7 @@ final case class Schedule(
   @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =
     copy(wrapped = w)
 
-  @inline private def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
+  @inline def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(slot, f(on(slot))))
 
   val scoreCalculator: ScoreCalculator = new ScoreCalculator(this)

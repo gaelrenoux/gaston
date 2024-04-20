@@ -95,12 +95,13 @@ private[input] class InputTranscription(input: InputModel) {
                 topicIx.getAndIncrement(), inTopicPart.name,
                 mandatory = mandatory, forbidden = forbidden,
                 min = min, max = max,
-                slots = slots, forced = inTopic.forced
+                slots = slots, forced = inTopic.forced, isFollowup = inTopicPart.index.exists(_ > 1)
               )
               inTopicPart.index.getOrElse(0) -> topic
             }
             // second iteration in reverse to add the followup (first one is straight because we prefer id to be increasing with the parts
             .reverseIterator.map { case (partIndex, topic) =>
+              assert(followup.forall(_.isFollowup))
               val topicWithFollowup = topic.copy(followup = followup)
               followup = Some(topicWithFollowup)
               partIndex -> topicWithFollowup
