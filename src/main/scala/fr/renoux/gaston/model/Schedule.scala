@@ -174,15 +174,15 @@ final case class Schedule(
   lazy val errors: Seq[String] = if (isSolution) Nil else {
     val slotErrors = slotSchedules.flatMap(_.errors).toSeq
     val missingForcedTopics = problem.forcedTopics.diff(scheduledTopics)
-    val forcedTopicsError = if (missingForcedTopics.nonEmpty) Some(s"Missing forced topics $missingForcedTopics") else None
+    val forcedTopicsError = if (missingForcedTopics.nonEmpty) Some(s"Missing forced topics ${missingForcedTopics.map(_.toLongString)}") else None
     val constraintsError = problem.globalLevelConstraints.flatMap { c =>
-      if (!c.isRespected(this)) Some(s"Constraint $c not respected") else None
+      if (!c.isRespected(this)) Some(s"Constraint ${c.toLongString} not respected") else None
     }.toSeq
     val followupTopicsErrors = slotSchedules.flatMap { ss =>
       ss.topics.flatMap { topic =>
         topic.followup.flatMap { followup =>
           if (ss.slot.next.exists(nextSlot => on(nextSlot).topicsSet.contains(followup))) None
-          else Some(s"Bad followup topic for topic ${topic.name} (on slot ${ss.slot.name})")
+          else Some(s"Bad followup topic for topic ${topic.toLongString} (on slot ${ss.slot.toLongString})")
         }
       }
     }
