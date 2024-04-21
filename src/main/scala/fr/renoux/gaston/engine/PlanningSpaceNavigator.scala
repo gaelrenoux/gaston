@@ -21,11 +21,11 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
   def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {
 
     lazy val allAdds = possibleAdds(schedule)
-    lazy val allSwaps = possibleSwaps(schedule)
     lazy val allExternalSwaps = possibleExtSwaps(schedule)
+    lazy val allSwaps = possibleSwaps(schedule)
     lazy val allRemovals = possibleRemovals(schedule)
 
-    LazyList.from(allAdds ++ allSwaps ++ allExternalSwaps ++ allRemovals)
+    LazyList.from(allAdds ++ allExternalSwaps ++ allSwaps ++ allRemovals)
   }
 
   /** Add an unscheduled topic */
@@ -143,7 +143,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     newTopic <- shuffled(schedule.unscheduledTopics -- slotSchedule.permanentlyIncompatibleTopics).view
 
     /* Filter out impossible topics because followup topic can't be added. Also, can't move followup topics directly. */
-    if (newTopic.followup.isEmpty || slot.hasNext)  && !newTopic.isFollowup && !oldTopic.isFollowup
+    if (newTopic.followup.isEmpty || slot.hasNext) && !newTopic.isFollowup && !oldTopic.isFollowup
 
     /* Handle simultaneous topics */
     oldTopics = simultaneousTopics(oldTopic)
