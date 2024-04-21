@@ -24,7 +24,8 @@ class InputSpec extends AnyFlatSpec with Matchers {
     object slots {
       lazy val a = Slot(0, "A", persons.all, Some(b), maxTopics = 4)
       lazy val b = Slot(1, "B", persons.all, None, maxTopics = Int.MaxValue)
-      val all: Set[Slot] = Set(a, b)
+      lazy val c = Slot(2, "C", persons.all, None, maxTopics = Int.MaxValue)
+      val all: Set[Slot] = Set(a, b, c)
     }
 
     object topics {
@@ -34,10 +35,11 @@ class InputSpec extends AnyFlatSpec with Matchers {
       lazy val gamma2 = Topic(3, "gamma ~2", min = 4, max = 6, isFollowup = true)
       val unassignedA: Topic = InputTranscription.unassignedTopic(4, expected.slots.a)
       val unassignedB: Topic = InputTranscription.unassignedTopic(5, expected.slots.b)
-      val all: Set[Topic] = Set(unassignedA, unassignedB, alpha, beta, gamma1, gamma2)
+      val unassignedC: Topic = InputTranscription.unassignedTopic(6, expected.slots.c)
+      val all: Set[Topic] = Set(unassignedA, unassignedB, unassignedC, alpha, beta, gamma1, gamma2)
     }
 
-    implicit val counts = Counts(slots = 2, topics = 6, persons = 3)
+    implicit val counts = Counts(slots = 3, topics = 7, persons = 3)
 
   }
 
@@ -65,7 +67,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
     import expected.counts
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
-      t <- Set(expected.topics.unassignedA, expected.topics.unassignedB)
+      t <- Set(expected.topics.unassignedA, expected.topics.unassignedB, expected.topics.unassignedC)
       p <- Set(expected.persons.bernard, expected.persons.hoagie, expected.persons.laverne)
     } yield PersonTopicPreference(p, t, Score(-1000))
     val additionalPreferences = Set(
