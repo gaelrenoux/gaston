@@ -30,6 +30,8 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
 
   def writeStart(seed: Long): Unit = write(s"Starting to run ! (seed #$seed)")
 
+  def writeStartThread(): Unit = write(s"Starting to run on thread ${Thread.currentThread().getName} !")
+
   def writeEnd(schedule: Schedule): Unit = {
     val render = new Renderer(problem)
     write(s"Finished !\n\n${render(schedule)}\n")

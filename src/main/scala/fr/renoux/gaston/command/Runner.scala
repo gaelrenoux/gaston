@@ -23,6 +23,7 @@ import fr.renoux.gaston.util.CanAddDuration._
   * @param hook Something to do at regular interval, e.g. output current values on the stdout. First argument is the latest schedule, second argument is the number of schedules tried.
   */
 class Runner(
+    startup: () => Unit = () => (),
     hook: (Schedule, Long) => Unit = (_, _) => (),
     hookFrequency: FiniteDuration = 20.seconds,
     parallelism: Int = math.max(1, Runtime.getRuntime.availableProcessors - 1)
@@ -46,6 +47,7 @@ class Runner(
       (0 until parallelism).map { i =>
         implicit val random: Random = new Random(seed + i)
         Future {
+          startup()
           runRecursive(now.plusMillis(hookFrequencyMillis), 0, Schedule.startingUnassignedOrForced)(optimParams)
         }
       }
