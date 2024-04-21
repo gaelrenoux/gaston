@@ -224,8 +224,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
       else {
         // Typically, we can't add because mandatory persons are already taken. We'll check that first.
         val competingTopics = nextSlotSchedule.topics.filter(t => t.mandatory.exists(followupMandatories)).toSet
-        val allTopicsToRemove = topicsToRemove ++ competingTopics
-        if (competingTopics.nonEmpty && isExtSwapPossible(nextSlotSchedule, allTopicsToRemove, topicsToAdd)) {
+        lazy val allTopicsToRemove = topicsToRemove ++ competingTopics
+        if (competingTopics.nonEmpty && !competingTopics.exists(_.forced) && isExtSwapPossible(nextSlotSchedule, allTopicsToRemove, topicsToAdd)) {
           Some(schedule.clearSlots(nextSlot).updateSlotSchedule(nextSlot)(_.removeTopics(allTopicsToRemove).addTopics(topicsToAdd)))
         } else {
           // No competing topics, or removing them is not enough. We could try dropping more topics, but let's stop there for now. TODO
