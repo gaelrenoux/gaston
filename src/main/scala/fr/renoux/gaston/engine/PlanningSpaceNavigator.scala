@@ -100,7 +100,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
       if (followupTopics1.isEmpty) Some(schedule)
       else swapFollowupTopics(schedule, slot2.next.get, followupTopics1, followupTopics2)
     partialNextSlotModified2 <-
-      if (followupTopics2.isEmpty) Some(schedule)
+      if (followupTopics2.isEmpty) Some(partialNextSlotModified1)
       else swapFollowupTopics(partialNextSlotModified1, slot1.next.get, followupTopics2, followupTopics1)
 
     /* Generate the swap */

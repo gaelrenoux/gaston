@@ -22,7 +22,8 @@ final case class Slot(
 
   def toShortString: String = s"$id -> $name"
 
-  def toLongString: String = s"Slot($id, $name, ${personsPresent.map(_.name)}, $maxTopics"
+  def toLongString: String =
+    s"Slot($id, $name,${next.fold("")(s => s" next: ${s.name},")} ${personsPresent.map(_.name).mkString("(", ",", ")")}${if (maxTopics < Int.MaxValue) s", max: $maxTopics" else ""})"
 }
 
 //TODO call to hashcode is a minor (9%) hot-spot ! Same for topic and person !
