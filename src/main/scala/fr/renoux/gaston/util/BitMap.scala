@@ -2,22 +2,18 @@ package fr.renoux.gaston.util
 
 import scala.reflect.ClassTag
 
-/** A map where the key is only identified by its integer ID. Like in a bitset, you cannot get the keys back, you can
-  * just find the associated value.
+/** An immutable map where the key is only identified by its integer ID. Like in a bitset, you cannot get the keys back,
+  * you can just find the associated value. Identifier can only go from 0 until its size (excluded).
   *
   * The wrapped array contains null for missing entries, as it is faster to check than an option.
   */
 final class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends AnyVal {
 
+  @inline def size: Int = wrapped.length
+
   @inline def apply(a: A): B = wrapped(a.id)
 
-  @inline def get(a: A): Option[B] = Option(wrapped(a.id))
-
-  @inline def getId(id: Int): Option[B] = Option(wrapped(id))
-
   @inline def map[C: ClassTag](f: B => C): BitMap[A, C] = new BitMap[A, C](wrapped.map(f))
-
-  @inline def contains(a: A): Boolean = wrapped(a.id) != null // scalastyle:ignore null
 }
 
 object BitMap {
@@ -40,7 +36,7 @@ object BitMap {
       @inline def toBitMap(size: Int)(implicit tagB: ClassTag[B], ev: Null <:< B): BitMap[A, B] =
         BitMap.from[A, B](size, ev(null))(wrapped) // scalastyle:ignore null
 
-      @inline def toBitMap()(implicit tagB: ClassTag[B], ev: Null <:< B, count: Count[A]): BitMap[A, B] =
+      @inline def toBitMap(implicit tagB: ClassTag[B], ev: Null <:< B, count: Count[A]): BitMap[A, B] =
         BitMap.from[A, B](count.value, ev(null))(wrapped) // scalastyle:ignore null
     }
   }

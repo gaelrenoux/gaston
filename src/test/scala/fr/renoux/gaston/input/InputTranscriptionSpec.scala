@@ -152,8 +152,8 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         persons = inputPersons
       )
       implicit val problem: Problem = from(inputModel)
-      problem.incompatibleTopicsBySlot.get(slot"one").get should be(Set(t"alpha"))
-      problem.incompatibleTopicsBySlot.get(slot"two").get should be(Set.empty)
+      problem.incompatibleTopicsBySlot(slot"one") should be(Set(t"alpha"))
+      problem.incompatibleTopicsBySlot(slot"two") should be(Set.empty)
     }
 
   }
