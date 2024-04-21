@@ -1,5 +1,6 @@
 package fr.renoux.gaston.util
 
+/** A bunch of extension mehtods regarding options. */
 object OptionImplicits {
 
   @inline final implicit class SetOptionOps[A](val wrapped: Option[Set[A]]) extends AnyVal {

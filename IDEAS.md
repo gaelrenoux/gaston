@@ -1,2 +1,4 @@
 - Add unit test for forced topics
 - When a schedule is a success (better than previous one), try to re-assign everyone a few times to see if you can improve it further
+- Count not the increasing-scores chedules in the logs, but all tested schedules
+- Better handling of constraints

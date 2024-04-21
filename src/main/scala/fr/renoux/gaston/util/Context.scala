@@ -1,5 +1,6 @@
 package fr.renoux.gaston.util
 
+/** Context moving around the application. Contains a bunch of tools for monitoring and metrics, and flags regarding behavior. */
 final case class Context(
     debugMode: Boolean = false,
     tools: Tools = Tools.NoOp

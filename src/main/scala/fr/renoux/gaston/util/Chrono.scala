@@ -3,6 +3,9 @@ package fr.renoux.gaston.util
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
+/** A class to measure how much time a piece of code is doing.
+  * @param blocking If true, storing the time spent after the code is done is blocking. Otherwise, it's deported into a Future.
+  *  */
 sealed class Chrono(blocking: Boolean = false) {
 
   private val _times: mutable.Map[String, Long] = mutable.Map[String, Long]().withDefaultValue(0L)

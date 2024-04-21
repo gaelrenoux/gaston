@@ -6,6 +6,7 @@ import scala.collection.IterableOps
 import scala.collection.IterableOnceOps
 
 
+/** A bunch of extension mehtods over collections. */
 object CollectionImplicits {
 
   @inline final implicit class RichIterableOnceOps[A, CC[_], C <: CC[A]](val wrapped: IterableOnceOps[A, CC, C]) extends AnyVal {
