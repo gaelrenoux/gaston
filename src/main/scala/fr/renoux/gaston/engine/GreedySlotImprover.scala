@@ -41,6 +41,9 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
       } yield (improved, State(improved, move))
 
     improvedSchedules.headOption
+    //TODO The schedule should come with some index, showing how many were examined. In the lazy list, only the improving schedules are kept (so "We have tried
+    // 39 schedules" means that we have improved a schedule 39 times). In tests, it makes it harder to see how many schedules we actually tried, which would be
+    // a better metric.
   }
 }
 
