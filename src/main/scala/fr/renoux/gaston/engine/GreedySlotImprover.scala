@@ -38,6 +38,10 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
         unimproved <- filler.fill(partial)(rand)
         improved = personImprover.improve(unimproved)
         if improved.score > state.schedule.score
+        _ = if (!improved.isSolution) {
+          val message = s"A bad schedule was generated !\n${improved.toFormattedString}\n${improved.errors.mkString("\n")}\n\nLast move: $move"
+          throw new IllegalStateException(message)
+        }
       } yield (improved, State(improved, move))
 
     improvedSchedules.headOption
