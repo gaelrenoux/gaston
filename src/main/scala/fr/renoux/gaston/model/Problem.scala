@@ -21,6 +21,7 @@ trait Problem {
   /** All forced topics, starting with the ones that are limited to the least number of possible slots, up to the ones that can be on any slot. */
   lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
     forcedTopics.toSeq.view.map { topic => topic -> topic.slots.fold(slots.size)(_.size) }.sortBy(_._2).map(_._1).toSeq
+  lazy val topicsWithFollowups: Set[(Topic, Topic)] = topics.flatMap { t => t.followup.map(t -> _) }
 
   lazy val slotsList: List[Slot] = slots.toList
   lazy val topicsList: List[Topic] = topics.toList

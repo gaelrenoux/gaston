@@ -149,7 +149,21 @@ final case class Schedule(
     lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
     lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
-    allSlotsOk && forcedTopicsOk && constraintsOk
+    /* TODO: Special case: followup topics. This should never be an error, as the navigator should not allow for such a situation. Kept temporarily to check
+    *   if it's happening or not. */
+    lazy val followupTopicsOk = problem.topicsWithFollowups.isEmpty || {
+      slotSchedules.forall { ss =>
+        ss.topics.forall { topic =>
+          topic.followup match {
+            case None => true
+            case Some(followup) => ss.slot.next.exists(nextSlot => on(nextSlot).topicsSet.contains(followup))
+          }
+        }
+      }
+    }
+    if (!followupTopicsOk) throw new IllegalStateException(s"Followup topics are not OK in:\n$toFormattedString")
+
+    allSlotsOk && forcedTopicsOk && constraintsOk && followupTopicsOk
   }
 
   /** @return true if this respects all constraints */
