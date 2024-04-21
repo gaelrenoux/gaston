@@ -161,8 +161,6 @@ final case class Schedule(
         }
       }
     }
-    if (!followupTopicsOk) throw new IllegalStateException(s"Followup topics are not OK in:\n$toFormattedString")
-
     allSlotsOk && forcedTopicsOk && constraintsOk && followupTopicsOk
   }
 
@@ -180,7 +178,16 @@ final case class Schedule(
     val constraintsError = problem.globalLevelConstraints.flatMap { c =>
       if (!c.isRespected(this)) Some(s"Constraint $c not respected") else None
     }.toSeq
-    slotErrors ++ forcedTopicsError ++ constraintsError
+    val followupTopicsErrors = slotSchedules.flatMap { ss =>
+      ss.topics.flatMap { topic =>
+        topic.followup.flatMap { followup =>
+          if (ss.slot.next.exists(nextSlot => on(nextSlot).topicsSet.contains(followup))) None
+          else Some(s"Bad followup topic for topic ${topic.name} (on slot ${ss.slot.name})")
+        }
+      }
+    }
+
+    slotErrors ++ forcedTopicsError ++ constraintsError ++ followupTopicsErrors
   }
 
   /** Produces a clear, multiline version of this schedule. */
