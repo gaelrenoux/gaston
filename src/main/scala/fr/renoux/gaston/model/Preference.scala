@@ -68,6 +68,6 @@ object Preference {
   }
 
   /** This is only used for pseudo-constraints: constraints represented as preferences. */
-  val NecessaryPreferenceScore: Score = Score.NegativeInfinity
+  val NecessaryPreferenceScore: Score = Score(-1000000000.0) // Cannot be negative infinity: we want breaking one constraint to be better than breaking two.
 
 }
