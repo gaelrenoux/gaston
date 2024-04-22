@@ -5,6 +5,9 @@ package fr.renoux.gaston.model
   * deduplication. Constraints are only the stuff that are integral in constructing the solution, not additional
   * constraints such as people not wanting to play some game (those are handled as "soft" constraint, preferences with a
   * heavy cost).
+  *
+  * Constraints are only checked for sanity (ie, a failed constraint should crash the program), as the construction
+  * process ensure they are respected.
   */
 trait Constraint {
 

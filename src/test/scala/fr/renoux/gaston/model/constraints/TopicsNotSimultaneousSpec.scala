@@ -1,12 +1,13 @@
-package fr.renoux.gaston.model
+package fr.renoux.gaston.model.constraints
 
-import fr.renoux.gaston.model.constraints._
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+
 /** Unit test on constraints */
-class ConstraintsSpec extends AnyFlatSpec with Matchers {
+class TopicsNotSimultaneousSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._
   import fr.renoux.gaston.MinimalTestModel.Problems._
@@ -20,26 +21,33 @@ class ConstraintsSpec extends AnyFlatSpec with Matchers {
 
   def scheduled(s: Slot, ts: Topic*): Schedule = Schedule.from(s(ts.map(_.apply()): _*))
 
-  behavior of "TopicsSimultaneous"
-  val leadingFightingMachinesSimultaneous: TopicsSimultaneous = TopicsSimultaneous(Set(Leading, Fighting, Machines))
+  behavior of "TopicsNotSimultaneous"
+  val leadingFightingMachinesSimultaneous: Constraint = TopicsNotSimultaneous(Set(Leading, Fighting, Machines).toBitSet)
 
-  it should "break if the topics are on different slots" in {
+  it should "not break if the topics are on different slots" in {
     leadingFightingMachinesSimultaneous.isRespected(
-      scheduled(Morning, Fighting, Raphael, Leonardo) ++ scheduled(Afternoon, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
-    ) should be(false)
+      scheduled(Morning, Fighting, Raphael, Leonardo) ++ scheduled(Afternoon, Machines, Donatello) ++ scheduled(Evening, Leading, Leonardo, Raphael)
+    ) should be(true)
   }
 
-  it should "break if one of the topics is missing" in {
+  it should "not break if one of the topics is missing" in {
     leadingFightingMachinesSimultaneous.isRespected(
-      scheduled(Afternoon, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
-    ) should be(false)
+      scheduled(Morning, Machines, Donatello) ++ scheduled(Afternoon, Leading, Leonardo, Raphael)
+    ) should be(true)
   }
 
-  it should "not break if the topics are all on the same slot" in {
+  it should "break if all of the topics are all on the same slot" in {
     leadingFightingMachinesSimultaneous.isRespected(
       scheduled(Afternoon, Fighting, Raphael, Leonardo) ++ scheduled(Afternoon, Machines, Donatello)
         ++ scheduled(Afternoon, Leading, Leonardo, Raphael) ++ scheduled(Evening, Party, Leonardo, Raphael, Michelangelo, Donatello)
-    ) should be(true)
+    ) should be(false)
+  }
+
+  it should "break if some of the topics are all on the same slot" in {
+    leadingFightingMachinesSimultaneous.isRespected(
+      scheduled(Afternoon, Fighting, Raphael, Leonardo) ++ scheduled(Afternoon, Machines, Donatello)
+        ++ scheduled(Morning, Leading, Leonardo, Raphael) ++ scheduled(Evening, Party, Leonardo, Raphael, Michelangelo, Donatello)
+    ) should be(false)
   }
 
   it should "not break if the topics are not scheduled" in {

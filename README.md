@@ -311,6 +311,7 @@ Some vocabulary:
   - Therefore, a planning is a schedule with no one assigned apart from the mandatory persons.
 - Assignment is when we assign persons to an existing planning.
 - Scheduling is doing both.
+- A partial schedule is a schedule where only the planning is done, most persons are not assigned yet.
 
 Then, the lazy-list starts being generated. A generation step starts from the latest generated schedule, and procedes with the following steps:
 - Figure out all neighbours of the latest schedule in the planning spaces. Neighbours are plannings that we can get from that schedule by adding or dropping a topic, or swapping two topics.
