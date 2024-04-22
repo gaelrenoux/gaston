@@ -31,9 +31,8 @@ final case class SlotSchedule(
   lazy val topics: Iterable[Topic] = wrapped.keys
   lazy val topicsSet: Set[Topic] = wrapped.keySet
   lazy val topicsList: List[Topic] = topics.toList
-  lazy val realTopics: Iterable[Topic] = topics.filterNot(_.virtual)
+  lazy val realTopics: Iterable[Topic] = topics.filterNot(t => t.virtual || t.isFollowup) // can't move followups directly, move the base topic instead
   lazy val realTopicsSet: Set[Topic] = realTopics.toSet
-  lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val removableTopics: Iterable[Topic] = realTopics.filterNot(_.forced)
 
   lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)

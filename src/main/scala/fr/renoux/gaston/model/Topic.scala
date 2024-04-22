@@ -20,7 +20,7 @@ final case class Topic(
     followup: Option[Topic] = None,
     isFollowup: Boolean = false,
     forced: Boolean = false,
-    virtual: Boolean = false
+    virtual: Boolean = false // TODO maybe rename to locked, to indicate it can't be moved ?
 ) extends Identified {
 
   /** To facilitate writing schedules */

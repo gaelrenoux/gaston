@@ -16,7 +16,7 @@ trait Problem {
   val constraints: Set[Constraint]
   val preferences: Set[Preference]
 
-  lazy val realTopics: Set[Topic] = topics.filterNot(_.virtual)
+  lazy val realTopics: Set[Topic] = topics.filterNot(t => t.virtual || t.isFollowup)
   lazy val forcedTopics: Set[Topic] = topics.filter(_.forced)
   /** All forced topics, starting with the ones that are limited to the least number of possible slots, up to the ones that can be on any slot. */
   lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
