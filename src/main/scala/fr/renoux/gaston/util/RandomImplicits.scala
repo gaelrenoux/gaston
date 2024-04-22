@@ -8,6 +8,7 @@ object RandomImplicits {
   @inline final implicit class RandomOps(wrapped: Random) {
     /** Picks randomly an element in a set. */
     @inline def pick[A](s: Set[A]): A = {
+      if (s.isEmpty) throw new IndexOutOfBoundsException()
       val i = wrapped.nextInt(s.size)
       s.toIndexedSeq(i)
     }

@@ -29,7 +29,7 @@ object PerformanceAnalysis extends App {
   implicit val problem: Problem = udoConProblem
   implicit val context: Context = Context(tools = tools)
 
-  val duration: FiniteDuration = 5.minutes
+  val duration: FiniteDuration = 1.minutes
   val seed: Long = 0L
 
   implicit val improver: GreedySlotImprover = new GreedySlotImprover
@@ -42,7 +42,8 @@ object PerformanceAnalysis extends App {
   }
 
   println(s"${schedule.score} after $count iterations")
-  println(s"Times: ${tools.chrono.timesPretty}")
+  println(s"Times: ${tools.chrono.timesTotalPretty}")
   println(s"Counts: ${tools.chrono.countsPretty}")
+  println(s"Average times: ${tools.chrono.timesAveragePretty}")
 
 }
