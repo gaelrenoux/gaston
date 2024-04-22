@@ -2,3 +2,5 @@
 - When a schedule is a success (better than previous one), try to re-assign everyone a few times to see if you can improve it further
 - Count not the increasing-scores chedules in the logs, but all tested schedules
 - Better handling of constraints
+- Incompatibility reward should be in the preference (in the config), not in settings
+- Test that keeping the same seed keeps the same results (doesn't seem to be working)

@@ -1,0 +1,54 @@
+package fr.renoux.gaston.model.preferences
+
+import fr.renoux.gaston.model._
+import fr.renoux.gaston.util.{BitSet, Context}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+
+// scalastyle:off magic.number
+class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
+
+  import fr.renoux.gaston.MinimalTestModel.Persons._
+  import fr.renoux.gaston.MinimalTestModel.Problems._
+  import fr.renoux.gaston.MinimalTestModel.Slots._
+  import fr.renoux.gaston.MinimalTestModel.Topics._
+
+  private implicit val problem: Problem = Minimal
+  private implicit val context: Context = Context.Default
+
+  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps: _*)))
+
+  behavior of "TopicsExclusive"
+  val cannotLeadAndPartyExceptLeo: Preference = TopicsExclusive(Set(Leading, Party).toBitSet, Set(Leonardo).toBitSet)
+
+  it should "return the reward if a person does both" in {
+    cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Michelangelo) ++
+      scheduled(Afternoon, Party, Raphael, Michelangelo)
+    ) should be(cannotLeadAndPartyExceptLeo.reward)
+  }
+
+  it should "return the reward if a person does both with another exempted person" in {
+    cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Michelangelo, Leonardo) ++
+      scheduled(Afternoon, Party, Raphael, Michelangelo, Leonardo)
+    ) should be(cannotLeadAndPartyExceptLeo.reward)
+  }
+
+  it should "return zero if no one does both" in {
+    cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Michelangelo) ++
+      scheduled(Afternoon, Party, Raphael)
+    ) should be(Score.Zero)
+  }
+
+  it should "return zero if an exempted person does both" in {
+    cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Leonardo) ++
+      scheduled(Afternoon, Party, Raphael, Leonardo, Michelangelo)
+    ) should be(Score.Zero)
+  }
+
+  it should "break if a person does two out of three" in {
+    TopicsExclusive(Set(Leading, Party, Machines).toBitSet, BitSet.empty[Person]).score(scheduled(Morning, Leading, Leonardo, Michelangelo) ++
+      scheduled(Afternoon, Party, Raphael, Michelangelo) ++ scheduled(Evening, Machines, Donatello)
+    ) should be(cannotLeadAndPartyExceptLeo.reward)
+  }
+
+}

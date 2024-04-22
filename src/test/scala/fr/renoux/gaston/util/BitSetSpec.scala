@@ -15,7 +15,7 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
     bs(gromit) should be(false)
     bs(lassie) should be(false)
     bs(milou) should be(false)
-    an[IndexOutOfBoundsException] should be thrownBy(bs(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bs(rintintin))
 
     bs.nonEmpty should be(false)
     bs.actualEquals(BitSet.from[Dog](3)(Nil)) should be(true)
@@ -32,7 +32,7 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
     bs(gromit) should be(true)
     bs(lassie) should be(false)
     bs(milou) should be(true)
-    an[IndexOutOfBoundsException] should be thrownBy(bs(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bs(rintintin))
 
     bs.nonEmpty should be(true)
     bs.actualEquals(set.toBitSet(3)) should be(true)
@@ -50,7 +50,7 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
     bs(gromit) should be(true)
     bs(lassie) should be(false)
     bs(milou) should be(true)
-    an[IndexOutOfBoundsException] should be thrownBy(bs(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bs(rintintin))
 
     bs.nonEmpty should be(true)
     bs.actualEquals(set.toBitSet(3)) should be(true)
@@ -59,6 +59,14 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
     val bsuc = bs.unsafeContent
     bsuc(0) = false
     bs(gromit) should be(false)
+  }
+
+  "empty" should "create an empty BitSet" in {
+    implicit val c: Count[Dog] = Count[Dog](3)
+    val bs = BitSet.empty[Dog]
+    bs(gromit) should be(false)
+    bs(lassie) should be(false)
+    bs(milou) should be(false)
   }
 
 }

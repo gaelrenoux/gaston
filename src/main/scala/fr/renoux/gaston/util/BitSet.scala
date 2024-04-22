@@ -48,6 +48,9 @@ object BitSet {
     new BitSet[A](tmp)
   }
 
+  def empty[A <: Identified](implicit c: Count[A]): BitSet[A] =
+    new BitSet[A](Array.fill(c.value)(false))
+
   object syntax {
     implicit class BitSetConversionOps[A <: Identified](val wrapped: Iterable[A]) extends AnyVal {
       @inline def toBitSet(size: Int): BitSet[A] = BitSet.from[A](size)(wrapped)

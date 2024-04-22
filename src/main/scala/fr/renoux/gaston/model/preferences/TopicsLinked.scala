@@ -13,7 +13,7 @@ final case class TopicsLinked(topics: BitSet[Topic], reward: Score = Preference.
   override def scoreSchedule(schedule: Schedule): Score = {
     val groups: Iterable[Set[Person]] = schedule.personsByTopic.view.filterKeys(topics.contains).values
     if (groups.isEmpty) Score.Zero else {
-      val persons = groups.head
+      val persons = groups.foldLeft(Set.empty[Person])(_ ++ _)
       groups.foldLeft(Score.Zero) { (score, current) =>
         val anomalyCount = (persons diff current).size + (current diff persons).size
         score + (reward * anomalyCount)

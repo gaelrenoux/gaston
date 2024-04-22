@@ -1,10 +1,11 @@
 package fr.renoux.gaston
 
-import java.util.concurrent.atomic.AtomicInteger
-
 import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.{Counts, Person, Slot, Topic}
+import fr.renoux.gaston.util.Count
+
+import java.util.concurrent.atomic.AtomicInteger
 
 
 object MinimalTestModel {
@@ -21,6 +22,7 @@ object MinimalTestModel {
     val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
     val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
     val All: Set[Person] = AllTurtles ++ AllEnemies
+    implicit val PersonCount: Count[Person] = util.Count[Person](All.size)
   }
 
   object Topics {
@@ -33,6 +35,7 @@ object MinimalTestModel {
     val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> InputTranscription.unassignedTopic(index.getAndIncrement(), s)).toMap
     val Concrete: Set[Topic] = Set(Leading, Fighting, Machines, Party)
     val All: Set[Topic] = Concrete ++ Unassigned.values
+    implicit val TopicCount: Count[Topic] = util.Count[Topic](All.size)
   }
 
   object Slots {
@@ -43,11 +46,11 @@ object MinimalTestModel {
     lazy val Night = Slot(index.getAndIncrement(), "night", Persons.All, None)
 
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
-    val Count = All.flatten.size
+    implicit val SlotCount: Count[Slot] = util.Count[Slot](All.flatten.size)
   }
 
   object Problems {
-    implicit val MinimalCounts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
+    implicit val MinimalCounts: Counts = Counts.fromCounts(Slots.SlotCount, Topics.TopicCount, Persons.PersonCount)
     val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Set.empty, Set.empty)
   }
 
