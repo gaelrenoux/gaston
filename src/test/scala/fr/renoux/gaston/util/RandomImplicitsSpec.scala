@@ -11,15 +11,16 @@ class RandomImplicitsSpec extends AnyFlatSpec with Matchers {
 
   import RandomImplicits._
 
-  val random = new Random(0) // always the same values
 
   "pick" should "work for one element" in {
+    val random = new Random(0) // always the same values
     random.pick(Set(1)) should be(1)
     random.pick(Set(1, 2)) should be(2)
     an[IndexOutOfBoundsException] should be thrownBy random.pick(Set.empty[Int])
   }
 
   it should "work for multiple elements" in {
+    val random = new Random(0) // always the same values
     random.pick(Set(1), 1) should be(List(1))
     random.pick(Set(1, 2), 2) should be(List(1, 2))
     random.pick(Set(1, 2), 1) should be(List(1))
