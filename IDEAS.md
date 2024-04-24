@@ -4,3 +4,4 @@
 - Better handling of constraints
 - Incompatibility reward should be in the preference (in the config), not in settings
 - Test that keeping the same seed keeps the same results (doesn't seem to be working)
+- Nothing and Unassigned should be merged when there's no minimum on the acceptable number of persons unassigned. Better conf would be a min number, with different anti-preferences above and below that min.

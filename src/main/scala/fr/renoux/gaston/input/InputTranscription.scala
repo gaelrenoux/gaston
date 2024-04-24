@@ -241,11 +241,22 @@ private[input] class InputTranscription(input: InputModel) {
       } yield PersonTopicPreference(person, nothingTopic, getNothingAntiPreference(inPerson))
     }.toSet
 
+    def getUnassignedAntiPreference(inPerson: InputPerson): Score = settings.personUnassignedAntiPreferenceScaling match {
+      case None => settings.personUnassignedAntiPreference
+      case Some(scalingSettings) if !scalingSettings.enabled => settings.personUnassignedAntiPreference
+      case Some(scalingSettings) =>
+        val forbiddenRatio = inPerson.forbidden.size.toDouble / input.topics.size
+        val antiPreferenceVariablePart: Score = settings.personUnassignedAntiPreference - scalingSettings.maximumAntiPreference
+        val antiPreferenceRatio = math.max(0, 1 - (forbiddenRatio / scalingSettings.forbiddenRatioForMaximum))
+        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * antiPreferenceRatio)
+    }
+
     lazy val unassignedTopicPreferences: Set[PersonTopicPreference] = {
       for {
         unassignedTopic <- unassignedTopicsByNameAndSlot.values
-        person <- personsByName.values
-      } yield PersonTopicPreference(person, unassignedTopic, input.settings.personUnassignedAntiPreference)
+        inPerson <- input.personsSet
+        person = personsByName(inPerson.name)
+      } yield PersonTopicPreference(person, unassignedTopic, getUnassignedAntiPreference(inPerson))
     }.toSet
 
     lazy val all: Set[Preference] = {

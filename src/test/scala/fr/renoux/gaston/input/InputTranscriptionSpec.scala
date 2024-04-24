@@ -113,7 +113,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     it should "have a scaled anti-preference (with scaling enabled)" in {
       implicit val problem: Problem = from(
         inputModel.modify(_.settings.personOnNothingAntiPreferenceScaling).setTo(Some(
-          InputSettings.PersonOnNothingAntiPreferenceScaling(
+          InputSettings.NothingOrUnassignedAntiPreferenceScaling(
             forbiddenRatioForMaximum = 0.5,
             maximumAntiPreference = NonPosScore(-10.0)
           )

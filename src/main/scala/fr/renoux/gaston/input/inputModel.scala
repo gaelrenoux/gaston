@@ -42,8 +42,9 @@ case class InputSettings(
     minPersonsOnNothing: NonNegInt = 0,
     maxPersonsOnNothing: NonNegInt = 0,
     personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
-    personOnNothingAntiPreferenceScaling: Option[InputSettings.PersonOnNothingAntiPreferenceScaling] = None,
-    personUnassignedAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore // TODO should also carry some scaling
+    personOnNothingAntiPreferenceScaling: Option[InputSettings.NothingOrUnassignedAntiPreferenceScaling] = None,
+    personUnassignedAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore // TODO merge with personOnNothing
+    personUnassignedAntiPreferenceScaling: Option[InputSettings.NothingOrUnassignedAntiPreferenceScaling] = None,
     backtrackInitialSchedule: Boolean = true // TODO Should be calculated
 ) {
   lazy val isNothingEnabled: Boolean = maxPersonsOnNothing > 0
@@ -53,7 +54,7 @@ object InputSettings {
   /** If this is enabled, the anti-preference for nothing will scale with the number of forbidden topics for each person.
     * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal (negative) value
     */
-  case class PersonOnNothingAntiPreferenceScaling(
+  case class NothingOrUnassignedAntiPreferenceScaling(
       enabled: Boolean = true,
       forbiddenRatioForMaximum: Double = 0.75,
       maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
