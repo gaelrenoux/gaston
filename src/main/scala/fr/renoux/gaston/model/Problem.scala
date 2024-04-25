@@ -24,6 +24,9 @@ trait Problem {
   lazy val topicsWithFollowups: Set[(Topic, Topic)] = topics.flatMap { t => t.followup.map(t -> _) }
 
   lazy val slotsList: List[Slot] = slots.toList
+  lazy val slotsToNextSlot: Map[Slot, Slot] = slots.flatMap(s => s.next.map(s -> _)).toMap
+  lazy val slotsToPreviousSlot: Map[Slot, Slot] = slotsToNextSlot.map(_.swap)
+
   lazy val topicsList: List[Topic] = topics.toList
   lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val personsList: List[Person] = persons.toList

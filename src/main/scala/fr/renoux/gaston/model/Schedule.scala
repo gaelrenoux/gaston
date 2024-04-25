@@ -147,17 +147,23 @@ final case class Schedule(
   lazy val isPartialSolution: Boolean = {
     lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
     lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
+
+    /* TODO: All constraints: they should never be an error, as the navigator should not allow for such a situation.
+        Kept temporarily to check if it's happening or not. Should have an option to disable, it might make the algorithm go faster. */
     lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
 
-    /* TODO: Special case: followup topics. This should never be an error, as the navigator should not allow for such a situation. Kept temporarily to check
-    *   if it's happening or not. */
     lazy val followupTopicsOk = problem.topicsWithFollowups.isEmpty || {
       slotSchedules.forall { ss =>
+        lazy val previousSlot = problem.slotsToPreviousSlot(ss.slot)
         ss.topics.forall { topic =>
-          topic.followup match {
-            case None => true
-            case Some(followup) => ss.slot.next.exists(nextSlot => on(nextSlot).topicsSet.contains(followup))
-          }
+          val okIfHasFollowup =
+            topic.followup match {
+              case None => true
+              case Some(followup) => ss.slot.next.exists(nextSlot => on(nextSlot).topicsSet.contains(followup))
+            }
+          // TODO this might be a bit slow? But it's needed.
+          lazy val okIfIsFollowup = !topic.isFollowup || on(previousSlot).topics.exists(_.followup.contains(topic))
+          okIfHasFollowup && okIfIsFollowup
         }
       }
     }
