@@ -96,15 +96,15 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     if (followupTopics1.isEmpty || slot2.hasNext) && (followupTopics2.isEmpty || slot1.hasNext)
 
     /* Create a new partial schedule with the followup topics swapped if possible */
-    partialNextSlotModified1 <-
-      if (followupTopics1.isEmpty) Some(schedule)
-      else swapFollowupTopics(schedule, slot2.next.get, followupTopics1, followupTopics2)
-    partialNextSlotModified2 <-
-      if (followupTopics2.isEmpty) Some(partialNextSlotModified1)
-      else swapFollowupTopics(partialNextSlotModified1, slot1.next.get, followupTopics2, followupTopics1)
+    partialNextSlotModified <-
+      if (followupTopics1.isEmpty && followupTopics2.isEmpty) Some(schedule)
+      else {
+        swapFollowupTopics(schedule, slot2.next.get, followupTopics1, followupTopics2)
+          .flatMap(swapFollowupTopics(_, slot1.next.get, followupTopics2, followupTopics1))
+      }
 
     /* Generate the swap */
-    partial = partialNextSlotModified2.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
+    partial = partialNextSlotModified.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
 
   } yield (partial, Move.Swap(topics1, topics2, isExt = false))
 
