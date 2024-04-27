@@ -31,11 +31,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
     val topicNames = Set("alpha #1", "alpha #2", "alpha #3")
 
-    def topics(implicit problem: Problem) = problem.topics.filter(t => topicNames.contains(t.name))
+    def topics(implicit problem: Problem) = problem.topicsSet.filter(t => topicNames.contains(t.name))
 
     they should "be different topics" in {
       val problem = from(InputModel(topics = inputTopics))
-      problem.topics.map(_.name) should be(topicNames)
+      problem.topicsSet.map(_.name) should be(topicNames)
     }
 
     they should "all have the same mandatory, forbidden and wishes" in {

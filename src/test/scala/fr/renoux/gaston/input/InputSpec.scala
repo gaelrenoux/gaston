@@ -44,17 +44,17 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   "Produced problem" should "contain the correct slots" in {
-    problem.slots should be(expected.slots.all)
+    problem.slotsSet should be(expected.slots.all)
   }
 
   it should "contain the correct topics" in {
-    problem.topics.map(t => (t.id, t.name)).toSeq.sorted should be(expected.topics.all.map(t => (t.id, t.name)).toSeq.sorted)
-    problem.topics.toSeq.sortBy(_.name) should be(expected.topics.all.toSeq.sortBy(_.name))
-    problem.topics should be(expected.topics.all)
+    problem.topicsSet.map(t => (t.id, t.name)).toSeq.sorted should be(expected.topics.all.map(t => (t.id, t.name)).toSeq.sorted)
+    problem.topicsSet.toSeq.sortBy(_.name) should be(expected.topics.all.toSeq.sortBy(_.name))
+    problem.topicsSet should be(expected.topics.all)
   }
 
   it should "contain the correct persons" in {
-    problem.persons should be(expected.persons.all)
+    problem.personsSet should be(expected.persons.all)
   }
 
   it should "contain the correct constraints" in {

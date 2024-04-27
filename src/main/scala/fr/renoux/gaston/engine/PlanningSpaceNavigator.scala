@@ -72,7 +72,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   /** Swap two scheduled topics */
   private def possibleSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
-    (slot1, slot2) <- shuffled(problem.slotCouplesSeq).view
+    (slot1, slot2) <- shuffled(problem.slotCouplesList).view
     slotSchedule1 = schedule.on(slot1)
     slotSchedule2 = schedule.on(slot2)
     _ = log.debug(s"Checking for possible Swaps between slots ${slot1.name} and ${slot2.name}")

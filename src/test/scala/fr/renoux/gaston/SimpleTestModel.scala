@@ -2,10 +2,9 @@ package fr.renoux.gaston
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.{InputLoader, InputSettings, InputTranscription}
-import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
+import fr.renoux.gaston.model.{Problem, _}
 import fr.renoux.gaston.util.Context
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -125,7 +124,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import ProblemCounts.CompleteCounts
 
-    val Complete = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
+    val Complete = new Problem(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

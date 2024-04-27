@@ -238,15 +238,15 @@ object Schedule {
     * the minimum number of persons to maket them valid. Other persons are on the "unassigned" topics. */
   def startingUnassignedOrForced(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
     /* Everything complicated in here is for the forced-slots */
-    val forcedTopicsCountPerSlot = Array.fill(problem.slots.size)(0)
+    val forcedTopicsCountPerSlot = Array.fill(problem.slotsSet.size)(0)
     val forcedTopicsBySlot: Map[Slot, Seq[Topic]] = problem.forcedTopicsMostToLeastConstrained.map { topic =>
-      val possibleSlots = topic.slots.getOrElse(problem.slots).filterMinBy(s => forcedTopicsCountPerSlot(s.id))
+      val possibleSlots = topic.slots.getOrElse(problem.slotsSet).filterMinBy(s => forcedTopicsCountPerSlot(s.id))
       val slot = rand.pick(possibleSlots)
       forcedTopicsCountPerSlot(slot.id) += 1
       slot -> topic
     }.groupToMap
 
-    val slotSchedules = problem.slots.map { slot =>
+    val slotSchedules = problem.slotsSet.map { slot =>
       /* For each slot, starts with everyone unassigned */
       val allPersons = rand.shuffle(slot.personsPresent.toList)
       val slotScheduleUnassigned = SlotSchedule.everyoneUnassigned(slot)

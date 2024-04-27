@@ -1,8 +1,7 @@
 package fr.renoux.gaston
 
 import fr.renoux.gaston.input.InputTranscription
-import fr.renoux.gaston.model.impl.ProblemImpl
-import fr.renoux.gaston.model.{Counts, Person, Slot, Topic}
+import fr.renoux.gaston.model.{Counts, Person, Problem, Slot, Topic}
 import fr.renoux.gaston.util.Count
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -51,7 +50,7 @@ object MinimalTestModel {
 
   object Problems {
     implicit val MinimalCounts: Counts = Counts.fromCounts(Slots.SlotCount, Topics.TopicCount, Persons.PersonCount)
-    val Minimal = new ProblemImpl(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Set.empty, Set.empty)
+    val Minimal = new Problem(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Set.empty, Set.empty)
   }
 
 }

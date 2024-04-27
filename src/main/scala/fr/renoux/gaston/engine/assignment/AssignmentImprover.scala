@@ -26,7 +26,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
   private val defaultMaxRoundsCount = 1000
 
   /** This value is to avoid one slot hugging all round to improve itself, leaving no rounds to the other slots. */
-  private val defaultMaxSuccessiveRoundsCountPerSlot = defaultMaxRoundsCount / problem.slots.size
+  private val defaultMaxSuccessiveRoundsCountPerSlot = defaultMaxRoundsCount / problem.slotsSet.size
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
     * perfected any more or because the limit number of rounds has been reached. */

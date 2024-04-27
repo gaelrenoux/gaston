@@ -59,7 +59,7 @@ final class ScheduleAssigner(implicit private val problem: Problem) {
       val pCount = slot.personsPresentCount
       pCount < min || pCount > max
     } match {
-      case None => completeForSlots(problem.slots.toList, Some(partialSchedule))
+      case None => completeForSlots(problem.slotsSet.toList, Some(partialSchedule))
       case Some((slot, _)) =>
         log.trace(s"Impossible to fill slot $slot")
         None

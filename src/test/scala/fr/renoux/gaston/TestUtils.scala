@@ -17,9 +17,9 @@ object TestUtils {
 
   class ProblemIndexes(val problem: Problem) {
 
-    val slotsByName: Map[String, Slot] = problem.slots.map(p => p.name -> p).toMap
-    val topicsByName: Map[String, Topic] = problem.topics.map(p => p.name -> p).toMap
-    val personsByName: Map[String, Person] = problem.persons.map(p => p.name -> p).toMap
+    val slotsByName: Map[String, Slot] = problem.slotsSet.map(p => p.name -> p).toMap
+    val topicsByName: Map[String, Topic] = problem.topicsSet.map(p => p.name -> p).toMap
+    val personsByName: Map[String, Person] = problem.personsSet.map(p => p.name -> p).toMap
 
     implicit final class Interpolation(val sc: StringContext) {
       def slot(args: Any*): Slot = slotsByName(sc.s(args))
@@ -34,9 +34,9 @@ object TestUtils {
 
   implicit final class ProblemInterpolation(sc: StringContext)(implicit problem: Problem) {
 
-    val slotsByName: Map[String, Slot] = problem.slots.map(p => p.name -> p).toMap
-    val topicsByName: Map[String, Topic] = problem.topics.map(p => p.name -> p).toMap
-    val personsByName: Map[String, Person] = problem.persons.map(p => p.name -> p).toMap
+    val slotsByName: Map[String, Slot] = problem.slotsSet.map(p => p.name -> p).toMap
+    val topicsByName: Map[String, Topic] = problem.topicsSet.map(p => p.name -> p).toMap
+    val personsByName: Map[String, Person] = problem.personsSet.map(p => p.name -> p).toMap
 
     def slot(args: Any*): Slot = slotsByName(sc.s(args: _*))
 

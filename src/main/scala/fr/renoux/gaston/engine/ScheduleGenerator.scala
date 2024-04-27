@@ -30,7 +30,7 @@ final class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(i
   /** Generates just one schedule. */
   def createOne(implicit random: Random): Schedule = {
     log.debug("Generating a single schedule")
-    val slots = random.shuffle(problem.slots.toList)
+    val slots = random.shuffle(problem.slotsSet.toList)
     // TODO need to handle followup topics !
     val (forcedTopics, unforcedTopics) = problem.realTopicsList.partition(_.forced)
     val topics = random.shuffle(forcedTopics) ::: random.shuffle(unforcedTopics)

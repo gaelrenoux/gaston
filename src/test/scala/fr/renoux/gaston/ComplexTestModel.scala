@@ -1,15 +1,13 @@
 package fr.renoux.gaston
 
-import java.util.concurrent.atomic.AtomicInteger
-
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model._
-import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.RandomImplicits._
 
+import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 import scala.util.Random
 
@@ -90,7 +88,7 @@ class ComplexTestModel(seed: Long) {
   object Problems {
     val Complete: Problem = {
       import ProblemCounts.CompleteCounts
-      val p = new ProblemImpl(
+      val p = new Problem(
         Slots.AllSequence,
         Topics.All,
         Topics.Unassigned.toBitMap,

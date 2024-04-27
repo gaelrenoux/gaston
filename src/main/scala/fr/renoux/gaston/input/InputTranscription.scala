@@ -9,7 +9,6 @@ import eu.timepit.refined.refineV
 import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.model.preferences._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
@@ -277,7 +276,7 @@ private[input] class InputTranscription(input: InputModel) {
 
   /* Construction of the Problem */
   lazy val problem: Problem = {
-    val p = new ProblemImpl(
+    val p = new Problem(
       slotSequences,
       topicsByName.values.flatten.toSet,
       unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
