@@ -44,12 +44,12 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
     if (schedule.score > bestScore) {
       bestScore = schedule.score
       val render = new Renderer(problem)
-      write(render(schedule))
+      write(s"From thread ${Thread.currentThread().getName}:\n${render(schedule)}")
     }
   }
 
-  def writeAttempts(count: Long): Unit = synchronized {
-    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} !")
+  def writeAttempts(count: Long, schedule: Schedule): Unit = synchronized {
+    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} ! (current score is ${schedule.score})")
   }
 
   def writeBacktrackingFailure(fs: BacktrackingFailures): Unit = {

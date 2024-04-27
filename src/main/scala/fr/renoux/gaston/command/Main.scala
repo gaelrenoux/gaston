@@ -66,9 +66,9 @@ object Main {
       val runner = new Runner(
         parallelism = commandLine.parallelism,
         startup = () => output.writeStartThread(),
-        hook = (ss, count) => {
-          output.writeScheduleIfBetter(ss)
-          output.writeAttempts(count)
+        hook = (schedule, count) => {
+          output.writeScheduleIfBetter(schedule)
+          output.writeAttempts(count, schedule)
         }
       )
 

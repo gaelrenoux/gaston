@@ -51,8 +51,7 @@ class Renderer(
       s"\nOther:\n${notableOtherPrefs.map(p => s"  ${p.toLongString}").mkString("\n")}"
     }
 
-    s"""
-       |${schedule.toFormattedString}
+    s"""${schedule.toFormattedString}
        |Schedule score is ${schedule.score.value}
        |
        |Person       Score     (Detail)
