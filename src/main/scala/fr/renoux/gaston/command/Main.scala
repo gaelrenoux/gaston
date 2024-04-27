@@ -48,7 +48,7 @@ object Main {
     input <- loadInput(commandLine)
     problem <- transcribe(input)
   } yield {
-    val output = new Output(commandLine.silent)(problem)
+    implicit val output: Output = Output(commandLine.silent)(problem)
     if (commandLine.generateInput) {
       output.writeInput(input)
     } else {
@@ -65,11 +65,7 @@ object Main {
 
       val runner = new Runner(
         parallelism = commandLine.parallelism,
-        startup = () => output.writeStartThread(),
-        hook = (schedule, count) => {
-          output.writeScheduleIfBetter(schedule)
-          output.writeAttempts(count, schedule)
-        }
+        startup = () => output.writeStartThread()
       )
 
       output.writeStart(commandLine.seed)

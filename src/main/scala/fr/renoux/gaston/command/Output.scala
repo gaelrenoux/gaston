@@ -5,12 +5,13 @@ import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.input.{InputLoader, InputModel}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
-/** Destination of all information in Gaston. It writes stuff both to the log file and the standard output.
-  *
-  * It has some business-aware method, to make sure it only prints new schedules if they are better than schedules found
+/** Destination of all information in Gaston. It writes stuff both to the log file and the standard output. It has some
+  * business-aware method, to make sure it only prints new schedules if they are better than schedules found
   * previously.
+  *
+  * It is thread-safe and can be used by all runners concurrently.
   */
-class Output(silent: Boolean = false)(implicit val problem: Problem) {
+final class Output private (silent: Boolean)(implicit val problem: Problem) {
 
   import Ordering.Double.IeeeOrdering
 
@@ -24,8 +25,10 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
   private def write(txt: => String, separator: Boolean = false): Unit = {
     log.info(txt)
     if (notSilent) {
-      if (separator) println(s"\n$separatorLine\n$txt\n$separatorLine\n")
-      else println(txt)
+      synchronized {
+        if (separator) println(s"\n$separatorLine\n$txt\n$separatorLine\n")
+        else println(txt)
+      }
     }
   }
 
@@ -50,7 +53,11 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
   }
 
   def writeAttempts(count: Long, schedule: Schedule): Unit = synchronized {
-    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} ! (current score is ${schedule.score.value})")
+    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} (current score is ${schedule.score.value})")
+  }
+
+  def writeNewScheduleChain(): Unit = synchronized {
+    write(s"Starting new schedule chain on thread ${Thread.currentThread().getName}")
   }
 
   def writeBacktrackingFailure(fs: BacktrackingFailures): Unit = {
@@ -70,4 +77,12 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
       write(s"I'm having trouble generating a valid schedule. Probable causes are: \n$allMessages", separator = true)
     }
   }
+}
+
+object Output {
+  def apply(silent: Boolean = false)(implicit problem: Problem): Output = new Output(silent)
+
+  def standard(implicit problem: Problem): Output = new Output(silent = false)
+
+  def silent(implicit problem: Problem): Output = new Output(silent = true)
 }

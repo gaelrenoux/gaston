@@ -19,19 +19,17 @@ import fr.renoux.gaston.util.CanAddDuration._
   *
   * It can function in two different modes, that can be combined:
   * - Run for a fixed amount of time, then aggregate the results together and returns the best one.
-  * - Run continuously with a hook to regularly output the best result found.
-  * @param hook Something to do at regular interval, e.g. output current values on the stdout. First argument is the latest schedule, second argument is the number of schedules tried.
+  * - Run continuously and regularly output the best result found.
   */
 class Runner(
     startup: () => Unit = () => (),
-    hook: (Schedule, Long) => Unit = (_, _) => (),
-    hookFrequency: FiniteDuration = 20.seconds,
     parallelism: Int = math.max(1, Runtime.getRuntime.availableProcessors - 1)
-)(implicit problem: Problem, engine: Engine, ctx: Context) {
+)(implicit problem: Problem, engine: Engine, output: Output, ctx: Context) {
 
   private val log = Logger[Runner]
 
-  private val hookFrequencyMillis = hookFrequency.toMillis
+  /** Interval of time between each status output */
+  private val statusFrequency = 20.seconds.toMillis // TODO shouldn't be hardcoded
 
   /** Produces a schedule. Also returns the number of schedule examined */
   def run(
@@ -48,7 +46,7 @@ class Runner(
         implicit val random: Random = new Random(seed + i)
         Future {
           startup()
-          runRecursive(now.plusMillis(hookFrequencyMillis), 0, Schedule.startingUnassignedOrForced)(optimParams)
+          runRecursive(now.plusMillis(statusFrequency), 0, Schedule.startingUnassignedOrForced)(optimParams)
         }
       }
     }
@@ -64,7 +62,7 @@ class Runner(
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
   @tailrec
   private def runRecursive(
-      nextHookInvocation: Instant,
+      nextStatusTime: Instant,
       count: Long,
       current: Schedule,
       nextSchedules: LazyList[Schedule] = LazyList.empty
@@ -78,23 +76,24 @@ class Runner(
 
     } else {
       /* If the last log is old enough, render the current best schedule */
-      val newNextLog = if (now isAfter nextHookInvocation) {
-        hook(current, count)
-        Instant.now().plusMillis(hookFrequencyMillis)
-      } else nextHookInvocation
+      val newNextStatusTime = if (now isAfter nextStatusTime) {
+        output.writeScheduleIfBetter(current)
+        output.writeAttempts(count, current)
+        Instant.now().plusMillis(statusFrequency)
+      } else nextStatusTime
 
       /* Run once then recurse */
 
       val evaluated: LazyList[Schedule] = if (nextSchedules.nonEmpty) nextSchedules else {
-        log.info("Starting a new schedule chain")
+        output.writeNewScheduleChain()
         engine.lazySeq(random.nextLong(), optimParams)
       }
       evaluated match {
         case (ss: Schedule) #:: (tail: LazyList[Schedule]) =>
-          if (ss.score > current.score) runRecursive(newNextLog, count + 1, ss, tail)(optimParams)
-          else runRecursive(newNextLog, count + 1, current, tail)(optimParams)
+          if (ss.score > current.score) runRecursive(newNextStatusTime, count + 1, ss, tail)(optimParams)
+          else runRecursive(newNextStatusTime, count + 1, current, tail)(optimParams)
         case _ =>
-          runRecursive(newNextLog, count + 1, current)(optimParams)
+          runRecursive(newNextStatusTime, count + 1, current)(optimParams)
       }
     }
   }

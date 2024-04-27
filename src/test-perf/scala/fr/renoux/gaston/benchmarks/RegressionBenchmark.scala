@@ -1,7 +1,7 @@
 package fr.renoux.gaston.benchmarks
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.command.Runner
+import fr.renoux.gaston.command.{Output, Runner}
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
@@ -58,6 +58,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
       parallelRunCount: Opt[Int] = Opt.Missing
   )(implicit improver: Improver = new GreedySlotImprover): Unit = {
     implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
+    implicit val output: Output = Output.silent
 
     val handler = logMinutes()
 

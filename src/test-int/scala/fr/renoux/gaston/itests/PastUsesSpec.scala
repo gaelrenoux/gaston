@@ -1,7 +1,7 @@
 package fr.renoux.gaston.itests
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.command.Runner
+import fr.renoux.gaston.command.{Output, Runner}
 import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, OptimParams}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.{Problem, Schedule}
@@ -28,6 +28,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     implicit val p: Problem = problem
     implicit val i: GreedySlotImprover = new GreedySlotImprover
     implicit val engine: Engine = new Engine(backtrackInitialSchedule = backtrackInitialSchedule)
+    implicit val output: Output = Output.silent
     val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
     runner.run(seed = 42, params)

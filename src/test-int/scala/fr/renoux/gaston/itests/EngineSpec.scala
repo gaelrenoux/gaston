@@ -1,7 +1,7 @@
 package fr.renoux.gaston.itests
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.command.Runner
+import fr.renoux.gaston.command.{Output, Runner}
 import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, OptimParams}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.{Problem, Schedule}
@@ -21,13 +21,14 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     implicit val p: Problem = problem
     implicit val i: GreedySlotImprover = new GreedySlotImprover
     implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
+    implicit val output: Output = Output.silent
     val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
     runner.run(seed = 42, params)
   }
 
   "problem 17" should "return a good result after 10 iterations" in {
-    val (result, count) =  run(problem17, 10)
+    val (result, count) = run(problem17, 10)
     println(result.toFormattedString)
     println(count)
     count should be(10)
@@ -35,7 +36,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
   }
 
   it should "return a great result after 100 iterations" in {
-    val (result, count) =  run(problem17, 100)
+    val (result, count) = run(problem17, 100)
     println(result.toFormattedString)
     println(count)
     count should be(100)
@@ -43,7 +44,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
   }
 
   "problem 19" should "return a good result after 10 iterations" in {
-    val (result, count) =  run(problem19, 10)
+    val (result, count) = run(problem19, 10)
     println(result.toFormattedString)
     println(count)
     count should be(10)
@@ -51,7 +52,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
   }
 
   it should "return a great result after 100 iterations" in {
-    val (result, count) =  run(problem19, 100)
+    val (result, count) = run(problem19, 100)
     println(result.toFormattedString)
     println(count)
     count should be(100)
