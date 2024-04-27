@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.model.impl.ProblemImpl
 import fr.renoux.gaston.util.BitMap
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.TupleImplicits._
@@ -93,4 +94,8 @@ trait Problem {
 
   def toFormattedString: String
 
+}
+
+object Problem {
+  val Empty: Problem = new ProblemImpl(Seq.empty, Set.empty, BitMap.empty, Set.empty, Set.empty, Set.empty)(Counts.Empty)
 }

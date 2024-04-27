@@ -17,6 +17,10 @@ final class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends An
 }
 
 object BitMap {
+  def empty[A <: Identified, B: ClassTag]: BitMap[A, B] = {
+    new BitMap[A, B](Array.empty[B])
+  }
+
   def from[A <: Identified, B: ClassTag](size: Int, default: B)(m: Iterable[(A, B)]): BitMap[A, B] = {
     val tmp = Array.fill[B](size)(default)
     m.foreach { case (a, b) => tmp(a.id) = b }

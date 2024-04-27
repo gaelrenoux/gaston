@@ -6,6 +6,7 @@ import fr.renoux.gaston.util.BitMap
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 
+// TODO Merge this with Problem, it's ridiculous
 /** A problem to solve. A schedule solves a problem. */
 final class ProblemImpl(
     val slotSequences: Seq[Seq[Slot]],
