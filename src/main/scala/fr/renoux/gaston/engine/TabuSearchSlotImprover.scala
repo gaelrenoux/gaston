@@ -13,6 +13,7 @@ import scala.util.Random
   * instead of always looking for the best.
   *
   * Doesn't seem to be very good.
+  * TODO Rework or drop
   */
 final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[TabuSearchSlotImprover.State] {
 
@@ -30,7 +31,7 @@ final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) exte
     tabu = Set(schedule.planning)
   )
 
-  override protected def step(state: State)(implicit rand: Random): Option[(Schedule, State)] = {
+  override protected def step(state: State)(implicit rand: Random): Option[State] = {
     log.debug(s"Size of tabu is ${state.tabu.size}")
 
     val neighbours = navigator.neighbours(state.current).map(_._1).distinctBy(_.planning)
@@ -50,18 +51,22 @@ final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) exte
       case Some(s) => find(state.addTabu(s), currentBest)(list.tail)
     }
 
-    find(state, None)(neighborhood).map { s => (s.best, s) }
+    find(state, None)(neighborhood)
   }
 
 }
 
 object TabuSearchSlotImprover {
 
-  case class State(
+  final case class State(
       best: Schedule,
       current: Schedule,
       tabu: Set[Schedule.Planning]
-  ) {
+  ) extends Improver.State  {
+    override val schedule: Schedule = best
+
+    override val attemptsCount: Long = 0 // TODO
+
     def advance(s: Schedule): State =
       if (s.score > best.score) copy(best = s, current = s, tabu = tabu + s.planning)
       else copy(current = s, tabu = tabu + s.planning)

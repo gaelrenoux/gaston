@@ -21,14 +21,16 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
   private val filler: ScheduleAssigner = new ScheduleAssigner
   private val personImprover: AssignmentImprover = new AssignmentImprover
 
-  override protected def initialState(schedule: Schedule): State = State(schedule, Move.Nothing)
+  /** Initial attemptsCount is 1 because there's already the initial schedule */
+  override protected def initialState(schedule: Schedule): State = State(schedule, Move.Nothing, 1)
 
   /** Take an already improved schedule, and return the first better schedule it can find by swapping topics. */
   override protected def step(state: State)
-    (implicit rand: Random): Option[(Schedule, GreedySlotImprover.State)] = chrono("GreedySlotImprover > improveOnce") {
+    (implicit rand: Random): Option[GreedySlotImprover.State] = chrono("GreedySlotImprover > improveOnce") {
     log.debug("New improver step")
 
     val neighbours: LazyList[(Schedule, Move)] = navigator.neighbours(state.schedule).distinctBy(_._1.planning)
+    var attemptsCount = 0
 
     val improvedSchedules =
       for {
@@ -37,24 +39,23 @@ final class GreedySlotImprover(implicit problem: Problem, ctx: Context) extends 
         _ = log.debug(s"Trying that move: $move")
         unimproved <- filler.fill(partial)(rand)
         improved = personImprover.improve(unimproved)
+        _ = attemptsCount += 1 // TODO Ugly, we could also do a zipWithIndex but let's check performance
         if improved.score > state.schedule.score
         _ = if (!improved.isSolution) {
           val message = s"A bad schedule was generated !\n${improved.toFormattedString}\n${improved.errors.mkString("\n")}\n\nLast move: $move"
           throw new IllegalStateException(message)
         }
-      } yield (improved, State(improved, move))
+      } yield State(improved, move, state.attemptsCount + attemptsCount)
 
     improvedSchedules.headOption
-    //TODO The schedule should come with some index, showing how many were examined. In the lazy list, only the improving schedules are kept (so "We have tried
-    // 39 schedules" means that we have improved a schedule 39 times). In tests, it makes it harder to see how many schedules we actually tried, which would be
-    // a better metric.
   }
 }
 
 object GreedySlotImprover {
 
-  case class State(
-      schedule: Schedule, previousMove: Move
-  )
+  /** @param attemptsCount How many schedule attempts it took to reach the current state */
+  final case class State(
+      schedule: Schedule, previousMove: Move, attemptsCount: Long
+  ) extends Improver.State
 
 }

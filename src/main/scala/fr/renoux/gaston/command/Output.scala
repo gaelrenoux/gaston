@@ -22,6 +22,13 @@ final class Output private (silent: Boolean)(implicit val problem: Problem) {
 
   private var bestScore: Score = Score.MinValue // scalastyle:ignore var.field
 
+  private def shortString(l: Long) = {
+    if (l <10000) l.toString
+    else if (l<10000000) s"${l/1000}K"
+    else if (l<10000000000L) s"${l/1000000}M"
+    else s"${l/1000000000L}G"
+  }
+
   private def write(txt: => String, separator: Boolean = false): Unit = {
     log.info(txt)
     if (notSilent) {
@@ -52,8 +59,8 @@ final class Output private (silent: Boolean)(implicit val problem: Problem) {
     }
   }
 
-  def writeAttempts(count: Long, schedule: Schedule): Unit = synchronized {
-    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} (current score is ${schedule.score.value})")
+  def writeAttempts(count: Long, bestSchedule: Schedule): Unit = synchronized {
+    write(s"We have tried ${shortString(count)} schedules on thread ${Thread.currentThread().getName} (best score is ${bestSchedule.score.value})")
   }
 
   def writeNewScheduleChain(): Unit = synchronized {

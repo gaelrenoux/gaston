@@ -63,37 +63,35 @@ class Runner(
   @tailrec
   private def runRecursive(
       nextStatusTime: Instant,
-      count: Long,
-      current: Schedule,
-      nextSchedules: LazyList[Schedule] = LazyList.empty
+      totalAttemptsCount: Long,
+      best: Schedule,
+      nextSchedules: LazyList[(Schedule, Long)] = LazyList.empty
   )(optimParams: OptimParams)(implicit random: Random): (Schedule, Long) = {
     val now = Instant.now()
 
     /* If time's out, stop now */
-    if (optimParams.timeout.exists(_ isBefore now) || optimParams.maxIterations.exists(_ <= count)) {
-      log.info(s"We have tried $count schedules ! It is time to stop !")
-      (current, count)
+    if (optimParams.timeout.exists(_ isBefore now) || optimParams.maxIterations.exists(_ <= totalAttemptsCount)) {
+      log.info(s"We have tried $totalAttemptsCount schedules ! It is time to stop !")
+      (best, totalAttemptsCount)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
       val newNextStatusTime = if (now isAfter nextStatusTime) {
-        output.writeScheduleIfBetter(current)
-        output.writeAttempts(count, current)
+        output.writeScheduleIfBetter(best)
+        output.writeAttempts(totalAttemptsCount, best)
         Instant.now().plusMillis(statusFrequency)
       } else nextStatusTime
 
       /* Run once then recurse */
 
-      val evaluated: LazyList[Schedule] = if (nextSchedules.nonEmpty) nextSchedules else {
-        output.writeNewScheduleChain()
-        engine.lazySeq(random.nextLong(), optimParams)
-      }
-      evaluated match {
-        case (ss: Schedule) #:: (tail: LazyList[Schedule]) =>
-          if (ss.score > current.score) runRecursive(newNextStatusTime, count + 1, ss, tail)(optimParams)
-          else runRecursive(newNextStatusTime, count + 1, current, tail)(optimParams)
-        case _ =>
-          runRecursive(newNextStatusTime, count + 1, current)(optimParams)
+      nextSchedules match {
+        case (ss: Schedule, attemptsCount: Long) #:: (tail: LazyList[(Schedule, Long)]) =>
+          if (ss.score > best.score) runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, ss, tail)(optimParams)
+          else runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, best, tail)(optimParams)
+        case _ => // we finished the list
+          output.writeNewScheduleChain()
+          val newSeq = engine.lazySeq(random.nextLong(), optimParams)
+          runRecursive(newNextStatusTime, totalAttemptsCount, best, newSeq)(optimParams)
       }
     }
   }
