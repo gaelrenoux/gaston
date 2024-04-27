@@ -21,20 +21,21 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
 
   private var bestScore: Score = Score.MinValue // scalastyle:ignore var.field
 
-  private def write(txt: => String): Unit = {
+  private def write(txt: => String, separator: Boolean = false): Unit = {
     log.info(txt)
     if (notSilent) {
-      println(s"$separatorLine\n$txt\n$separatorLine\n")
+      if (separator) println(s"\n$separatorLine\n$txt\n$separatorLine\n")
+      else println(txt)
     }
   }
 
-  def writeStart(seed: Long): Unit = write(s"Starting to run ! (seed #$seed)")
+  def writeStart(seed: Long): Unit = write(s"Starting to run ! (seed #$seed)", separator = true)
 
   def writeStartThread(): Unit = write(s"Starting to run on thread ${Thread.currentThread().getName} !")
 
   def writeEnd(schedule: Schedule): Unit = {
     val render = new Renderer(problem)
-    write(s"Finished !\n\n${render(schedule)}\n")
+    write(s"Finished !\n${render(schedule)}", separator = true)
   }
 
   def writeInput(input: InputModel): Unit =
@@ -44,12 +45,12 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
     if (schedule.score > bestScore) {
       bestScore = schedule.score
       val render = new Renderer(problem)
-      write(s"From thread ${Thread.currentThread().getName}:\n${render(schedule)}")
+      write(s"From thread ${Thread.currentThread().getName}:\n${render(schedule)}", separator = true)
     }
   }
 
   def writeAttempts(count: Long, schedule: Schedule): Unit = synchronized {
-    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} ! (current score is ${schedule.score})")
+    write(s"We have tried $count schedules on thread ${Thread.currentThread().getName} ! (current score is ${schedule.score.value})")
   }
 
   def writeBacktrackingFailure(fs: BacktrackingFailures): Unit = {
@@ -66,7 +67,7 @@ class Output(silent: Boolean = false)(implicit val problem: Problem) {
       }
       val allMessages = (noTopicMessages ++ maxParaMessages).sortBy(_._1).reverseIterator.map(_._2).mkString("\n")
 
-      write(s"I'm having trouble generating a valid schedule. Probable causes are: \n$allMessages")
+      write(s"I'm having trouble generating a valid schedule. Probable causes are: \n$allMessages", separator = true)
     }
   }
 }
