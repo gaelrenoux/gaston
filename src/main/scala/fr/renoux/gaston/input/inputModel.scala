@@ -45,6 +45,7 @@ case class InputSettings(
     personOnNothingAntiPreferenceScaling: Option[InputSettings.NothingOrUnassignedAntiPreferenceScaling] = None,
     personUnassignedAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore // TODO merge with personOnNothing
     personUnassignedAntiPreferenceScaling: Option[InputSettings.NothingOrUnassignedAntiPreferenceScaling] = None,
+    personUnassignedMultipleAntiPreference: Option[NonPosScore] = None, // we ignore this when we don't intend to have persons stay unassigned at all
     backtrackInitialSchedule: Boolean = true // TODO Should be calculated
 ) {
   lazy val isNothingEnabled: Boolean = maxPersonsOnNothing > 0

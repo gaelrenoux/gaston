@@ -12,6 +12,7 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.util.{BitSet, Count}
 import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -131,10 +132,9 @@ private[input] class InputTranscription(input: InputModel) {
     topicsFirstPartByOccurrenceIndexByName.mapValuesStrict(_.values.toSet)
 
   /* Counts */
-  lazy val slotsCount: Int = slotsByName.size
-  lazy val personsCount: Int = personsByName.size
-  lazy val topicsCount: Int = topicsByName.values.flatten.size
-  implicit lazy val counts: Counts = Counts(slots = slotsCount, topics = topicsCount, persons = personsCount)
+  implicit val slotsCount: Count[Slot] = Count[Slot](slotsByName.size)
+  implicit val personsCount: Count[Person] = Count[Person](personsByName.size)
+  implicit val topicsCount: Count[Topic] = Count[Topic](topicsByName.values.flatten.size)
 
 
   /* Constraints */
@@ -258,6 +258,12 @@ private[input] class InputTranscription(input: InputModel) {
       } yield PersonTopicPreference(person, unassignedTopic, getUnassignedAntiPreference(inPerson))
     }.toSet
 
+    lazy val exclusiveUnassignedTopics: Set[TopicsExclusive] =
+      input.settings.personUnassignedMultipleAntiPreference.fold(Set.empty[TopicsExclusive]) { reward =>
+        Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toBitSet, BitSet.empty, reward))
+      }
+
+
     lazy val all: Set[Preference] = {
       Set.empty[Preference] ++
         topicScores ++
@@ -268,7 +274,8 @@ private[input] class InputTranscription(input: InputModel) {
         groupDislikes ++
         personTopicPreferences ++
         nothingTopicPreferences ++
-        unassignedTopicPreferences
+        unassignedTopicPreferences ++
+        exclusiveUnassignedTopics
     }
   }
 

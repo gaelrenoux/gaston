@@ -9,7 +9,11 @@ final case class Counts(
     slots: Int,
     topics: Int,
     persons: Int
-)
+) {
+  val slotsCount: Count[Slot] = Count[Slot](slots)
+  val topicsCount: Count[Topic] = Count[Topic](topics)
+  val personsCount: Count[Person] = Count[Person](persons)
+}
 
 object Counts {
   val Empty: Counts = Counts(0, 0, 0)

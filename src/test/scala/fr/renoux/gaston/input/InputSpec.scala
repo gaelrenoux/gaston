@@ -39,7 +39,12 @@ class InputSpec extends AnyFlatSpec with Matchers {
       val all: Set[Topic] = Set(unassignedA, unassignedB, unassignedC, alpha, beta, gamma1, gamma2)
     }
 
-    implicit val counts = Counts(slots = 3, topics = 7, persons = 3)
+    object implicits {
+      implicit val counts = Counts(slots = 3, topics = 7, persons = 3)
+      implicit val countSlots = counts.slotsCount
+      implicit val countTopics = counts.topicsCount
+      implicit val countPersons = counts.personsCount
+    }
 
   }
 
@@ -64,7 +69,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "contain the correct preferences" in {
-    import expected.counts
+    import expected.implicits._
     val scalingFactor: Double = Score.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
       t <- Set(expected.topics.unassignedA, expected.topics.unassignedB, expected.topics.unassignedC)
