@@ -277,11 +277,19 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
       )
     )
     val schedule2bis = schedule.swapPersons(Morning, (Acting, Corwin), (Dancing, Garion))
-    schedule2bis should be (schedule2)
+    schedule2bis should be(schedule2)
 
     // Everyone on schedule 1 is at 0. On schedule 2, only Corwin is at 5. Having three persons less happy after him, his score is divided by 2^3
-    (schedule2.score - schedule.score) should be (strongPreference / Weight(8))
-    schedule.deltaScoreIfSwapPerson(Morning, (Acting, Corwin), (Dancing, Garion)) should be (Some(strongPreference / Weight(8)))
+    (schedule2.score - schedule.score) should be(strongPreference / Weight(8))
+    schedule.deltaScoreIfSwapPerson(Morning, (Acting, Corwin), (Dancing, Garion)) should be(Some(strongPreference / Weight(8)))
+  }
+
+  "Empty schedule" should "have a zero score on empty problem" in {
+    Schedule.empty(Problem.Empty, Context.Default).score should be(Score.Zero)
+  }
+
+  it should "have a negative-or-zero score on current problem" in {
+    Schedule.empty.score should be <= Score.Zero
   }
 
 }
