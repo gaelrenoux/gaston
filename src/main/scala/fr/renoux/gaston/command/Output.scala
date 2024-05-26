@@ -59,8 +59,9 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
     }
   }
 
-  def writeAttempts(count: Long, bestSchedule: Schedule): Unit = synchronized {
-    write(s"We have tried ${shortString(count)} schedules on thread ${Thread.currentThread().getName} (best score is ${bestSchedule.score.value})")
+  def writeAttempts(count: Long, threadBestSchedule: Schedule): Unit = synchronized {
+    val currentThread = Thread.currentThread()
+    write(s"We have tried ${shortString(count)} schedules on thread ${currentThread.getName} (best score on thread is ${threadBestSchedule.score.value})")
   }
 
   def writeNewScheduleChain(): Unit = synchronized {
