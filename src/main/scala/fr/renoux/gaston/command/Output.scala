@@ -11,7 +11,7 @@ import fr.renoux.gaston.model.{Problem, Schedule, Score}
   *
   * It is thread-safe and can be used by all runners concurrently.
   */
-final class Output private (silent: Boolean)(implicit val problem: Problem) {
+final class Output private(silent: Boolean)(implicit val problem: Problem) {
 
   import Ordering.Double.IeeeOrdering
 
@@ -23,10 +23,10 @@ final class Output private (silent: Boolean)(implicit val problem: Problem) {
   private var bestScore: Score = Score.MinValue // scalastyle:ignore var.field
 
   private def shortString(l: Long) = {
-    if (l <10000) l.toString
-    else if (l<10000000) s"${l/1000}K"
-    else if (l<10000000000L) s"${l/1000000}M"
-    else s"${l/1000000000L}G"
+    if (l < 10000) l.toString
+    else if (l < 10000000) s"${l / 1000}K"
+    else if (l < 10000000000L) s"${l / 1000000}M"
+    else s"${l / 1000000000L}G"
   }
 
   private def write(txt: => String, separator: Boolean = false): Unit = {
