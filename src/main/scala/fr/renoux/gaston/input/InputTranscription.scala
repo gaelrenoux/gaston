@@ -7,6 +7,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.refineV
 import eu.timepit.refined.types.string.NonEmptyString
+import fr.renoux.gaston.input.InputCleaner._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences._
@@ -23,14 +24,14 @@ import java.util.concurrent.atomic.AtomicInteger
   * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
   * result in the `result` field.
   */
-private[input] class InputTranscription(input: InputModel) {
+private[input] class InputTranscription(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription._
 
   private val log = Logger[InputTranscription]
 
+  val input: InputModel = rawInput.clean()
   val settings: InputSettings = input.settings
-
 
   /* Checking errors */
   lazy val errors: Set[String] = checkErrors(input)

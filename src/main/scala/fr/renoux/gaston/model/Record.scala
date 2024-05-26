@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 
 /** A Record is a triplet of slot, topic and assigned persons */
 final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
-
+  import Record._
   import problem.counts
 
   lazy val personsList: List[Person] = persons.toList
@@ -91,7 +91,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 
   /** Produces a clear, single-line version of this record, with no indentation. */
   lazy val toFormattedString: String =
-    s"${topic.name}: ${persons.map(_.name).mkString(", ")}"
+    s"${topic.name} $FormattedTopicPersonsSeparator ${persons.map(_.name).mkString(FormattedPersonsSeparator)}"
 
 }
 
@@ -101,4 +101,7 @@ object Record {
   def fromTuple2(tuple: ((Slot, Topic), Set[Person]))(implicit problem: Problem): Record = Record(tuple._1._1, tuple._1._2, tuple._2)
 
   def apply(slot: Slot, topic: Topic, persons: Person*)(implicit problem: Problem): Record = apply(slot, topic, persons.toSet)
+
+  val FormattedTopicPersonsSeparator: String = "==>"
+  val FormattedPersonsSeparator: String = ", "
 }

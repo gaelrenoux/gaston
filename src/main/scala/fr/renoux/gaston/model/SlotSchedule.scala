@@ -186,7 +186,7 @@ final case class SlotSchedule(
 
   /** Produces a clear, multiline version of this schedule slot, with a 2-space indentation. */
   lazy val toFormattedString: String = {
-    val builder = new StringBuilder("  ").append(slot.name).append(": \n")
+    val builder = new StringBuilder("  ").append(slot.name).append("\n")
     recordsList.sortBy(_.topic.name).foreach { r =>
       if (r.persons.nonEmpty) {
         builder.append("    ").append(r.toFormattedString).append("\n")
@@ -209,6 +209,7 @@ final case class SlotSchedule(
 }
 
 object SlotSchedule {
+
   def empty(slot: Slot)(implicit problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
 
   /** Slot schedule where everyone is on an "unassigned" topic, no other topic. */
