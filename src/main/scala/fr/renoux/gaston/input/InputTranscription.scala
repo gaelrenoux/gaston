@@ -311,7 +311,7 @@ object InputTranscription {
 
   def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}[$slotName]")
 
-  def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
+  def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), min = 0, max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++
