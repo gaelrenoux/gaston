@@ -203,6 +203,7 @@ final case class SlotSchedule(
 
   override def equals(o: Any): Boolean = o match {
     case that: SlotSchedule => this.slot == that.slot && this.wrapped == that.wrapped
+    case _ => false
   }
 
   override lazy val hashCode: Int = wrapped.hashCode * 17 + slot.hashCode
