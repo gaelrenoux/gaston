@@ -13,7 +13,7 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{BitSet, Count}
+import fr.renoux.gaston.util.{BitMap, BitSet, Count}
 import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -259,7 +259,7 @@ private[input] class InputTranscription(rawInput: InputModel) {
     val p = new Problem(
       slotSequences,
       topicsByName.values.flatten.toSet,
-      unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
+      if (unassignedTopicsByNameAndSlot.isEmpty) BitMap.empty else unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
       personsByName.values.toSet,
       Constraints.all,
       Preferences.all

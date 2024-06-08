@@ -46,7 +46,7 @@ class Runner(
         implicit val random: Random = new Random(seed + i)
         Future {
           startup()
-          runRecursive(now.plusMillis(statusFrequency), 0, Schedule.startingUnassignedOrForced)(optimParams)
+          runRecursive(now.plusMillis(statusFrequency), 0, Schedule.abysmal)(optimParams)
         }
       }
     }

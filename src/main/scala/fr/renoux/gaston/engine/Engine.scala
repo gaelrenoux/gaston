@@ -10,19 +10,18 @@ import scala.util.Random
 
 /** Main class for the engine. Instantiate it and iterate on lazySeq to start producing schedules. */
 final class Engine(
-    backtrackInitialSchedule: Boolean = false,
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, improver: Improver, ctx: Context) {
 
   private val log = Logger[Engine]
 
-  private val generator = new ScheduleGenerator(triggerOnBacktrackingFailure)
+  private val scheduleBacktrackingGenerator = new ScheduleGenerator(triggerOnBacktrackingFailure)
 
   /** Lazy sequence of incrementing scored schedules, with the number of schedules attempted. Ends when the schedule can't be improved any more. Non-empty. */
   def lazySeq(seed: Long, params: OptimParams): LazyList[(Schedule, Long)] = {
     implicit val rand: Random = new Random(seed)
 
-    val initial: Schedule = if (backtrackInitialSchedule) generator.createOne else Schedule.startingUnassignedOrForced
+    val initial: Schedule = if (problem.unassignedTopics.isEmpty) scheduleBacktrackingGenerator.createOne else Schedule.startingUnassignedOrForced
     if (!initial.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initial.toFormattedString}\n${initial.errors.mkString("\n")}"
       throw new IllegalStateException(message)

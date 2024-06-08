@@ -59,7 +59,6 @@ object Main {
       implicit val improver: Improver = new GreedySlotImprover
 
       implicit val engine: Engine = new Engine(
-        backtrackInitialSchedule = input.settings.backtrackInitialSchedule,
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
 

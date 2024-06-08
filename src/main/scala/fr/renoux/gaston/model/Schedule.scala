@@ -12,9 +12,11 @@ import scala.util.Random
 /**
   * A schedule is an association of people, to topics, to slots.
   * What we're trying and testing and looking for a good one.
+  * @param isAbysmal Flag to force this schedule to report the minimum possible score.
   */
 final case class Schedule(
-    private val wrapped: Map[Slot, SlotSchedule]
+    private val wrapped: Map[Slot, SlotSchedule],
+    private val isAbysmal: Boolean = false
 )(implicit
     val problem: Problem,
     ctx: Context
@@ -51,7 +53,7 @@ final case class Schedule(
 
   def set(slotSchedule: SlotSchedule): Schedule = updateWrapped(wrapped + (slotSchedule.slot -> slotSchedule))
 
-  lazy val score: Score = scoreCalculator.globalScore
+  lazy val score: Score = if (isAbysmal) Score.NegativeInfinity else scoreCalculator.globalScore
 
   /** Add a new record to this schedule. */
   def add(record: Record): Schedule = updateSlotSchedule(record.slot)(_.add(record))
@@ -231,6 +233,9 @@ object Schedule {
 
   /** Empty schedule for a problem */
   def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty)
+
+  /** Same as `empty`, except the schedule is marked as having the worst score. */
+  def abysmal(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty, isAbysmal = true)
 
   /** Schedule where only the forced topics are placed (randomly). Forced topics contain their mandatory persons plus
     * the minimum number of persons to make them valid. Other persons are on the "unassigned" topics. */

@@ -39,8 +39,7 @@ case class InputSettings(
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
     defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
-    unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
-    backtrackInitialSchedule: Boolean = true // TODO Should be calculated
+    unassigned: InputSettings.Unassigned = InputSettings.Unassigned()
 )
 
 object InputSettings {

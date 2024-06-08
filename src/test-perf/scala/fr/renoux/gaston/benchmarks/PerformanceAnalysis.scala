@@ -32,7 +32,7 @@ object PerformanceAnalysis extends App {
   val seed: Long = 0L
 
   implicit val improver: GreedySlotImprover = new GreedySlotImprover
-  implicit val engine: Engine = new Engine(backtrackInitialSchedule = true)
+  implicit val engine: Engine = new Engine
   implicit val output: Output = Output.silent
   val runner = new Runner
   val params = OptimParams(timeout = Some(Instant.now() + duration))

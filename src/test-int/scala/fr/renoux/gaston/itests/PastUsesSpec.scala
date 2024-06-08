@@ -24,10 +24,10 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
   private val udocon2019: Problem = problemFromClassPath("udocon2019/uc19.conf").force
   private val r32019: Problem = problemFromClassPath("r32019/r32019.conf").force
 
-  private def run(problem: Problem, iterations: Long, backtrackInitialSchedule: Boolean = true): (Schedule, Long) = {
+  private def run(problem: Problem, iterations: Long): (Schedule, Long) = {
     implicit val p: Problem = problem
     implicit val i: GreedySlotImprover = new GreedySlotImprover
-    implicit val engine: Engine = new Engine(backtrackInitialSchedule = backtrackInitialSchedule)
+    implicit val engine: Engine = new Engine
     implicit val output: Output = Output.silent
     val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
@@ -67,7 +67,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
   }
 
   "r32019" should "return a good result after 10 iterations" in {
-    val (result, count) = run(r32019, 10, backtrackInitialSchedule = false)
+    val (result, count) = run(r32019, 10)
     println(result.toFormattedString)
     println(count)
     count should be > 10L
@@ -75,7 +75,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
   }
 
   it should "return a great result after 100 iterations" in {
-    val (result, count) = run(r32019, 100, backtrackInitialSchedule = false)
+    val (result, count) = run(r32019, 100)
     println(result.toFormattedString)
     println(count)
     count should be > 100L
