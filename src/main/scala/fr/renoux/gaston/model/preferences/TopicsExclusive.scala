@@ -5,10 +5,11 @@ import fr.renoux.gaston.util.BitSet
 
 /** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot).
   *
-  * This is normally used as a soft-constraint (very high negative score, in order to make sure it's always respected).
+  * This is often used as a soft-constraint (very high negative score, in order to make sure it's always respected).
   */
 final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti with Preference.Impersonal {
+  // TODO add score scaling: the more times we break the rule, the lower it goes (e.g. it's -50 on two topics but -200 on three)
 
   assert(topics.size > 1, s"$this should contain more than one topic")
 
