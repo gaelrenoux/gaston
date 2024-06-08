@@ -32,13 +32,17 @@ The input file describes the problem to solve. It follows the HOCON format, and 
     - `settings`: Global settings. All fields are optional and have a default value.
         - `incompatibility-anti-preference`: Negative score for a person forced to share a topic with someone it would rather not. Default is `-1000`.
         - `default-max-topics-per-slot`: Max number of topics per slot (default is no limit.
-        - `default-min-persons-per-topic`: Minimum number of persons per topic, can be overriden on specific topics. Default is `1`.
-        - `default-max-persons-per-topic`: Maximum number of persons per topic, can be overriden on specific topics. Default is `10`.
-        - `max-persons-on-nothing`: On each slot, maximum number of persons who can have no topic scheduled. Default value is `0`, i.e. everyone must have a topic scheduled on each slot.
-        - `min-persons-on-nothing`: On each slot, minimum number of persons who can have no topic scheduled (the idea being that enough unoccupied persons can do something together). Default is `0`, i.e. no minimum.
-        - `person-on-nothing-anti-preference`: Negative score attached to a person doing nothing on a slot. Default value is `-100`.
-        - `person-unassigned-anti-preference`: Negative score attached to a person being unassigned on a slot. Default value is `-1000`. Unlike doing nothing, you can't set up specific limits to have at least a few people doing nothing together (but performance is better).
-        - `backtrack-initial-schedule`: Technical stuff: should initial schedules be empty or backtracked ? Best answer depends on the schedule being highly constrained or note. Default is `true`.
+        - `default-min-persons-per-topic`: Minimum number of persons per topic, can be overridden on specific topics. Default is `1`.
+        - `default-max-persons-per-topic`: Maximum number of persons per topic, can be overridden on specific topics. Default is `10`.
+        - `unassigned`: A bunch of settings about how to handle unassigned persons (to be unassigned is to not be scheduled on any topic, on some slot). Default is no not allow it at all.
+            - `allowed`: If true, Gaston will allow for people staying unassigned. Default is `false`.
+            - `person-anti-preference`: Negative score attached to a person being unassigned. It's counted once for every slot when a person is unassigned. Default value is `-1000`.
+            - `person-multiple-anti-preference`: Additional negative score attached if unassigned on multiple slots (in addition to the basic anti-preference). Useful if you want to make one unassignment acceptable, but not two. Default value is `0`.
+            - `max`: On each slot, maximum number of persons who can be unassigned. Default is unlimited.
+            - `min`: On each slot, minimum number of persons who can be unassigned (the idea being that enough unassigned persons can do something together). Default is `0`, i.e. no minimum.
+            - `persons-anti-preference-scaling`: If present, this settings make the unassignment anti-preference scale with the number of forbidden entries of a person. The more topics are forbidden for them, the less impactful an unassignment will be. Default is none.
+                - `forbidden-ratio-for-maximum`: For a person, if their ratio of forbidden topics to total topics reach this value, the unassignment anti-preference will be set to its maximum value below.Default is `75%`.
+                - `maximum-anti-preference`: If a person has the maximum ratio of forbidden topics, their unassignment anti-preference. Default is `-1`.
     - `tableSettings`: Settings for importing a table. Optional (leave that field out if you are not importing a table). See the *Importing a table* section below for details. 
     - `slots`: The slots on which to schedule, as an array of arrays of slots. The inner arrays contain the slots following each other directly (such as one in the morning and the other in the afternoon of the same day), so that mult-slot topics may be handled (WIP). The following lines describe the structure of one slot.
         - `name`: Name of the slot. Must be unique among slots.
@@ -238,8 +242,6 @@ gaston {
   
   settings {
       default-max-topics-per-slot = 3
-      minPersonsOnNothing = 3
-      maxPersonsOnNothing = 10
   }
   
   table-settings {
@@ -300,8 +302,6 @@ An Engine run (in `Engine.lazySeq`) starts with an initial schedule respecting a
     - This schedule has been assignment-optimized (see below).
 - If not using backtracking (backtrack-initial-schedule option is set to false), we start with an empty schedule. This is recommended if you expect some persons to be unassigned on some slots.
     - This starts using `Schedule.startingUnassignedOrForced`.
-
-TODO: Document why backtracking is actually useful. Seems like always starting from an empty schedule would be easier. Maybe it's faster?
 
 Then, the Engine calls an improver on this initial schedule. The improver will generate the lazy-list of improving schedules.
 There are two improvers implemented, GreedySlotImprover and TabuSearchSlotImprover. Only the first one is currently being used.
