@@ -14,6 +14,10 @@ final class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends An
   @inline def apply(a: A): B = wrapped(a.id)
 
   @inline def map[C: ClassTag](f: B => C): BitMap[A, C] = new BitMap[A, C](wrapped.map(f))
+
+  @inline def isEmpty: Boolean = !nonEmpty
+
+  @inline def nonEmpty: Boolean = wrapped.exists(_ != null)
 }
 
 object BitMap {

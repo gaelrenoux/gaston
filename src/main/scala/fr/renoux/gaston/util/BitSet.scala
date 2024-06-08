@@ -24,6 +24,8 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
     total
   }
 
+  @inline def isEmpty: Boolean = !nonEmpty
+
   @inline def nonEmpty: Boolean = wrapped.exists(identity)
 
   @inline def size: Int = wrapped.count(identity)
