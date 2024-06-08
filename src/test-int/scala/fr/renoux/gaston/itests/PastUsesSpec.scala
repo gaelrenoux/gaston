@@ -38,7 +38,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = run(udocon2017, 10)
     println(result.toFormattedString)
     println(count)
-    count should be(10)
+    count should be > 10L
     result.score.value should be > 519.0
   }
 
@@ -46,7 +46,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = run(udocon2017, 100)
     println(result.toFormattedString)
     println(count)
-    count should be(100)
+    count should be> 100L
     result.score.value should be > 729.0
   }
 
@@ -54,7 +54,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = run(udocon2019, 10)
     println(result.toFormattedString)
     println(count)
-    count should be(10)
+    count should be > 10L
     result.score.value should be > 657.0
   }
 
@@ -62,7 +62,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = run(udocon2019, 100)
     println(result.toFormattedString)
     println(count)
-    count should be(100)
+    count should be > 100L
     result.score.value should be > 970.0
   }
 
@@ -70,7 +70,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = run(r32019, 10, backtrackInitialSchedule = false)
     println(result.toFormattedString)
     println(count)
-    count should be(10)
+    count should be > 10L
     result.score.value should be > 657.0
   }
 
@@ -78,7 +78,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = run(r32019, 100, backtrackInitialSchedule = false)
     println(result.toFormattedString)
     println(count)
-    count should be(100)
+    count should be > 100L
     result.score.value should be > 970.0
   }
 

@@ -1,7 +1,6 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.util.Context
-import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

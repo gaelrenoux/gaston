@@ -61,25 +61,18 @@ private[input] class InputTranscription(rawInput: InputModel) {
 
   /* Topics */
   private val topicIx = new AtomicInteger(0) // ugly, simpler
-  lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] = {
-    input.slotsSet.map { inSlot =>
-      val slot = slotsByName(inSlot.name)
-      val name = unassignedTopicName(inSlot.name)
-      (name, slot) -> unassignedTopic(topicIx.getAndIncrement(), slot)
-    }.toMap
-  }
-  lazy val nothingTopicsByName: Map[NonEmptyString, Topic] = if (!input.settings.isNothingEnabled) Map.empty[NonEmptyString, Topic] else {
-    log.info("Persons-on-nothing enabled")
-    input.slotsSet.map { inSlot =>
-      val slot = slotsByName(inSlot.name)
-      val name = nothingTopicName(inSlot.name)
-      val min = settings.minPersonsOnNothing
-      val max = settings.maxPersonsOnNothing
-      name -> Topic(topicIx.getAndIncrement(), name, min = min, max = max, slots = Some(Set(slot)), virtual = true)
-    }.toMap
-  }
+  lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] =
+    if (!input.settings.unassigned.allowed) Map.empty[(NonEmptyString, Slot), Topic] else {
+      log.info("Unassigned persons are allowed")
+      input.slotsSet.map { inSlot =>
+        val slot = slotsByName(inSlot.name)
+        val name = unassignedTopicName(inSlot.name)
+        val topic = unassignedTopic(topicIx.getAndIncrement(), slot, min = settings.unassigned.minPersons, max = settings.unassigned.maxPersons)
+        (name, slot) -> topic
+      }.toMap
+    }
 
-  lazy val concreteTopicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] = {
+  lazy val basicTopicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] = {
     input.topics.map { inTopic: InputTopic =>
       val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
       val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
@@ -117,8 +110,7 @@ private[input] class InputTranscription(rawInput: InputModel) {
   }
 
   lazy val topicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] =
-    concreteTopicsByPartIndexByOccurrenceIndexByName ++
-      nothingTopicsByName.mapValuesStrict { topic => Map(0 -> Map(0 -> topic)) } ++
+    basicTopicsByPartIndexByOccurrenceIndexByName ++
       unassignedTopicsByNameAndSlot.map { case (key, topic) => key._1 -> Map(0 -> Map(0 -> topic)) }
 
   lazy val topicsFirstPartByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] =
@@ -223,32 +215,13 @@ private[input] class InputTranscription(rawInput: InputModel) {
         topic <- topicsByName(wishedTopicName)
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
-    def getNothingAntiPreference(inPerson: InputPerson): Score = settings.personOnNothingAntiPreferenceScaling match {
-      case None => settings.personOnNothingAntiPreference
-      case Some(scalingSettings) if !scalingSettings.enabled => settings.personOnNothingAntiPreference
+    def getUnassignedAntiPreference(inPerson: InputPerson): Score = settings.unassigned.personAntiPreferenceScaling match {
+      case None => settings.unassigned.personAntiPreference
       case Some(scalingSettings) =>
-        val forbiddenRatio = inPerson.forbidden.size.toDouble / input.topics.size
-        val antiPreferenceVariablePart: Score = settings.personOnNothingAntiPreference - scalingSettings.maximumAntiPreference
-        val antiPreferenceRatio = math.max(0, 1 - (forbiddenRatio / scalingSettings.forbiddenRatioForMaximum))
-        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * antiPreferenceRatio)
-    }
-
-    lazy val nothingTopicPreferences: Set[PersonTopicPreference] = {
-      for {
-        nothingTopic <- nothingTopicsByName.values
-        inPerson <- input.personsSet
-        person = personsByName(inPerson.name)
-      } yield PersonTopicPreference(person, nothingTopic, getNothingAntiPreference(inPerson))
-    }.toSet
-
-    def getUnassignedAntiPreference(inPerson: InputPerson): Score = settings.personUnassignedAntiPreferenceScaling match {
-      case None => settings.personUnassignedAntiPreference
-      case Some(scalingSettings) if !scalingSettings.enabled => settings.personUnassignedAntiPreference
-      case Some(scalingSettings) =>
-        val forbiddenRatio = inPerson.forbidden.size.toDouble / input.topics.size
-        val antiPreferenceVariablePart: Score = settings.personUnassignedAntiPreference - scalingSettings.maximumAntiPreference
-        val antiPreferenceRatio = math.max(0, 1 - (forbiddenRatio / scalingSettings.forbiddenRatioForMaximum))
-        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * antiPreferenceRatio)
+        val ratioOfForbiddenTopics = inPerson.forbidden.size.toDouble / input.topics.size
+        val antiPreferenceVariablePart: Score = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
+        val ratioOnVariablePart = math.max(0, 1 - (ratioOfForbiddenTopics / scalingSettings.forbiddenRatioForMaximum))
+        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * ratioOnVariablePart)
     }
 
     lazy val unassignedTopicPreferences: Set[PersonTopicPreference] = {
@@ -259,8 +232,8 @@ private[input] class InputTranscription(rawInput: InputModel) {
       } yield PersonTopicPreference(person, unassignedTopic, getUnassignedAntiPreference(inPerson))
     }.toSet
 
-    lazy val exclusiveUnassignedTopics: Set[TopicsExclusive] =
-      input.settings.personUnassignedMultipleAntiPreference.fold(Set.empty[TopicsExclusive]) { reward =>
+    lazy val unassignedTopicsExclusivePreferences: Set[TopicsExclusive] =
+      input.settings.unassigned.personMultipleAntiPreference.fold(Set.empty[TopicsExclusive]) { reward =>
         Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toBitSet, BitSet.empty, reward))
       }
 
@@ -274,9 +247,8 @@ private[input] class InputTranscription(rawInput: InputModel) {
         linkedParts ++
         groupDislikes ++
         personTopicPreferences ++
-        nothingTopicPreferences ++
         unassignedTopicPreferences ++
-        exclusiveUnassignedTopics
+        unassignedTopicsExclusivePreferences
     }
   }
 
@@ -305,13 +277,12 @@ private[input] class InputTranscription(rawInput: InputModel) {
 
 object InputTranscription {
 
-  private val VirtualTopicPrefix = "@"
+  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${Topic.SyntheticPrefix}Unassigned ($slotName)")
 
-  def nothingTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}Nothing ($slotName)")
-
-  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${VirtualTopicPrefix}[$slotName]")
-
-  def unassignedTopic(id: Int, slot: Slot): Topic = Topic(id, unassignedTopicName(slot.name), min = 0, max = Person.MaxCount, slots = Some(Set(slot)), virtual = true)
+  def unassignedTopic(id: Int, slot: Slot, min: Int = 0, max: Int = Int.MaxValue): Topic = {
+    val realMin = if (min <= 1) 0 else min
+    Topic(id, unassignedTopicName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = min == 0)
+  }
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++
@@ -328,9 +299,9 @@ object InputTranscription {
       else Some(s"Settings: default min persons per topic (${input.settings.defaultMinPersonsPerTopic}) " +
         s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic}) ")
     } ++ {
-      if (input.settings.minPersonsOnNothing <= input.settings.maxPersonsOnNothing) None
-      else Some(s"Settings: Min persons on nothing (${input.settings.minPersonsOnNothing}) " +
-        s"is higher than max persons on nothing (${input.settings.maxPersonsOnNothing})")
+      if (input.settings.unassigned.minPersons <= input.settings.unassigned.maxPersons) None
+      else Some(s"Settings: Min persons on unassigned (${input.settings.unassigned.minPersons}) " +
+        s"is higher than max persons on unassigned (${input.settings.unassigned.maxPersons})")
     }
   }
 
@@ -347,8 +318,8 @@ object InputTranscription {
       duplicates.map { d => s"Duplicate topic name: $d" }
     } ++ {
       input.topics
-        .filter { t => t.name.startsWith(VirtualTopicPrefix) }
-        .map { t => s"Topic [${t.name}]: prefix $VirtualTopicPrefix is reserved by the software" }
+        .filter { t => t.name.startsWith(Topic.SyntheticPrefix) }
+        .map { t => s"Topic [${t.name}]: prefix ${Topic.SyntheticPrefix} is reserved by the software" }
     } ++ {
       input.topics
         .filter { t => t.min.lazyZip(t.max).exists(_ > _) }

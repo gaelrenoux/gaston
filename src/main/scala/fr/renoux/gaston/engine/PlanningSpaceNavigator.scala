@@ -78,8 +78,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     _ = log.debug(s"Checking for possible Swaps between slots ${slot1.name} and ${slot2.name}")
 
     /* Filter out impossible topics because of incompatibility */
-    t1 <- shuffled(slotSchedule1.realTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics).view
-    t2 <- shuffled(slotSchedule2.realTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics).view
+    t1 <- shuffled(slotSchedule1.movableTopicsSet -- slotSchedule2.permanentlyIncompatibleTopics).view
+    t2 <- shuffled(slotSchedule2.movableTopicsSet -- slotSchedule1.permanentlyIncompatibleTopics).view
 
     /* Filter out impossible topics because followup topic can't be added. Also, can't move followup topics directly. */
     if (t1.followup.isEmpty || slot2.hasNext) && (t2.followup.isEmpty || slot1.hasNext) && !t1.isFollowup && !t2.isFollowup

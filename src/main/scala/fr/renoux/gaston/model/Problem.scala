@@ -34,8 +34,6 @@ class Problem(
   /* TOPICS */
 
   lazy val topicsList: List[Topic] = topicsSet.toList
-  lazy val realTopics: Set[Topic] = topicsSet.filterNot(t => t.virtual || t.isFollowup)
-  lazy val realTopicsList: List[Topic] = realTopics.toList
   lazy val forcedTopics: Set[Topic] = topicsSet.filter(_.forced)
   /** All forced topics, starting with the ones that are limited to the least number of possible slots, up to the ones that can be on any slot. */
   lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
@@ -126,7 +124,6 @@ class Problem(
     val couples = for {
       slot <- slotsSet
       topic <- topicsSet
-      if !topic.virtual // Virtual topics are never moved anyway
       if topic.mandatory.exists(!slot.personsPresent.contains(_)) || topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
     couples.groupToMap.toBitMap(Set.empty)

@@ -4,6 +4,8 @@ import fr.renoux.gaston.util.Context
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
+import scala.util.Random
+
 class ScheduleSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.SimpleTestModel.Persons._
@@ -290,6 +292,19 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
 
   it should "have a negative-or-zero score on current problem" in {
     Schedule.empty.score should be <= Score.Zero
+  }
+
+  "startingUnassignedOrForced" should "return a schedule with all unassigned topics" in {
+    implicit val rand = new Random(0)
+    val s = Schedule.startingUnassignedOrForced
+    println(s.toFormattedString)
+    List(Morning, AfterNoon, Evening).foreach { slot =>
+      val slotSchedule = s.on(slot)
+      slotSchedule.topics.size should be(1)
+      slotSchedule.topics.head.isSynthetic should be(true)
+      slotSchedule.topics.head.name should be(s"@Unassigned (${slot.name})")
+      slotSchedule.scheduledPersons should contain theSameElementsAs slot.personsPresent
+    }
   }
 
 }

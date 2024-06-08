@@ -31,9 +31,15 @@ final case class SlotSchedule(
   lazy val topics: Iterable[Topic] = wrapped.keys
   lazy val topicsSet: Set[Topic] = wrapped.keySet
   lazy val topicsList: List[Topic] = topics.toList
-  lazy val realTopics: Iterable[Topic] = topics.filterNot(t => t.virtual || t.isFollowup) // can't move followups directly, move the base topic instead
-  lazy val realTopicsSet: Set[Topic] = realTopics.toSet
-  lazy val removableTopics: Iterable[Topic] = realTopics.filterNot(_.forced)
+
+  /** Topics that can be moved to another slot. Can't move followup directly (move the base topic instead), and can't
+    * move if it's restricted to this very slot. */
+  lazy val movableTopics: Iterable[Topic] = topics.filterNot(t => t.isFollowup || t.requiresSingleSpecificSlot)
+  lazy val movableTopicsSet: Set[Topic] = movableTopics.toSet
+
+  /** Topics that can be removed from the schedule. Can't remove followup directly (remove the base topic instead), and
+    * can't remove forced topics. */
+  lazy val removableTopics: Iterable[Topic] = topics.filterNot(t => t.forced || t.isFollowup)
 
   lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)
 
@@ -140,7 +146,7 @@ final case class SlotSchedule(
   /** Impersonal score of the slot, regardless of how persons are assigned to topics on this slot (as long as the same persons are present) */
   lazy val impersonalScoreSlotLevel: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
 
-  /** Total impersonal score in this slot.  */
+  /** Total impersonal score in this slot. */
   lazy val impersonalScore: Score = impersonalScoreTopicLevel + impersonalScoreSlotLevel
 
   @tailrec
@@ -213,11 +219,13 @@ object SlotSchedule {
 
   def empty(slot: Slot)(implicit problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
 
-  /** Slot schedule where everyone is on an "unassigned" topic, no other topic. */
-  def everyoneUnassigned(slot: Slot)(implicit problem: Problem): SlotSchedule = {
-    val t = problem.unassignedTopics(slot)
-    SlotSchedule(slot, Map(t -> Record(slot, t, slot.personsPresent)))
-  }
+  /** Slot schedule where everyone is on an "unassigned" topic, no other topic. Doesn't work if unassignes isn't allowed. */
+  def everyoneUnassigned(slot: Slot)(implicit problem: Problem): SlotSchedule =
+    if (problem.unassignedTopics.isEmpty) throw new IllegalStateException("Cannot call everyoneUnassigned, persons cannot be unassigned")
+    else {
+      val t = problem.unassignedTopics(slot)
+      SlotSchedule(slot, Map(t -> Record(slot, t, slot.personsPresent)))
+    }
 
   /** Commodity method */
   @testOnly def from(slot: Slot, entries: Seq[Record]*)(implicit problem: Problem): SlotSchedule = {

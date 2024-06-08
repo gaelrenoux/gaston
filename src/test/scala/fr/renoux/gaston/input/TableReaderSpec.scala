@@ -32,8 +32,7 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
   val settings = InputSettings(
     incompatibilityAntiPreference = NonPosScore(-1000.0),
     defaultMinPersonsPerTopic = 4,
-    defaultMaxPersonsPerTopic = 6,
-    personOnNothingAntiPreference = NonPosScore(-100.0)
+    defaultMaxPersonsPerTopic = 6
   )
 
   val input = InputModel(

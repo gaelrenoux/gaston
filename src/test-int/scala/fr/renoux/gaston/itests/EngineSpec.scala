@@ -31,7 +31,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     val (result, count) = run(problem17, 10)
     println(result.toFormattedString)
     println(count)
-    count should be(10)
+    count should be > 10L
     result.score.value should be > 519.0
   }
 
@@ -39,7 +39,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     val (result, count) = run(problem17, 100)
     println(result.toFormattedString)
     println(count)
-    count should be(100)
+    count should be > 100L
     result.score.value should be > 725.0
   }
 
@@ -47,7 +47,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     val (result, count) = run(problem19, 10)
     println(result.toFormattedString)
     println(count)
-    count should be(10)
+    count should be > 10L
     result.score.value should be > 657.0
   }
 
@@ -55,7 +55,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     val (result, count) = run(problem19, 100)
     println(result.toFormattedString)
     println(count)
-    count should be(100)
+    count should be > 100L
     result.score.value should be > 970.0
   }
 

@@ -39,9 +39,7 @@ final case class Schedule(
   lazy val topicToSlot: Map[Topic, Slot] = planning.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
   lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopics.toBitSet
-  // lazy val scheduledRealTopics: Set[Topic] = scheduledTopics.filterNot(_.virtual)
-  // lazy val scheduledRemovableTopics: Set[Topic] = scheduledRealTopics.filterNot(_.forced)
-  lazy val unscheduledTopics: Set[Topic] = (problem.realTopics -- scheduledTopics)
+  lazy val unscheduledTopics: Set[Topic] = (problem.topicsSet -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values // not a Set: we do not want to deduplicate identical groups!
   // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.max).sum)
@@ -235,23 +233,25 @@ object Schedule {
   def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty)
 
   /** Schedule where only the forced topics are placed (randomly). Forced topics contain their mandatory persons plus
-    * the minimum number of persons to maket them valid. Other persons are on the "unassigned" topics. */
+    * the minimum number of persons to make them valid. Other persons are on the "unassigned" topics. */
   def startingUnassignedOrForced(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
     /* Everything complicated in here is for the forced-slots */
     val forcedTopicsCountPerSlot = Array.fill(problem.slotsSet.size)(0)
-    val forcedTopicsBySlot: Map[Slot, Seq[Topic]] = problem.forcedTopicsMostToLeastConstrained.map { topic =>
-      val possibleSlots = topic.slots.getOrElse(problem.slotsSet).filterMinBy(s => forcedTopicsCountPerSlot(s.id))
-      val slot = rand.pick(possibleSlots)
-      forcedTopicsCountPerSlot(slot.id) += 1
-      slot -> topic
-    }.groupToMap
+    val forcedTopicsBySlot: Map[Slot, Seq[Topic]] =
+      problem.forcedTopicsMostToLeastConstrained.filterNot(_.isSynthetic) // synthetic topics are handled manually
+        .map { topic =>
+          val possibleSlots = topic.slots.getOrElse(problem.slotsSet).filterMinBy(s => forcedTopicsCountPerSlot(s.id))
+          val slot = rand.pick(possibleSlots)
+          forcedTopicsCountPerSlot(slot.id) += 1
+          slot -> topic
+        }.groupToMap
 
     val slotSchedules = problem.slotsSet.map { slot =>
       /* For each slot, starts with everyone unassigned */
       val allPersons = rand.shuffle(slot.personsPresent.toList)
       val slotScheduleUnassigned = SlotSchedule.everyoneUnassigned(slot)
       val unassignedTopic = slotScheduleUnassigned.topics.head
-      /* Add forced topics and assing some persons on tem */
+      /* Add forced topics and assign some persons on them */
       val slotScheduleWithForcedTopics = forcedTopicsBySlot.get(slot) match {
         case None => slotScheduleUnassigned
         case Some(forcedTopics) =>

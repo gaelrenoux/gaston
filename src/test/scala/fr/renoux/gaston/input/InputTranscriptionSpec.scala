@@ -73,10 +73,10 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
 
 
-  behavior of "Nothing"
+  behavior of "Unassigned"
 
   {
-    val inputSettings = InputSettings(maxPersonsOnNothing = 3)
+    val inputSettings = InputSettings(unassigned = InputSettings.Unassigned(allowed = true, maxPersons = 3, personAntiPreference = NonPosScore(-42.0)))
     val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
     val inputTopics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma"))
     val inputPersons = List(
@@ -94,46 +94,46 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     it should "have a basic anti-preference (when no scaling)" in {
       implicit val problem: Problem = from(inputModel)
       val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Nothing") => s
+        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       val biancaNothingPreferences = problem.preferencesByPerson(p"Bianca").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Nothing") => s
+        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       val carolineNothingPreferences = problem.preferencesByPerson(p"Caroline").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Nothing") => s
+        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       arnoldNothingPreferences.size should be(inputSlots.size)
-      arnoldNothingPreferences.foreach(_ should be(Score(-100)))
+      arnoldNothingPreferences.foreach(_ should be(Score(-42)))
       biancaNothingPreferences.size should be(inputSlots.size)
-      biancaNothingPreferences.foreach(_ should be(Score(-100)))
+      biancaNothingPreferences.foreach(_ should be(Score(-42)))
       carolineNothingPreferences.size should be(inputSlots.size)
-      carolineNothingPreferences.foreach(_ should be(Score(-100)))
+      carolineNothingPreferences.foreach(_ should be(Score(-42)))
     }
 
     it should "have a scaled anti-preference (with scaling enabled)" in {
       implicit val problem: Problem = from(
-        inputModel.modify(_.settings.personOnNothingAntiPreferenceScaling).setTo(Some(
-          InputSettings.NothingOrUnassignedAntiPreferenceScaling(
+        inputModel.modify(_.settings.unassigned.personAntiPreferenceScaling).setTo(Some(
+          InputSettings.UnassignedAntiPreferenceScaling(
             forbiddenRatioForMaximum = 0.5,
-            maximumAntiPreference = NonPosScore(-10.0)
+            maximumAntiPreference = NonPosScore(-12.0)
           )
         ))
       )
       val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Nothing") => s
+        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       val biancaNothingPreferences = problem.preferencesByPerson(p"Bianca").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Nothing") => s
+        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       val carolineNothingPreferences = problem.preferencesByPerson(p"Caroline").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Nothing") => s
+        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       arnoldNothingPreferences.size should be(inputSlots.size)
-      arnoldNothingPreferences.foreach(_ should be(Score(-100)))
+      arnoldNothingPreferences.foreach(_ should be(Score(-42)))
       biancaNothingPreferences.size should be(inputSlots.size)
-      biancaNothingPreferences.foreach(_ should be(Score(-40)))
+      biancaNothingPreferences.foreach(_ should be(Score(-22)))
       carolineNothingPreferences.size should be(inputSlots.size)
-      carolineNothingPreferences.foreach(_ should be(Score(-100)))
+      carolineNothingPreferences.foreach(_ should be(Score(-42)))
     }
   }
 

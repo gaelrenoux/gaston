@@ -7,7 +7,6 @@ import fr.renoux.gaston.util.Identified
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
   * @param isFollowup true Only if this topic is another's topic followup
   * @param forced Topic must be on the schedule.
-  * @param virtual Topic created for technical reasons, not a real topic. Cannot be moved or removed from its slot.
   */
 final case class Topic(
     id: Int,
@@ -20,23 +19,31 @@ final case class Topic(
     followup: Option[Topic] = None,
     isFollowup: Boolean = false,
     forced: Boolean = false,
-    virtual: Boolean = false // TODO maybe rename to locked, to indicate it can't be moved ?
 ) extends Identified {
+
+  /** true if this topic is only schedulable on a single slot. */
+  lazy val requiresSingleSpecificSlot: Boolean = slots.exists(_.size == 1)
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
 
-  def toShortString: String = s"$id -> $name"
+  val isSynthetic: Boolean = name.startsWith(Topic.SyntheticPrefix)
 
-  def toLongString: String = s"Topic($id, $name, mandatory=${mandatory.map(_.name).mkString("[", ", ", "]")}, " +
+  val toShortString: String = s"$id -> $name"
+
+  val toLongString: String = s"Topic($id, $name, mandatory=${mandatory.map(_.name).mkString("[", ", ", "]")}, " +
     s"forbidden=${forbidden.map(_.name).mkString("[", ", ", "]")}, $min to $max, " +
     slots.fold("")(s => s.map(_.name).mkString("forced = [", ", ", "], ")) +
     followup.fold("")(t => s"followup = ${t.toShortString}, ") +
     (if (isFollowup) "isFollowup = true, " else "") +
-    s"forced=$forced, virtual=$virtual"
+    s"forced=$forced" +
+    ")"
 }
 
 object Topic {
+
+  /** A prefix on the topic-name for synthetic topics (topics created by Gaston, not present in the input). */
+  val SyntheticPrefix = "@"
 
   val DefaultMin = 1
 

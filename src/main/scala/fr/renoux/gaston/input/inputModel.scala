@@ -39,26 +39,29 @@ case class InputSettings(
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
     defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
-    minPersonsOnNothing: NonNegInt = 0,
-    maxPersonsOnNothing: NonNegInt = 0,
-    personOnNothingAntiPreference: NonPosScore = NonPosScore(-100.0),
-    personOnNothingAntiPreferenceScaling: Option[InputSettings.NothingOrUnassignedAntiPreferenceScaling] = None,
-    personUnassignedAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore // TODO merge with personOnNothing
-    personUnassignedAntiPreferenceScaling: Option[InputSettings.NothingOrUnassignedAntiPreferenceScaling] = None,
-    personUnassignedMultipleAntiPreference: Option[NonPosScore] = None, // we ignore this when we don't intend to have persons stay unassigned at all
+    unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
     backtrackInitialSchedule: Boolean = true // TODO Should be calculated
-) {
-  lazy val isNothingEnabled: Boolean = maxPersonsOnNothing > 0
-}
+)
 
 object InputSettings {
-  /** If this is enabled, the anti-preference for nothing will scale with the number of forbidden topics for each person.
-    * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal (negative) value
+
+  /** Settings for unassigned topics. */
+  case class Unassigned(
+      allowed: Boolean = false, // all other values in this class are unused when this is false
+      minPersons: NonNegInt = 0, // O allow to not remove the topic, which let us skip a step when optimizing
+      maxPersons: PosInt = Int.MaxValue,
+      personAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
+      personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
+      personMultipleAntiPreference: Option[NonPosScore] = None
+  )
+
+  /** If this is enabled, the anti-preference for unassigned will scale with the number of forbidden topics for each person.
+    * @param maximumAntiPreference The maximum value of the anti-preference (i.e., closest to zero).
+    * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal value.
     */
-  case class NothingOrUnassignedAntiPreferenceScaling(
-      enabled: Boolean = true,
-      forbiddenRatioForMaximum: Double = 0.75,
+  case class UnassignedAntiPreferenceScaling(
       maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
+      forbiddenRatioForMaximum: Double = 0.75,
   )
 }
 
