@@ -194,9 +194,7 @@ final case class SlotSchedule(
   lazy val toFormattedString: String = {
     val builder = new StringBuilder("  ").append(slot.name).append("\n")
     recordsList.sortBy(_.topic.name).foreach { r =>
-      if (r.persons.nonEmpty) {
-        builder.append("    ").append(r.toFormattedString).append("\n")
-      }
+      builder.append("    ").append(r.toFormattedString).append("\n")
     }
     builder.toString
   }
