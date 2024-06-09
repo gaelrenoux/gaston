@@ -2,7 +2,7 @@ import sbt.Keys._
 
 organization := "gael.renoux"
 name := "gaston"
-version := "0.6.0"
+version := "0.7.0"
 
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
