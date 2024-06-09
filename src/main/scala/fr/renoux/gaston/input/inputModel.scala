@@ -8,7 +8,7 @@ import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.input.InputRefinements._
 import fr.renoux.gaston.model.{Score, Topic, Weight}
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.Opt
+import fr.renoux.gaston.util.{NumberUtils, Opt}
 
 /* All line and column indices are zero-based */
 // scalastyle:off magic.number
@@ -48,7 +48,7 @@ object InputSettings {
   case class Unassigned(
       allowed: Boolean = false, // all other values in this class are unused when this is false
       minPersons: NonNegInt = 0, // O allow to not remove the topic, which let us skip a step when optimizing
-      maxPersons: PosInt = Int.MaxValue,
+      maxPersons: PosInt = NumberUtils.IntLowMaxValue,
       personAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
       personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
       personMultipleAntiPreference: Option[NonPosScore] = None

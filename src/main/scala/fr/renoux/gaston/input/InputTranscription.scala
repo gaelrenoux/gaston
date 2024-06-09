@@ -13,7 +13,7 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{BitMap, BitSet, Count}
+import fr.renoux.gaston.util.{BitMap, BitSet, Count, NumberUtils}
 import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -279,7 +279,7 @@ object InputTranscription {
 
   def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${Topic.SyntheticPrefix}Unassigned ($slotName)")
 
-  def unassignedTopic(id: Int, slot: Slot, min: Int = 0, max: Int = Int.MaxValue): Topic = {
+  def unassignedTopic(id: Int, slot: Slot, min: Int = 0, max: Int = NumberUtils.IntLowMaxValue): Topic = {
     val realMin = if (min <= 1) 0 else min
     Topic(id, unassignedTopicName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = min == 0)
   }
