@@ -24,7 +24,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     implicit val output: Output = Output.silent
     val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
-    runner.run(seed = 42, params)
+    runner.run(globalSeed = 42, params)
   }
 
   "problem 17" should "return a good result after 10 iterations" in {

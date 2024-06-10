@@ -22,7 +22,7 @@ import fr.renoux.gaston.util.CanAddDuration._
   * - Run continuously and regularly output the best result found.
   */
 class Runner(
-    startup: () => Unit = () => (),
+    startup: Long => Unit = _ => (),
     parallelism: Int = math.max(1, Runtime.getRuntime.availableProcessors - 1)
 )(implicit problem: Problem, engine: Engine, output: Output, ctx: Context) {
 
@@ -33,19 +33,21 @@ class Runner(
 
   /** Produces a schedule. Also returns the number of schedule examined */
   def run(
-      seed: Long = Random.nextLong(),
+      globalSeed: Long = Random.nextLong(),
       optimParams: OptimParams
   ): (Schedule, Long) = {
-
+    val globalRand = new Random(globalSeed)
     val now = Instant.now()
     val maxDuration = optimParams.timeout.map(_ - now)
 
     /* Parallelize on the number of cores */
     val future: Future[Seq[(Schedule, Long)]] = Future.sequence {
-      (0 until parallelism).map { i =>
-        implicit val random: Random = new Random(seed + i)
+      (0 until parallelism).map { _ =>
+        /* Needs to use nextLong to instantiate the new seeds: just incrementing the seeds leads to very similar randoms */
+        val threadSeed = globalRand.nextLong()
+        implicit val random: Random = new Random(threadSeed)
         Future {
-          startup()
+          startup(threadSeed)
           runRecursive(now.plusMillis(statusFrequency), 0, Schedule.abysmal)(optimParams)
         }
       }
@@ -89,8 +91,9 @@ class Runner(
           if (ss.score > best.score) runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, ss, tail)(optimParams)
           else runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, best, tail)(optimParams)
         case _ => // we finished the list
-          output.writeNewScheduleChain()
-          val newSeq = engine.lazySeq(random.nextLong(), optimParams)
+          val newChainSeed = random.nextLong()
+          output.writeNewScheduleChain(newChainSeed)
+          val newSeq = engine.lazySeq(newChainSeed, optimParams)
           runRecursive(newNextStatusTime, totalAttemptsCount, best, newSeq)(optimParams)
       }
     }

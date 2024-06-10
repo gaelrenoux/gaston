@@ -39,9 +39,9 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
     }
   }
 
-  def writeStart(seed: Long): Unit = write(s"Starting to run ! (global seed: $seed)", separator = true)
+  def writeStart(globalSeed: Long): Unit = write(s"Starting with global-seed: $globalSeed", separator = true)
 
-  def writeStartThread(): Unit = write(s"Starting to run on thread ${Thread.currentThread().getName} !")
+  def writeStartThread(threadSeed: Long): Unit = write(s"Starting on thread ${Thread.currentThread().getName} with thread-seed: $threadSeed")
 
   def writeEnd(schedule: Schedule): Unit = {
     val render = new Renderer(problem)
@@ -64,8 +64,8 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
     write(s"We have tried ${shortString(count)} schedules on thread ${currentThread.getName} (best score on thread is ${threadBestSchedule.score.value})")
   }
 
-  def writeNewScheduleChain(): Unit = synchronized {
-    write(s"Starting new schedule chain on thread ${Thread.currentThread().getName}")
+  def writeNewScheduleChain(chainSeed: Long): Unit = synchronized {
+    write(s"Starting new schedule chain on thread ${Thread.currentThread().getName} with chain-seed: $chainSeed")
   }
 
   def writeBacktrackingFailure(fs: BacktrackingFailures): Unit = {

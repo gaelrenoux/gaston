@@ -8,27 +8,27 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
 
   type ErrorOr[A] = Either[String, A]
 
-  private val firstLineRegex = """Schedule seed: (\d+)""".r
+  private val firstLineRegex = """Schedule-chain seed: (\d+)""".r
 
   /** Parses a schedule from the result of [[Schedule.toFormattedString]]. */
   def parseFormattedString(str: String): Either[String, Schedule] = {
     val lines = str.linesIterator.toList
     for {
       headerResult <- readHeader(lines)
-      (seed, linesLeft) = headerResult
+      (globalSeed, linesLeft) = headerResult
       result <- readAllSlotSchedules(0, linesLeft)
       (slotSchedules, _) = result
-    } yield Schedule(seed, slotSchedules.map(ss => ss.slot -> ss).toMap)
+    } yield Schedule(globalSeed, slotSchedules.map(ss => ss.slot -> ss).toMap)
   }
 
   private def readHeader(lines: List[String]): Either[String, (Long, List[String])] = lines match {
-    case firstLineRegex(seed) :: lines =>
-      try Right((seed.toLong, lines))
+    case firstLineRegex(globalSeed) :: lines =>
+      try Right((globalSeed.toLong, lines))
       catch {
-        case _: NumberFormatException => Left(s"Seed in first line was not a number: $seed")
+        case _: NumberFormatException => Left(s"Global-seed in first line was not a number: $globalSeed")
       }
     case h :: _ => Left(s"Unrecognized first line: $h")
-    case Nil => Left(s"Empty schedule")
+    case Nil => Left("Empty schedule")
   }
 
   private[model] def readAllSlotSchedules(

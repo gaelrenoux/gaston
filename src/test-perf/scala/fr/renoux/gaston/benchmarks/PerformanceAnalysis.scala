@@ -29,7 +29,7 @@ object PerformanceAnalysis extends App {
   implicit val context: Context = Context(tools = tools)
 
   val duration: FiniteDuration = 1.minutes
-  val seed: Long = 0L
+  val globalSeed: Long = 0L
 
   implicit val improver: GreedySlotImprover = new GreedySlotImprover
   implicit val engine: Engine = new Engine
@@ -38,7 +38,7 @@ object PerformanceAnalysis extends App {
   val params = OptimParams(timeout = Some(Instant.now() + duration))
 
   val (schedule, count) = tools.chrono("Total") {
-    runner.run(seed = seed, params)
+    runner.run(globalSeed = globalSeed, params)
   }
 
   println(s"${schedule.score} after $count iterations")

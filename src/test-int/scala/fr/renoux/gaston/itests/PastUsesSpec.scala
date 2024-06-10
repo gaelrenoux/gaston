@@ -31,7 +31,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     implicit val output: Output = Output.silent
     val runner = new Runner(parallelism = 1)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
-    runner.run(seed = 42, params)
+    runner.run(globalSeed = 42, params)
   }
 
   "udocon2017" should "return a good result after 10 iterations" in {

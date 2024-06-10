@@ -64,12 +64,12 @@ object Main {
 
       val runner = new Runner(
         parallelism = commandLine.parallelism,
-        startup = () => output.writeStartThread()
+        startup = threadSeed => output.writeStartThread(threadSeed)
       )
 
-      output.writeStart(commandLine.seed)
+      output.writeStart(commandLine.globalSeed)
       val timeout = commandLine.maxDuration.map(Instant.now() + _)
-      val (ss, _) = runner.run(seed = commandLine.seed, optimParams = OptimParams(timeout = timeout))
+      val (ss, _) = runner.run(globalSeed = commandLine.globalSeed, optimParams = OptimParams(timeout = timeout))
 
       /* Print final result */
       output.writeEnd(ss)

@@ -15,7 +15,7 @@ case class CommandLine(
     silent: Boolean = false,
     debug: Boolean = false,
     maxDuration: Option[FiniteDuration] = None,
-    seed: Long = math.abs(Random.nextLong()),
+    globalSeed: Long = Random.nextLong(),
     parallelism: Int = Runtime.getRuntime.availableProcessors - 1
 )
 
@@ -50,8 +50,8 @@ object CommandLine {
       .text("Debug mode: log debug messages. Bad for performances.")
 
     opt[Long]("seed").optional().valueName("<number>")
-      .action((s, in) => in.copy(seed = s))
-      .text("Seed to use for randomization.")
+      .action((s, in) => in.copy(globalSeed = s))
+      .text("Global seed to use for randomization (will generate thread-seeds and chain-seeds).")
 
     opt[Duration]('d', "duration").optional().valueName("<duration>")
       .action((dur, in) => in.copy(maxDuration = dur match {

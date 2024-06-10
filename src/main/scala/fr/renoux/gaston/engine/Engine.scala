@@ -18,10 +18,10 @@ final class Engine(
   private val scheduleBacktrackingGenerator = new ScheduleGenerator(triggerOnBacktrackingFailure)
 
   /** Lazy sequence of incrementing scored schedules, with the number of schedules attempted. Ends when the schedule can't be improved any more. Non-empty. */
-  def lazySeq(seed: Long, params: OptimParams): LazyList[(Schedule, Long)] = {
-    implicit val rand: Random = new Random(seed)
+  def lazySeq(chainSeed: Long, params: OptimParams): LazyList[(Schedule, Long)] = {
+    implicit val rand: Random = new Random(chainSeed)
 
-    val initial: Schedule = if (problem.unassignedTopics.isEmpty) scheduleBacktrackingGenerator.createOne else Schedule.startingUnassignedOrForced(seed)
+    val initial: Schedule = if (problem.unassignedTopics.isEmpty) scheduleBacktrackingGenerator.createOne else Schedule.startingUnassignedOrForced(chainSeed)
     if (!initial.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initial.toFormattedString}\n${initial.errors.mkString("\n")}"
       throw new IllegalStateException(message)

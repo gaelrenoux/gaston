@@ -52,7 +52,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
   /** Runs the engine with some values */
   private def benchmark(
       duration: FiniteDuration,
-      seed: Long = 0L,
+      globalSeed: Long = 0L,
       expectsCount: Long,
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing
@@ -69,7 +69,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
       }
 
       val params: OptimParams = OptimParams(stopAtScore = Some(expectsScore), timeout = Some(Instant.now() + duration))
-      val (schedule, count) = runner.run(seed = seed, params)
+      val (schedule, count) = runner.run(globalSeed = globalSeed, params)
 
       println(s"${schedule.score} after $count iterations")
 
