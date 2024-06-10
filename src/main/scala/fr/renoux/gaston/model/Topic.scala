@@ -27,7 +27,9 @@ final case class Topic(
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
 
-  val isSynthetic: Boolean = name.startsWith(Topic.SyntheticPrefix)
+  val isSynthetic: Boolean = name.startsWith(Topic.SyntheticPrefix) // TODO probably unneeded, just have an isUnassigned flag and be done with it
+
+  def isUnassigned: Boolean = name.startsWith(s"${Topic.SyntheticPrefix}Unassigned") // TODO Ugly, make it a constant to replace isSynthetic
 
   val toShortString: String = s"$id -> $name"
 

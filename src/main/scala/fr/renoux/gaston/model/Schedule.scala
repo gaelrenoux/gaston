@@ -28,6 +28,9 @@ final case class Schedule(
   @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =
     copy(wrapped = w)
 
+  @inline private def updateAllSlotSchedules(f: SlotSchedule => SlotSchedule): Schedule =
+    updateWrapped(wrapped.map { case (slot, slotSchedule) => (slot, f(slotSchedule)) })
+
   @inline def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(slot, f(on(slot))))
 
@@ -203,6 +206,11 @@ final case class Schedule(
     builder.append(unscheduledTopics.view.map(_.name).toSeq.sorted.mkString("Unscheduled topics: ", ", ", "\n"))
     builder.toString
   }
+
+  /** Unassign all persons, except mandatory persons. If unassigned topics do not exist, does nothing. Used only in tests. */
+  @testOnly def unassignAll: Schedule =
+    if (problem.unassignedTopics.isEmpty) this
+    else updateAllSlotSchedules(_.unassignAll)
 
   /** Merge with another schedule's content. Used only in tests. */
   @testOnly def ++(that: Schedule): Schedule = Schedule(

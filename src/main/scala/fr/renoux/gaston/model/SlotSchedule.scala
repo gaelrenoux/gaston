@@ -199,6 +199,19 @@ final case class SlotSchedule(
     builder.toString
   }
 
+  /** Unassign all persons, except mandatory persons. If unassigned topics do not exist, returns this SlotSchedule without change. Used only in tests. */
+  @testOnly def unassignAll: SlotSchedule =
+    if (problem.unassignedTopics.isEmpty) this
+    else updateWrapped {
+      val cleanedWrapped = wrapped.collect {
+        case (topic, _) if !topic.isUnassigned => topic -> Record(slot, topic, topic.mandatory)
+      }
+      val unassignedTopic = problem.unassignedTopics(slot)
+      val unassignedPersons = slot.personsPresent -- cleanedWrapped.values.view.flatMap(_.persons).toSet
+      val unassignedRecord = Record(slot, unassignedTopic, unassignedPersons)
+      cleanedWrapped + (unassignedTopic -> unassignedRecord)
+    }
+
   /** Merge with another slot schedule's content. Used only in tests. */
   @testOnly def ++(that: SlotSchedule): SlotSchedule = updateWrapped {
     if (slot != that.slot) throw new IllegalArgumentException
