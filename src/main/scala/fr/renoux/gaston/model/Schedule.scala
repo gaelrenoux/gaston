@@ -251,7 +251,7 @@ object Schedule {
     /* Everything complicated in here is for the forced-slots */
     val forcedTopicsCountPerSlot = Array.fill(problem.slotsSet.size)(0)
     val forcedTopicsBySlot: Map[Slot, Seq[Topic]] =
-      problem.forcedTopicsMostToLeastConstrained.filterNot(_.isSynthetic) // synthetic topics are handled manually
+      problem.forcedTopicsMostToLeastConstrained.filterNot(_.isUnassigned) // unassigned topics are handled manually
         .map { topic =>
           val possibleSlots = topic.slots.getOrElse(problem.slotsSet).filterMinBy(s => forcedTopicsCountPerSlot(s.id))
           val slot = rand.pick(possibleSlots)

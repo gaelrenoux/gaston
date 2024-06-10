@@ -1,7 +1,7 @@
 package fr.renoux.gaston
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.input.{InputLoader, InputSettings, InputTranscription}
+import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.{Problem, _}
@@ -47,9 +47,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     private val index = new AtomicInteger(0)
 
-    val UnassignedMorning: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), SimpleTestModel.Slots.Morning)
-    val UnassignedAfternoon: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), SimpleTestModel.Slots.AfterNoon)
-    val UnassignedEvening: Topic = InputTranscription.unassignedTopic(index.getAndIncrement(), Slots.Evening)
+    val UnassignedMorning: Topic = Topic.unassigned(index.getAndIncrement(), SimpleTestModel.Slots.Morning)
+    val UnassignedAfternoon: Topic = Topic.unassigned(index.getAndIncrement(), SimpleTestModel.Slots.AfterNoon)
+    val UnassignedEvening: Topic = Topic.unassigned(index.getAndIncrement(), Slots.Evening)
 
     val Acting = Topic(index.getAndIncrement(), "Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
     val Bathing = Topic(index.getAndIncrement(), "Bathing", mandatory = Set(Bianca), forbidden = Set(Corwin), min = 2, max = 5)

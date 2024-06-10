@@ -13,7 +13,7 @@ import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences._
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{BitMap, BitSet, Count, NumberUtils}
+import fr.renoux.gaston.util.{BitMap, BitSet, Count}
 import mouse.map._
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -66,8 +66,8 @@ private[input] class InputTranscription(rawInput: InputModel) {
       log.info("Unassigned persons are allowed")
       input.slotsSet.map { inSlot =>
         val slot = slotsByName(inSlot.name)
-        val name = unassignedTopicName(inSlot.name)
-        val topic = unassignedTopic(topicIx.getAndIncrement(), slot, min = settings.unassigned.minPersons, max = settings.unassigned.maxPersons)
+        val name = NonEmptyString.unsafeFrom(Topic.unassignedName(inSlot.name))
+        val topic = Topic.unassigned(topicIx.getAndIncrement(), slot, min = settings.unassigned.minPersons, max = settings.unassigned.maxPersons)
         (name, slot) -> topic
       }.toMap
     }
@@ -276,13 +276,6 @@ private[input] class InputTranscription(rawInput: InputModel) {
 }
 
 object InputTranscription {
-
-  def unassignedTopicName(slotName: String): NonEmptyString = NonEmptyString.unsafeFrom(s"${Topic.SyntheticPrefix}Unassigned ($slotName)")
-
-  def unassignedTopic(id: Int, slot: Slot, min: Int = 0, max: Int = NumberUtils.IntLowMaxValue): Topic = {
-    val realMin = if (min <= 1) 0 else min
-    Topic(id, unassignedTopicName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = min == 0)
-  }
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++

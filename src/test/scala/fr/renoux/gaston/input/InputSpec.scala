@@ -1,9 +1,9 @@
 package fr.renoux.gaston.input
 
 import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive, TopicsLinked}
-import fr.renoux.gaston.model.{Slot, _}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -33,9 +33,9 @@ class InputSpec extends AnyFlatSpec with Matchers {
       lazy val beta = Topic(1, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
       lazy val gamma1 = Topic(2, "gamma ~1", min = 4, max = 6, followup = Some(gamma2))
       lazy val gamma2 = Topic(3, "gamma ~2", min = 4, max = 6, isFollowup = true)
-      val unassignedA: Topic = InputTranscription.unassignedTopic(4, expected.slots.a)
-      val unassignedB: Topic = InputTranscription.unassignedTopic(5, expected.slots.b)
-      val unassignedC: Topic = InputTranscription.unassignedTopic(6, expected.slots.c)
+      val unassignedA: Topic = Topic.unassigned(4, expected.slots.a)
+      val unassignedB: Topic = Topic.unassigned(5, expected.slots.b)
+      val unassignedC: Topic = Topic.unassigned(6, expected.slots.c)
       val all: Set[Topic] = Set(unassignedA, unassignedB, unassignedC, alpha, beta, gamma1, gamma2)
     }
 
@@ -86,10 +86,10 @@ class InputSpec extends AnyFlatSpec with Matchers {
     val expectedPreferences = initialTopicsPreferences ++ additionalPreferences
 
     problem.preferences.filter {
-      case p: PersonTopicPreference if p.topic.isSynthetic => true
+      case p: PersonTopicPreference if p.topic.isUnassigned => true
       case _ => false
     } should be(expectedPreferences.filter {
-      case p: PersonTopicPreference if p.topic.isSynthetic => true
+      case p: PersonTopicPreference if p.topic.isUnassigned => true
       case _ => false
     })
 

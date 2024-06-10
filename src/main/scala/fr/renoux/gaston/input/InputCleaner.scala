@@ -2,7 +2,6 @@ package fr.renoux.gaston.input
 
 import cats.data.NonEmptyList
 import eu.timepit.refined.api.Refined
-import eu.timepit.refined.collection.NonEmpty
 import fr.renoux.gaston.model.{Record, Score, Weight}
 import fr.renoux.gaston.util.StringImplicits._
 import shapeless._

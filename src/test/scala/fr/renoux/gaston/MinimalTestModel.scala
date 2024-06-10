@@ -1,6 +1,5 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.{Counts, Person, Problem, Slot, Topic}
 import fr.renoux.gaston.util.Count
 
@@ -31,7 +30,7 @@ object MinimalTestModel {
     val Machines = Topic(index.getAndIncrement(), "machines")
     val Party = Topic(index.getAndIncrement(), "party")
 
-    val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> InputTranscription.unassignedTopic(index.getAndIncrement(), s)).toMap
+    val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> Topic.unassigned(index.getAndIncrement(), s)).toMap
     val Concrete: Set[Topic] = Set(Leading, Fighting, Machines, Party)
     val All: Set[Topic] = Concrete ++ Unassigned.values
     implicit val TopicCount: Count[Topic] = util.Count[Topic](All.size)

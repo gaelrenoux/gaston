@@ -1,12 +1,13 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.util.Identified
+import fr.renoux.gaston.util.{Identified, NumberUtils}
 
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
   * @param slots Slots on which the topic must be, None meaning it can be on any slot.
   * @param isFollowup true Only if this topic is another's topic followup
   * @param forced Topic must be on the schedule.
+  * @param isUnassigned Special flag on synthetic topics that actually stores unassigned persons.
   */
 final case class Topic(
     id: Int,
@@ -19,6 +20,7 @@ final case class Topic(
     followup: Option[Topic] = None,
     isFollowup: Boolean = false,
     forced: Boolean = false,
+    isUnassigned: Boolean = false
 ) extends Identified {
 
   /** true if this topic is only schedulable on a single slot. */
@@ -26,10 +28,6 @@ final case class Topic(
 
   /** To facilitate writing schedules */
   def apply(persons: Person*): (Topic, Set[Person]) = this -> persons.toSet
-
-  val isSynthetic: Boolean = name.startsWith(Topic.SyntheticPrefix) // TODO probably unneeded, just have an isUnassigned flag and be done with it
-
-  def isUnassigned: Boolean = name.startsWith(s"${Topic.SyntheticPrefix}Unassigned") // TODO Ugly, make it a constant to replace isSynthetic
 
   val toShortString: String = s"$id -> $name"
 
@@ -44,8 +42,18 @@ final case class Topic(
 
 object Topic {
 
-  /** A prefix on the topic-name for synthetic topics (topics created by Gaston, not present in the input). */
+  /** A prefix on the topic-name for synthetic topics (topics created by Gaston, not present in the input). Currently
+    * only unassigned topics, but reserving it just in case. */
   val SyntheticPrefix = "@"
+
+  def unassignedName(slotName: String): String = s"${Topic.SyntheticPrefix}Unassigned ($slotName)"
+
+  /** Create a special "unassigned" topic */
+  // TODO maybe find a better name than 'unassigned', maybe 'pending' ?
+  def unassigned(id: Int, slot: Slot, min: Int = 0, max: Int = NumberUtils.IntLowMaxValue.value): Topic = {
+    val realMin = if (min <= 1) 0 else min
+    Topic(id, unassignedName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = min == 0, isUnassigned = true)
+  }
 
   val DefaultMin = 1
 

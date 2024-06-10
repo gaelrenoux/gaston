@@ -1,7 +1,6 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.input.InputTranscription
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
@@ -39,7 +38,7 @@ class ComplexTestModel(seed: Long) {
       val forb = random.pick(Persons.All - mand)
       Topic(index.getAndIncrement(), n, mandatory = Set(mand), forbidden = Set(forb), min = 4, max = 12)
     }
-    val Unassigned: Map[Slot, Topic] = Slots.AllSet.map { s => s -> InputTranscription.unassignedTopic(index.getAndIncrement(), s) }.toMap
+    val Unassigned: Map[Slot, Topic] = Slots.AllSet.map { s => s -> Topic.unassigned(index.getAndIncrement(), s) }.toMap
     val All: Set[Topic] = Concrete ++ Unassigned.values
   }
 

@@ -295,13 +295,13 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "startingUnassignedOrForced" should "return a schedule with all unassigned topics" in {
-    implicit val rand = new Random(0)
+    implicit val rand: Random = new Random(0)
     val s = Schedule.startingUnassignedOrForced
     println(s.toFormattedString)
     List(Morning, AfterNoon, Evening).foreach { slot =>
       val slotSchedule = s.on(slot)
       slotSchedule.topics.size should be(1)
-      slotSchedule.topics.head.isSynthetic should be(true)
+      slotSchedule.topics.head.isUnassigned should be(true)
       slotSchedule.topics.head.name should be(s"@Unassigned (${slot.name})")
       slotSchedule.scheduledPersons should contain theSameElementsAs slot.personsPresent
     }
