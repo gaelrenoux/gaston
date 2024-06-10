@@ -39,7 +39,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
     }
   }
 
-  def writeStart(seed: Long): Unit = write(s"Starting to run ! (seed #$seed)", separator = true)
+  def writeStart(seed: Long): Unit = write(s"Starting to run ! (global seed: $seed)", separator = true)
 
   def writeStartThread(): Unit = write(s"Starting to run on thread ${Thread.currentThread().getName} !")
 

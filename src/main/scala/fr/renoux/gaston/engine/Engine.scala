@@ -21,7 +21,7 @@ final class Engine(
   def lazySeq(seed: Long, params: OptimParams): LazyList[(Schedule, Long)] = {
     implicit val rand: Random = new Random(seed)
 
-    val initial: Schedule = if (problem.unassignedTopics.isEmpty) scheduleBacktrackingGenerator.createOne else Schedule.startingUnassignedOrForced
+    val initial: Schedule = if (problem.unassignedTopics.isEmpty) scheduleBacktrackingGenerator.createOne else Schedule.startingUnassignedOrForced(seed)
     if (!initial.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initial.toFormattedString}\n${initial.errors.mkString("\n")}"
       throw new IllegalStateException(message)

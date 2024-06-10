@@ -12,9 +12,11 @@ import scala.util.Random
 /**
   * A schedule is an association of people, to topics, to slots.
   * What we're trying and testing and looking for a good one.
+  * @param seed The Engine seed that has been used to produce this verdict. Allows to rerun it if debugging.
   * @param isAbysmal Flag to force this schedule to report the minimum possible score.
   */
 final case class Schedule(
+    seed: Long,
     private val wrapped: Map[Slot, SlotSchedule],
     private val isAbysmal: Boolean = false
 )(implicit
@@ -201,7 +203,7 @@ final case class Schedule(
 
   /** Produces a clear, multiline version of this schedule. */
   lazy val toFormattedString: String = {
-    val builder = new StringBuilder("Schedule:\n")
+    val builder = new StringBuilder(s"Schedule seed: $seed\n")
     slotSchedules.toSeq.sortBy(_.slot.name).foreach { ss => builder.append(ss.toFormattedString) }
     builder.append(unscheduledTopics.view.map(_.name).toSeq.sorted.mkString("Unscheduled topics: ", ", ", "\n"))
     builder.toString
@@ -214,6 +216,7 @@ final case class Schedule(
 
   /** Merge with another schedule's content. Used only in tests. */
   @testOnly def ++(that: Schedule): Schedule = Schedule(
+    this.seed + that.seed,
     wrapped.zipByKeys(that.wrapped).mapValuesStrict {
       case (Some(a), Some(b)) => a ++ b
       case (Some(a), None) => a
@@ -222,6 +225,7 @@ final case class Schedule(
     }
   )
 
+  /** Note that equals does NOT take into account the seed or the isAbysmal flag */
   override def equals(o: Any): Boolean = o match {
     case that: Schedule => this.wrapped == that.wrapped
     case _ => false
@@ -240,14 +244,14 @@ object Schedule {
   }
 
   /** Empty schedule for a problem */
-  def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty)
+  def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(seed = 0, Map.empty)
 
   /** Same as `empty`, except the schedule is marked as having the worst score. */
-  def abysmal(implicit problem: Problem, ctx: Context): Schedule = Schedule(Map.empty, isAbysmal = true)
+  def abysmal(implicit problem: Problem, ctx: Context): Schedule = Schedule(seed = 0, Map.empty, isAbysmal = true)
 
   /** Schedule where only the forced topics are placed (randomly). Forced topics contain their mandatory persons plus
     * the minimum number of persons to make them valid. Other persons are on the "unassigned" topics. */
-  def startingUnassignedOrForced(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
+  def startingUnassignedOrForced(seed: Long)(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
     /* Everything complicated in here is for the forced-slots */
     val forcedTopicsCountPerSlot = Array.fill(problem.slotsSet.size)(0)
     val forcedTopicsBySlot: Map[Slot, Seq[Topic]] =
@@ -283,12 +287,12 @@ object Schedule {
       slot -> slotScheduleWithForcedTopics
     }
 
-    Schedule(slotSchedules.toMap)
+    Schedule(seed, slotSchedules.toMap)
   }
 
-  /** Commodity method */
+  /** Commodity method for tests */
   @testOnly def from(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
-    new Schedule(entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
+    new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
       case (s, rs) => s -> SlotSchedule.from(s, rs)
     })
 }
