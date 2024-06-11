@@ -3,7 +3,7 @@ package fr.renoux.gaston.command
 import cats.implicits._
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, Improver, OptimParams}
+import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, Improver, Termination}
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration._
@@ -66,7 +66,7 @@ object Main {
 
       output.writeStart(commandLine.globalSeed)
       val timeout = commandLine.maxDuration.map(Instant.now() + _)
-      val (ss, _) = runner.run(optimParams = OptimParams(timeout = timeout))
+      val (ss, _) = runner.run(termination = Termination(timeout = timeout))
 
       /* Print final result */
       output.writeEnd(ss)

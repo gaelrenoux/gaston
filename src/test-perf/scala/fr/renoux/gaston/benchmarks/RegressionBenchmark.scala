@@ -4,7 +4,7 @@ import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.{Output, ParallelRunner}
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
-import fr.renoux.gaston.model.Problem
+import fr.renoux.gaston.model.{Problem, Score}
 import fr.renoux.gaston.util.CanAddDuration._
 import fr.renoux.gaston.util.{Context, Opt}
 import org.scalatest.flatspec.AnyFlatSpec
@@ -68,8 +68,8 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
         case Some(prc) => new ParallelRunner(seed = globalSeed, parallelism = prc)
       }
 
-      val params: OptimParams = OptimParams(stopAtScore = Some(expectsScore), timeout = Some(Instant.now() + duration))
-      val (schedule, count) = runner.run(params)
+      val termination: Termination = Termination(score = Some(Score(expectsScore)), timeout = Some(Instant.now() + duration))
+      val (schedule, count) = runner.run(termination)
 
       println(s"${schedule.score} after $count iterations")
 

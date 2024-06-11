@@ -30,7 +30,7 @@ abstract class Runner(seed: Long) {
   /** Generate schedules over time, outputting them at the statusFrequency interval. Will only terminate if some
     * termination conditions are set. If it terminates, its result is the best schedule found and the count of schedules
     * examined. */
-  def run(optimParams: OptimParams): (Schedule, Long)
+  def run(termination: Termination): (Schedule, Long)
 }
 
 
@@ -42,10 +42,10 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
 
   /** Runs the schedule generation. The argument controls when to stop the process. If no termination condition is set,
     * this method never terminates. */
-  override def run(optimParams: OptimParams): (Schedule, Long) = {
+  override def run(termination: Termination): (Schedule, Long) = {
     implicit val random: Random = new Random(seed)
     output.writeStartThread(seed)
-    runRecursive(Instant.now().plusMillis(statusFrequencyMs), 0, Schedule.abysmal)(optimParams)
+    runRecursive(Instant.now().plusMillis(statusFrequencyMs), 0, Schedule.abysmal)(termination)
   }
 
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
@@ -55,12 +55,20 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
       totalAttemptsCount: Long,
       best: Schedule,
       nextSchedules: LazyList[(Schedule, Long)] = LazyList.empty
-  )(optimParams: OptimParams)(implicit random: Random): (Schedule, Long) = {
+  )(termination: Termination)(implicit random: Random): (Schedule, Long) = {
     val now = Instant.now()
 
-    /* If time's out, stop now */
-    if (optimParams.timeout.exists(_ isBefore now) || optimParams.maxIterations.exists(_ <= totalAttemptsCount)) {
-      log.info(s"We have tried $totalAttemptsCount schedules ! It is time to stop !")
+    /* Check for termination criteria */
+    if (termination.timeout.exists(_ isBefore now)) {
+      log.info(s"Termination on timeout: $now > ${termination.timeout}")
+      (best, totalAttemptsCount)
+
+    } else if (termination.count.exists(_ <= totalAttemptsCount)) {
+      log.info(s"Termination on count: $totalAttemptsCount >= ${termination.count}")
+      (best, totalAttemptsCount)
+
+    } else if (termination.score.exists(_ <= best.score)) {
+      log.info(s"Termination on score: ${best.score} >= ${termination.score}")
       (best, totalAttemptsCount)
 
     } else {
@@ -71,39 +79,43 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
         Instant.now().plusMillis(statusFrequencyMs)
       } else nextStatusTime
 
-      /* Run once then recur */
+      /* Read one schedule from the lazy list then recur */
 
       nextSchedules match {
         case (ss: Schedule, attemptsCount: Long) #:: (tail: LazyList[(Schedule, Long)]) =>
-          if (ss.score > best.score) runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, ss, tail)(optimParams)
-          else runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, best, tail)(optimParams)
-        case _ => // we finished the list
+          if (ss.score > best.score) runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, ss, tail)(termination)
+          else runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, best, tail)(termination)
+        case _ => // we finished the lazy-list, let's start a new one
+          // TODO The part "new chain" should be in its own class, it's another responsibility than what the Runner is
+          //  doing (although we'd need a way to mark a chain-change in the output).
           val newChainSeed = random.nextLong()
           output.writeNewScheduleChain(newChainSeed)
-          val newSeq = engine.lazySeq(newChainSeed, optimParams)
-          runRecursive(newNextStatusTime, totalAttemptsCount, best, newSeq)(optimParams)
+          val newSeq = engine.lazySeq(newChainSeed, termination.reduceCount(totalAttemptsCount))
+          runRecursive(newNextStatusTime, totalAttemptsCount, best, newSeq)(termination)
       }
     }
   }
 }
 
 
-/** Runs multiple parallel SyncRunners, with different seeds, in parallel, then aggregate the results if they terminate. */
+/** Runs multiple parallel SyncRunners, with different seeds, in parallel, then aggregate the results if they terminate.
+  * Note that termination conditions must be met on all parallel runners for this one to terminate. */
+// TODO Find a way to terminate early as soon as a minimum score is reached, but not for other termination conditions.
 class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = ParallelRunner.defaultParallelism())
   (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
   extends Runner(seed) {
 
   /** Runs multiple Runners, in parallel, then wait for them to finish. Note that if no termination conditions are set,
     * this method will never terminate. */
-  def run(optimParams: OptimParams): (Schedule, Long) = {
+  def run(termination: Termination): (Schedule, Long) = {
     val now = Instant.now()
-    val maxDuration = optimParams.timeout.map(_ - now)
+    val maxDuration = termination.timeout.map(_ - now)
 
     /* Parallelize on the number of cores */
     val future: Future[Seq[(Schedule, Long)]] = Future.sequence {
       (0 until parallelism).map { _ =>
         val runner = new SyncRunner(random.nextLong())
-        Future(runner.run(optimParams))
+        Future(runner.run(termination))
       }
     }
 

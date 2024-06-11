@@ -19,8 +19,8 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
     implicit val engine: Engine = new Engine
     implicit val output: Output = Output.silent
     val runner = new SyncRunner(seed)
-    val params: OptimParams = OptimParams(maxIterations = Some(iterations))
-    runner.run(params)
+    val termination: Termination = Termination(count = Some(iterations))
+    runner.run(termination)
   }
 
   "Given a fixed seed, the runner" should "always return the same result after 10 iterations" in {
