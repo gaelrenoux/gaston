@@ -55,5 +55,8 @@ class ScheduleParserSpec extends AnyFlatSpec with Matchers {
     result.left.toOption should be(None)
     result.toOption.get.toFormattedString should be(Best.toFormattedString)
     result.toOption.get should be(Best)
+
+    println("result.toOption.get.toFormattedString")
+    result.toOption.get.toFormattedString should be(Best.toFormattedString)
   }
 }

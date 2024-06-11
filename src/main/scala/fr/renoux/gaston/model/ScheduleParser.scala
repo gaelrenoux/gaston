@@ -8,26 +8,35 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
 
   type ErrorOr[A] = Either[String, A]
 
-  private val firstLineRegex = """Schedule-chain seed: (\d+)""".r
+  private val seedLineRegex = """Schedule-chain seed: (\d+)""".r
 
   /** Parses a schedule from the result of [[Schedule.toFormattedString]]. */
   def parseFormattedString(str: String): Either[String, Schedule] = {
     val lines = str.linesIterator.toList
     for {
-      headerResult <- readHeader(lines)
-      (globalSeed, linesLeft) = headerResult
-      result <- readAllSlotSchedules(0, linesLeft)
-      (slotSchedules, _) = result
+      //TODO set state monad
+      afterHeader <- readUselessLine(lines, "Schedule:")
+      scheduleResult <- readAllSlotSchedules(0, afterHeader)
+      (slotSchedules, afterSchedule) = scheduleResult
+      afterUnscheduled <- readUselessLine(afterSchedule, "Unscheduled topics:")
+      seedResult <- readSeed(afterUnscheduled)
+      (globalSeed, _) = seedResult
     } yield Schedule(globalSeed, slotSchedules.map(ss => ss.slot -> ss).toMap)
   }
 
-  private def readHeader(lines: List[String]): Either[String, (Long, List[String])] = lines match {
-    case firstLineRegex(globalSeed) :: lines =>
+  private def readUselessLine(lines: List[String], prefix: String): Either[String, List[String]] = lines match {
+    case line :: lines if line.trim.startsWith(prefix) => Right(lines)
+    case h :: _ => Left(s"Unrecognized line not starting with [$prefix]: $h")
+    case Nil => Left("Empty schedule")
+  }
+
+  private def readSeed(lines: List[String]): Either[String, (Long, List[String])] = lines match {
+    case seedLineRegex(globalSeed) :: lines =>
       try Right((globalSeed.toLong, lines))
       catch {
-        case _: NumberFormatException => Left(s"Global-seed in first line was not a number: $globalSeed")
+        case _: NumberFormatException => Left(s"Global-seed was not a number: $globalSeed")
       }
-    case h :: _ => Left(s"Unrecognized first line: $h")
+    case h :: _ => Left(s"Unrecognized seed line: $h")
     case Nil => Left("Empty schedule")
   }
 
