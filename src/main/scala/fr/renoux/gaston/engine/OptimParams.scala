@@ -8,9 +8,9 @@ import java.time.Instant
   * @param timeout Once reached, stop creating schedules and terminate the runner.
   * @param maxIterations Once reached, stop creating schedules and terminate the runner.
   */
-final case class OptimParams(
+final case class OptimParams( // TODO Rename to Controls, or maybe TerminationConditions? And add class doc.
     stopAtScore: Option[Double] = None,
-    maxImprovementRounds: Option[Int] = None,
+    maxImprovementRounds: Option[Int] = None, // not exactly a termination condition, but I don't think it's ever used in practice
     timeout: Option[Instant] = None,
     maxIterations: Option[Long] = None
 )

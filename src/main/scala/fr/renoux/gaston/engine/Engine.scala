@@ -8,7 +8,14 @@ import fr.renoux.gaston.util.Context
 import scala.util.Random
 
 
-/** Main class for the engine. Instantiate it and iterate on lazySeq to start producing schedules. */
+/** Main class for the engine. Its main method, `lazySeq`, produces a lazy list of improving schedules until it reaches
+  * a local maximum, at which point it terminate. There is no guarantee about the time it may takes to reach that
+  * maximum, and also mathematically there must be at least a global maximum, it might be near-inifinite in practice. It
+  * is up to the caller to responsibly iterate on the lazy list.
+  *
+  * The Engine is immutable and thread-safe. You can use the same instance in multiple parallel threads to produce
+  * different lazy sequences of schedule.
+  */
 final class Engine(
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
 )(implicit problem: Problem, improver: Improver, ctx: Context) {

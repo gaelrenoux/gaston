@@ -1,7 +1,7 @@
 package fr.renoux.gaston.itests
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.command.{Output, Runner}
+import fr.renoux.gaston.command.{Output, SyncRunner}
 import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, OptimParams}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.{Problem, Schedule}
@@ -22,9 +22,9 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     implicit val i: GreedySlotImprover = new GreedySlotImprover
     implicit val engine: Engine = new Engine
     implicit val output: Output = Output.silent
-    val runner = new Runner(parallelism = 1)
+    val runner = new SyncRunner(seed = 42)
     val params: OptimParams = OptimParams(maxIterations = Some(iterations))
-    runner.run(globalSeed = 42, params)
+    runner.run(params)
   }
 
   "problem 17" should "return a good result after 10 iterations" in {

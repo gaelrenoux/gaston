@@ -1,7 +1,7 @@
 package fr.renoux.gaston.benchmarks
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.command.{Output, Runner}
+import fr.renoux.gaston.command.{Output, ParallelRunner}
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
@@ -64,12 +64,12 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
     val _ = try {
       val runner = parallelRunCount.toOption match {
-        case None => new Runner
-        case Some(prc) => new Runner(parallelism = prc)
+        case None => new ParallelRunner(seed = globalSeed)
+        case Some(prc) => new ParallelRunner(seed = globalSeed, parallelism = prc)
       }
 
       val params: OptimParams = OptimParams(stopAtScore = Some(expectsScore), timeout = Some(Instant.now() + duration))
-      val (schedule, count) = runner.run(globalSeed = globalSeed, params)
+      val (schedule, count) = runner.run(params)
 
       println(s"${schedule.score} after $count iterations")
 
