@@ -6,6 +6,7 @@ import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
+import fr.renoux.gaston.util.OptionImplicits.AnyWithOptionalOps
 
 import scala.util.Random
 
@@ -29,17 +30,21 @@ final class GreedySlotScheduleImprover(implicit problem: Problem, ctx: Context) 
     (implicit rand: Random): Option[GreedySlotScheduleImprover.State] = chrono("GreedySlotImprover > improveOnce") {
     log.debug("New improver step")
 
-    val neighbours: LazyList[(Schedule, Move)] = navigator.neighbours(state.schedule).distinctBy(_._1.planning)
     var attemptsCount = 0
+    val neighbours: LazyList[(Schedule, Move)] = navigator.neighbours(state.schedule)
+      .distinctBy(_._1.planning) // TODO Check how useful that is, I'm not sold
+      .filterNot(_._2.reverts(state.previousMove))
+      .takeWhile { _ => !termination.checkTimeout() } // stop when we reach timeout
+      .optional(termination.intCount)(_ take _) // stop when we reach the max number of schedules to examine
+    // Not checking the score: improving schedules are always reported up, where they can be checked
 
     val improvedSchedules =
       for {
         (partial, move) <- neighbours
-        if !move.reverts(state.previousMove)
         _ = log.debug(s"Trying that move: $move")
+        _ = attemptsCount += 1 // TODO Ugly, we could also do a zipWithIndex but let's check performance
         unimproved <- randomAssigner.fill(partial)(rand)
         improved = assignmentImprover.improve(unimproved)
-        _ = attemptsCount += 1 // TODO Ugly, we could also do a zipWithIndex but let's check performance
         if improved.score > state.schedule.score
         _ = if (!improved.isSolution) {
           val message = s"A bad schedule was generated !\n${improved.toFormattedString}\n${improved.errors.mkString("\n")}\n\nLast move: $move"

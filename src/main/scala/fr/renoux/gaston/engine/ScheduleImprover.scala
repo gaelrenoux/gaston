@@ -38,7 +38,7 @@ object ScheduleImprover {
         if (termination.checkTimeout()) None // reached timeout, we can stop
         else if (termination.checkCount(state.attemptsCount)) None // reached count, we can stop
         else if (termination.checkScore(state.schedule.score)) None // reached a good enough schedule on the last step, we can stop
-        else step(state, termination).map { newState => (newState.result, newState) }
+        else step(state, termination.reduceCount(state.attemptsCount)).map { newState => (newState.result, newState) }
       }
       (initialSchedule, 1L) #:: unfolding
     }

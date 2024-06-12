@@ -31,6 +31,7 @@ final class TabuSearchSlotScheduleImprover(implicit problem: Problem, ctx: Conte
     tabu = Set(schedule.planning)
   )
 
+  // TODO termination is unused, figure out if this class is useful before implementing it
   override protected def step(state: State, termination: Termination)(implicit rand: Random): Option[State] = {
     log.debug(s"Size of tabu is ${state.tabu.size}")
 
