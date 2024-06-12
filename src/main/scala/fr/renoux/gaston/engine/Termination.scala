@@ -15,11 +15,24 @@ final case class Termination( // TODO Rename to Controls, or maybe TerminationCo
     count: Option[Long] = None,
     timeout: Option[Instant] = None
 ) {
-  def reduceCount(delta: Long): Termination = copy(count = count.map(_ - delta))
 
   lazy val intCount: Option[Int] = count.collect {
     case c: Long if c <= Int.MaxValue => c.toInt
   }
+
+  private val timeoutMs = timeout.map(_.toEpochMilli)
+
+  def reduceCount(delta: Long): Termination = copy(count = count.map(_ - delta))
+
+  def checkScore(s: Score): Boolean = score.exists(_ <= s)
+
+  def checkCount(c: Long): Boolean = count.exists(_ <= c)
+
+  def checkTimeout(now: Instant): Boolean = timeoutMs.exists(_ <= now.toEpochMilli)
+
+  def checkTimeout(nowMs: Long): Boolean = timeoutMs.exists(_ <= nowMs)
+
+  def checkTimeout(): Boolean = timeoutMs.exists(_ <= System.currentTimeMillis())
 }
 
 object Termination {

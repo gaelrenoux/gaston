@@ -59,15 +59,15 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
     val now = Instant.now()
 
     /* Check for termination criteria */
-    if (termination.timeout.exists(_ isBefore now)) {
+    if (termination.checkTimeout(now)) {
       log.info(s"Termination on timeout: $now > ${termination.timeout}")
       (best, totalAttemptsCount)
 
-    } else if (termination.count.exists(_ <= totalAttemptsCount)) {
+    } else if (termination.checkCount(totalAttemptsCount)) {
       log.info(s"Termination on count: $totalAttemptsCount >= ${termination.count}")
       (best, totalAttemptsCount)
 
-    } else if (termination.score.exists(_ <= best.score)) {
+    } else if (termination.checkScore(best.score)) {
       log.info(s"Termination on score: ${best.score} >= ${termination.score}")
       (best, totalAttemptsCount)
 
@@ -76,7 +76,7 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
       val newNextStatusTime = if (now isAfter nextStatusTime) {
         output.writeScheduleIfBetter(best)
         output.writeAttempts(totalAttemptsCount, best)
-        Instant.now().plusMillis(statusFrequencyMs)
+        now.plusMillis(statusFrequencyMs)
       } else nextStatusTime
 
       /* Read one schedule from the lazy list then recur */

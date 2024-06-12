@@ -33,18 +33,14 @@ object ScheduleImprover {
     /** Generates the sequence of improvements, given methods that provide the initial state, and how to produce a
       * schedule and transform the state at each step. */
     final def improvements(initialSchedule: Schedule, termination: Termination)(implicit rand: Random): LazyList[(Schedule, Long)] = {
-      val timeoutMs = termination.timeout.map(_.toEpochMilli)
       val init = initialState(initialSchedule)
       lazy val unfolding: LazyList[(Schedule, Long)] = LazyList.unfold(init) { state =>
-        if (termination.score.exists(state.schedule.score >= _)) None // reached a good enough schedule on the last step, we can stop
-        else if (timeoutMs.exists(_ < System.currentTimeMillis())) None // reached timeout, we can stop
+        if (termination.checkTimeout()) None // reached timeout, we can stop
+        else if (termination.checkCount(state.attemptsCount)) None // reached count, we can stop
+        else if (termination.checkScore(state.schedule.score)) None // reached a good enough schedule on the last step, we can stop
         else step(state, termination).map { newState => (newState.result, newState) }
       }
-      val lazyList = ((initialSchedule, 1L) #:: unfolding)
-      termination.intCount match {
-        case None => lazyList
-        case Some(count) => lazyList.take(count)
-      }
+      (initialSchedule, 1L) #:: unfolding
     }
 
     /** Generates the initial state from the very first schedule. */
