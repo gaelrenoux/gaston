@@ -97,8 +97,8 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
       while (continue) {
         Thread.sleep(1000)
         if (System.currentTimeMillis() - startTime > 60000 * lastMinute) {
-          lastMinute = lastMinute + 1
           println(s"Minute $lastMinute")
+          lastMinute = lastMinute + 1
         }
       }
     }(ExecutionContext.global)
