@@ -21,6 +21,9 @@ object ScheduleImprover {
 
     /** This is how many schedules we've tried out (including the ones that we rejected because they weren't good enough). */
     val attemptsCount: Long
+
+    /** The result of the latest step. */
+    def result: (Schedule, Long) = (schedule, attemptsCount)
   }
 
   /** Typically, actual improvers work step by step, using a state representing where it's at in the improving process.
@@ -31,17 +34,11 @@ object ScheduleImprover {
       * schedule and transform the state at each step. */
     final def improvements(initialSchedule: Schedule, termination: Termination)(implicit rand: Random): LazyList[(Schedule, Long)] = {
       val timeoutMs = termination.timeout.map(_.toEpochMilli)
-      val init: Option[S] = Some(initialState(initialSchedule))
-      lazy val unfolding: LazyList[(Schedule, Long)] = LazyList.unfold(init) {
-        case None => None // stop the unfolding here, previous step returned a schedule but no state
-        case Some(state) =>
-          if (termination.score.exists(state.schedule.score >= _)) None // reached a good enough schedule on the last step, we can stop
-          else if (timeoutMs.exists(_ < System.currentTimeMillis())) None // reached timeout, we can stop
-          else step(state, termination).map { newState =>
-            val schedule = newState.schedule
-            val attemptsCount = newState.attemptsCount
-            (schedule -> attemptsCount, Some(newState))
-          }
+      val init = initialState(initialSchedule)
+      lazy val unfolding: LazyList[(Schedule, Long)] = LazyList.unfold(init) { state =>
+        if (termination.score.exists(state.schedule.score >= _)) None // reached a good enough schedule on the last step, we can stop
+        else if (timeoutMs.exists(_ < System.currentTimeMillis())) None // reached timeout, we can stop
+        else step(state, termination).map { newState => (newState.result, newState) }
       }
       val lazyList = ((initialSchedule, 1L) #:: unfolding)
       termination.intCount match {
@@ -55,7 +52,6 @@ object ScheduleImprover {
 
     /** Returns the state to be transmitted to next step. If it returns None, this is the end of the lazy sequence. */
     protected def step(state: S, termination: Termination)(implicit rand: Random): Option[S]
-    // TODO Integrate Termination in here as well to check timeout more often
   }
 
 }
