@@ -10,14 +10,11 @@ isSnapshot := true
 scalaVersion := "2.13.10"
 
 lazy val gaston = (project in file("."))
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.testSettings): _*)
-  .configs(PerformanceTest)
-  .settings(inConfig(PerformanceTest)(Defaults.testSettings): _*)
+  .configs(SlowTest)
+  .settings(inConfig(SlowTest)(Defaults.testSettings): _*)
 
 /* Those tests are much slower */
-lazy val IntegrationTest = config("test-int") extend (Test)
-lazy val PerformanceTest = config("test-perf") extend (Test)
+lazy val SlowTest = config("test-slow") extend (Test)
 
 scalacOptions ++= Seq(
 
@@ -96,8 +93,8 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 
   /* Tests */
-  "com.softwaremill.diffx" %% "diffx-core" % "0.5.0" % "test,test-perf",
-  "org.scalatest" %% "scalatest" % "3.2.16" % "test,test-perf"
+  "com.softwaremill.diffx" %% "diffx-core" % "0.5.0" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.16" % Test
 )
 
 mainClass in assembly := Some("fr.renoux.gaston.command.Main")
