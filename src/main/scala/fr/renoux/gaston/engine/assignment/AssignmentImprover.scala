@@ -13,7 +13,8 @@ import scala.util.Random
 
 
 /**
-  * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them.
+  * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them. Every person
+  * should already be assigned somewhere (this will not assign unassigned persons).
   */
 final class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
 

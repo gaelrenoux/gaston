@@ -2,8 +2,8 @@ package fr.renoux.gaston.engine
 
 import cats.implicits._
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
-import fr.renoux.gaston.engine.assignment.{AssignmentImprover, ScheduleAssigner}
+import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
+import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.Context
@@ -13,22 +13,25 @@ import scala.collection.immutable.Queue
 import scala.util.Random
 
 /**
-  * Uses backtracking to produce a Stream of schedules. Those schedules are not the best you could have, but they are
-  * valid and all persons have their optimal slots.
-  *
-  * Placing persons on the generated schedule is delegated to the ScheduleAssigner.
+  * Uses backtracking to produce a valid schedule, making random choices to provide a planning. Given the planning,
+  * assignment of persons is optimized.
   */
-final class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
+final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
 
-  private val log = Logger[ScheduleGenerator]
+  private val log = Logger[RandomScheduleGenerator]
 
-  import ScheduleGenerator._
+  import RandomScheduleGenerator._
 
-  private val filler = new ScheduleAssigner
+  private val randomAssigner = new RandomAssigner
   private val improver = new AssignmentImprover
 
+  // TODO Handle followup topics in this class
+  if (problem.topicsList.exists(_.followup.nonEmpty)) {
+    throw new UnsupportedOperationException("The RandomScheduleGenerator doesn't support followup topics yet")
+  }
+
   /** Generates just one schedule. */
-  def createOne(implicit random: Random): Schedule = {
+  def create(implicit random: Random): Schedule = {
     log.debug("Generating a single schedule")
     val slots = random.shuffle(problem.slotsSet.toList)
     // TODO need to handle followup topics !
@@ -44,7 +47,7 @@ final class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(i
     (implicit random: Random): Option[Schedule] = {
     backtrackAssignTopicsToSlots(state).toOption match {
       case None => None
-      case Some(newState) => filler.fill(newState.partialSchedule) match {
+      case Some(newState) => randomAssigner.fill(newState.partialSchedule) match {
         case None => backtrackAndFill(newState)
         case Some(schedule) => Some(schedule)
       }
@@ -112,7 +115,7 @@ final class ScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(i
 
 }
 
-object ScheduleGenerator {
+object RandomScheduleGenerator {
 
   /** Backtracking state
     * @param partialSchedule Partial schedule we are starting from
@@ -122,7 +125,7 @@ object ScheduleGenerator {
     */
   private case class State(partialSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
 
-    private implicit val problem = partialSchedule.problem
+    private implicit val problem: Problem = partialSchedule.problem
 
     lazy val isSlotsEmpty: Boolean = slotsLeft.isEmpty
 

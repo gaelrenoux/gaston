@@ -1,7 +1,7 @@
 package fr.renoux.gaston.command
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
+import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.input.{InputLoader, InputModel}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 

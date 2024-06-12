@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.assignment.{AssignmentImprover, ScheduleAssigner}
+import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
 
@@ -15,14 +15,14 @@ import scala.util.Random
   * Doesn't seem to be very good.
   * TODO Rework or drop
   */
-final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) extends Improver.Base[TabuSearchSlotImprover.State] {
+final class TabuSearchSlotScheduleImprover(implicit problem: Problem, ctx: Context) extends ScheduleImprover.Base[TabuSearchSlotScheduleImprover.State] {
 
-  import TabuSearchSlotImprover.State
+  import TabuSearchSlotScheduleImprover.State
 
-  private val log = Logger[TabuSearchSlotImprover]
+  private val log = Logger[TabuSearchSlotScheduleImprover]
 
   private val navigator = new PlanningSpaceNavigator
-  private val filler: ScheduleAssigner = new ScheduleAssigner
+  private val filler: RandomAssigner = new RandomAssigner
   private val personImprover: AssignmentImprover = new AssignmentImprover
 
   override protected def initialState(schedule: Schedule): State = State(
@@ -31,7 +31,7 @@ final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) exte
     tabu = Set(schedule.planning)
   )
 
-  override protected def step(state: State)(implicit rand: Random): Option[State] = {
+  override protected def step(state: State, termination: Termination)(implicit rand: Random): Option[State] = {
     log.debug(s"Size of tabu is ${state.tabu.size}")
 
     val neighbours = navigator.neighbours(state.current).map(_._1).distinctBy(_.planning)
@@ -56,13 +56,13 @@ final class TabuSearchSlotImprover(implicit problem: Problem, ctx: Context) exte
 
 }
 
-object TabuSearchSlotImprover {
+object TabuSearchSlotScheduleImprover {
 
   final case class State(
       best: Schedule,
       current: Schedule,
       tabu: Set[Schedule.Planning]
-  ) extends Improver.State  {
+  ) extends ScheduleImprover.State  {
     override val schedule: Schedule = best
 
     override val attemptsCount: Long = 0 // TODO

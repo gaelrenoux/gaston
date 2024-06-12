@@ -12,6 +12,7 @@ import scala.util.Random
 
 // scalastyle:off magic.number
 
+//TODO Add a version with unassigned topics
 class ComplexTestModel(seed: Long) {
 
   private val log = Logger(classOf[ComplexTestModel])

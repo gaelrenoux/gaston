@@ -7,18 +7,19 @@ import fr.renoux.gaston.util.immutable
 import scala.annotation.tailrec
 import scala.util.Random
 
-// TODO Renames into ScheduleFiller
 /**
   * Fills a partial schedule with persons, ignoring preferences but respecting constraints.
   */
 @immutable
-final class ScheduleAssigner(implicit private val problem: Problem) {
+final class RandomAssigner(implicit private val problem: Problem) {
 
-  private val log = Logger[ScheduleAssigner]
+  private val log = Logger[RandomAssigner]
 
   /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
-    * schedule respecting all constraints. Returns None if such a schedule cannot be constructed (e.g. too many people
-    * forbidden on a topic).
+    * schedule respecting all constraints, using backtracking as necessary.
+    *
+    * Returns None if such a schedule cannot be constructed (for example there are
+    * not enough persons to fill all topics on a slot, or there's a slot with not enough topics to put everyone in).
     */
   def fill(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
 

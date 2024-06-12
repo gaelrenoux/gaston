@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.ScheduleGenerator.BacktrackingFailures
+import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
 
@@ -18,17 +18,17 @@ import scala.util.Random
   */
 final class Engine(
     triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ()
-)(implicit problem: Problem, improver: Improver, ctx: Context) {
+)(implicit problem: Problem, improver: ScheduleImprover, ctx: Context) {
 
   private val log = Logger[Engine]
 
-  private val scheduleBacktrackingGenerator = new ScheduleGenerator(triggerOnBacktrackingFailure)
+  private lazy val startingScheduleGenerator = new RandomScheduleGenerator(triggerOnBacktrackingFailure)
 
   /** Lazy sequence of incrementing scored schedules, with the number of schedules attempted. Ends when the schedule can't be improved any more. Non-empty. */
   def lazySeq(chainSeed: Long, termination: Termination): LazyList[(Schedule, Long)] = {
     implicit val rand: Random = new Random(chainSeed)
 
-    val initial: Schedule = if (problem.unassignedTopics.isEmpty) scheduleBacktrackingGenerator.createOne else Schedule.startingUnassignedOrForced(chainSeed)
+    val initial: Schedule = if (problem.unassignedTopics.isEmpty) startingScheduleGenerator.create else Schedule.startingUnassignedOrForced(chainSeed)
     if (!initial.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initial.toFormattedString}\n${initial.errors.mkString("\n")}"
       throw new IllegalStateException(message)

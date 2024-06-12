@@ -2,7 +2,7 @@ package fr.renoux.gaston.itests
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.{Output, SyncRunner}
-import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, Termination}
+import fr.renoux.gaston.engine.{Engine, GreedySlotScheduleImprover, Termination}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Context
@@ -19,7 +19,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
 
   private def run(problem: Problem, iterations: Long): (Schedule, Long) = {
     implicit val p: Problem = problem
-    implicit val i: GreedySlotImprover = new GreedySlotImprover
+    implicit val i: GreedySlotScheduleImprover = new GreedySlotScheduleImprover
     implicit val engine: Engine = new Engine
     implicit val output: Output = Output.silent
     val runner = new SyncRunner(seed = 42)

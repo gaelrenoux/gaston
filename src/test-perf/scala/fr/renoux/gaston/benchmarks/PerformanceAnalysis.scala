@@ -2,7 +2,7 @@ package fr.renoux.gaston.benchmarks
 
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.command.{Output, ParallelRunner}
-import fr.renoux.gaston.engine.{Engine, GreedySlotImprover, Termination}
+import fr.renoux.gaston.engine.{Engine, GreedySlotScheduleImprover, Termination}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration._
@@ -31,7 +31,7 @@ object PerformanceAnalysis extends App {
   val duration: FiniteDuration = 1.minutes
   val globalSeed: Long = 0L
 
-  implicit val improver: GreedySlotImprover = new GreedySlotImprover
+  implicit val improver: GreedySlotScheduleImprover = new GreedySlotScheduleImprover
   implicit val engine: Engine = new Engine
   implicit val output: Output = Output.silent
   val orchestrator = new ParallelRunner(seed = globalSeed)

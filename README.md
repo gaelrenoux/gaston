@@ -289,6 +289,13 @@ gaston {
 
 ## Brain dump
 
+Some vocabulary:
+- Planning is when we decide which topic is on which slot. It does NOT include assigning persons to those topics or checking score. It does however require we check that mandatory persons are availabe.
+    - Therefore, a planning is a schedule with no one assigned apart from the mandatory persons.
+- Assignment is when we assign persons to an existing planning.
+- Scheduling is doing both.
+- A partial schedule is a schedule where only the planning is done, most persons are not assigned yet.
+
 The Engine produces a lazy list of schedules, each new schedule being better than the next one. The list ends when no
 further improvement can be found, which never happens on real-world examples. It starts with a seed for all random
 operations.
@@ -305,13 +312,6 @@ An Engine run (in `Engine.lazySeq`) starts with an initial schedule respecting a
 
 Then, the Engine calls an improver on this initial schedule. The improver will generate the lazy-list of improving schedules.
 There are two improvers implemented, GreedySlotImprover and TabuSearchSlotImprover. Only the first one is currently being used.
-
-Some vocabulary:
-- Planning is when we decide which topic is on which slot. It does NOT include assigning persons to those topics or checking score. It does however require we check that mandatory persons are availabe.
-  - Therefore, a planning is a schedule with no one assigned apart from the mandatory persons.
-- Assignment is when we assign persons to an existing planning.
-- Scheduling is doing both.
-- A partial schedule is a schedule where only the planning is done, most persons are not assigned yet.
 
 Then, the lazy-list starts being generated. A generation step starts from the latest generated schedule, and procedes with the following steps:
 - Figure out all neighbours of the latest schedule in the planning spaces. Neighbours are plannings that we can get from that schedule by adding or dropping a topic, or swapping two topics.
