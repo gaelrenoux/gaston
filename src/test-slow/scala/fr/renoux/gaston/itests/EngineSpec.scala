@@ -27,7 +27,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     runner.run(termination)
   }
 
-  "problem 17" should "return a good result after 10 iterations" in {
+  "problem 17" should "return a good result after 10 schedules" in {
     val (result, count) = run(problem17, 10)
     println(result.toFormattedString)
     println(count)
@@ -35,7 +35,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     result.score.value should be > 519.0
   }
 
-  it should "return a great result after 100 iterations" in {
+  it should "return a great result after 100 schedules" in {
     val (result, count) = run(problem17, 100)
     println(result.toFormattedString)
     println(count)
@@ -43,7 +43,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     result.score.value should be > 725.0
   }
 
-  "problem 19" should "return a good result after 10 iterations" in {
+  "problem 19" should "return a good result after 10 schedules" in {
     val (result, count) = run(problem19, 10)
     println(result.toFormattedString)
     println(count)
@@ -51,7 +51,7 @@ class EngineSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
     result.score.value should be > 657.0
   }
 
-  it should "return a great result after 100 iterations" in {
+  it should "return a great result after 100 schedules" in {
     val (result, count) = run(problem19, 100)
     println(result.toFormattedString)
     println(count)

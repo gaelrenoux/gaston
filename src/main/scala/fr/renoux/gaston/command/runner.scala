@@ -45,37 +45,40 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
   override def run(termination: Termination): (Schedule, Long) = {
     implicit val random: Random = new Random(seed)
     output.writeStartThread(seed)
-    runRecursive(Instant.now().plusMillis(statusFrequencyMs), 0, Schedule.abysmal)(termination)
+    runRecursive(Instant.now().plusMillis(statusFrequencyMs), 0, 0, Schedule.abysmal)(termination)
   }
 
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
   @tailrec
   private def runRecursive(
       nextStatusTime: Instant,
-      totalAttemptsCount: Long,
+      currentChainCount: Long,
+      previousChainsCount: Long,
       best: Schedule,
       nextSchedules: LazyList[(Schedule, Long)] = LazyList.empty
   )(termination: Termination)(implicit random: Random): (Schedule, Long) = {
     val now = Instant.now()
+    val totalCount = currentChainCount + previousChainsCount
 
     /* Check for termination criteria */
     if (termination.checkTimeout(now)) {
+      // TODO Log should go into Output as well
       log.info(s"Termination on timeout: $now > ${termination.timeout}")
-      (best, totalAttemptsCount)
+      (best, totalCount)
 
-    } else if (termination.checkCount(totalAttemptsCount)) {
-      log.info(s"Termination on count: $totalAttemptsCount >= ${termination.count}")
-      (best, totalAttemptsCount)
+    } else if (termination.checkCount(totalCount)) {
+      log.info(s"Termination on count: $totalCount >= ${termination.count}")
+      (best, totalCount)
 
     } else if (termination.checkScore(best.score)) {
       log.info(s"Termination on score: ${best.score} >= ${termination.score}")
-      (best, totalAttemptsCount)
+      (best, totalCount)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
       val newNextStatusTime = if (now isAfter nextStatusTime) {
         output.writeScheduleIfBetter(best)
-        output.writeAttempts(totalAttemptsCount, best)
+        output.writeAttempts(totalCount, best)
         now.plusMillis(statusFrequencyMs)
       } else nextStatusTime
 
@@ -83,15 +86,15 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
 
       nextSchedules match {
         case (ss: Schedule, attemptsCount: Long) #:: (tail: LazyList[(Schedule, Long)]) =>
-          if (ss.score > best.score) runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, ss, tail)(termination)
-          else runRecursive(newNextStatusTime, totalAttemptsCount + attemptsCount, best, tail)(termination)
+          if (ss.score > best.score) runRecursive(newNextStatusTime, attemptsCount, previousChainsCount, ss, tail)(termination)
+          else runRecursive(newNextStatusTime, attemptsCount, previousChainsCount, best, tail)(termination)
         case _ => // we finished the lazy-list, let's start a new one
           // TODO The part "new chain" should be in its own class, it's another responsibility than what the Runner is
           //  doing (although we'd need a way to mark a chain-change in the output).
           val newChainSeed = random.nextLong()
           output.writeNewScheduleChain(newChainSeed)
-          val newSeq = engine.lazySeq(newChainSeed, termination.reduceCount(totalAttemptsCount))
-          runRecursive(newNextStatusTime, totalAttemptsCount, best, newSeq)(termination)
+          val newSeq = engine.lazySeq(newChainSeed, termination.reduceCount(totalCount))
+          runRecursive(newNextStatusTime, 0, totalCount, best, newSeq)(termination)
       }
     }
   }

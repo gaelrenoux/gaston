@@ -6,7 +6,6 @@ import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
-import fr.renoux.gaston.util.OptionImplicits.AnyWithOptionalOps
 
 import scala.util.Random
 
@@ -30,19 +29,18 @@ final class GreedySlotScheduleImprover(implicit problem: Problem, ctx: Context) 
     (implicit rand: Random): Option[GreedySlotScheduleImprover.State] = chrono("GreedySlotImprover > improveOnce") {
     log.debug("New improver step")
 
-    var attemptsCount = 0
-    val neighbours: LazyList[(Schedule, Move)] = navigator.neighbours(state.schedule)
+    val neighbours: LazyList[((Schedule, Move), Int)] = navigator.neighbours(state.schedule)
       .distinctBy(_._1.planning) // TODO Check how useful that is, I'm not sold
       .filterNot(_._2.reverts(state.previousMove))
+      .zipWithIndex
       .takeWhile { _ => !termination.checkTimeout() } // stop when we reach timeout
-      .optional(termination.intCount)(_ take _) // stop when we reach the max number of schedules to examine
-    // Not checking the score: improving schedules are always reported up, where they can be checked
+      .takeWhile { case (_, index) => !termination.checkCount(index + state.attemptsCount) } // stop when we reach the max number of schedules to examine
+    // Not checking the score: improving schedules are always reported up, where they can be checked, so no need to do it here
 
     val improvedSchedules =
       for {
-        (partial, move) <- neighbours
+        ((partial, move), index) <- neighbours
         _ = log.debug(s"Trying that move: $move")
-        _ = attemptsCount += 1 // TODO Ugly, we could also do a zipWithIndex but let's check performance
         unimproved <- randomAssigner.fill(partial)(rand)
         improved = assignmentImprover.improve(unimproved)
         if improved.score > state.schedule.score
@@ -50,7 +48,7 @@ final class GreedySlotScheduleImprover(implicit problem: Problem, ctx: Context) 
           val message = s"A bad schedule was generated !\n${improved.toFormattedString}\n${improved.errors.mkString("\n")}\n\nLast move: $move"
           throw new IllegalStateException(message)
         }
-      } yield State(improved, move, state.attemptsCount + attemptsCount)
+      } yield State(improved, move, state.attemptsCount + index + 1)
 
     improvedSchedules.headOption
   }
@@ -58,7 +56,6 @@ final class GreedySlotScheduleImprover(implicit problem: Problem, ctx: Context) 
 
 object GreedySlotScheduleImprover {
 
-  /** @param attemptsCount How many schedule attempts it took to reach the current state */
   final case class State(
       schedule: Schedule, previousMove: Move, attemptsCount: Long
   ) extends ScheduleImprover.State

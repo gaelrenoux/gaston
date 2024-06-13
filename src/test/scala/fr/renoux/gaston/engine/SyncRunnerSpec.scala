@@ -29,10 +29,12 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
         run(SimpleTestModel.Problems.Complete, iterations = 10, seed = 42)
       }
 
+    results.map(_._2).foreach {
+      _ should be(10)
+    }
     results.map(_._1).toSet.size should be(1) // always the same schedule
     results.map(_._1.score).toSet.size should be(1) // always with the same score
     results.map(_._1.chainSeed).toSet.size should be(1) // always with the same seed
-    results.map(_._2).toSet.size should be(1) // always seeing the same number of schedules
 
     println(results.head._1.toFormattedString)
     // TODO Check out why it still has a very incomplete schedule in 10 iterations
@@ -53,19 +55,22 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
         run(SimpleTestModel.Problems.Complete, iterations = 100, seed = 666)
       }
 
+    results.map(_._2).foreach {
+      _ should be(100)
+    }
+
     // we'll always have reached the optimal solution on this problem in 100 iterations, so we must compare the seeds
     results.map(_._1).toSet.size should be(1) // always the same schedule
     results.map(_._1.score).toSet.size should be(1) // always with the same score
     results.map(_._1.chainSeed).toSet.size should be(1) // always with the same seed
-    results.map(_._2).toSet.size should be(1) // always seeing the same number of schedules
 
     println(results.head._2)
     println(results.head._1.toFormattedString)
 
     val otherResult = run(SimpleTestModel.Problems.Complete, iterations = 100, seed = 777)
-    // since we'll have the optimial solution, we must compare the seeds only. Number of seen schedules should also be different.
+    otherResult._2 should be(100)
+    // since we'll have the optimial solution, we must compare the seeds only.
     otherResult._1.chainSeed shouldNot be(results.head._1.chainSeed)
-    otherResult._2 shouldNot be(results.head._2)
 
     println(otherResult._2)
     println(otherResult._1.toFormattedString)

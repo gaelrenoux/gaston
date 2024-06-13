@@ -34,51 +34,51 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     runner.run(termination)
   }
 
-  "udocon2017" should "return a good result after 10 iterations" in {
+  "udocon2017" should "not crash after examining 10 schedules" in {
     val (result, count) = run(udocon2017, 10)
     println(result.toFormattedString)
     println(count)
-    count should be > 10L
-    result.score.value should be > 519.0
+    count should be(10L)
+    result.score.value should be > 0.0
   }
 
-  it should "return a great result after 100 iterations" in {
+  it should "return a great result after 100 schedules" in {
     val (result, count) = run(udocon2017, 100)
     println(result.toFormattedString)
     println(count)
-    count should be > 100L
+    count should be(100L)
     result.score.value should be > 729.0
   }
 
-  "udocon2019" should "return a good result after 10 iterations" in {
+  "udocon2019" should "not crash after examining 10 schedules" in {
     val (result, count) = run(udocon2019, 10)
     println(result.toFormattedString)
     println(count)
-    count should be > 10L
-    result.score.value should be > 657.0
+    count should be(10L)
+    result.score.value should be > 0.0
   }
 
-  it should "return a great result after 100 iterations" in {
+  it should "return a great result after 100 schedules" in {
     val (result, count) = run(udocon2019, 100)
     println(result.toFormattedString)
     println(count)
-    count should be > 100L
+    count should be(100L)
     result.score.value should be > 970.0
   }
 
-  "r32019" should "return a good result after 10 iterations" in {
+  "r32019" should "not crash after after examining 10 schedules" in {
     val (result, count) = run(r32019, 10)
     println(result.toFormattedString)
     println(count)
-    count should be > 10L
-    result.score.value should be > 657.0
+    count should be(10L)
+    result.score.value should be > 0.0
   }
 
-  it should "return a great result after 100 iterations" in {
+  it should "return a great result after 100 schedules" in {
     val (result, count) = run(r32019, 100)
     println(result.toFormattedString)
     println(count)
-    count should be > 100L
+    count should be(100L)
     result.score.value should be > 970.0
   }
 
