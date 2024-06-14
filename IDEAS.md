@@ -5,3 +5,4 @@
 - Create a max-unassigned or max-nothing, and use a topic-exclusive ? It's not a personal pref though, so it doesn't work that well
 - Keep and display schedules that are close to the current one, to give some alternatives (or fix a target score and give all that are above the score)
 - Simulated cooling
+- Generate a better base configuration, depending on what the user asks for
