@@ -31,13 +31,13 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
   }
 
   /** Generates just one schedule. */
-  def create(implicit random: Random): Schedule = {
+  def create(chainSeed: Long)(implicit random: Random): Schedule = {
     log.debug("Generating a single schedule")
     val slots = random.shuffle(problem.slotsSet.toList)
     // TODO need to handle followup topics !
     val (forcedTopics, unforcedTopics) = problem.topicsList.filterNot(_.isFollowup).partition(_.forced)
     val topics = random.shuffle(forcedTopics) ::: random.shuffle(unforcedTopics)
-    val state = State(Schedule.empty, Queue(slots: _*), topics)
+    val state = State(Schedule.empty(chainSeed), Queue(slots: _*), topics)
     val unimproved = backtrackAndFill(state)
     improver.improve(unimproved.get)
   }

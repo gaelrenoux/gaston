@@ -287,11 +287,11 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "Empty schedule" should "have a zero score on empty problem" in {
-    Schedule.empty(Problem.Empty, Context.Default).score should be(Score.Zero)
+    Schedule.empty(0)(Problem.Empty, Context.Default).score should be(Score.Zero)
   }
 
   it should "have a negative-or-zero score on current problem" in {
-    Schedule.empty.score should be <= Score.Zero
+    Schedule.empty(0).score should be <= Score.Zero
   }
 
   "startingUnassignedOrForced" should "return a schedule with all unassigned topics" in {

@@ -245,7 +245,7 @@ object Schedule {
   }
 
   /** Empty schedule for a problem */
-  def empty(implicit problem: Problem, ctx: Context): Schedule = Schedule(chainSeed = 0, Map.empty)
+  def empty(chainSeed: Long)(implicit problem: Problem, ctx: Context): Schedule = Schedule(chainSeed, Map.empty)
 
   /** Same as `empty`, except the schedule is marked as having the worst score. */
   def abysmal(implicit problem: Problem, ctx: Context): Schedule = Schedule(chainSeed = 0, Map.empty, isAbysmal = true)

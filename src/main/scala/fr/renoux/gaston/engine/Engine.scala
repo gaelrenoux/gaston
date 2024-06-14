@@ -32,7 +32,9 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
   final def lazySeq(chainSeed: Long, termination: Termination): LazyList[(Schedule, Long)] = {
     implicit val rand: Random = new Random(chainSeed)
 
-    val initialSchedule: Schedule = if (problem.unassignedTopics.isEmpty) startingScheduleGenerator.create else Schedule.startingUnassignedOrForced(chainSeed)
+    val initialSchedule: Schedule =
+      if (problem.unassignedTopics.isEmpty) startingScheduleGenerator.create(chainSeed)
+      else Schedule.startingUnassignedOrForced(chainSeed)
     if (!initialSchedule.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initialSchedule.toFormattedString}\n${initialSchedule.errors.mkString("\n")}"
       throw new IllegalStateException(message)
