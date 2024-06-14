@@ -13,7 +13,7 @@ import scala.util.Try
 /**
   * Reads a table of preferences to complement the input settings.
   */
-class TableReader(input: InputModel) {
+final class TableReader(input: InputModel) {
 
   val tableSettings: InputTableSettings = input.tableSettings
   val settings: InputSettings = input.settings

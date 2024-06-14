@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
   * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
   * result in the `result` field.
   */
-private[input] class InputTranscription(rawInput: InputModel) {
+private[input] final class InputTranscription(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription._
 

@@ -9,7 +9,7 @@ import scala.collection.IterableOnceOps
 /** A bunch of extension mehtods over collections. */
 object CollectionImplicits {
 
-  @inline final implicit class RichIterableOnceOps[A, CC[_], C <: CC[A]](val wrapped: IterableOnceOps[A, CC, C]) extends AnyVal {
+  @inline implicit final class RichIterableOnceOps[A, CC[_], C <: CC[A]](val wrapped: IterableOnceOps[A, CC, C]) extends AnyVal {
     @inline def replace[B >: A](pf: PartialFunction[A, B]): CC[B] = wrapped.map(a => pf.applyOrElse(a, identity[A]))
 
     @inline def zipWith[B](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
@@ -30,7 +30,7 @@ object CollectionImplicits {
     }
   }
 
-  @inline final implicit class RichIterableOps[A, CC[_], C <: CC[A]](val wrapped: IterableOps[A, CC, C]) extends AnyVal {
+  @inline implicit final class RichIterableOps[A, CC[_], C <: CC[A]](val wrapped: IterableOps[A, CC, C]) extends AnyVal {
 
     /** Keeps all elements where the f argument gives the minimum value over the collection. */
     @inline def filterMinBy[B: Ordering](f: A => B): C = if (wrapped.isEmpty) wrapped.filter(_ => true) else {
@@ -40,7 +40,7 @@ object CollectionImplicits {
     }
   }
 
-  @inline final implicit class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {
+  @inline implicit final class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {
     @inline def unzipEither: (CC[A], CC[B]) = {
       val lefts = wrapped.collect { case Left(a) => a }
       val rights = wrapped.collect { case Right(b) => b }
@@ -48,11 +48,11 @@ object CollectionImplicits {
     }
   }
 
-  @inline final implicit class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, _], CCO, _]) extends AnyVal {
+  @inline implicit final class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, _], CCO, _]) extends AnyVal {
     @inline def mapMap[B](f: A => B): CCO[CCI[B]] = wrapped.map(_.map(f))
   }
 
-  @inline final implicit class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
+  @inline implicit final class MapOps[K, V](val wrapped: Map[K, V]) extends AnyVal {
 
     @inline def getMinKey(implicit o: Ordering[K]): Option[V] = if (wrapped.isEmpty) None else Some(wrapped.minBy(_._1)._2)
 

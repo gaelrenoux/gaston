@@ -24,7 +24,7 @@ object CanAddDuration {
     override def minus(a: Instant, b: Instant): FiniteDuration = (a.toEpochMilli - b.toEpochMilli).milliseconds
   }
 
-  @inline final implicit class Ops[A: CanAddDuration](val wrapped: A) {
+  @inline implicit final class Ops[A: CanAddDuration](val wrapped: A) {
 
     @inline def plus(d: FiniteDuration): A =
       CanAddDuration[A].plus(wrapped, d)

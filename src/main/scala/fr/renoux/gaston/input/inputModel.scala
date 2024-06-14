@@ -17,7 +17,7 @@ import fr.renoux.gaston.util.{NumberUtils, Opt}
 user-friendly as possible in the configuration file, and in second to be comfortable to use by the developer. However,
 it is not optimized for performance.
 */
-case class InputModel(
+final case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),
     slots: List[List[InputSlot]] = Nil,
@@ -34,7 +34,7 @@ case class InputModel(
   lazy val topicsByName: Map[NonEmptyString, InputTopic] = topics.view.zipWith(_.name).map(_.swap).toMap
 }
 
-case class InputSettings(
+final case class InputSettings(
     incompatibilityAntiPreference: NonPosScore = NonPosScore(-1000.0),
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
@@ -45,7 +45,7 @@ case class InputSettings(
 object InputSettings {
 
   /** Settings for unassigned topics. */
-  case class Unassigned(
+  final case class Unassigned(
       allowed: Boolean = false, // all other values in this class are unused when this is false
       minPersons: NonNegInt = 0, // O allow to not remove the topic, which let us skip a step when optimizing
       maxPersons: PosInt = NumberUtils.IntLowMaxValue,
@@ -58,13 +58,13 @@ object InputSettings {
     * @param maximumAntiPreference The maximum value of the anti-preference (i.e., closest to zero).
     * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal value.
     */
-  case class UnassignedAntiPreferenceScaling(
+  final case class UnassignedAntiPreferenceScaling(
       maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
       forbiddenRatioForMaximum: Double = 0.75,
   )
 }
 
-case class InputTableSettings(
+final case class InputTableSettings(
     separator: NonEmptyString = "\t",
     personsRow: NonNegInt = 0,
     wishesStartRow: NonNegInt = 1,
@@ -80,12 +80,12 @@ case class InputTableSettings(
     preferencesScoreMapping: Option[Map[String, Score]] = None
 )
 
-case class InputSlot(
+final case class InputSlot(
     name: NonEmptyString,
     maxTopics: Option[PosInt] = None
 )
 
-case class InputTopic(
+final case class InputTopic(
     name: NonEmptyString,
     min: Option[PosInt] = None,
     max: Option[PosInt] = None,
@@ -116,7 +116,7 @@ object InputTopic {
   val PartMarker = "~"
 
   /** For multi-occurrence topic */
-  case class Occurrence(
+  final case class Occurrence(
       inputTopic: InputTopic,
       index: Opt[Int] = Opt.Missing // present only if there are multiple occurrences
   ) {
@@ -130,7 +130,7 @@ object InputTopic {
   }
 
   /** Fo multi-slot topics */
-  case class Part(
+  final case class Part(
       occurrence: Occurrence,
       index: Opt[Int] = Opt.Missing // present only if there are multiple parts
   ) {
@@ -140,7 +140,7 @@ object InputTopic {
 
 }
 
-case class InputPerson(
+final case class InputPerson(
     name: NonEmptyString,
     weight: PosWeight = DefaultWeightRefined,
     baseScore: Score = Score.Zero,
@@ -151,32 +151,32 @@ case class InputPerson(
     wishes: Map[String, Score] = Map.empty // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
 )
 
-case class InputGlobalConstraints(
+final case class InputGlobalConstraints(
     simultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     notSimultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     exclusive: Set[InputExclusiveConstraint] = Set.empty,
     linked: Set[InputLinkedConstraint] = Set.empty,
 )
 
-case class InputSimultaneousConstraint(
+final case class InputSimultaneousConstraint(
     topics: Set[NonEmptyString]
 )
 
-case class InputExclusiveConstraint(
+final case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
     exemptions: Set[NonEmptyString] = Set.empty
 )
 
-case class InputLinkedConstraint(
+final case class InputLinkedConstraint(
     topics: Set[NonEmptyString]
 )
 
 object InputRefinements {
 
-  class ScoreNonPositive()
+  final class ScoreNonPositive
 
   implicit val scoreNonPositiveValidate: Validate.Plain[Score, ScoreNonPositive] =
-    Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", new ScoreNonPositive())
+    Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", new ScoreNonPositive)
 
   type NonPosScore = Score Refined ScoreNonPositive
 
@@ -184,10 +184,10 @@ object InputRefinements {
     def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).getOrElse(throw new IllegalArgumentException(s.toString))
   }
 
-  class WeightPositive()
+  final class WeightPositive
 
   implicit val weightPositiveValidate: Validate.Plain[Weight, WeightPositive] =
-    Validate.fromPredicate(w => w.value > 0, w => s"($w is positive)", new WeightPositive())
+    Validate.fromPredicate(w => w.value > 0, w => s"($w is positive)", new WeightPositive)
 
   type PosWeight = Weight Refined WeightPositive
 

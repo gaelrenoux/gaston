@@ -123,7 +123,7 @@ object RandomScheduleGenerator {
     * @param topicsLeft Topics we can try for the current slot.
     * @param topicsPassed Topics that won't work for the current slot, but may work for ulterior slots.
     */
-  private case class State(partialSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
+  private final case class State(partialSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
 
     private implicit val problem: Problem = partialSchedule.problem
 
@@ -174,7 +174,7 @@ object RandomScheduleGenerator {
 
   }
 
-  case class BacktrackingFailures(
+  final case class BacktrackingFailures(
       triggerOnFailures: BacktrackingFailures => Unit,
       noTopics: Map[Slot, Int] = Map(),
       maxParallelizationReached: Map[Slot, Int] = Map(),

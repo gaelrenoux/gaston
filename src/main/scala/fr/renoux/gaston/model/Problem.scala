@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.TupleImplicits._
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
-class Problem(
+final class Problem(
     val slotSequences: Seq[Seq[Slot]],
     val topicsSet: Set[Topic],
     val unassignedTopics: BitMap[Slot, Topic],

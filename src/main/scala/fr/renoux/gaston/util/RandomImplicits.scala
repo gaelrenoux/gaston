@@ -5,7 +5,7 @@ import scala.util.Random
 
 object RandomImplicits {
 
-  @inline final implicit class RandomOps(wrapped: Random) {
+  @inline implicit final class RandomOps(wrapped: Random) {
     /** Picks randomly an element in a set. */
     @inline def pick[A](s: Set[A]): A = {
       if (s.isEmpty) throw new IndexOutOfBoundsException()

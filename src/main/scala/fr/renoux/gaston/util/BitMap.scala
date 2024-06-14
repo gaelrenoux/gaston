@@ -34,7 +34,7 @@ object BitMap {
   implicit def toFunction[A <: Identified, B](bitMap: BitMap[A, B]): Function[A, B] = bitMap.apply
 
   object syntax {
-    implicit class BitMapConversionOps[A <: Identified, B](val wrapped: Iterable[(A, B)]) extends AnyVal {
+    implicit final class BitMapConversionOps[A <: Identified, B](val wrapped: Iterable[(A, B)]) extends AnyVal {
       @inline def toBitMap(size: Int, default: B)(implicit tagB: ClassTag[B]): BitMap[A, B] =
         BitMap.from[A, B](size, default)(wrapped)
 

@@ -49,7 +49,7 @@ object CanTakeChunks {
       }
   }
 
-  final implicit class Ops[T[_] <: Iterable[_], A](val wrapped: T[A]) extends AnyVal {
+  implicit final class Ops[T[_] <: Iterable[_], A](val wrapped: T[A]) extends AnyVal {
 
     /** Takes chunks from the list, with a specific size. */
     @inline

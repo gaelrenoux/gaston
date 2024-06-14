@@ -6,7 +6,7 @@ import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
 
 /** A tool to render a solution as a pretty String. */
-class Renderer(
+final class Renderer(
     val problem: Problem
 ) {
 
