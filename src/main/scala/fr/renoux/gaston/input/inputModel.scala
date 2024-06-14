@@ -20,7 +20,7 @@ it is not optimized for performance.
 final case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),
-    slots: List[List[InputSlot]] = Nil,
+    slots: List[List[InputSlot]] = List(Nil), // Presents better than Nil when generating an input
     persons: List[InputPerson] = Nil,
     topics: List[InputTopic] = Nil,
     constraints: InputGlobalConstraints = InputGlobalConstraints()
