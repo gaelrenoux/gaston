@@ -15,8 +15,7 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
 
   private def run(problem: Problem, iterations: Long, seed: Long): (Schedule, Long) = {
     implicit val p: Problem = problem
-    implicit val i: GreedySlotScheduleImprover = new GreedySlotScheduleImprover
-    implicit val engine: Engine = new Engine
+    implicit val engine: Engine = new GreedyEngine
     implicit val output: Output = Output.silent
     val runner = new SyncRunner(seed)
     val termination: Termination = Termination(count = Some(iterations))

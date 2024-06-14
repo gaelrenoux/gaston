@@ -56,8 +56,8 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
       expectsCount: Long,
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing
-  )(implicit improver: ScheduleImprover = new GreedySlotScheduleImprover): Unit = {
-    implicit val engine: Engine = new Engine
+  ): Unit = {
+    implicit val engine: Engine = new GreedyEngine
     implicit val output: Output = Output.silent
 
     val handler = logMinutes()

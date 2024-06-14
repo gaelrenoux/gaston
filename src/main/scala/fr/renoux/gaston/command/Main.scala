@@ -3,7 +3,7 @@ package fr.renoux.gaston.command
 import cats.implicits._
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.{Engine, GreedySlotScheduleImprover, ScheduleImprover, Termination}
+import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
 import fr.renoux.gaston.input._
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration._
@@ -56,9 +56,8 @@ object Main {
 
       implicit val _problem: Problem = problem
       implicit val context: Context = Context.Default
-      implicit val improver: ScheduleImprover = new GreedySlotScheduleImprover
 
-      implicit val engine: Engine = new Engine(
+      implicit val engine: Engine = new GreedyEngine(
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
 

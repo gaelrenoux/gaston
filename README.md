@@ -310,10 +310,10 @@ An Engine run (in `Engine.lazySeq`) starts with an initial schedule respecting a
 - If not using backtracking (backtrack-initial-schedule option is set to false), we start with an empty schedule. This is recommended if you expect some persons to be unassigned on some slots.
     - This starts using `Schedule.startingUnassignedOrForced`.
 
-Then, the Engine calls an improver on this initial schedule. The improver will generate the lazy-list of improving schedules.
-There are two improvers implemented, GreedySlotImprover and TabuSearchSlotImprover. Only the first one is currently being used.
+Then, the Engine generates a lazy-list by improving the state step-by-step.
+There are two Engines implemented, GreedyEngine and TabuSearchEngine. Only the first one is currently being used.
 
-Then, the lazy-list starts being generated. A generation step starts from the latest generated schedule, and procedes with the following steps:
+In GreedyEngine, a generation step starts from the latest generated schedule, and procedes with the following steps:
 - Figure out all neighbours of the latest schedule in the planning spaces. Neighbours are plannings that we can get from that schedule by adding or dropping a topic, or swapping two topics.
 - Eliminate neighbours that would be just a revert of the previous change (e.g. latest schedule was obtained by adding topic A, then dropping topic A is not a neighbour we need to consider).
 - For each neighbour (lazily)

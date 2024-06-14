@@ -1,13 +1,13 @@
 package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Context
 
 import scala.annotation.tailrec
 import scala.util.Random
-
 
 /** Use tabu search to improve a schedule. Not a real tabu search as we stop a step when we found a better schedule,
   * instead of always looking for the best.
@@ -15,17 +15,18 @@ import scala.util.Random
   * Doesn't seem to be very good.
   * TODO Rework or drop
   */
-final class TabuSearchSlotScheduleImprover(implicit problem: Problem, ctx: Context) extends ScheduleImprover.Base[TabuSearchSlotScheduleImprover.State] {
+final class TabuSearchEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context)
+  extends Engine(triggerOnBacktrackingFailure) {
 
-  import TabuSearchSlotScheduleImprover.State
+  type State = TabuSearchEngine.State
 
-  private val log = Logger[TabuSearchSlotScheduleImprover]
+  private val log = Logger[TabuSearchEngine]
 
   private val navigator = new PlanningSpaceNavigator
-  private val filler: RandomAssigner = new RandomAssigner
-  private val personImprover: AssignmentImprover = new AssignmentImprover
+  private val randomAssigner: RandomAssigner = new RandomAssigner
+  private val assignmentImprover: AssignmentImprover = new AssignmentImprover
 
-  override protected def initialState(schedule: Schedule): State = State(
+  override protected def initialState(schedule: Schedule): State = TabuSearchEngine.State(
     best = schedule,
     current = schedule,
     tabu = Set(schedule.planning)
@@ -40,8 +41,8 @@ final class TabuSearchSlotScheduleImprover(implicit problem: Problem, ctx: Conte
     val neighborhood: LazyList[Schedule] = for {
       n <- neighbours
       if !state.tabu.contains(n.planning)
-      unimproved <- filler.fill(n)(rand)
-      improved = personImprover.improve(unimproved)
+      unimproved <- randomAssigner.fill(n)(rand)
+      improved = assignmentImprover.improve(unimproved)
     } yield improved
 
     @tailrec
@@ -57,13 +58,14 @@ final class TabuSearchSlotScheduleImprover(implicit problem: Problem, ctx: Conte
 
 }
 
-object TabuSearchSlotScheduleImprover {
+object TabuSearchEngine {
 
   final case class State(
       best: Schedule,
       current: Schedule,
       tabu: Set[Schedule.Planning]
-  ) extends ScheduleImprover.State  {
+  ) extends Engine.State {
+
     override val schedule: Schedule = best
 
     override val attemptsCount: Long = 0 // TODO
