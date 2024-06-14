@@ -60,7 +60,8 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
       slotCache.get(slotSchedule.topicsSet) match {
         case Some(ss) =>
-          recImprove(schedule.set(ss), maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
+          val newSchedule = schedule.set(ss.copy(slot = slot))
+          recImprove(newSchedule, maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
 
         case None => goodMoveOnSlot(schedule, slot) match {
 
