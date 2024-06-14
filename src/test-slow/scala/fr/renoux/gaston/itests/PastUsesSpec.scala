@@ -22,7 +22,10 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
   private implicit val context: Context = Context.Default
   private val udocon2017: Problem = problemFromClassPath("udocon2017/uc17.conf").force
   private val udocon2019: Problem = problemFromClassPath("udocon2019/uc19.conf").force
+  private val udocon2024: Problem = problemFromClassPath("udocon2024/full.conf").force
   private val r32019: Problem = problemFromClassPath("r32019/r32019.conf").force
+  private val r32023: Problem = problemFromClassPath("r32023/tts.conf").force
+  private val r32024: Problem = problemFromClassPath("r32024/full.conf").force
 
   private def run(problem: Problem, iterations: Long): (Schedule, Long) = {
     implicit val p: Problem = problem
@@ -59,6 +62,19 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     result.score.value should be > 970.0
   }
 
+  "udocon2024" should "not crash after examining 10 schedules" in {
+    val (result, count) = run(udocon2024, 10)
+    println(result.toFormattedString)
+    count should be(10L)
+  }
+
+  it should "return a great result after 1000 schedules" in {
+    val (result, count) = run(udocon2024, 1000)
+    println(result.toFormattedString)
+    count should be(1000L)
+    result.score.value should be > 970.0
+  }
+
   "r32019" should "not crash after after examining 10 schedules" in {
     val (result, count) = run(r32019, 10)
     println(result.toFormattedString)
@@ -70,6 +86,32 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     println(result.toFormattedString)
     count should be(1000L)
     result.score.value should be > 970.0
+  }
+
+  "r32023" should "not crash after after examining 10 schedules" in {
+    val (result, count) = run(r32023, 10)
+    println(result.toFormattedString)
+    count should be(10L)
+  }
+
+  it should "return a great result after 1000 schedules" in {
+    val (result, count) = run(r32023, 1000)
+    println(result.toFormattedString)
+    count should be(1000L)
+    result.score.value should be > 500.0
+  }
+
+  "r32024" should "not crash after after examining 10 schedules" in {
+    val (result, count) = run(r32024, 10)
+    println(result.toFormattedString)
+    count should be(10L)
+  }
+
+  it should "return a great result after 1000 schedules" in {
+    val (result, count) = run(r32024, 1000)
+    println(result.toFormattedString)
+    count should be(1000L)
+    result.score.value should be > 500.0
   }
 
 }
