@@ -2,8 +2,11 @@ package fr.renoux.gaston.command
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
+import fr.renoux.gaston.engine.Termination
 import fr.renoux.gaston.input.{InputLoader, InputModel}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
+
+import java.time.Instant
 
 /** Destination of all information in Gaston. It writes stuff both to the log file and the standard output. It has some
   * business-aware method, to make sure it only prints new schedules if they are better than schedules found
@@ -84,6 +87,16 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
 
       write(s"I'm having trouble generating a valid schedule. Probable causes are: \n$allMessages", separator = true)
     }
+  }
+
+  def writeTerminationOnTimeout(termination: Termination, now: Instant): Unit =
+    write(s"Termination on timeout: $now > ${termination.timeout.get} on thread ${Thread.currentThread().getName}")
+
+  def writeTerminationOnCount(termination: Termination, count: Long): Unit =
+    write(s"Termination on count: $count >= ${termination.count.get} on thread ${Thread.currentThread().getName}")
+
+  def writeTerminationOnScore(termination: Termination, score: Score): Unit = {
+    write(s"Termination on score: ${score.value} >= ${termination.score.get.value} on thread ${Thread.currentThread().getName}")
   }
 }
 

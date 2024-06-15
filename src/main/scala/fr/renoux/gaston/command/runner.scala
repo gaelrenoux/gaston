@@ -1,6 +1,5 @@
 package fr.renoux.gaston.command
 
-import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine._
 import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.CanAddDuration._
@@ -39,8 +38,6 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
   (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
   extends Runner(seed, statusDisplayInterval) {
 
-  private val log = Logger[SyncRunner]
-
   /** Runs the schedule generation. The argument controls when to stop the process. If no termination condition is set,
     * this method never terminates. */
   override def run(termination: Termination): (Schedule, Long) = {
@@ -63,16 +60,15 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
 
     /* Check for termination criteria */
     if (termination.checkTimeout(now)) {
-      // TODO Log should go into Output as well
-      log.info(s"Termination on timeout: $now > ${termination.timeout}")
+      output.writeTerminationOnTimeout(termination, now)
       (best, totalCount)
 
     } else if (termination.checkCount(totalCount)) {
-      log.info(s"Termination on count: $totalCount >= ${termination.count}")
+      output.writeTerminationOnCount(termination, totalCount)
       (best, totalCount)
 
     } else if (termination.checkScore(best.score)) {
-      log.info(s"Termination on score: ${best.score} >= ${termination.score}")
+      output.writeTerminationOnScore(termination, best.score)
       (best, totalCount)
 
     } else {
