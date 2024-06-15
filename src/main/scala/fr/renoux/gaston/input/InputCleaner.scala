@@ -6,7 +6,10 @@ import fr.renoux.gaston.model.{Record, Score, Weight}
 import fr.renoux.gaston.util.StringImplicits._
 import shapeless._
 
-/** Typeclass: can be cleaned up. */
+import scala.concurrent.duration.FiniteDuration
+
+/** Typeclass: can be cleaned up. Used on the input to sanitize entries: remove special characters from Strings, for
+  * example. */
 trait InputCleaner[A] {
   def clean(a: A): A
 }
@@ -36,6 +39,8 @@ object InputCleaner {
   implicit object LongCleaner extends IdentityCleaner[Long]
 
   implicit object DoubleCleaner extends IdentityCleaner[Double]
+
+  implicit object FiniteDurationCleaner extends IdentityCleaner[FiniteDuration]
 
   implicit final def optionInputCleaner[A](implicit aCleaner: InputCleaner[A]): InputCleaner[Option[A]] =
     instance(option => option.map(aCleaner.clean))

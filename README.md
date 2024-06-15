@@ -30,6 +30,7 @@ The input file describes the problem to solve. It follows the HOCON format, and 
 
 - `gaston`: Root element of the configuration.
     - `settings`: Global settings. All fields are optional and have a default value.
+        - `status-display-interval`: How often you want to display new good schedules. You can write any time unit, for example: `20 seconds` or `30 minutes`, or abbreviate it as `20s` or `30m`. Default is `20 seconds`.
         - `incompatibility-anti-preference`: Negative score for a person forced to share a topic with someone it would rather not. Default is `-1000`.
         - `default-max-topics-per-slot`: Max number of topics per slot (default is no limit.
         - `default-min-persons-per-topic`: Minimum number of persons per topic, can be overridden on specific topics. Default is `1`.

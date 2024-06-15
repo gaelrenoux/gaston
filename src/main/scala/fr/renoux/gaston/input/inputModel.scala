@@ -10,6 +10,8 @@ import fr.renoux.gaston.model.{Score, Topic, Weight}
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{NumberUtils, Opt}
 
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+
 /* All line and column indices are zero-based */
 // scalastyle:off magic.number
 
@@ -39,7 +41,8 @@ final case class InputSettings(
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
     defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
-    unassigned: InputSettings.Unassigned = InputSettings.Unassigned()
+    unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
+    statusDisplayInterval: FiniteDuration = 20.seconds
 )
 
 object InputSettings {

@@ -61,7 +61,11 @@ object Main {
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
 
-      val runner = new ParallelRunner(seed = commandLine.globalSeed, parallelism = commandLine.parallelism)
+      val runner = new ParallelRunner(
+        seed = commandLine.globalSeed,
+        parallelism = commandLine.parallelism,
+        statusDisplayInterval = input.settings.statusDisplayInterval
+      )
 
       output.writeStart(commandLine.globalSeed)
       val timeout = commandLine.maxDuration.map(Instant.now() + _)

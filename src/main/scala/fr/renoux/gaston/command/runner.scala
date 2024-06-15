@@ -20,10 +20,10 @@ import scala.util.Random
   *
   * Runners may be mutable, as they typically handle their own random generator, and are NOT thread-safe.
   */
-abstract class Runner(seed: Long) {
+abstract class Runner(seed: Long, statusDisplayInterval: FiniteDuration) {
 
   /** Interval of time between each status output */
-  protected val statusFrequencyMs: Long = 20.seconds.toMillis // TODO shouldn't be hardcoded
+  protected val statusDisplayIntervalMs: Long = statusDisplayInterval.toMillis
 
   protected implicit val random: Random = new Random(seed)
 
@@ -35,8 +35,9 @@ abstract class Runner(seed: Long) {
 
 
 /** A SyncRunner simply runs in the current thread. */
-class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
-  extends Runner(seed) {
+class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
+  (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
+  extends Runner(seed, statusDisplayInterval) {
 
   private val log = Logger[SyncRunner]
 
@@ -45,7 +46,7 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
   override def run(termination: Termination): (Schedule, Long) = {
     implicit val random: Random = new Random(seed)
     output.writeStartThread(seed)
-    runRecursive(Instant.now().plusMillis(statusFrequencyMs), 0, 0, Schedule.abysmal)(termination)
+    runRecursive(Instant.now().plusMillis(statusDisplayIntervalMs), 0, 0, Schedule.abysmal)(termination)
   }
 
   /** Recursive run, single-threaded: if it still has time, produces a schedule then invokes itself again . */
@@ -79,7 +80,7 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
       val newNextStatusTime = if (now isAfter nextStatusTime) {
         output.writeScheduleIfBetter(best)
         output.writeAttempts(totalCount, best)
-        now.plusMillis(statusFrequencyMs)
+        now.plusMillis(statusDisplayIntervalMs)
       } else nextStatusTime
 
       /* Read one schedule from the lazy list then recur */
@@ -104,9 +105,9 @@ class SyncRunner(seed: Long)(implicit problem: Problem, engine: Engine, output: 
 /** Runs multiple parallel SyncRunners, with different seeds, in parallel, then aggregate the results if they terminate.
   * Note that termination conditions must be met on all parallel runners for this one to terminate. */
 // TODO Find a way to terminate early as soon as a minimum score is reached, but not for other termination conditions.
-class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = ParallelRunner.defaultParallelism())
+class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = ParallelRunner.defaultParallelism(), statusDisplayInterval: FiniteDuration = 1.day)
   (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
-  extends Runner(seed) {
+  extends Runner(seed, statusDisplayInterval) {
 
   /** Runs multiple Runners, in parallel, then wait for them to finish. Note that if no termination conditions are set,
     * this method will never terminate. */
@@ -117,7 +118,7 @@ class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = Parallel
     /* Parallelize on the number of cores */
     val future: Future[Seq[(Schedule, Long)]] = Future.sequence {
       (0 until parallelism).map { _ =>
-        val runner = new SyncRunner(random.nextLong())
+        val runner = new SyncRunner(random.nextLong(), statusDisplayInterval)
         Future(runner.run(termination))
       }
     }
