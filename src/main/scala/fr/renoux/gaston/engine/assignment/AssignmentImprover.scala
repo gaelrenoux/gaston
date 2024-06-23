@@ -20,7 +20,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   private val cache: mutable.Map[Schedule.Planning, Schedule] = TrieMap[Schedule.Planning, Schedule]()
 
-  private val slotCache: mutable.Map[Set[Topic], SlotSchedule] = TrieMap[Set[Topic], SlotSchedule]()
+  private val slotCache: mutable.Map[(Set[Topic], Set[Person]), SlotSchedule] = TrieMap[(Set[Topic], Set[Person]), SlotSchedule]()
 
   private val log = Logger[AssignmentImprover]
 
@@ -58,16 +58,16 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
       val (slot, slotsTail) = slots.dequeue
       val slotSchedule = schedule.on(slot)
 
-      slotCache.get(slotSchedule.topicsSet) match {
+      slotCache.get((slotSchedule.topicsSet, slotSchedule.slot.personsPresent)) match {
         case Some(ss) =>
-          val newSchedule = schedule.set(ss.copy(slot = slot))
+          val newSchedule = schedule.set(ss.changeSlot(slot))
           recImprove(newSchedule, maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
 
         case None => goodMoveOnSlot(schedule, slot) match {
 
           case None =>
             /* can't improve this slot any more ! Store in cache, then continue on the slots left */
-            slotCache.update(slotSchedule.topicsSet, slotSchedule)
+            slotCache.update((slotSchedule.topicsSet, slotSchedule.slot.personsPresent), slotSchedule)
             recImprove(schedule, maxRounds - 1, slotsTail)
 
           case Some(candidate) =>
