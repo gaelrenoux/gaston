@@ -75,6 +75,11 @@ final case class SlotSchedule(
   /** Get the records for a specific Topic */
   def on(t: Topic): Record = wrapped(t)
 
+  def changeSlot(newSlot: Slot): SlotSchedule = copy(
+    slot = newSlot,
+    wrapped = wrapped.map { case (topic, record) => topic -> record.copy(slot = newSlot) }
+  )
+
   /** Add a new record to this schedule. */
   def add(record: Record): SlotSchedule = updateWrapped(wrapped + (record.topic -> record))
 
