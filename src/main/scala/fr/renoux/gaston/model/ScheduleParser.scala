@@ -12,7 +12,7 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
 
   /** Parses a schedule from the result of [[Schedule.toFormattedString]]. */
   def parseFormattedString(str: String): Either[String, Schedule] = {
-    val lines = str.linesIterator.toList
+    val lines = str.trim.linesIterator.toList
     for {
       //TODO set state monad
       afterHeader <- readUselessLine(lines, "Schedule:")
