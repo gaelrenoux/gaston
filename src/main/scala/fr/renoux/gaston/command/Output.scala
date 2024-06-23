@@ -72,7 +72,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
   }
 
   def writeBacktrackingFailure(fs: BacktrackingFailures): Unit = {
-    if (fs.total % 50000 == 0) {
+    if (fs.total % 200000 == 0) {
       val noTopicMessages = fs.noTopics.toSeq.map {
         case (slot, count) =>
           val percent = 100.0 * count / fs.total
@@ -85,7 +85,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
       }
       val allMessages = (noTopicMessages ++ maxParaMessages).sortBy(_._1).reverseIterator.map(_._2).mkString("\n")
 
-      write(s"I'm having trouble generating a valid schedule. Probable causes are: \n$allMessages", separator = true)
+      write(s"I'm having trouble generating a valid schedule (on thread ${Thread.currentThread().getName}). Probable causes are: \n$allMessages", separator = true)
     }
   }
 
