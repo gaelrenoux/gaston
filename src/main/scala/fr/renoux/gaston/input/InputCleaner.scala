@@ -26,6 +26,7 @@ object InputCleaner {
     override def clean(a: String): String = a.trim
       .replaceRec(Record.FormattedTopicPersonsSeparator, Record.FormattedTopicPersonsSeparator.tail)
       .replaceRec(Record.FormattedPersonsSeparator, Record.FormattedPersonsSeparator.tail)
+      .replaceRec(Record.MandatoryMarker, Record.MandatoryMarker.toLowerCase)
   }
 
   class IdentityCleaner[A] extends InputCleaner[A] {

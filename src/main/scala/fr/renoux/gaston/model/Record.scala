@@ -7,11 +7,13 @@ import scala.annotation.tailrec
 
 /** A Record is a triplet of slot, topic and assigned persons */
 final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
+
   import Record._
   import problem.counts
 
   lazy val personsList: List[Person] = persons.toList
   lazy val countPersons: Int = persons.size
+
 
   lazy val personsBitSet: BitSet[Person] = persons.toBitSet
 
@@ -59,9 +61,10 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   }
 
   /**
-    * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to partial schedules
-    */
+   * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
+   *
+   * @return true if this respects all constraints applicable to partial schedules
+   */
   lazy val isPartialSolution: Boolean = {
     topic.max >= countPersons && // topic.min <= pCount &&
       !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
@@ -89,9 +92,14 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
     copy(persons = persons ++ that.persons)
   }
 
+  // TODO The whole formatting thing is rare enough that it's probably not worth it to cache it. It could all be moved
+  //  into the renderer, in an IO package.
   /** Produces a clear, single-line version of this record, with no indentation. */
-  lazy val toFormattedString: String =
-    s"${topic.name} $FormattedTopicPersonsSeparator ${persons.map(_.name).mkString(FormattedPersonsSeparator)}"
+  lazy val toFormattedString: String = {
+    val mandatoryNames = topic.mandatory.view.map { p => s"${p.name} ($MandatoryMarker)" }
+    val otherNames = optionalPersons.view.map(_.name)
+    s"${topic.name} $FormattedTopicPersonsSeparator ${(mandatoryNames ++ otherNames).mkString(FormattedPersonsSeparator)}"
+  }
 
 }
 
@@ -102,6 +110,8 @@ object Record {
 
   def apply(slot: Slot, topic: Topic, persons: Person*)(implicit problem: Problem): Record = apply(slot, topic, persons.toSet)
 
+  // All this should be in an IO package, in an object containing constants.
   val FormattedTopicPersonsSeparator: String = "==>"
   val FormattedPersonsSeparator: String = ", "
+  val MandatoryMarker: String = "MND"
 }

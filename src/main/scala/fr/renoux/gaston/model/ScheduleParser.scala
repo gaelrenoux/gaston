@@ -79,7 +79,7 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
   private[model] def parseRecord(slot: Slot, line: String): ErrorOr[Record] = line.trim.split(Record.FormattedTopicPersonsSeparator) match {
     case Array(topicString, personsString) =>
       val topicName = topicString.trim
-      val personNames = personsString.split(Record.FormattedPersonsSeparator).map(_.trim)
+      val personNames = personsString.split(Record.FormattedPersonsSeparator).map(_.trim.replace(s" (${Record.MandatoryMarker})", ""))
       val topic = problem.topicsList.find(_.name == topicName).toRight(s"Unknown topic: $topicName")
       lazy val persons = personNames.toList.traverse { name => problem.personsList.find(_.name == name).toRight(s"Unknown person: $name") }
       for {t <- topic; ps <- persons} yield Record(slot, t, ps.toSet)
