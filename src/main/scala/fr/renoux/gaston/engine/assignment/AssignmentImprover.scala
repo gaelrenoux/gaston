@@ -6,7 +6,9 @@ import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
 import scala.annotation.tailrec
+import scala.collection.concurrent.TrieMap
 import scala.collection.immutable.Queue
+import scala.collection.mutable
 import scala.util.Random
 
 
@@ -15,6 +17,10 @@ import scala.util.Random
   * should already be assigned somewhere (this will not assign unassigned persons).
   */
 final class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
+
+  private val cache: mutable.Map[Schedule.Planning, Schedule] = TrieMap[Schedule.Planning, Schedule]()
+
+  private val slotCache: mutable.Map[(Set[Topic], Set[Person]), SlotSchedule] = TrieMap[(Set[Topic], Set[Person]), SlotSchedule]()
 
   private val log = Logger[AssignmentImprover]
 
@@ -27,7 +33,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
     * perfected any more or because the limit number of rounds has been reached. */
   def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(implicit rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
-      recImprove(schedule, maxRounds)
+      cache.getOrElseUpdate(schedule.planning, recImprove(schedule, maxRounds))
     }
 
   /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one (slotRoundsLimit is
@@ -51,15 +57,23 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
     } else {
       val (slot, slotsTail) = slots.dequeue
 
-      goodMoveOnSlot(schedule, slot) match {
-        case None =>
-          /* can't improve this slot any more ! Continue on the slots left */
-          recImprove(schedule, maxRounds - 1, slotsTail)
+      slotCache.get((slotSchedule.topicsSet, slotSchedule.slot.personsPresent)) match {
+        case Some(ss) =>
+          val newSchedule = schedule.set(ss.changeSlot(slot))
+          recImprove(newSchedule, maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
 
-        case Some(candidate) =>
-          /* The slot was improved! If there are rounds left stay on the same slot, otherwise move to the next one and come back to this one later. */
-          if (slotRoundsLimit > 0) recImprove(candidate, maxRounds - 1, slots, slotRoundsLimit - 1) // current slot still on top of the queue
-          else recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot)) // current slot moved to the bottom of the queue
+        case None => goodMoveOnSlot(schedule, slot) match {
+
+          case None =>
+            /* can't improve this slot any more ! Store in cache, then continue on the slots left */
+            slotCache.update((slotSchedule.topicsSet, slotSchedule.slot.personsPresent), slotSchedule)
+            recImprove(schedule, maxRounds - 1, slotsTail)
+
+          case Some(candidate) =>
+            /* The slot was improved! If there are rounds left stay on the same slot, otherwise move to the next one and come back to this one later. */
+            if (slotRoundsLimit > 0) recImprove(candidate, maxRounds - 1, slots, slotRoundsLimit - 1) // current slot still on top of the queue
+            else recImprove(candidate, maxRounds - 1, slotsTail.enqueue(slot)) // current slot moved to the bottom of the queue
+        }
       }
     }
 
