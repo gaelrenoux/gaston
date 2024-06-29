@@ -130,6 +130,7 @@ final case class Schedule(
     else Some {
       val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
       val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
+      // Using a Monoid on the next instruction is indeed the fastest way I could find to merge those maps, tested in benchmarks.
       val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
       scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore
     }
