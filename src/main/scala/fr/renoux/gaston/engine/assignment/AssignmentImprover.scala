@@ -18,8 +18,10 @@ import scala.util.Random
   */
 final class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
 
+  // Should be an LRU or LFU cache to drop most unused values
   private val cache: mutable.Map[Schedule.Planning, Schedule] = TrieMap[Schedule.Planning, Schedule]()
 
+  // should be an LRU or LFU cache as well, although it might stay small enough to not need one
   private val slotCache: mutable.Map[(Set[Topic], Set[Person]), SlotSchedule] = TrieMap[(Set[Topic], Set[Person]), SlotSchedule]()
 
   private val log = Logger[AssignmentImprover]
@@ -33,7 +35,15 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
     * perfected any more or because the limit number of rounds has been reached. */
   def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(implicit rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
-      cache.getOrElseUpdate(schedule.planning, recImprove(schedule, maxRounds))
+      cache.get(schedule.planning) match {
+        case None =>
+          val result = recImprove(schedule, maxRounds)
+          cache(schedule.planning) = result
+          result
+        case Some(found) =>
+          // println(s">>>>>>>>>>>>>>>> Cache hit on ${schedule.planning.flatMap(_._2.map(_.name))}")
+          found
+      }
     }
 
   /** Recursive method improving the schedule. Works a bit on a slot before getting to the next one (slotRoundsLimit is
@@ -59,6 +69,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
       slotCache.get((slotSchedule.topicsSet, slotSchedule.slot.personsPresent)) match {
         case Some(ss) =>
+          // println(s">>>>>>>>>>>>>>>> Cache hit on ${slotSchedule.topicsSet.map(_.name)}")
           val newSchedule = schedule.set(ss.changeSlot(slot))
           recImprove(newSchedule, maxRounds - 1, slotsTail) // slot read from the cache, go to the next one
 
