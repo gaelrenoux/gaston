@@ -55,8 +55,8 @@ final case class SlotSchedule(
   lazy val countTopics: Int = topics.size
   lazy val maxTopicsLeft: Int = slot.maxTopics - countTopics
 
-  lazy val minPersons: Option[Int] = if (isEmpty) None else Some(topics.view.map(_.min).sum)
-  lazy val maxPersons: Option[Int] = if (isEmpty) None else Some(topics.view.map(_.max).sum)
+  lazy val minPersons: Option[Int] = if (isEmpty) None else Some(topics.foldLeft(0)(_ + _.min))
+  lazy val maxPersons: Option[Int] = if (isEmpty) None else Some(topics.foldLeft(0)(_ + _.max))
 
   lazy val scheduledPersons: Set[Person] = recordsSet.flatMap(_.persons)
   lazy val unscheduledPersons: Set[Person] = slot.personsPresent -- scheduledPersons

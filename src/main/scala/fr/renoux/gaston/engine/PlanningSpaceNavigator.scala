@@ -65,7 +65,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     lazy val mandatories = topicsToAdd.flatMap(_.mandatory)
     lazy val mandatoriesAreNotTaken = !mandatories.exists(slotSchedule.mandatory)
     lazy val mandatoriesArePresent = mandatories.forall(slotSchedule.slot.personsPresent)
-    lazy val minPersonsRequired = slotSchedule.topics.view.map(_.min).sum + topicsToAdd.view.map(_.min).sum
+    lazy val minPersonsRequired = slotSchedule.topics.foldLeft(0)(_ + _.min) + topicsToAdd.foldLeft(0)(_ + _.min)
     lazy val enoughPersonsArePresent = slotSchedule.slot.personsPresentCount >= minPersonsRequired
     slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent && enoughPersonsArePresent
   }
@@ -117,14 +117,14 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     lazy val mandatoriesT2AreNotTakenOnS1 = !mandatoriesT2.exists(slotSchedule1.mandatory -- mandatoriesT1) // T1 mandatories are not mandatory anymore
     lazy val mandatoriesT1ArePresentOnS2 = mandatoriesT1.forall(slotSchedule2.slot.personsPresent)
     lazy val mandatoriesT2ArePresentOnS1 = mandatoriesT2.forall(slotSchedule1.slot.personsPresent)
-    lazy val minPersonsMoving1To2 = topics1.view.map(_.min).sum - topics2.view.map(_.min).sum
-    lazy val minPersonsRequiredS1 = slotSchedule1.topics.view.map(_.min).sum - minPersonsMoving1To2
-    lazy val minPersonsRequiredS2 = slotSchedule2.topics.view.map(_.min).sum + minPersonsMoving1To2
+    lazy val minPersonsMoving1To2 = topics1.foldLeft(0)(_ + _.min) - topics2.foldLeft(0)(_ + _.min)
+    lazy val minPersonsRequiredS1 = slotSchedule1.topics.foldLeft(0)(_ + _.min) - minPersonsMoving1To2
+    lazy val minPersonsRequiredS2 = slotSchedule2.topics.foldLeft(0)(_ + _.min) + minPersonsMoving1To2
     lazy val enoughPersonsArePresentOnS1 = slotSchedule1.slot.personsPresentCount >= minPersonsRequiredS1
     lazy val enoughPersonsArePresentOnS2 = slotSchedule2.slot.personsPresentCount >= minPersonsRequiredS2
-    lazy val maxPersonsMoving1To2 = topics1.view.map(_.max).sum - topics2.view.map(_.max).sum
-    lazy val maxPersonsPossibleS1 = slotSchedule1.topics.view.map(_.max).sum - maxPersonsMoving1To2
-    lazy val maxPersonsPossibleS2 = slotSchedule2.topics.view.map(_.max).sum + maxPersonsMoving1To2
+    lazy val maxPersonsMoving1To2 = topics1.foldLeft(0)(_ + _.max) - topics2.foldLeft(0)(_ + _.max)
+    lazy val maxPersonsPossibleS1 = slotSchedule1.topics.foldLeft(0)(_ + _.max) - maxPersonsMoving1To2
+    lazy val maxPersonsPossibleS2 = slotSchedule2.topics.foldLeft(0)(_ + _.max) + maxPersonsMoving1To2
     lazy val notTooManyPersonsAreOnS1 = slotSchedule1.slot.personsPresentCount <= maxPersonsPossibleS1
     lazy val notTooManyPersonsAreOnS2 = slotSchedule2.slot.personsPresentCount <= maxPersonsPossibleS2
 
@@ -174,9 +174,9 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     lazy val mandatoriesAreNotTaken = !mandatoriesNew.exists(slotSchedule.mandatory -- mandatoriesOld)
     lazy val mandatoriesArePresent = mandatoriesNew.forall(slotSchedule.slot.personsPresent)
 
-    lazy val minPersonsRequired = slotSchedule.topics.view.map(_.min).sum - topicsToRemove.view.map(_.min).sum + topicsToAdd.view.map(_.min).sum
+    lazy val minPersonsRequired = slotSchedule.topics.foldLeft(0)(_ + _.min) - topicsToRemove.foldLeft(0)(_ + _.min) + topicsToAdd.foldLeft(0)(_ + _.min)
     lazy val enoughPersonsArePresent = slotSchedule.slot.personsPresentCount >= minPersonsRequired
-    lazy val maxPersonsPossible = slotSchedule.topics.view.map(_.max).sum - topicsToRemove.view.map(_.max).sum + topicsToAdd.view.map(_.max).sum
+    lazy val maxPersonsPossible = slotSchedule.topics.foldLeft(0)(_ + _.max) - topicsToRemove.foldLeft(0)(_ + _.max) + topicsToAdd.foldLeft(0)(_ + _.max)
     lazy val notTooManyPersonsArePresent = slotSchedule.slot.personsPresentCount <= maxPersonsPossible
 
     slotIsNotFull && mandatoriesAreNotTaken && mandatoriesArePresent && enoughPersonsArePresent && notTooManyPersonsArePresent
@@ -207,7 +207,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
   } yield (partial, Move.Remove(slot, topicsToRemove))
 
   private def isRemovalPossible(slotSchedule: SlotSchedule, topicsToRemove: Set[Topic]): Boolean = {
-    lazy val maxPersonsPossible = slotSchedule.topics.view.map(_.max).sum - topicsToRemove.view.map(_.max).sum
+    lazy val maxPersonsPossible = slotSchedule.topics.foldLeft(0)(_ + _.max) - topicsToRemove.foldLeft(0)(_ + _.max)
     lazy val notTooManyPersonsArePresent = slotSchedule.slot.personsPresentCount <= maxPersonsPossible
 
     notTooManyPersonsArePresent

@@ -49,8 +49,8 @@ final case class Schedule(
   lazy val unscheduledTopics: Set[Topic] = (problem.topicsSet -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values // not a Set: we do not want to deduplicate identical groups!
-  // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.max).sum)
-  // lazy val minPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.view.map(_.min).sum)
+  // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.max))
+  // lazy val minPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.min))
   lazy val personsByTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsByTopic).toMap
 
   /** Get the SlotSchedule for a specific Slot */

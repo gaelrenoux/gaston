@@ -55,8 +55,8 @@ final class RandomAssigner(implicit private val problem: Problem) {
 
     /* check wether it's possible to make it work first */
     val filled = partialSchedule.planning.find { case (slot, topics) =>
-      val min = topics.view.map(_.min).sum
-      val max = topics.view.map(_.max).sum
+      val min = topics.foldLeft(0)(_ + _.min)
+      val max = topics.foldLeft(0)(_ + _.max)
       val pCount = slot.personsPresentCount
       pCount < min || pCount > max
     } match {
