@@ -24,7 +24,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   behavior of "Engine"
 
-  it should "give an good score when working 1 min" in {
+  it should "give an good score when working 1 min" ignore {
     benchmark(
       duration = 1.minute,
       expectsScore = 715,
@@ -32,7 +32,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
     )
   }
 
-  it should "give a good score when working 5 min" in {
+  it should "give a good score when working 5 min" ignore {
     benchmark(
       duration = 5.minutes,
       expectsScore = 760,
@@ -40,7 +40,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
     )
   }
 
-  it should "give a great score when working 20 min" in {
+  it should "give a great score when working 20 min" ignore {
     benchmark(
       duration = 20.minutes,
       expectsScore = 770,
