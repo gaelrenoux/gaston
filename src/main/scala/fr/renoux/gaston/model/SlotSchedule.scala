@@ -146,7 +146,7 @@ final case class SlotSchedule(
   /** Score for each person, regardless of its weight. All personal scores are records-level, so the whole computation is done per record. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).combineAll
 
-  lazy val impersonalScoreTopicLevel: Score = recordsList.view.map(_.impersonalScore).sum
+  lazy val impersonalScoreTopicLevel: Score = Score.sum(recordsList)(_.impersonalScore)
 
   /** Impersonal score of the slot, regardless of how persons are assigned to topics on this slot (as long as the same persons are present) */
   lazy val impersonalScoreSlotLevel: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)

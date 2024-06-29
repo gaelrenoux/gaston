@@ -37,7 +37,7 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
 
   /** There are some impersonal global-level preferences, so we have to calculate them in addition to the slot computation. */
   lazy val impersonalScore: Score = chrono("ScoreCalculator > impersonalScore") {
-    schedule.slotSchedulesList.map(_.impersonalScore).sum + impersonalGlobalPreferencesScore
+    Score.sum(schedule.slotSchedulesList)(_.impersonalScore) + impersonalGlobalPreferencesScore
   }
 
   /** Those preferences are impersonal in that they are not weighted by a person. But person repartition does matter! */

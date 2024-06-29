@@ -86,4 +86,8 @@ object Score extends (Double => Score) {
     override def parseString(str: String): Option[Score] = str.toDoubleOption.map(Score)
   }
 
+  def sum[A](it: Iterable[A])(f: A => Score): Score =
+    if (it.isEmpty) Score.Zero
+    else Score(it.foldLeft(0.0)(_ + f(_).value))
+
 }

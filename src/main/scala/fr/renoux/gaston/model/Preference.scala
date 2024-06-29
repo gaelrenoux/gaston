@@ -43,7 +43,7 @@ object Preference {
     /** Score the slot schedule according to this preference */
     def scoreSlot(schedule: SlotSchedule): Score
 
-    override def score(schedule: Schedule): Score = schedule.slotSchedulesList.map(scoreSlot).sum
+    override def score(schedule: Schedule): Score = Score.sum(schedule.slotSchedulesList)(scoreSlot)
   }
 
   /** Trait for preferences which can be evaluated record by record */
@@ -51,7 +51,8 @@ object Preference {
     /** Score the record according to this preference */
     def scoreRecord(record: Record): Score
 
-    override def score(schedule: Schedule): Score = schedule.slotSchedulesList.flatMap(_.recordsList).map(scoreRecord).sum
+    override def score(schedule: Schedule): Score =
+      Score.sum(schedule.slotSchedulesList.flatMap(_.recordsList))(scoreRecord)
   }
 
   /** Personal preferences are always at record level, and apply to a specific person. */
