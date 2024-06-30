@@ -15,21 +15,21 @@ final class RandomAssigner(implicit private val problem: Problem) {
 
   private val log = Logger[RandomAssigner]
 
-  /** Starts with a partial schedule satisfying all constraints except number constraint, and generates a random
-    * schedule respecting all constraints, using backtracking as necessary.
+  /** Starts with a partial schedule satisfying all constraints except number constraint (including having all mandatory
+    * persons correctly assigned on their topics), and generates a random schedule respecting all constraints, using
+    * backtracking as necessary.
     *
     * Returns None if such a schedule cannot be constructed (for example there are
     * not enough persons to fill all topics on a slot, or there's a slot with not enough topics to put everyone in).
     */
   def fill(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
-
+    
     /* Iterate over Slots, stop in case there is an incompatibility on some Slot */
     @tailrec
-    def completeForSlots(slots: List[Slot], scheduleOption: Option[Schedule]): Option[Schedule] = (slots, scheduleOption) match {
-      case (Nil, _) => scheduleOption
-      case (_, None) => None
+    def completeForSlots(slots: List[Slot], schedule: Schedule): Option[Schedule] = slots match {
+      case Nil => Some(schedule)
 
-      case (slot :: slotsTail, Some(schedule)) =>
+      case slot :: slotsTail =>
         /* Handle current slot */
         val slotSchedule = schedule.on(slot)
 
@@ -46,9 +46,11 @@ final class RandomAssigner(implicit private val problem: Problem) {
         val topicsNeedingMin = topicsWithNeeded.filter(c => c._2 > 0)
         val topicsOpenToMax = topicsWithOptional.filter(_._2 > 0)
 
-        val newSchedule = backtrackAssignPersonsToTopics(schedule, slot)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft, Nil, Nil)
+        backtrackAssignPersonsToTopics(slotSchedule)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft, Nil, Nil) match {
+          case None => None
+          case Some(newSlotSchedule) => completeForSlots(slotsTail, schedule.replaceSlotSchedule(newSlotSchedule))
+        }
 
-        completeForSlots(slotsTail, newSchedule)
     }
 
     log.debug("Starting to fill the partial schedule")
@@ -60,7 +62,7 @@ final class RandomAssigner(implicit private val problem: Problem) {
       val pCount = slot.personsPresentCount
       pCount < min || pCount > max
     } match {
-      case None => completeForSlots(problem.slotsSet.toList, Some(partialSchedule))
+      case None => completeForSlots(problem.slotsSet.toList, partialSchedule)
       case Some((slot, _)) =>
         log.trace(s"Impossible to fill slot $slot")
         None
@@ -74,7 +76,7 @@ final class RandomAssigner(implicit private val problem: Problem) {
 
   /**
     * Assign persons to a list of topics.
-    * @param partialSchedule Partial schedule from which we start
+    * @param partialSlotSchedule Partial slot schedule from which we start
     * @param topicsInNeed Topics to which we need to add people to reach the min number of persons
     * @param topicsOpen Topics to which we can add people up to the the max number of persons
     * @param personsLeft Persons that need to be assigned to topics
@@ -84,18 +86,18 @@ final class RandomAssigner(implicit private val problem: Problem) {
     */
   // scalastyle:off cyclomatic.complexity method.length
   private def backtrackAssignPersonsToTopics(
-      partialSchedule: Schedule, slot: Slot
+      partialSlotSchedule: SlotSchedule
   )(
       topicsInNeed: List[(Topic, Int)],
       topicsOpen: List[(Topic, Int)],
       personsLeft: List[Person],
       personsSkipped: List[Person],
       topicsOpenDelayed: List[(Topic, Int)]
-  ): Option[Schedule] =
+  ): Option[SlotSchedule] =
     (topicsInNeed, topicsOpen, personsLeft) match {
       case (Nil, _, Nil) if personsSkipped.isEmpty =>
         log.trace("Finishing backtrackAssignPersonsToTopics because we have no more persons and all topics have their min numbers")
-        Some(partialSchedule) // no more persons left and min numbers all reached !
+        Some(partialSlotSchedule) // no more persons left and min numbers all reached !
 
       case (_, _, Nil) =>
         log.trace("Hit a dead end in backtrackAssignPersonsToTopics because we have no more persons and some topics don't have their min numbers")
@@ -107,40 +109,40 @@ final class RandomAssigner(implicit private val problem: Problem) {
 
       case (Nil, Nil, _) =>
         log.trace("No more topics open to max, go again with all delayed topics")
-        backtrackAssignPersonsToTopics(partialSchedule, slot)(topicsInNeed, topicsOpenDelayed, personsLeft ++ personsSkipped, Nil, Nil)
+        backtrackAssignPersonsToTopics(partialSlotSchedule)(topicsInNeed, topicsOpenDelayed, personsLeft ++ personsSkipped, Nil, Nil)
 
       case ((topic, _) :: _, _, person :: ptail) if topic.forbidden(person) =>
         log.trace("Current topic has not reached min number, but current person is forbidden on it: step to the next person")
-        backtrackAssignPersonsToTopics(partialSchedule, slot)(topicsInNeed, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
+        backtrackAssignPersonsToTopics(partialSlotSchedule)(topicsInNeed, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
 
       case ((topic, count) :: ttail, _, person :: ptail) =>
         log.trace("Current topic has not reached min number");
         {
           /* Add current person and try to go on, with the same topic is we need more persons, or on the next topic */
-          val newSchedule = partialSchedule.addPersonToExistingTopic(slot, topic, person)
-          if (count == 1) backtrackAssignPersonsToTopics(newSchedule, slot)(ttail, topicsOpen, ptail ++ personsSkipped, Nil, topicsOpenDelayed) // min reached !
-          else backtrackAssignPersonsToTopics(newSchedule, slot)((topic, count - 1) :: ttail, topicsOpen, ptail, personsSkipped, topicsOpenDelayed)
+          val newSchedule = partialSlotSchedule.addPersonToExistingTopic(topic, person)
+          if (count == 1) backtrackAssignPersonsToTopics(newSchedule)(ttail, topicsOpen, ptail ++ personsSkipped, Nil, topicsOpenDelayed) // min reached !
+          else backtrackAssignPersonsToTopics(newSchedule)((topic, count - 1) :: ttail, topicsOpen, ptail, personsSkipped, topicsOpenDelayed)
         } orElse {
           /* If going on did not work, adding current person won't work so go to the next one */
           log.trace("Backtracking in backtrackAssignPersonsToTopics")
-          backtrackAssignPersonsToTopics(partialSchedule, slot)(topicsInNeed, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
+          backtrackAssignPersonsToTopics(partialSlotSchedule)(topicsInNeed, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
         }
 
       case (Nil, (topic, _) :: _, person :: ptail) if topic.forbidden(person) =>
         log.trace("Current topic has not reached max number, but current person is forbidden on it: step to the next person")
-        backtrackAssignPersonsToTopics(partialSchedule, slot)(Nil, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
+        backtrackAssignPersonsToTopics(partialSlotSchedule)(Nil, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
 
       case (Nil, (topic, count) :: ttail, person :: ptail) =>
         log.trace("Current topic has not reached max number");
         {
           /* Add current person and try to go on, with the next topic (current topic goes at the end if we can have more persons) */
-          val newSchedule = partialSchedule.addPersonToExistingTopic(slot, topic, person)
-          if (count == 1) backtrackAssignPersonsToTopics(newSchedule, slot)(Nil, ttail, ptail ++ personsSkipped, Nil, topicsOpenDelayed)
-          else backtrackAssignPersonsToTopics(newSchedule, slot)(Nil, ttail, ptail ++ personsSkipped, Nil, (topic, count - 1) :: topicsOpenDelayed)
+          val newSchedule = partialSlotSchedule.addPersonToExistingTopic(topic, person)
+          if (count == 1) backtrackAssignPersonsToTopics(newSchedule)(Nil, ttail, ptail ++ personsSkipped, Nil, topicsOpenDelayed)
+          else backtrackAssignPersonsToTopics(newSchedule)(Nil, ttail, ptail ++ personsSkipped, Nil, (topic, count - 1) :: topicsOpenDelayed)
         } orElse {
           /* If going on did not work, adding current person won't work so go to the next one */
           log.trace("Backtracking in backtrackAssignPersonsToTopics")
-          backtrackAssignPersonsToTopics(partialSchedule, slot)(topicsInNeed, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
+          backtrackAssignPersonsToTopics(partialSlotSchedule)(topicsInNeed, topicsOpen, ptail, person :: personsSkipped, topicsOpenDelayed)
         }
     }
 

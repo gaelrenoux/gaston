@@ -33,6 +33,9 @@ final case class Schedule(
   @inline private def updateAllSlotSchedules(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.map { case (slot, slotSchedule) => (slot, f(slotSchedule)) })
 
+  @inline def replaceSlotSchedule(ss: SlotSchedule): Schedule =
+    updateWrapped(wrapped.updated(ss.slot, ss))
+
   @inline def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(slot, f(on(slot))))
 
