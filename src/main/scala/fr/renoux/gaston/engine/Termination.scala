@@ -24,14 +24,19 @@ final case class Termination( // TODO Rename to Controls, or maybe TerminationCo
 
   def reduceCount(delta: Long): Termination = copy(count = count.map(_ - delta))
 
+  /** Returns true if the argument score has reached the desired score */
   def checkScore(s: Score): Boolean = score.exists(_ <= s)
 
+  /** Returns true if the argument count has reached the max count */
   def checkCount(c: Long): Boolean = count.exists(_ <= c)
 
+  /** Returns true if the argument time has reached the timeout */
   def checkTimeout(now: Instant): Boolean = timeoutMs.exists(_ <= now.toEpochMilli)
 
+  /** Returns true if the argument time has reached the timeout */
   def checkTimeout(nowMs: Long): Boolean = timeoutMs.exists(_ <= nowMs)
 
+  /** Returns true if the current time has reached the timeout */
   def checkTimeout(): Boolean = timeoutMs.exists(_ <= System.currentTimeMillis())
 }
 
