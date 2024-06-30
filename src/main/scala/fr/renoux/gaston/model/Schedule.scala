@@ -33,6 +33,15 @@ final case class Schedule(
   @inline private def updateAllSlotSchedules(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.map { case (slot, slotSchedule) => (slot, f(slotSchedule)) })
 
+  @inline
+  def replaceAllSlotSchedules(sss: Map[Slot, SlotSchedule]): Schedule = {
+    if (sss.size < problem.counts.slots) throw new IllegalArgumentException(s"Not enough slot-schedules in $sss")
+    else updateWrapped(sss)
+  }
+
+  @inline def replaceSlotSchedule(ss: SlotSchedule): Schedule =
+    updateWrapped(wrapped.updated(ss.slot, ss))
+
   @inline def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(slot, f(on(slot))))
 
@@ -48,7 +57,7 @@ final case class Schedule(
   lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopics.toBitSet
   lazy val unscheduledTopics: Set[Topic] = (problem.topicsSet -- scheduledTopics)
 
-  lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values // not a Set: we do not want to deduplicate identical groups!
+  lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values.filter(_.nonEmpty) // not a Set: we do not want to deduplicate identical groups!
   // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.max))
   // lazy val minPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.min))
   lazy val personsByTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsByTopic).toMap

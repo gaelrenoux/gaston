@@ -140,17 +140,20 @@ class SimpleTestModel(implicit settings: InputSettings) {
       Morning(
         Acting(Arthur, Iago, Hercule),
         Dancing(Daniela, Corwin, Bianca),
-        Grinding(Garion, Fiona)
+        Grinding(Garion, Fiona),
+        UnassignedMorning()
       ),
       AfterNoon(
         Bathing(Bianca, Arthur),
         Eating(Eric, Daniela, Corwin),
-        Helping(Hercule, Garion, Fiona)
+        Helping(Hercule, Garion, Fiona),
+        UnassignedAfternoon()
       ),
       Evening(
         Cooking(Corwin, Bianca),
         Fighting(Fiona, Eric, Daniela),
-        Inking(Iago, Hercule, Garion)
+        Inking(Iago, Hercule, Garion),
+        UnassignedEvening()
       )
     )
 

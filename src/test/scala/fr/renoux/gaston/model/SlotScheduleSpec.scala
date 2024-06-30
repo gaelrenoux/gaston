@@ -17,7 +17,7 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
   private val bestMorning = Best.on(Morning)
 
   "topics" should "work" in {
-    bestMorning.topics should be(Set(Acting, Dancing, Grinding))
+    bestMorning.topics should be(Set(Acting, Dancing, Grinding, UnassignedMorning))
   }
 
   "persons" should "work" in {
@@ -28,7 +28,8 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
     bestMorning.countPersonsByTopic should be(Map(
       Acting -> 3,
       Dancing -> 3,
-      Grinding -> 2
+      Grinding -> 2,
+      UnassignedMorning -> 0
     ))
   }
 
