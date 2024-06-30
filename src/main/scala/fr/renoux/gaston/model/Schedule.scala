@@ -33,6 +33,12 @@ final case class Schedule(
   @inline private def updateAllSlotSchedules(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.map { case (slot, slotSchedule) => (slot, f(slotSchedule)) })
 
+  @inline
+  def replaceAllSlotSchedules(sss: Map[Slot, SlotSchedule]): Schedule = {
+    if (sss.size < problem.counts.slots) throw new IllegalArgumentException(s"Not enough slot-schedules in $sss")
+    else updateWrapped(sss)
+  }
+
   @inline def replaceSlotSchedule(ss: SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(ss.slot, ss))
 

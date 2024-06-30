@@ -4,7 +4,6 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.util.immutable
 
-import scala.annotation.tailrec
 import scala.util.Random
 
 /**
@@ -19,58 +18,43 @@ final class RandomAssigner(implicit private val problem: Problem) {
     * persons correctly assigned on their topics), and generates a random schedule respecting all constraints, using
     * backtracking as necessary.
     *
-    * Returns None if such a schedule cannot be constructed (for example there are
-    * not enough persons to fill all topics on a slot, or there's a slot with not enough topics to put everyone in).
+    * Input schedule must have a workable one, where the totals of min and max on topics are compatible with the number
+    * of persons present on their slot). In rare cases, it can be impossible to build a working schedule, for example
+    * if too many persons are forbidden on several of the available topics in one slot.
     */
   def fill(partialSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
-    
-    /* Iterate over Slots, stop in case there is an incompatibility on some Slot */
-    @tailrec
-    def completeForSlots(slots: List[Slot], schedule: Schedule): Option[Schedule] = slots match {
-      case Nil => Some(schedule)
-
-      case slot :: slotsTail =>
-        /* Handle current slot */
-        val slotSchedule = schedule.on(slot)
-
-        val personsLeft = random.shuffle(slotSchedule.unscheduledPersonsList)
-        val topics = slotSchedule.topics
-
-        val (topicsWithNeeded, topicsWithOptional) = topics.map { t =>
-          val count = slotSchedule.countPersonsByTopic(t)
-          val needed = t.min - count
-          val optional = t.max - math.max(t.min, count)
-          (t -> needed, t -> optional)
-        }.unzip
-
-        val topicsNeedingMin = topicsWithNeeded.filter(c => c._2 > 0)
-        val topicsOpenToMax = topicsWithOptional.filter(_._2 > 0)
-
-        backtrackAssignPersonsToTopics(slotSchedule)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft, Nil, Nil) match {
-          case None => None
-          case Some(newSlotSchedule) => completeForSlots(slotsTail, schedule.replaceSlotSchedule(newSlotSchedule))
-        }
-
-    }
-
     log.debug("Starting to fill the partial schedule")
+    val slotSchedules =
+      problem.slotsList.view
+        .map { slot => fillSlot(partialSchedule.on(slot)) }
+        .takeWhile(_.nonEmpty) // it's a view: as soon as we have a None, we won't work on the following slots
 
-    /* check wether it's possible to make it work first */
-    val filled = partialSchedule.planning.find { case (slot, topics) =>
-      val min = topics.foldLeft(0)(_ + _.min)
-      val max = topics.foldLeft(0)(_ + _.max)
-      val pCount = slot.personsPresentCount
-      pCount < min || pCount > max
-    } match {
-      case None => completeForSlots(problem.slotsSet.toList, partialSchedule)
-      case Some((slot, _)) =>
-        log.trace(s"Impossible to fill slot $slot")
-        None
+    if (slotSchedules.size < problem.counts.slots) {
+      log.debug("Could not fill partial schedule")
+      None
+    } else {
+      log.debug("Partial schedule was filled")
+      val scheduleMap = slotSchedules.map { case Some(ss) => ss.slot -> ss }.toMap
+      Some(partialSchedule.replaceAllSlotSchedules(scheduleMap))
     }
+  }
 
-    log.debug(if (filled.isDefined) "Partial schedule was filled" else "Could not fill partial schedule")
+  @inline
+  private def fillSlot(slotSchedule: SlotSchedule)(implicit random: Random): Option[SlotSchedule] = {
+    val personsLeft = random.shuffle(slotSchedule.unscheduledPersonsList)
+    val topics = slotSchedule.topics
 
-    filled
+    val (topicsWithNeeded, topicsWithOptional) = topics.map { t =>
+      val count = slotSchedule.countPersonsByTopic(t)
+      val needed = t.min - count
+      val optional = t.max - math.max(t.min, count)
+      (t -> needed, t -> optional)
+    }.unzip
+
+    val topicsNeedingMin = topicsWithNeeded.filter(c => c._2 > 0)
+    val topicsOpenToMax = topicsWithOptional.filter(_._2 > 0)
+
+    backtrackAssignPersonsToTopics(slotSchedule)(topicsNeedingMin.toList, topicsOpenToMax.toList, personsLeft, Nil, Nil)
   }
 
 
