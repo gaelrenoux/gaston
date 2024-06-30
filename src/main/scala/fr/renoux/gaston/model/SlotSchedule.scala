@@ -15,7 +15,7 @@ final case class SlotSchedule(
   @inline private def updateWrapped(w: Map[Topic, Record]): SlotSchedule =
     copy(wrapped = w)
 
-  @inline private def updateTopicRecord(topic: Topic)(f: Record => Record): SlotSchedule = {
+  @inline def updateTopicRecord(topic: Topic)(f: Record => Record): SlotSchedule = {
     val updated = wrapped.get(topic).map(f).fold(wrapped)(wrapped.updated(topic, _))
     copy(wrapped = updated)
   }

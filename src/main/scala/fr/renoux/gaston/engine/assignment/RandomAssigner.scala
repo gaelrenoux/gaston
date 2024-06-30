@@ -62,13 +62,13 @@ final class RandomAssigner(implicit private val problem: Problem) {
         val records = random.shuffle(partialSlotSchedule.recordsList)
         assignRemainingPersons(partialSlotSchedule)(personsLeft ++ personsSkipped, records)
 
+      case (record :: otherRecords, _) if !record.requiresMorePersons =>
+        // current record is ready, remove it entirely and go to the next one
+        backtrackFillPersons(partialSlotSchedule)(otherRecords, personsSkipped ++ personsLeft)
+
       case (_, Nil) =>
         // we've reached a point where we cannot complete the head record. There's no solution from here.
         None
-
-      case (record :: otherRecords, _) if record.requiresMorePersons =>
-        // current record is ready, remove it entirely and go to the next one
-        backtrackFillPersons(partialSlotSchedule)(otherRecords, personsSkipped ++ personsLeft)
 
       case (record :: _, person :: otherPersons) if record.topic.forbidden.contains(person) =>
         // skip the current person and move to the next one

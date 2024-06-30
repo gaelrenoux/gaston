@@ -28,7 +28,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 
   lazy val optionalPersons: Set[Person] = persons -- topic.mandatory
 
-  lazy val requiresMorePersons: Boolean = countRequiredPositions >= 0
+  lazy val requiresMorePersons: Boolean = countRequiredPositions > 0
   lazy val canRemovePersons: Boolean = countPersons > topic.min && optionalPersons.nonEmpty
   lazy val canAddPersons: Boolean = countOpenPositions > 0
 

@@ -41,13 +41,13 @@ class ScheduleParserSpec extends AnyFlatSpec with Matchers {
   }
 
   "readSlotSchedule" should "parse a slot schedule" in {
-    val lines = Best.toFormattedString.linesIterator.toList.tail // drop 'Schedule:' line
+    val lines = Best.toFormattedString.linesIterator.toList.tail // drop the line 'Schedule:'
     val result: Either[String, (Option[SlotSchedule], List[String])] = parser.readSlotSchedule(0, lines)
     result.left.toOption should be(None)
     val (slotSchedule, linesLeft) = result.toOption.get
     slotSchedule.get.toFormattedString should be(Best.on(AfterNoon).toFormattedString) // AfterNoon is the first slot alphabetically
     slotSchedule should be(Some(Best.on(AfterNoon)))
-    linesLeft should be(lines.drop(4))
+    linesLeft should be(lines.drop(5))
   }
 
   "parseFormattedString" should "parse a schedule" in {

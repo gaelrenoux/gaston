@@ -31,9 +31,9 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
 
   "planning" should "work" in {
     Best.planning should be(Map(
-      Morning -> Set(Acting, Dancing, Grinding),
-      AfterNoon -> Set(Bathing, Eating, Helping),
-      Evening -> Set(Cooking, Fighting, Inking)
+      Morning -> Set(Acting, Dancing, Grinding, UnassignedMorning),
+      AfterNoon -> Set(Bathing, Eating, Helping, UnassignedAfternoon),
+      Evening -> Set(Cooking, Fighting, Inking, UnassignedEvening)
     ))
   }
 
@@ -47,7 +47,10 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
       Helping -> AfterNoon,
       Cooking -> Evening,
       Fighting -> Evening,
-      Inking -> Evening
+      Inking -> Evening,
+      UnassignedMorning -> Morning,
+      UnassignedAfternoon -> AfterNoon,
+      UnassignedEvening -> Evening
     ))
   }
 
@@ -70,7 +73,10 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
       Helping -> Set(Hercule, Garion, Fiona),
       Cooking -> Set(Corwin, Bianca),
       Fighting -> Set(Fiona, Eric, Daniela),
-      Inking -> Set(Iago, Hercule, Garion)
+      Inking -> Set(Iago, Hercule, Garion),
+      UnassignedMorning -> Set.empty,
+      UnassignedAfternoon -> Set.empty,
+      UnassignedEvening -> Set.empty
     ))
   }
 
