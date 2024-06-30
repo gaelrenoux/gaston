@@ -61,7 +61,7 @@ final case class SlotSchedule(
   lazy val scheduledPersons: Set[Person] = recordsSet.flatMap(_.persons)
   lazy val unscheduledPersons: Set[Person] = slot.personsPresent -- scheduledPersons
   lazy val unscheduledPersonsList: List[Person] = unscheduledPersons.toList
-  lazy val personsByTopic: Map[Topic, Set[Person]] = recordsSet.groupBy(_.topic).mapValuesStrict(_.flatMap(_.persons))
+  lazy val personsByTopic: Map[Topic, Set[Person]] = wrapped.mapValuesStrict(_.persons)
   lazy val countPersonsByTopic: Map[Topic, Int] = personsByTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
   lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)

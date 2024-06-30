@@ -13,6 +13,8 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 
   lazy val personsList: List[Person] = persons.toList
   lazy val countPersons: Int = persons.size
+  lazy val countRequiredPositions: Int = math.max(topic.min - countPersons, 0)
+  lazy val countOpenPositions: Int = topic.max - countPersons
 
 
   lazy val personsBitSet: BitSet[Person] = persons.toBitSet
@@ -26,8 +28,9 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 
   lazy val optionalPersons: Set[Person] = persons -- topic.mandatory
 
+  lazy val requiresMorePersons: Boolean = countRequiredPositions >= 0
   lazy val canRemovePersons: Boolean = countPersons > topic.min && optionalPersons.nonEmpty
-  lazy val canAddPersons: Boolean = countPersons < topic.max
+  lazy val canAddPersons: Boolean = countOpenPositions > 0
 
   /** Clear all non-mandatory persons. */
   lazy val cleared: Record = copy(persons = topic.mandatory)
@@ -60,10 +63,9 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   }
 
   /**
-   * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
-   *
-   * @return true if this respects all constraints applicable to partial schedules
-   */
+    * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to partial schedules
+    */
   lazy val isPartialSolution: Boolean = {
     topic.max >= countPersons && // topic.min <= pCount &&
       !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
