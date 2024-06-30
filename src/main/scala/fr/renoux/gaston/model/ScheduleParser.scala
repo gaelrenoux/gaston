@@ -83,6 +83,10 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
       val topic = problem.topicsList.find(_.name == topicName).toRight(s"Unknown topic: $topicName")
       lazy val persons = personNames.toList.traverse { name => problem.personsList.find(_.name == name).toRight(s"Unknown person: $name") }
       for {t <- topic; ps <- persons} yield Record(slot, t, ps.toSet)
+    case Array(topicString) => // no person on this topic
+      val topicName = topicString.trim
+      val topic = problem.topicsList.find(_.name == topicName).toRight(s"Unknown topic: $topicName")
+      topic.map { t => Record(slot, t, Set.empty[Person]) }
     case _ => Left(s"Not a valid topic line: $line")
   }
 
