@@ -6,7 +6,7 @@ import fr.renoux.gaston.util.BitSet
 /**
   * That one person doesn't want to share a schedule record with any person from that group. The reward here is
   * negative, as we count the number of such occurrences. Note that it does not apply on the members of the group, who
-  * mah have no anti-preference towards the person.
+  * may have no anti-preference towards the person.
   */
 final case class PersonGroupAntiPreference(
     person: Person,
