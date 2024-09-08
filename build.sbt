@@ -92,6 +92,8 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.8",
+
   /* Tests */
   "com.softwaremill.diffx" %% "diffx-core" % "0.5.0" % Test,
   "org.scalatest" %% "scalatest" % "3.2.16" % Test,
