@@ -1,6 +1,7 @@
-package fr.renoux.gaston.model
+package fr.renoux.gaston.tools
 
 import cats.implicits._
+import fr.renoux.gaston.model.{Person, Problem, Record, Schedule, Slot, SlotSchedule}
 import fr.renoux.gaston.util.Context
 
 /** Parse a schedule from various formats */
@@ -40,7 +41,7 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
     case Nil => Left("Empty schedule")
   }
 
-  private[model] def readAllSlotSchedules(
+  private def readAllSlotSchedules(
       returnIndentation: Int,
       lines: List[String],
       acc: List[SlotSchedule] = Nil
@@ -50,7 +51,7 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
       case (Some(slotSchedule), linesLeft) => readAllSlotSchedules(returnIndentation, linesLeft, slotSchedule :: acc)
     }
 
-  private[model] def readSlotSchedule(returnIndentation: Int, lines: List[String]): ErrorOr[(Option[SlotSchedule], List[String])] = lines match {
+  private[tools] def readSlotSchedule(returnIndentation: Int, lines: List[String]): ErrorOr[(Option[SlotSchedule], List[String])] = lines match {
     case Nil => Right((None, Nil))
     case slotLine :: otherLines =>
       val indentation = countIndentation(slotLine)
@@ -66,7 +67,7 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
       }
   }
 
-  private[model] def readAllRecords(slot: Slot, returnIndentation: Int, lines: List[String], acc: List[Record] = Nil): ErrorOr[(Set[Record], List[String])] =
+  private[tools] def readAllRecords(slot: Slot, returnIndentation: Int, lines: List[String], acc: List[Record] = Nil): ErrorOr[(Set[Record], List[String])] =
     lines match {
       case Nil => Right((acc.toSet, Nil))
       case _ if countIndentation(lines.head) <= returnIndentation => Right((acc.toSet, lines))
@@ -76,7 +77,7 @@ final class ScheduleParser(implicit problem: Problem, context: Context) {
         }
     }
 
-  private[model] def parseRecord(slot: Slot, line: String): ErrorOr[Record] = line.trim.split(Record.FormattedTopicPersonsSeparator) match {
+  private[tools] def parseRecord(slot: Slot, line: String): ErrorOr[Record] = line.trim.split(Record.FormattedTopicPersonsSeparator) match {
     case Array(topicString, personsString) =>
       val topicName = topicString.trim
       val personNames = personsString.split(Record.FormattedPersonsSeparator).map(_.trim.replace(s" (${Record.MandatoryMarker})", ""))

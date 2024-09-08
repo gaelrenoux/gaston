@@ -1,5 +1,6 @@
-package fr.renoux.gaston.model
+package fr.renoux.gaston.tools
 
+import fr.renoux.gaston.model.{Problem, Record, SlotSchedule}
 import fr.renoux.gaston.util.Context
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

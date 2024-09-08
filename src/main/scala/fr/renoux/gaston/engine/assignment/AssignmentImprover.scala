@@ -50,7 +50,6 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
     } else {
       val (slot, slotsTail) = slots.dequeue
-      val slotSchedule = schedule.on(slot)
 
       goodMoveOnSlot(schedule, slot) match {
         case None =>
