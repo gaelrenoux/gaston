@@ -7,13 +7,13 @@ import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.TupleImplicits._
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
-final class Problem(
-    val slotSequences: Seq[Seq[Slot]],
-    val topicsSet: Set[Topic],
-    val unassignedTopics: BitMap[Slot, Topic],
-    val personsSet: Set[Person],
-    val constraints: Set[Constraint],
-    val preferences: Set[Preference]
+final case class Problem(
+    slotSequences: Seq[Seq[Slot]],
+    topicsSet: Set[Topic],
+    unassignedTopics: BitMap[Slot, Topic],
+    personsSet: Set[Person],
+    constraints: Set[Constraint],
+    preferences: Set[Preference]
 )(implicit val counts: Counts) {
 
   /* SLOTS */
