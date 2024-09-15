@@ -20,10 +20,12 @@ final case class Slot(
 
   lazy val hasNext: Boolean = next.nonEmpty
 
-  def toShortString: String = s"$id -> $name"
+  lazy val toShortString: String = s"$id -> $name"
 
-  def toLongString: String =
+  lazy val toLongString: String =
     s"Slot($id, $name,${next.fold("")(s => s" next: ${s.name},")} ${personsPresent.map(_.name).mkString("(", ",", ")")}${if (maxTopics < Int.MaxValue) s", max: $maxTopics" else ""})"
+
+  lazy val toAbstract: (Int, List[Person.Id], Option[Int], Int) = (id, personsPresent.map(_.id).toList.sorted, next.map(_.id), maxTopics)
 }
 
 //TODO call to hashcode is a minor (9%) hot-spot ! Same for topic and person !

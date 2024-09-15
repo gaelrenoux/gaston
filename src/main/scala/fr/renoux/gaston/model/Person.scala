@@ -18,6 +18,8 @@ final case class Person(
 
   def toLongString: String = s"Person($id, $name, ${weight.value}${if (baseScore == Score.Zero) "" else s", baseScore=$baseScore"})"
 
+  lazy val toAbstract: (Person.Id, Double, Double) = (id, weight.value, baseScore.value)
+
 }
 
 object Person {

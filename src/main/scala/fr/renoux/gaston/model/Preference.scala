@@ -16,6 +16,8 @@ trait Preference {
 
   val isPersonal: Boolean
 
+  def toAbstract: Product
+
 }
 
 object Preference {

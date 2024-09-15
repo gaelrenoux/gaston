@@ -27,6 +27,8 @@ final case class TopicsNotSimultaneous(topics: BitSet[Topic]) extends Constraint
 
   override def hashCode(): Int = this.topics.actualHashCode
 
-  override def toLongString: String = s"TopicsNotSimultaneous($topics)"
+  override lazy val toLongString: String = s"TopicsNotSimultaneous($topics)"
+
+  override lazy val toAbstract: (String, Seq[Int]) = ("TopicsNotSimultaneous", topics.toIdSet.toSeq.sorted)
 }
 

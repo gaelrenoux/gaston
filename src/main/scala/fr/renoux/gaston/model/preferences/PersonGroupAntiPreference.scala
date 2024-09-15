@@ -28,5 +28,7 @@ final case class PersonGroupAntiPreference(
 
   override def hashCode(): Int = (this.person, this.group.actualHashCode, reward).hashCode()
 
-  override def toLongString: String = s"PersonGroupAntiPreference(${person.toShortString}, $group, $reward)"
+  override lazy val toLongString: String = s"PersonGroupAntiPreference(${person.toShortString}, $group, $reward)"
+
+  override lazy val toAbstract: (String, Person.Id, Seq[Person.Id], Double) = ("PersonGroupAntiPreference", person.id, group.toIdSet.toSeq.sorted, reward.value)
 }
