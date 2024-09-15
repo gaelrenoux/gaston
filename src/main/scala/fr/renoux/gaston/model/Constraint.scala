@@ -19,6 +19,8 @@ trait Constraint {
   def isRespected(schedule: Schedule): Boolean
 
   def toLongString: String
+
+  def toAbstract: Product
 }
 
 object Constraint {

@@ -14,5 +14,7 @@ final case class PersonTopicPreference(
     else Score.Zero
   }
 
-  override def toLongString: String = s"PersonTopicPreference(${person.toShortString}, ${topic.toShortString}, $reward)"
+  override lazy val toLongString: String = s"PersonTopicPreference(${person.toShortString}, ${topic.toShortString}, $reward)"
+
+  override lazy val toAbstract: (String, Person.Id, Int, Double) = ("PersonTopicPreference", person.id, topic.id, reward.value)
 }
