@@ -33,7 +33,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
   /** Generates just one schedule. */
   def create(chainSeed: Long)(implicit random: Random): Schedule = {
     log.debug("Generating a single schedule")
-    val slots = random.shuffle(problem.slotsSet.toList)
+    val slots = random.shuffle(problem.slotsList)
     // TODO need to handle followup topics !
     val (forcedTopics, unforcedTopics) = problem.topicsList.filterNot(_.isFollowup).partition(_.forced)
     val topics = random.shuffle(forcedTopics) ::: random.shuffle(unforcedTopics)
@@ -143,7 +143,7 @@ object RandomScheduleGenerator {
 
     lazy val headTopic: Topic = topicsLeft.head
 
-    lazy val nextRecord = Record(headSlot, headTopic, headTopic.mandatory)
+    lazy val nextRecord: Record = Record(headSlot, headTopic, headTopic.mandatory)
 
     lazy val withHeadSlotSatisfied: State = State(partialSchedule, slotsLeft.tail, topicsLeft ::: topicsPassed)
 
