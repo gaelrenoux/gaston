@@ -25,7 +25,8 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
 
   /** Generates a lazy sequence of generally-improving schedules: we might have some setbacks but as a whole, it should
     * go up and up. Each schedule is accompanied with the number of schedules attempted since the beginning of the lazy
-    * sueqence.
+    * sequence.
+    * TODO: detail what can of setback we can have.
     *
     * The generated sequence is non-empty as it always contain at least the initial schedule passed as an argument.
     */

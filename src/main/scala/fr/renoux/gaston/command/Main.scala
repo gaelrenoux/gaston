@@ -57,6 +57,7 @@ object Main {
       implicit val _problem: Problem = problem
       implicit val context: Context = Context.Default
 
+      // TODO Engine shouldn't be implicit, I think
       implicit val engine: Engine = new GreedyEngine(
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
