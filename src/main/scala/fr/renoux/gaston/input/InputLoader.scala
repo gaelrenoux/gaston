@@ -74,6 +74,7 @@ object InputLoader {
 
   /** Render a configuration into a String. Used mostly after loading the preferences from a table, in order to integrate them into the canonical input. */
   def render(input: InputModel): String = {
+    // TODO drop constraints/settings/other that are empty. Also give a better order to sections, instead of just alphabetical.
     val config: ConfigValue = ConfigWriter[InputModel].to(input)
     config.atKey("gaston").root().render(renderConfig)
   }

@@ -19,7 +19,7 @@ final case class Problem(
   /* SLOTS */
 
   val slotsSet: Set[Slot] = slotSequences.flatten.toSet
-  lazy val slotsList: List[Slot] = slotsSet.toList
+  lazy val slotsList: List[Slot] = slotsSet.toList.sortBy(_.id)
   lazy val slotsToNextSlot: Map[Slot, Slot] = slotsSet.flatMap(s => s.next.map(s -> _)).toMap
   lazy val slotsToPreviousSlot: Map[Slot, Slot] = slotsToNextSlot.map(_.swap)
 
@@ -33,7 +33,7 @@ final case class Problem(
 
   /* TOPICS */
 
-  lazy val topicsList: List[Topic] = topicsSet.toList
+  lazy val topicsList: List[Topic] = topicsSet.toList.sortBy(_.id)
   lazy val forcedTopics: Set[Topic] = topicsSet.filter(_.forced)
   /** All forced topics, starting with the ones that are limited to the least number of possible slots, up to the ones that can be on any slot. */
   lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
@@ -44,7 +44,7 @@ final case class Problem(
 
   /* PERSONS */
 
-  lazy val personsList: List[Person] = personsSet.toList
+  lazy val personsList: List[Person] = personsSet.toList.sortBy(_.id)
   lazy val personsCount: Int = personsSet.size
   lazy val baseScoreByPerson: Map[Person, Score] =
     if (personsSet.exists(_.baseScore != Score.Zero)) personsSet.map(p => p -> p.baseScore).toMap
@@ -151,6 +151,15 @@ final case class Problem(
     builder.append("  Preferences:\n")
     preferencesList.map(_.toLongString).sorted.foreach(builder.append("    ").append(_).append("\n"))
     builder.toString
+  }
+
+  lazy val toAbstract: Product = {
+    val abstractSlots = slotSequences.mapMap(_.toAbstract).map(_.sortBy(_._1))
+    val abstractTopics = topicsSet.map(_.toAbstract).toSeq.sortBy(_._1)
+    val abstractPersons = personsSet.map(_.toAbstract).toSeq.sortBy(_._1)
+    val abstractConstraints = constraints.map(_.toAbstract)
+    val abstractPreferences = preferences.map(_.toAbstract)
+    (abstractSlots, abstractTopics, abstractPersons, abstractConstraints, abstractPreferences)
   }
 
 }

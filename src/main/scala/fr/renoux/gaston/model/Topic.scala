@@ -38,6 +38,15 @@ final case class Topic(
     (if (isFollowup) "isFollowup = true, " else "") +
     s"forced=$forced" +
     ")"
+
+  lazy val toAbstract: (Int, Set[Person.Id], Set[Person.Id], Int, Int, Option[Set[Int]], Option[Int], Boolean, Boolean, Boolean) = (
+    id,
+    mandatory.map(_.id), forbidden.map(_.id),
+    min, max,
+    slots.map(_.map(_.id)),
+    followup.map(_.id),
+    isFollowup, forced, isUnassigned
+  )
 }
 
 object Topic {

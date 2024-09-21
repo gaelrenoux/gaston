@@ -3,7 +3,7 @@ package fr.renoux.gaston.util
 import java.util
 
 /** A set of something with an integer Id, which can only be used to test if it contains an A (but not iterate on that
-  * A or get it back). */
+  * A or get it back). Immutable. */
 final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
 
   @inline def apply(a: A): Boolean = wrapped(a.id)
@@ -39,6 +39,9 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
 
   /** Returns the a wrapped array, so it cannot be changed from the outside. Slower. */
   @inline def safeContent: Seq[Boolean] = wrapped.toSeq
+
+  /** Returns a Set of the ids present in this. */
+  def toIdSet: Set[Int] = wrapped.view.zipWithIndex.filter(_._1).map(_._2).toSet
 
   override def toString: String = wrapped.view.zipWithIndex.filter(_._1).map(_._2).mkString("[", ", ", "]")
 }

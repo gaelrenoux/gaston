@@ -15,6 +15,8 @@ final case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotL
     missing.isEmpty || missing.size == topicsSize
   }
 
-  override def toLongString: String = s"TopicsSimultaneous(${topics.map(_.toShortString)})"
+  override lazy val toLongString: String = s"TopicsSimultaneous(${topics.map(_.toShortString)})"
+
+  override def toAbstract: Product = ("TopicsSimultaneous", topics.map(_.id).toSeq.sorted)
 }
 
