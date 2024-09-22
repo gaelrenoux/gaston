@@ -18,6 +18,7 @@ object InputRenderer {
   /** Style to use when rendering the input. Useful after we integrated table preferences into the canonical input. */
   private lazy val renderConfig = ConfigRenderOptions.defaults()
     .setOriginComments(false)
+    .setComments(true)
     .setJson(false)
 
   /** Render a configuration into a String. Used mostly after loading the preferences from a table, in order to integrate them into the canonical input. */
