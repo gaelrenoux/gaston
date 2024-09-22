@@ -1,7 +1,7 @@
 package fr.renoux.gaston
 
 import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.input.{InputLoader, InputModel, transcribe}
+import fr.renoux.gaston.input.{InputLoader, InputModel, InputRenderer, InputTranscription}
 import fr.renoux.gaston.tools.InputAnonymizer
 
 import java.nio.file.Paths
@@ -21,11 +21,11 @@ object InputAnonymizerApp extends App {
   val tableSource = stringFromResource("r32023/r32023-table.csv")
 
   val anonymizer = new InputAnonymizer(source)
-  assert(transcribe(source).force.toAbstract == transcribe(anonymizer.anonymized).force.toAbstract)
+  assert(InputTranscription.transcribe(source).force.toAbstract == InputTranscription.transcribe(anonymizer.anonymized).force.toAbstract)
 
   // println(InputLoader.render(source))
   // println(InputLoader.render(anonymizer.anonymized))
-   println(InputLoader.render(anonymizer.anonymizedReordered))
+  println(InputRenderer.render(anonymizer.anonymizedReordered))
   //println(anonymizer.anonymizeTable(tableSource))
 
 }

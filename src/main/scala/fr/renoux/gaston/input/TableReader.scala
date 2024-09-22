@@ -91,7 +91,7 @@ final class TableReader(input: InputModel) {
 
       InputPerson(
         name = person,
-        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else DefaultWeightRefined,
+        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else Constants.DefaultWeightRefined,
         mandatory = mandatoryTopics,
         forbidden = forbiddenTopics,
         wishes = scoresByTopic

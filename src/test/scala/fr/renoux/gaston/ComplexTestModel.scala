@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
+import fr.renoux.gaston.input.Constants
 import fr.renoux.gaston.model.Score.ScoreIsFractional._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
@@ -80,7 +81,7 @@ class ComplexTestModel(seed: Long) {
     val Unassigned: Set[Preference] = for {
       t: Topic <- Topics.Unassigned.values.toSet
       p <- Persons.All
-    } yield PersonTopicPreference(p, t, Score.PersonTotalScore.negative)
+    } yield PersonTopicPreference(p, t, Constants.PersonTotalScore.negative)
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities ++ Unassigned
   }
