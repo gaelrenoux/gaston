@@ -6,6 +6,7 @@ import fr.renoux.gaston.util.Count
 import java.util.concurrent.atomic.AtomicInteger
 
 
+/** This test model problem is trivial to solve. It is used for simple tests on constraints, preferences, etc. */
 object MinimalTestModel {
 
   object Persons {

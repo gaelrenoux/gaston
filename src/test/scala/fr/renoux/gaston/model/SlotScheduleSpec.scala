@@ -12,9 +12,9 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Solutions._
   import fr.renoux.gaston.SimpleTestModel.Topics._
 
-  implicit val problem: Problem = Complete
+  implicit val problem: Problem = WithUnassignedTopics
 
-  private val bestMorning = Best.on(Morning)
+  private val bestMorning = BestWithUnassignedTopics.on(Morning)
 
   "topics" should "work" in {
     bestMorning.topics should be(Set(Acting, Dancing, Grinding, UnassignedMorning))
@@ -34,7 +34,7 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "unweightedScoresByPerson" should "be correct for a simple case" in {
-    val slots = SimpleTestModel.Solutions.Best.slotSchedulesList.sortBy(_.slot.id).map(_.unweightedScoresByPerson)
+    val slots = SimpleTestModel.Solutions.BestWithUnassignedTopics.slotSchedulesList.sortBy(_.slot.id).map(_.unweightedScoresByPerson)
     val slot1 = slots.head
     val slot2 = slots.tail.head
     val slot3 = slots.tail.tail.head

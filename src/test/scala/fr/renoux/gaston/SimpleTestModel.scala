@@ -5,7 +5,7 @@ import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.{Problem, _}
-import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.util.{BitMap, Context}
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -124,7 +124,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import ProblemCounts.CompleteCounts
 
-    val Complete = new Problem(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
+    val WithUnassignedTopics = new Problem(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
+    val NoUnassignedTopics = new Problem(Slots.All, Topics.Concrete, BitMap.empty[Slot, Topic], Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {
@@ -133,29 +134,52 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import Slots._
     import Topics._
 
-    private implicit val problem: Problem = Problems.Complete
     private implicit val context: Context = Context.Default
 
-    val Best = Schedule.from(
-      Morning(
-        Acting(Arthur, Iago, Hercule),
-        Dancing(Daniela, Corwin, Bianca),
-        Grinding(Garion, Fiona),
-        UnassignedMorning()
-      ),
-      AfterNoon(
-        Bathing(Bianca, Arthur),
-        Eating(Eric, Daniela, Corwin),
-        Helping(Hercule, Garion, Fiona),
-        UnassignedAfternoon()
-      ),
-      Evening(
-        Cooking(Corwin, Bianca),
-        Fighting(Fiona, Eric, Daniela),
-        Inking(Iago, Hercule, Garion),
-        UnassignedEvening()
+    val BestWithUnassignedTopics: Schedule = {
+      implicit val problem: Problem = Problems.WithUnassignedTopics
+      Schedule.from(
+        Morning(
+          Acting(Arthur, Iago, Hercule),
+          Dancing(Daniela, Corwin, Bianca),
+          Grinding(Garion, Fiona),
+          UnassignedMorning()
+        ),
+        AfterNoon(
+          Bathing(Bianca, Arthur),
+          Eating(Eric, Daniela, Corwin),
+          Helping(Hercule, Garion, Fiona),
+          UnassignedAfternoon()
+        ),
+        Evening(
+          Cooking(Corwin, Bianca),
+          Fighting(Fiona, Eric, Daniela),
+          Inking(Iago, Hercule, Garion),
+          UnassignedEvening()
+        )
       )
-    )
+    }
+
+    val BestNoUnassignedTopics: Schedule = {
+      implicit val problem: Problem = Problems.NoUnassignedTopics
+      Schedule.from(
+        Morning(
+          Acting(Arthur, Iago, Hercule),
+          Dancing(Daniela, Corwin, Bianca),
+          Grinding(Garion, Fiona)
+        ),
+        AfterNoon(
+          Bathing(Bianca, Arthur),
+          Eating(Eric, Daniela, Corwin),
+          Helping(Hercule, Garion, Fiona)
+        ),
+        Evening(
+          Cooking(Corwin, Bianca),
+          Fighting(Fiona, Eric, Daniela),
+          Inking(Iago, Hercule, Garion)
+        )
+      )
+    }
 
   }
 

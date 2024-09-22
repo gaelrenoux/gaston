@@ -14,11 +14,11 @@ class ScheduleParserSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Solutions._
   import fr.renoux.gaston.SimpleTestModel.Topics._
 
-  private implicit val problem: Problem = Complete
+  private implicit val problem: Problem = WithUnassignedTopics
   private implicit val context: Context = Context.Default
 
   val parser = new ScheduleParser()
-  val formatted: String = Best.toFormattedString
+  val formatted: String = BestWithUnassignedTopics.toFormattedString
   println(formatted)
 
   "parseTopic" should "read a correct topic" in {
@@ -42,22 +42,22 @@ class ScheduleParserSpec extends AnyFlatSpec with Matchers {
   }
 
   "readSlotSchedule" should "parse a slot schedule" in {
-    val lines = Best.toFormattedString.linesIterator.toList.tail // drop the line 'Schedule:'
+    val lines = BestWithUnassignedTopics.toFormattedString.linesIterator.toList.tail // drop the line 'Schedule:'
     val result: Either[String, (Option[SlotSchedule], List[String])] = parser.readSlotSchedule(0, lines)
     result.left.toOption should be(None)
     val (slotSchedule, linesLeft) = result.toOption.get
-    slotSchedule.get.toFormattedString should be(Best.on(AfterNoon).toFormattedString) // AfterNoon is the first slot alphabetically
-    slotSchedule should be(Some(Best.on(AfterNoon)))
+    slotSchedule.get.toFormattedString should be(BestWithUnassignedTopics.on(AfterNoon).toFormattedString) // AfterNoon is the first slot alphabetically
+    slotSchedule should be(Some(BestWithUnassignedTopics.on(AfterNoon)))
     linesLeft should be(lines.drop(5))
   }
 
   "parseFormattedString" should "parse a schedule" in {
-    val result = parser.parseFormattedString(Best.toFormattedString)
+    val result = parser.parseFormattedString(BestWithUnassignedTopics.toFormattedString)
     result.left.toOption should be(None)
-    result.toOption.get.toFormattedString should be(Best.toFormattedString)
-    result.toOption.get should be(Best)
+    result.toOption.get.toFormattedString should be(BestWithUnassignedTopics.toFormattedString)
+    result.toOption.get should be(BestWithUnassignedTopics)
 
     println("result.toOption.get.toFormattedString")
-    result.toOption.get.toFormattedString should be(Best.toFormattedString)
+    result.toOption.get.toFormattedString should be(BestWithUnassignedTopics.toFormattedString)
   }
 }

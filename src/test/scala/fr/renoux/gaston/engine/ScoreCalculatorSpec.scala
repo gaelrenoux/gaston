@@ -9,11 +9,11 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
 
 
   "score" should "give the correct result for a simple problem" in {
-    SimpleTestModel.Solutions.Best.score.value should be(10.2265625)
+    SimpleTestModel.Solutions.BestWithUnassignedTopics.score.value should be(10.2265625)
   }
 
   it should "give a correct unweightedScoresByPerson" in {
-    SimpleTestModel.Solutions.Best.scoreCalculator.unweightedScoresByPerson should be(Map(
+    SimpleTestModel.Solutions.BestWithUnassignedTopics.scoreCalculator.unweightedScoresByPerson should be(Map(
       SimpleTestModel.Persons.Arthur -> Score(5.0),
       SimpleTestModel.Persons.Bianca -> Score(6.0),
       SimpleTestModel.Persons.Corwin -> Score(6.0),
@@ -27,7 +27,7 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "give a correct weightedScoresByPerson" in {
-    SimpleTestModel.Solutions.Best.scoreCalculator.weightedScoresByPerson should be(Map(
+    SimpleTestModel.Solutions.BestWithUnassignedTopics.scoreCalculator.weightedScoresByPerson should be(Map(
       SimpleTestModel.Persons.Arthur -> Score(5.0),
       SimpleTestModel.Persons.Bianca -> Score(6.0),
       SimpleTestModel.Persons.Corwin -> Score(6.0),

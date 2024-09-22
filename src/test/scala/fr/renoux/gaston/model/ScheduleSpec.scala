@@ -15,7 +15,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Topics._
   import fr.renoux.gaston.SimpleTestModel.strongPreference
 
-  private implicit val problem: Problem = Complete
+  private implicit val problem: Problem = WithUnassignedTopics
   private implicit val context: Context = Context.Default
 
   private val Simple = Schedule.from(
@@ -30,7 +30,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   )
 
   "planning" should "work" in {
-    Best.planning should be(Map(
+    BestWithUnassignedTopics.planning should be(Map(
       Morning -> Set(Acting, Dancing, Grinding, UnassignedMorning),
       AfterNoon -> Set(Bathing, Eating, Helping, UnassignedAfternoon),
       Evening -> Set(Cooking, Fighting, Inking, UnassignedEvening)
@@ -38,7 +38,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "topicToSlot" should "work" in {
-    Best.topicToSlot should be(Map(
+    BestWithUnassignedTopics.topicToSlot should be(Map(
       Acting -> Morning,
       Dancing -> Morning,
       Grinding -> Morning,
@@ -64,7 +64,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   } */
 
   "personsByTopic" should "work" in {
-    Best.personsByTopic should be(Map(
+    BestWithUnassignedTopics.personsByTopic should be(Map(
       Acting -> Set(Arthur, Iago, Hercule),
       Dancing -> Set(Daniela, Corwin, Bianca),
       Grinding -> Set(Garion, Fiona),
@@ -81,7 +81,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "personGroups" should "work" in {
-    Best.personGroups.toSet should be(Set(
+    BestWithUnassignedTopics.personGroups.toSet should be(Set(
       Set(Arthur, Iago, Hercule),
       Set(Daniela, Corwin, Bianca),
       Set(Garion, Fiona),
@@ -245,7 +245,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
 
   "isSound" should "validate a correct schedule" in {
     Simple.isSound should be(true)
-    Best.isSound should be(true)
+    BestWithUnassignedTopics.isSound should be(true)
   }
 
   it should "reject a schedule demanding ubiquity" in {

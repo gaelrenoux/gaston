@@ -25,7 +25,7 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
   "Given a fixed seed, the runner" should "always return the same result after 10 iterations" in {
     val results =
       for {_ <- 0 until 10} yield {
-        run(SimpleTestModel.Problems.Complete, iterations = 10, seed = 42)
+        run(SimpleTestModel.Problems.WithUnassignedTopics, iterations = 10, seed = 42)
       }
 
     results.map(_._2).foreach {
@@ -38,7 +38,7 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
     println(results.head._1.toFormattedString)
     // TODO Check out why it still has a very incomplete schedule in 10 iterations
 
-    val otherResult = run(SimpleTestModel.Problems.Complete, iterations = 10, seed = 43)
+    val otherResult = run(SimpleTestModel.Problems.WithUnassignedTopics, iterations = 10, seed = 43)
     otherResult._2 should be(10)
     otherResult._1 shouldNot be(results.head._1)
     otherResult._1.score shouldNot be(results.head._1.score)
@@ -51,7 +51,7 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
   "Given a fixed seed, the runner" should "always return the same result after 100 iterations" in {
     val results =
       for {_ <- 0 until 3} yield {
-        run(SimpleTestModel.Problems.Complete, iterations = 100, seed = 666)
+        run(SimpleTestModel.Problems.WithUnassignedTopics, iterations = 100, seed = 666)
       }
 
     results.map(_._2).foreach {
@@ -66,7 +66,7 @@ class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester 
     println(results.head._2)
     println(results.head._1.toFormattedString)
 
-    val otherResult = run(SimpleTestModel.Problems.Complete, iterations = 100, seed = 777)
+    val otherResult = run(SimpleTestModel.Problems.WithUnassignedTopics, iterations = 100, seed = 777)
     otherResult._2 should be(100)
     // since we'll have the optimial solution, we must compare the seeds only.
     otherResult._1.chainSeed shouldNot be(results.head._1.chainSeed)

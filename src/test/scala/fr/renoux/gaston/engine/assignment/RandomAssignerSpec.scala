@@ -38,7 +38,7 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
 
   it should "fill in a schedule where one person is unscheduled" in {
     implicit val rand: Random = new Random(0)
-    implicit val problem: Problem = SimpleTestModel.Problems.Complete
+    implicit val problem: Problem = SimpleTestModel.Problems.WithUnassignedTopics
     import fr.renoux.gaston.SimpleTestModel.Slots
     import fr.renoux.gaston.SimpleTestModel.Slots._
     import fr.renoux.gaston.SimpleTestModel.Topics._
@@ -46,18 +46,18 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
 
     val randomAssigner = new RandomAssigner
 
-    val baseSchedule = SimpleTestModel.Solutions.Best.updateSlotSchedule(Morning) { ss =>
+    val baseSchedule = SimpleTestModel.Solutions.BestWithUnassignedTopics.updateSlotSchedule(Morning) { ss =>
       ss.updateTopicRecord(Grinding)(_.removePerson(Fiona))
     }
     val testFilled = randomAssigner.fill(baseSchedule)
     println(testFilled.map(_.toFormattedString))
     testFilled.nonEmpty should be(true)
-    testFilled.get should be(SimpleTestModel.Solutions.Best)
+    testFilled.get should be(SimpleTestModel.Solutions.BestWithUnassignedTopics)
   }
 
   it should "fill in an empty schedule" in {
     implicit val rand: Random = new Random(0)
-    implicit val problem: Problem = SimpleTestModel.Problems.Complete
+    implicit val problem: Problem = SimpleTestModel.Problems.WithUnassignedTopics
     import fr.renoux.gaston.SimpleTestModel.Slots
     import fr.renoux.gaston.SimpleTestModel.Slots._
     import fr.renoux.gaston.SimpleTestModel.Topics._
@@ -65,7 +65,7 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
 
     val randomAssigner = new RandomAssigner
 
-    val partialSchedule = SimpleTestModel.Solutions.Best.clearSlots(Slots.All.flatten: _*)
+    val partialSchedule = SimpleTestModel.Solutions.BestWithUnassignedTopics.clearSlots(Slots.All.flatten: _*)
     val filledSchedule = randomAssigner.fill(partialSchedule)
 
     filledSchedule.nonEmpty should be(true)
