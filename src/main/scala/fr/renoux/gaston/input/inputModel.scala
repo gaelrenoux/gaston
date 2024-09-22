@@ -6,7 +6,7 @@ import eu.timepit.refined.auto._
 import eu.timepit.refined.types.numeric._
 import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.input.InputRefinements._
-import fr.renoux.gaston.model.{Score, Topic, Weight}
+import fr.renoux.gaston.model.{FlatScore, Topic, Weight}
 import fr.renoux.gaston.util.CollectionImplicits._
 import fr.renoux.gaston.util.{NumberUtils, Opt}
 
@@ -80,7 +80,7 @@ final case class InputTableSettings(
     personsCountAdd: NonNegInt = 0,
     mandatoryPersonWeight: PosWeight = DefaultWeightRefined,
     forbiddenPersonMarker: Option[String] = None,
-    preferencesScoreMapping: Option[Map[String, Score]] = None
+    preferencesScoreMapping: Option[Map[String, FlatScore]] = None
 )
 
 final case class InputSlot(
@@ -95,7 +95,7 @@ final case class InputTopic(
     duration: Option[PosInt] = None,
     occurrences: Option[PosInt] = None,
     slots: Option[Set[NonEmptyString]] = None,
-    presence: Option[Score] = None,
+    presence: Option[FlatScore] = None,
     forced: Boolean = false
 ) {
 
@@ -146,12 +146,12 @@ object InputTopic {
 final case class InputPerson(
     name: NonEmptyString,
     weight: PosWeight = DefaultWeightRefined,
-    baseScore: Score = Score.Zero,
+    baseScore: FlatScore = FlatScore.Zero,
     absences: Set[NonEmptyString] = Set.empty,
     mandatory: Set[NonEmptyString] = Set.empty,
     forbidden: Set[NonEmptyString] = Set.empty,
     incompatible: Set[NonEmptyString] = Set.empty,
-    wishes: Map[String, Score] = Map.empty // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
+    wishes: Map[String, FlatScore] = Map.empty // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
 )
 
 final case class InputGlobalConstraints(
@@ -178,13 +178,13 @@ object InputRefinements {
 
   final class ScoreNonPositive
 
-  implicit val scoreNonPositiveValidate: Validate.Plain[Score, ScoreNonPositive] =
+  implicit val scoreNonPositiveValidate: Validate.Plain[FlatScore, ScoreNonPositive] =
     Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", new ScoreNonPositive)
 
-  type NonPosScore = Score Refined ScoreNonPositive
+  type NonPosScore = FlatScore Refined ScoreNonPositive
 
   object NonPosScore {
-    def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).getOrElse(throw new IllegalArgumentException(s.toString))
+    def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](FlatScore(s)).getOrElse(throw new IllegalArgumentException(s.toString))
   }
 
   final class WeightPositive

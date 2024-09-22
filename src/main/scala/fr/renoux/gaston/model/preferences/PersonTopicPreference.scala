@@ -6,12 +6,12 @@ import fr.renoux.gaston.model._
 final case class PersonTopicPreference(
     person: Person,
     topic: Topic,
-    reward: Score
+    reward: FlatScore
 ) extends Preference.RecordLevel with Preference.Personal {
 
-  override def scoreRecord(record: Record): Score = {
+  override def scoreRecord(record: Record): FlatScore = {
     if (record.topic == topic && record.personsBitSet.contains(person)) reward
-    else Score.Zero
+    else FlatScore.Zero
   }
 
   override lazy val toLongString: String = s"PersonTopicPreference(${person.toShortString}, ${topic.toShortString}, $reward)"

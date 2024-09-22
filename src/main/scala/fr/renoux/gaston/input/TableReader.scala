@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.numeric.PosInt
 import eu.timepit.refined.types.string.NonEmptyString
-import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.model.FlatScore
 import fr.renoux.gaston.util.CanGroupToMap.ops._
 import fr.renoux.gaston.util.CollectionImplicits._
 
@@ -112,11 +112,11 @@ final class TableReader(input: InputModel) {
 
   // scalastyle:on method.length
 
-  def wishValueToScoreOption(value: String): Option[Score] =
+  def wishValueToScoreOption(value: String): Option[FlatScore] =
     if (value.isEmpty) None
     else if (tableSettings.forbiddenPersonMarker.contains(value)) None
     else tableSettings.preferencesScoreMapping match {
-      case None => Try(Score(value.toDouble)).toOption
+      case None => Try(FlatScore(value.toDouble)).toOption
       case Some(mapping) => mapping.get(value)
     }
 

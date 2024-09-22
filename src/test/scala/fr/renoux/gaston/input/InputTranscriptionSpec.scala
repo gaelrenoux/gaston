@@ -4,7 +4,7 @@ import com.softwaremill.quicklens._
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.input.InputRefinements.NonPosScore
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
-import fr.renoux.gaston.model.{Problem, Score}
+import fr.renoux.gaston.model.{Problem, FlatScore}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -44,14 +44,14 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         persons = List(
           InputPerson("Arnold", mandatory = Set("alpha")),
           InputPerson("Bianca", forbidden = Set("alpha")),
-          InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
+          InputPerson("Caroline", wishes = Map("alpha" -> FlatScore(50))),
         )
       ))
       problem.mandatoryTopicsByPerson(p"Arnold") should be(topics)
       problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
       problem.preferencesByPerson(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
-      } should be(topics.map(_ -> Score.PersonTotalScore))
+      } should be(topics.map(_ -> FlatScore.PersonTotalScore))
     }
 
     they should "be exclusive except for mandatory people" in {
@@ -82,7 +82,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     val inputPersons = List(
       InputPerson("Arnold", mandatory = Set("alpha")),
       InputPerson("Bianca", forbidden = Set("alpha")),
-      InputPerson("Caroline", wishes = Map("alpha" -> Score(50)))
+      InputPerson("Caroline", wishes = Map("alpha" -> FlatScore(50)))
     )
     val inputModel = InputModel(
       settings = inputSettings,
@@ -103,11 +103,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       arnoldNothingPreferences.size should be(inputSlots.size)
-      arnoldNothingPreferences.foreach(_ should be(Score(-42)))
+      arnoldNothingPreferences.foreach(_ should be(FlatScore(-42)))
       biancaNothingPreferences.size should be(inputSlots.size)
-      biancaNothingPreferences.foreach(_ should be(Score(-42)))
+      biancaNothingPreferences.foreach(_ should be(FlatScore(-42)))
       carolineNothingPreferences.size should be(inputSlots.size)
-      carolineNothingPreferences.foreach(_ should be(Score(-42)))
+      carolineNothingPreferences.foreach(_ should be(FlatScore(-42)))
     }
 
     it should "have a scaled anti-preference (with scaling enabled)" in {
@@ -129,11 +129,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
       arnoldNothingPreferences.size should be(inputSlots.size)
-      arnoldNothingPreferences.foreach(_ should be(Score(-42)))
+      arnoldNothingPreferences.foreach(_ should be(FlatScore(-42)))
       biancaNothingPreferences.size should be(inputSlots.size)
-      biancaNothingPreferences.foreach(_ should be(Score(-22)))
+      biancaNothingPreferences.foreach(_ should be(FlatScore(-22)))
       carolineNothingPreferences.size should be(inputSlots.size)
-      carolineNothingPreferences.foreach(_ should be(Score(-42)))
+      carolineNothingPreferences.foreach(_ should be(FlatScore(-42)))
     }
   }
 

@@ -5,7 +5,7 @@ import com.softwaremill.diffx.generic.auto._
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
-import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.model.FlatScore
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -26,7 +26,7 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     mandatoryPersonCol = 1,
     mandatoryPersonWeight = PosWeight(1.5),
     forbiddenPersonMarker = Some("0"),
-    preferencesScoreMapping = Some(Map("1" -> Score(1), "2" -> Score(5)))
+    preferencesScoreMapping = Some(Map("1" -> FlatScore(1), "2" -> FlatScore(5)))
   )
 
   val settings = InputSettings(

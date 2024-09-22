@@ -46,8 +46,8 @@ final case class Problem(
 
   lazy val personsList: List[Person] = personsSet.toList.sortBy(_.id)
   lazy val personsCount: Int = personsSet.size
-  lazy val baseScoreByPerson: Map[Person, Score] =
-    if (personsSet.exists(_.baseScore != Score.Zero)) personsSet.map(p => p -> p.baseScore).toMap
+  lazy val baseScoreByPerson: Map[Person, FlatScore] =
+    if (personsSet.exists(_.baseScore != FlatScore.Zero)) personsSet.map(p => p -> p.baseScore).toMap
     else Map.empty
 
 

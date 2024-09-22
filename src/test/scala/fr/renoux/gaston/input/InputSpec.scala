@@ -70,16 +70,16 @@ class InputSpec extends AnyFlatSpec with Matchers {
 
   it should "contain the correct preferences" in {
     import expected.implicits._
-    val scalingFactor: Double = Score.PersonTotalScore.value / 7
+    val scalingFactor: Double = FlatScore.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
       t <- Set(expected.topics.unassignedA, expected.topics.unassignedB, expected.topics.unassignedC)
       p <- Set(expected.persons.bernard, expected.persons.hoagie, expected.persons.laverne)
-    } yield PersonTopicPreference(p, t, Score(-1000))
+    } yield PersonTopicPreference(p, t, FlatScore(-1000))
     val additionalPreferences = Set(
-      PersonTopicPreference(expected.persons.bernard, expected.topics.alpha, Score(scalingFactor * 5.0)),
-      PersonTopicPreference(expected.persons.bernard, expected.topics.beta, Score(scalingFactor * 1.0)),
-      PersonTopicPreference(expected.persons.bernard, expected.topics.gamma1, Score(scalingFactor * 1.0)),
-      PersonTopicPreference(expected.persons.bernard, expected.topics.gamma2, Score(scalingFactor * 1.0)),
+      PersonTopicPreference(expected.persons.bernard, expected.topics.alpha, FlatScore(scalingFactor * 5.0)),
+      PersonTopicPreference(expected.persons.bernard, expected.topics.beta, FlatScore(scalingFactor * 1.0)),
+      PersonTopicPreference(expected.persons.bernard, expected.topics.gamma1, FlatScore(scalingFactor * 1.0)),
+      PersonTopicPreference(expected.persons.bernard, expected.topics.gamma2, FlatScore(scalingFactor * 1.0)),
       TopicsExclusive(Set(expected.topics.beta, expected.topics.gamma1).toBitSet, Set(expected.persons.laverne).toBitSet),
       TopicsLinked(Set(expected.topics.gamma1, expected.topics.gamma2).toBitSet)
     )

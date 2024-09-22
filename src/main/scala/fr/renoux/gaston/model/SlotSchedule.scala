@@ -116,7 +116,7 @@ final case class SlotSchedule(
   }
 
   /** Score for this slot schedule if we swap those two persons. Persons are in couple with their current topic. */
-  def deltaScoreIfSwapPersons(tp1: (Topic, Person), tp2: (Topic, Person)): Map[Person, Score] = {
+  def deltaScoreIfSwapPersons(tp1: (Topic, Person), tp2: (Topic, Person)): Map[Person, FlatScore] = {
     val (t1, p1) = tp1
     val (t2, p2) = tp2
     val oldR1 = wrapped(t1)
@@ -127,10 +127,10 @@ final case class SlotSchedule(
     // TODO ++ is a minor (6%) hot-spot
     persons.view.map { p =>
       val delta =
-        newR1.unweightedScoresByPerson.getOrElse(p, Score.Zero) +
-          newR2.unweightedScoresByPerson.getOrElse(p, Score.Zero) -
-          oldR1.unweightedScoresByPerson.getOrElse(p, Score.Zero) -
-          oldR2.unweightedScoresByPerson.getOrElse(p, Score.Zero)
+        newR1.unweightedScoresByPerson.getOrElse(p, FlatScore.Zero) +
+          newR2.unweightedScoresByPerson.getOrElse(p, FlatScore.Zero) -
+          oldR1.unweightedScoresByPerson.getOrElse(p, FlatScore.Zero) -
+          oldR2.unweightedScoresByPerson.getOrElse(p, FlatScore.Zero)
       p -> delta
     }.toMap
     // TODO toMap is a major (12%) hot-spot
@@ -144,19 +144,19 @@ final case class SlotSchedule(
   }
 
   /** Score for each person, regardless of its weight. All personal scores are records-level, so the whole computation is done per record. */
-  lazy val unweightedScoresByPerson: Map[Person, Score] = recordsList.map(_.unweightedScoresByPerson).combineAll
+  lazy val unweightedScoresByPerson: Map[Person, FlatScore] = recordsList.map(_.unweightedScoresByPerson).combineAll
 
-  lazy val impersonalScoreTopicLevel: Score = Score.sum(recordsList)(_.impersonalScore)
+  lazy val impersonalScoreTopicLevel: FlatScore = FlatScore.sum(recordsList)(_.impersonalScore)
 
   /** Impersonal score of the slot, regardless of how persons are assigned to topics on this slot (as long as the same persons are present) */
-  lazy val impersonalScoreSlotLevel: Score = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
+  lazy val impersonalScoreSlotLevel: FlatScore = preferencesScoreRec(problem.impersonalSlotLevelPreferencesList)
 
   /** Total impersonal score in this slot. */
-  lazy val impersonalScore: Score = impersonalScoreTopicLevel + impersonalScoreSlotLevel
+  lazy val impersonalScore: FlatScore = impersonalScoreTopicLevel + impersonalScoreSlotLevel
 
   @tailrec
-  private def preferencesScoreRec(prefs: List[Preference.SlotLevel], sum: Double = 0): Score = prefs match {
-    case Nil => Score(sum)
+  private def preferencesScoreRec(prefs: List[Preference.SlotLevel], sum: Double = 0): FlatScore = prefs match {
+    case Nil => FlatScore(sum)
     case p :: ps =>
       val s = p.scoreSlot(this)
       if (s.isNegativeInfinity) s else preferencesScoreRec(ps, sum + s.value)

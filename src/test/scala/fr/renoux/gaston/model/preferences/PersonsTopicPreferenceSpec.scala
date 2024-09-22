@@ -20,17 +20,17 @@ class PersonsTopicPreferenceSpec extends AnyFlatSpec with Matchers {
 
 
   behavior of "PersonsTopicPreference"
-  val leonardoLovesFighting: Preference = PersonTopicPreference(Leonardo, Fighting, Score(42))
+  val leonardoLovesFighting: Preference = PersonTopicPreference(Leonardo, Fighting, FlatScore(42))
 
   it should "return the score when respected" in {
     leonardoLovesFighting.score(scheduled(Morning, Fighting, Leonardo, Raphael)
-    ) should be(Score(42))
+    ) should be(FlatScore(42))
   }
 
   it should "return zero when not respected" in {
     leonardoLovesFighting.score(scheduled(Morning, Machines, Leonardo, Raphael)
       ++ scheduled(Morning, Fighting, Donatello, Michelangelo)
-    ) should be(Score(0))
+    ) should be(FlatScore(0))
   }
 
 }

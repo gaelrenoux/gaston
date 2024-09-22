@@ -67,7 +67,7 @@ final case class Schedule(
 
   def set(slotSchedule: SlotSchedule): Schedule = updateWrapped(wrapped + (slotSchedule.slot -> slotSchedule))
 
-  lazy val score: Score = if (isAbysmal) Score.NegativeInfinity else scoreCalculator.globalScore
+  lazy val score: FlatScore = if (isAbysmal) FlatScore.NegativeInfinity else scoreCalculator.globalScore
 
   /** Add a new record to this schedule. */
   def add(record: Record): Schedule = updateSlotSchedule(record.slot)(_.add(record))
@@ -133,14 +133,14 @@ final case class Schedule(
     * score in that case. */
   // TODO the whole method itself is a minor (5%) hot-spot
   // TODO can be improved by handling global preferences
-  def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Option[Score] =
+  def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Option[FlatScore] =
     if (problem.hasGlobalPreferencesWherePersonsMatter) None
     else if (score.isNegativeInfinity) None // Delta would be positive infinity, which isn't helpful. We need to recalculate to see if we're still NegInf.
     else Some {
       val existingUnweightedScoresByPerson = scoreCalculator.unweightedScoresByPerson
       val deltaUnweightedScoresByPerson = wrapped(slot).deltaScoreIfSwapPersons(tp1, tp2)
       // Using a Monoid on the next instruction is indeed the fastest way I could find to merge those maps, tested in benchmarks.
-      val newUnweightedScoresByPerson = Monoid[Map[Person, Score]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
+      val newUnweightedScoresByPerson = Monoid[Map[Person, FlatScore]].combine(existingUnweightedScoresByPerson, deltaUnweightedScoresByPerson)
       scoreCalculator.personalScoreFrom(newUnweightedScoresByPerson) - scoreCalculator.personalScore
     }
 

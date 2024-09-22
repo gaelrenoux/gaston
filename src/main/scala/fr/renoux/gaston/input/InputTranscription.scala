@@ -210,17 +210,17 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         inPerson <- input.personsSet
         person = personsByName(inPerson.name)
         totalInputScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value // TODO Right now, negative prefs are ignored in the total count
-        scoreFactor = Score.PersonTotalScore.value / totalInputScore
+        scoreFactor = FlatScore.PersonTotalScore.value / totalInputScore
         inWish <- inPerson.wishes
         wishedTopicName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
         topic <- topicsByName(wishedTopicName)
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
-    def getUnassignedAntiPreference(inPerson: InputPerson): Score = settings.unassigned.personAntiPreferenceScaling match {
+    def getUnassignedAntiPreference(inPerson: InputPerson): FlatScore = settings.unassigned.personAntiPreferenceScaling match {
       case None => settings.unassigned.personAntiPreference
       case Some(scalingSettings) =>
         val ratioOfForbiddenTopics = inPerson.forbidden.size.toDouble / input.topics.size
-        val antiPreferenceVariablePart: Score = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
+        val antiPreferenceVariablePart: FlatScore = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
         val ratioOnVariablePart = math.max(0, 1 - (ratioOfForbiddenTopics / scalingSettings.forbiddenRatioForMaximum))
         scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * ratioOnVariablePart)
     }

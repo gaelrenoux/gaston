@@ -40,37 +40,37 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
     val slot3 = slots.tail.tail.head
 
     slot1 should be(Map(
-      SimpleTestModel.Persons.Arthur -> Score(0.0),
-      SimpleTestModel.Persons.Bianca -> Score(1.0),
-      SimpleTestModel.Persons.Corwin -> Score(5.0),
-      SimpleTestModel.Persons.Daniela -> Score(0.0),
-      SimpleTestModel.Persons.Fiona -> Score(5.0),
+      SimpleTestModel.Persons.Arthur -> FlatScore(0.0),
+      SimpleTestModel.Persons.Bianca -> FlatScore(1.0),
+      SimpleTestModel.Persons.Corwin -> FlatScore(5.0),
+      SimpleTestModel.Persons.Daniela -> FlatScore(0.0),
+      SimpleTestModel.Persons.Fiona -> FlatScore(5.0),
       // SimpleTestModel.Persons.Eric -> Score(0.0), // missing from this slot
-      SimpleTestModel.Persons.Garion -> Score(0.0),
-      SimpleTestModel.Persons.Hercule -> Score(1.0),
-      SimpleTestModel.Persons.Iago -> Score(5.0),
+      SimpleTestModel.Persons.Garion -> FlatScore(0.0),
+      SimpleTestModel.Persons.Hercule -> FlatScore(1.0),
+      SimpleTestModel.Persons.Iago -> FlatScore(5.0),
     ))
     slot2 should be(Map(
-      SimpleTestModel.Persons.Arthur -> Score(5.0),
-      SimpleTestModel.Persons.Bianca -> Score(0.0),
-      SimpleTestModel.Persons.Corwin -> Score(1.0),
-      SimpleTestModel.Persons.Daniela -> Score(5.0),
-      SimpleTestModel.Persons.Eric -> Score(0.0),
-      SimpleTestModel.Persons.Fiona -> Score(1.0),
-      SimpleTestModel.Persons.Garion -> Score(5.0),
-      SimpleTestModel.Persons.Hercule -> Score(0.0),
+      SimpleTestModel.Persons.Arthur -> FlatScore(5.0),
+      SimpleTestModel.Persons.Bianca -> FlatScore(0.0),
+      SimpleTestModel.Persons.Corwin -> FlatScore(1.0),
+      SimpleTestModel.Persons.Daniela -> FlatScore(5.0),
+      SimpleTestModel.Persons.Eric -> FlatScore(0.0),
+      SimpleTestModel.Persons.Fiona -> FlatScore(1.0),
+      SimpleTestModel.Persons.Garion -> FlatScore(5.0),
+      SimpleTestModel.Persons.Hercule -> FlatScore(0.0),
       // SimpleTestModel.Persons.Iago -> Score(0.0), // missing from this slot
     ))
     slot3 should be(Map(
       // SimpleTestModel.Persons.Arthur -> Score(0.0), // missing from this slot
-      SimpleTestModel.Persons.Bianca -> Score(5.0),
-      SimpleTestModel.Persons.Corwin -> Score(0.0),
-      SimpleTestModel.Persons.Daniela -> Score(1.0),
-      SimpleTestModel.Persons.Eric -> Score(5.0),
-      SimpleTestModel.Persons.Fiona -> Score(0.0),
-      SimpleTestModel.Persons.Garion -> Score(1.0),
-      SimpleTestModel.Persons.Hercule -> Score(5.0),
-      SimpleTestModel.Persons.Iago -> Score(0.0),
+      SimpleTestModel.Persons.Bianca -> FlatScore(5.0),
+      SimpleTestModel.Persons.Corwin -> FlatScore(0.0),
+      SimpleTestModel.Persons.Daniela -> FlatScore(1.0),
+      SimpleTestModel.Persons.Eric -> FlatScore(5.0),
+      SimpleTestModel.Persons.Fiona -> FlatScore(0.0),
+      SimpleTestModel.Persons.Garion -> FlatScore(1.0),
+      SimpleTestModel.Persons.Hercule -> FlatScore(5.0),
+      SimpleTestModel.Persons.Iago -> FlatScore(0.0),
     ))
   }
 

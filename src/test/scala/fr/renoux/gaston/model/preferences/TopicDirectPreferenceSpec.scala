@@ -20,22 +20,22 @@ class TopicDirectPreferenceSpec extends AnyFlatSpec with Matchers {
 
 
   behavior of "TopicDirectPreferenceSpec"
-  val fightingIsGood: Preference = TopicDirectPreference(Fighting, Score(42))
+  val fightingIsGood: Preference = TopicDirectPreference(Fighting, FlatScore(42))
 
   it should "return the score when respected" in {
     fightingIsGood.score(scheduled(Morning, Fighting, Leonardo, Raphael)
-    ) should be(Score(42))
+    ) should be(FlatScore(42))
   }
 
   it should "return the score when respected (even with no one on it)" in {
     fightingIsGood.score(scheduled(Morning, Fighting)
-    ) should be(Score(42))
+    ) should be(FlatScore(42))
   }
 
   it should "return zero when not respected" in {
     fightingIsGood.score(scheduled(Morning, Machines, Leonardo, Raphael)
       ++ scheduled(Morning, Leading, Donatello, Michelangelo)
-    ) should be(Score(0))
+    ) should be(FlatScore(0))
   }
 
 }

@@ -24,7 +24,7 @@ class TopicsLinkedSpec extends AnyFlatSpec with Matchers {
   it should "return zero if a person does both" in {
     mustFightAndPartyAndMachines.score(scheduled(Morning, Fighting, Donatello, Michelangelo) ++
       scheduled(Afternoon, Party, Donatello, Michelangelo) ++ scheduled(Evening, Machines, Donatello, Michelangelo)
-    ) should be(Score.Zero)
+    ) should be(FlatScore.Zero)
   }
 
   it should "return the reward if a persons misses one" in {

@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.Termination
 import fr.renoux.gaston.input.{InputLoader, InputModel}
-import fr.renoux.gaston.model.{Problem, Schedule, Score}
+import fr.renoux.gaston.model.{Problem, Schedule, FlatScore}
 
 import java.time.Instant
 
@@ -23,7 +23,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
   private val log = Logger[Output]
   private val notSilent = !silent
 
-  private var bestScore: Score = Score.MinValue // scalastyle:ignore var.field
+  private var bestScore: FlatScore = FlatScore.MinValue // scalastyle:ignore var.field
 
   private def shortString(l: Long) = {
     if (l < 10000) l.toString
@@ -95,7 +95,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
   def writeTerminationOnCount(termination: Termination, count: Long): Unit =
     write(s"Termination on count: $count >= ${termination.count.get} on thread ${Thread.currentThread().getName}")
 
-  def writeTerminationOnScore(termination: Termination, score: Score): Unit = {
+  def writeTerminationOnScore(termination: Termination, score: FlatScore): Unit = {
     write(s"Termination on score: ${score.value} >= ${termination.score.get.value} on thread ${Thread.currentThread().getName}")
   }
 }

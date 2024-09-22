@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import fr.renoux.gaston.SimpleTestModel
-import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.model.FlatScore
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -14,29 +14,29 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
 
   it should "give a correct unweightedScoresByPerson" in {
     SimpleTestModel.Solutions.Best.scoreCalculator.unweightedScoresByPerson should be(Map(
-      SimpleTestModel.Persons.Arthur -> Score(5.0),
-      SimpleTestModel.Persons.Bianca -> Score(6.0),
-      SimpleTestModel.Persons.Corwin -> Score(6.0),
-      SimpleTestModel.Persons.Daniela -> Score(6.0),
-      SimpleTestModel.Persons.Eric -> Score(5.0),
-      SimpleTestModel.Persons.Fiona -> Score(6.0),
-      SimpleTestModel.Persons.Garion -> Score(6.0),
-      SimpleTestModel.Persons.Hercule -> Score(6.0),
-      SimpleTestModel.Persons.Iago -> Score(5.0),
+      SimpleTestModel.Persons.Arthur -> FlatScore(5.0),
+      SimpleTestModel.Persons.Bianca -> FlatScore(6.0),
+      SimpleTestModel.Persons.Corwin -> FlatScore(6.0),
+      SimpleTestModel.Persons.Daniela -> FlatScore(6.0),
+      SimpleTestModel.Persons.Eric -> FlatScore(5.0),
+      SimpleTestModel.Persons.Fiona -> FlatScore(6.0),
+      SimpleTestModel.Persons.Garion -> FlatScore(6.0),
+      SimpleTestModel.Persons.Hercule -> FlatScore(6.0),
+      SimpleTestModel.Persons.Iago -> FlatScore(5.0),
     ))
   }
 
   it should "give a correct weightedScoresByPerson" in {
     SimpleTestModel.Solutions.Best.scoreCalculator.weightedScoresByPerson should be(Map(
-      SimpleTestModel.Persons.Arthur -> Score(5.0),
-      SimpleTestModel.Persons.Bianca -> Score(6.0),
-      SimpleTestModel.Persons.Corwin -> Score(6.0),
-      SimpleTestModel.Persons.Daniela -> Score(6.0),
-      SimpleTestModel.Persons.Eric -> Score(5.0),
-      SimpleTestModel.Persons.Fiona -> Score(6.0),
-      SimpleTestModel.Persons.Garion -> Score(6.0),
-      SimpleTestModel.Persons.Hercule -> Score(6.0),
-      SimpleTestModel.Persons.Iago -> Score(5.0),
+      SimpleTestModel.Persons.Arthur -> FlatScore(5.0),
+      SimpleTestModel.Persons.Bianca -> FlatScore(6.0),
+      SimpleTestModel.Persons.Corwin -> FlatScore(6.0),
+      SimpleTestModel.Persons.Daniela -> FlatScore(6.0),
+      SimpleTestModel.Persons.Eric -> FlatScore(5.0),
+      SimpleTestModel.Persons.Fiona -> FlatScore(6.0),
+      SimpleTestModel.Persons.Garion -> FlatScore(6.0),
+      SimpleTestModel.Persons.Hercule -> FlatScore(6.0),
+      SimpleTestModel.Persons.Iago -> FlatScore(5.0),
     ))
   }
 }

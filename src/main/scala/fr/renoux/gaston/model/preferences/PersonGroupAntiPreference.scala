@@ -11,14 +11,14 @@ import fr.renoux.gaston.util.BitSet
 final case class PersonGroupAntiPreference(
     person: Person,
     group: BitSet[Person],
-    reward: Score
+    reward: FlatScore
 ) extends Preference.RecordLevel with Preference.Anti with Preference.Personal {
 
-  override def scoreRecord(record: Record): Score = {
+  override def scoreRecord(record: Record): FlatScore = {
     if (record.persons.contains(person)) {
       val count = record.persons.count(group.contains)
-      if (count == 0) Score.Zero else reward * count
-    } else Score.Zero
+      if (count == 0) FlatScore.Zero else reward * count
+    } else FlatScore.Zero
   }
 
   override def equals(o: Any): Boolean = o match {

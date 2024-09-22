@@ -2,7 +2,7 @@ package fr.renoux.gaston.input
 
 import cats.data.NonEmptyList
 import eu.timepit.refined.api.Refined
-import fr.renoux.gaston.model.{Record, Score, Weight}
+import fr.renoux.gaston.model.{Record, FlatScore, Weight}
 import fr.renoux.gaston.util.StringImplicits._
 import shapeless._
 
@@ -70,7 +70,7 @@ object InputCleaner {
 
   implicit object WeightCleaner extends IdentityCleaner[Weight]
 
-  implicit object ScoreCleaner extends IdentityCleaner[Score]
+  implicit object ScoreCleaner extends IdentityCleaner[FlatScore]
 
   /* Refined stuff */
 

@@ -19,28 +19,28 @@ class PersonGroupAntiPreferenceSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps: _*)))
 
   behavior of "PersonGroupAntiPreference"
-  val leonardoHatesEnemies: Preference = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady).toBitSet, Score(-150))
+  val leonardoHatesEnemies: Preference = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady).toBitSet, FlatScore(-150))
 
   it should "return a negative score for just one hated person" in {
     leonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop)
-    ) should be(Score(-150))
+    ) should be(FlatScore(-150))
   }
 
   it should "return a negative score multiplied by the number of hated persons in the topic" in {
     leonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop, Rocksteady)
-    ) should be(Score(-150 * 2))
+    ) should be(FlatScore(-150 * 2))
   }
 
   it should "sum negative scores on all topics" in {
     leonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop, Rocksteady)
       ++ scheduled(Afternoon, Machines, Leonardo, Donatello)
       ++ scheduled(Evening, Party, Leonardo, Michelangelo, Rocksteady)
-    ) should be(Score(-150 * 3))
+    ) should be(FlatScore(-150 * 3))
   }
 
   it should "return zero when not present" in {
     leonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael)
-    ) should be(Score.Zero)
+    ) should be(FlatScore.Zero)
   }
 
 }

@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
 
-  val strongPreference = Score(5)
-  val weakPreference = Score(1)
+  val strongPreference = FlatScore(5)
+  val weakPreference = FlatScore(1)
 
   object Persons {
     private val index = new AtomicInteger(0)

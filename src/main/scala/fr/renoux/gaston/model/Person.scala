@@ -11,12 +11,12 @@ final case class Person(
     id: Person.Id,
     name: String,
     weight: Weight = Weight.Default,
-    baseScore: Score = Score.Zero
+    baseScore: FlatScore = FlatScore.Zero
 ) extends Identified {
 
   def toShortString: String = s"$id -> $name"
 
-  def toLongString: String = s"Person($id, $name, ${weight.value}${if (baseScore == Score.Zero) "" else s", baseScore=$baseScore"})"
+  def toLongString: String = s"Person($id, $name, ${weight.value}${if (baseScore == FlatScore.Zero) "" else s", baseScore=$baseScore"})"
 
   lazy val toAbstract: (Person.Id, Double, Double) = (id, weight.value, baseScore.value)
 

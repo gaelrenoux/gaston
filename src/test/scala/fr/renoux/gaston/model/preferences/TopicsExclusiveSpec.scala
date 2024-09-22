@@ -36,13 +36,13 @@ class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
   it should "return zero if no one does both" in {
     cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Michelangelo) ++
       scheduled(Afternoon, Party, Raphael)
-    ) should be(Score.Zero)
+    ) should be(FlatScore.Zero)
   }
 
   it should "return zero if an exempted person does both" in {
     cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Leonardo) ++
       scheduled(Afternoon, Party, Raphael, Leonardo, Michelangelo)
-    ) should be(Score.Zero)
+    ) should be(FlatScore.Zero)
   }
 
   it should "break if a person does two out of three" in {

@@ -1,6 +1,6 @@
 package fr.renoux.gaston.engine
 
-import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.model.FlatScore
 
 import java.time.Instant
 
@@ -11,7 +11,7 @@ import java.time.Instant
   * @param timeout A timestamp when to stop.
   */
 final case class Termination( // TODO Rename to Controls, or maybe TerminationConditions? And add class doc.
-    score: Option[Score] = None,
+    score: Option[FlatScore] = None,
     count: Option[Long] = None,
     timeout: Option[Instant] = None
 ) {
@@ -25,7 +25,7 @@ final case class Termination( // TODO Rename to Controls, or maybe TerminationCo
   def reduceCount(delta: Long): Termination = copy(count = count.map(_ - delta))
 
   /** Returns true if the argument score has reached the desired score */
-  def checkScore(s: Score): Boolean = score.exists(_ <= s)
+  def checkScore(s: FlatScore): Boolean = score.exists(_ <= s)
 
   /** Returns true if the argument count has reached the max count */
   def checkCount(c: Long): Boolean = count.exists(_ <= c)

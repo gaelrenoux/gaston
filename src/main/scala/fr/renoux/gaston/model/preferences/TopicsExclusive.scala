@@ -7,15 +7,15 @@ import fr.renoux.gaston.util.BitSet
   *
   * This is often used as a soft-constraint (very high negative score, in order to make sure it's always respected).
   */
-final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: Score = Preference.NecessaryPreferenceScore)
+final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: FlatScore = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti with Preference.Impersonal {
   // TODO add score scaling: the more times we break the rule, the lower it goes (e.g. it's -50 on two topics but -200 on three)
 
   assert(topics.size > 1, s"$this should contain more than one topic")
 
-  override def scoreSchedule(schedule: Schedule): Score = {
+  override def scoreSchedule(schedule: Schedule): FlatScore = {
     val groups = schedule.personsByTopic.view.filterKeys(topics.contains).values.map(_.filterNot(exemptions.contains))
-    groups.foldLeft((Set.empty[Person], Score.Zero)) { case ((found, score), ps) =>
+    groups.foldLeft((Set.empty[Person], FlatScore.Zero)) { case ((found, score), ps) =>
       if (ps.exists(found)) (found, score + reward)
       else (found ++ ps, score)
     }._2

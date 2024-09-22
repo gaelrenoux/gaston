@@ -8,9 +8,9 @@ trait Preference {
 
   /** Score you get each time you satisfy this constraint. Anti-preferences (stuff you would like no to happen) should
     * have a negative reward */
-  def reward: Score
+  def reward: FlatScore
 
-  def score(schedule: Schedule): Score
+  def score(schedule: Schedule): FlatScore
 
   def toLongString: String
 
@@ -35,26 +35,26 @@ object Preference {
     def personsMatter: Boolean = true
 
     /** Score the schedule according to this preference. */
-    def scoreSchedule(schedule: Schedule): Score
+    def scoreSchedule(schedule: Schedule): FlatScore
 
-    override def score(schedule: Schedule): Score = scoreSchedule(schedule)
+    override def score(schedule: Schedule): FlatScore = scoreSchedule(schedule)
   }
 
   /** Trait for preferences which can be evaluated slot by slot, but not record by record */
   trait SlotLevel extends Preference {
     /** Score the slot schedule according to this preference */
-    def scoreSlot(schedule: SlotSchedule): Score
+    def scoreSlot(schedule: SlotSchedule): FlatScore
 
-    override def score(schedule: Schedule): Score = Score.sum(schedule.slotSchedulesList)(scoreSlot)
+    override def score(schedule: Schedule): FlatScore = FlatScore.sum(schedule.slotSchedulesList)(scoreSlot)
   }
 
   /** Trait for preferences which can be evaluated record by record */
   trait RecordLevel extends Preference {
     /** Score the record according to this preference */
-    def scoreRecord(record: Record): Score
+    def scoreRecord(record: Record): FlatScore
 
-    override def score(schedule: Schedule): Score =
-      Score.sum(schedule.slotSchedulesList.flatMap(_.recordsList))(scoreRecord)
+    override def score(schedule: Schedule): FlatScore =
+      FlatScore.sum(schedule.slotSchedulesList.flatMap(_.recordsList))(scoreRecord)
   }
 
   /** Personal preferences are always at record level, and apply to a specific person. */
@@ -71,6 +71,6 @@ object Preference {
   }
 
   /** This is only used for pseudo-constraints: constraints represented as preferences. */
-  val NecessaryPreferenceScore: Score = Score(-1000000000.0) // Cannot be negative infinity: we want breaking one constraint to be better than breaking two.
+  val NecessaryPreferenceScore: FlatScore = FlatScore(-1000000000.0) // Cannot be negative infinity: we want breaking one constraint to be better than breaking two.
 
 }

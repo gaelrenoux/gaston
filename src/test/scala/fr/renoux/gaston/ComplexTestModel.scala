@@ -1,7 +1,7 @@
 package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model.Score.ScoreIsFractional._
+import fr.renoux.gaston.model.FlatScore.FlatScoreIsFractional._
 import fr.renoux.gaston.model._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.RandomImplicits._
@@ -17,8 +17,8 @@ class ComplexTestModel(seed: Long) {
 
   private val log = Logger(classOf[ComplexTestModel])
 
-  private val strongPreference = Score(5)
-  private val weakPreference = Score(1)
+  private val strongPreference = FlatScore(5)
+  private val weakPreference = FlatScore(1)
 
   implicit val random: Random = new Random(seed)
 
@@ -80,7 +80,7 @@ class ComplexTestModel(seed: Long) {
     val Unassigned: Set[Preference] = for {
       t: Topic <- Topics.Unassigned.values.toSet
       p <- Persons.All
-    } yield PersonTopicPreference(p, t, Score.PersonTotalScore.negative)
+    } yield PersonTopicPreference(p, t, FlatScore.PersonTotalScore.negative)
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities ++ Unassigned
   }

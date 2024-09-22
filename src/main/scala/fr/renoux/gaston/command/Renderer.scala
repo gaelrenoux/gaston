@@ -23,14 +23,14 @@ final class Renderer(
 
   /** Formats the schedule and analysis to a pretty String. Empty lines at the beginning and the end. */
   def apply(schedule: Schedule): String = {
-    val weightedScoresByPerson: Map[Person, Score] = schedule.scoreCalculator.weightedScoresByPerson
+    val weightedScoresByPerson: Map[Person, FlatScore] = schedule.scoreCalculator.weightedScoresByPerson
 
     /* For each name, weighted score, base score, descending list of satisfied rewards, number of mandatory topics */
     val summaryByPerson: Seq[(String, Double, Double, Seq[Double], Int)] = topicPreferencesByPerson.toSeq.map {
       case (person, preferences) =>
         val score = weightedScoresByPerson(person).value
-        val baseScore = problem.baseScoreByPerson.getOrElse(person, Score.Zero).value
-        val satisfied = preferences.view.filter(_.score(schedule) != Score.Zero).map(_.reward.value).toSeq.sorted.reverse
+        val baseScore = problem.baseScoreByPerson.getOrElse(person, FlatScore.Zero).value
+        val satisfied = preferences.view.filter(_.score(schedule) != FlatScore.Zero).map(_.reward.value).toSeq.sorted.reverse
         val mandatoryCount = problem.mandatoryTopicsByPerson(person).intersect(schedule.scheduledTopics).size
         (person.name, score, baseScore, satisfied, mandatoryCount)
     }
@@ -46,7 +46,7 @@ final class Renderer(
       s"$nameTxt    $scoreTxt    ($baseScoreTxt$mandatoryTxt$satisfiedTxt)"
     }.mkString("\n")
 
-    val notableOtherPrefs = otherPreferences.filter(_.score(schedule) != Score.Zero)
+    val notableOtherPrefs = otherPreferences.filter(_.score(schedule) != FlatScore.Zero)
     val notableOtherPrefsTxt = if (notableOtherPrefs.isEmpty) "" else {
       s"\nOther:\n${notableOtherPrefs.map(p => s"  ${p.toLongString}").mkString("\n")}"
     }

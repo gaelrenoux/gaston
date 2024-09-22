@@ -4,17 +4,17 @@ import fr.renoux.gaston.model.{Preference, _}
 import fr.renoux.gaston.util.BitSet
 
 /** Every person on any of these topics, must be on all of these topics. Note that the 'reward' is applied for each anomaly. */
-final case class TopicsLinked(topics: BitSet[Topic], reward: Score = Preference.NecessaryPreferenceScore)
+final case class TopicsLinked(topics: BitSet[Topic], reward: FlatScore = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti with Preference.Impersonal {
   // TODO Add unit test
 
   assert(topics.size > 1, s"$this should contain more than one topic")
 
-  override def scoreSchedule(schedule: Schedule): Score = {
+  override def scoreSchedule(schedule: Schedule): FlatScore = {
     val groups: Iterable[Set[Person]] = schedule.personsByTopic.view.filterKeys(topics.contains).values
-    if (groups.isEmpty) Score.Zero else {
+    if (groups.isEmpty) FlatScore.Zero else {
       val persons = groups.foldLeft(Set.empty[Person])(_ ++ _)
-      groups.foldLeft(Score.Zero) { (score, current) =>
+      groups.foldLeft(FlatScore.Zero) { (score, current) =>
         val anomalyCount = (persons diff current).size + (current diff persons).size
         score + (reward * anomalyCount)
       }
