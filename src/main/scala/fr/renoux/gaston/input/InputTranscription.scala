@@ -212,7 +212,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
       val totalPersonWishesScore = inPerson.personWishes.filter(_._2.value > 0).values.sum.value
       val totalWishScore = totalTopicWishesScore + totalPersonWishesScore
-      val scoreFactor = Score.PersonTotalScore.value / totalWishScore
+      val scoreFactor = Constants.PersonTotalScore.value / totalWishScore
       inPerson.name -> scoreFactor
     }.toMap
 
@@ -429,4 +429,5 @@ object InputTranscription {
     }
   }
 
+  def transcribe(input: InputModel): Either[InputErrors, Problem] = new InputTranscription(input).result.toEither
 }

@@ -3,7 +3,7 @@ package fr.renoux.gaston.command
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.Termination
-import fr.renoux.gaston.input.{InputLoader, InputModel}
+import fr.renoux.gaston.input.{InputModel, InputRenderer}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
 import java.time.Instant
@@ -52,7 +52,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
   }
 
   def writeInput(input: InputModel): Unit =
-    write(s"\n${InputLoader.render(input)}\n")
+    write(s"\n${InputRenderer.render(input)}\n")
 
   def writeScheduleIfBetter(schedule: Schedule): Unit = synchronized {
     if (schedule.score > bestScore) {

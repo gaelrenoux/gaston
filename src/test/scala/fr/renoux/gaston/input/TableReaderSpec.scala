@@ -81,7 +81,7 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
   it should "be rendered correctly" in {
     val table = Source.fromResource("udocon2017/uc17-table.csv").mkString
     val input = reader.read(table)
-    val rendered = InputLoader.render(input)
+    val rendered = InputRenderer.render(input)
     val evaluated = InputLoader.fromString(rendered).force
     val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 

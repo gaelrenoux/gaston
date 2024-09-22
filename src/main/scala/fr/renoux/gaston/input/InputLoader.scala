@@ -1,17 +1,17 @@
 package fr.renoux.gaston.input
 
 import cats.data.NonEmptyList
-
-import java.io.{File, PrintWriter}
-import java.nio.file.Path
-import com.typesafe.config.{ConfigFactory, ConfigRenderOptions, ConfigValue}
+import cats.implicits._
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.collection.NonEmpty
-import pureconfig.error.ConfigReaderFailures
-import pureconfig.{ConfigSource, ConfigWriter}
-import cats.implicits._
 import fr.renoux.gaston.util.testOnly
+import pureconfig.ConfigSource
+import pureconfig.error.ConfigReaderFailures
+
+import java.io.{File, PrintWriter}
+import java.nio.file.Path
 
 
 /** Load the PureConfig input object from the configuration files. */
@@ -21,17 +21,11 @@ object InputLoader {
 
   private val log = Logger[InputLoader.type]
 
-  /** Style to use when rendering the input. Useful after we integrated table preferences into the canonical input. */
-  private lazy val renderConfig = ConfigRenderOptions.defaults()
-    .setOriginComments(false)
-    .setJson(false)
-
   import eu.timepit.refined.pureconfig._
   import pureconfig.generic.auto._
 
-  // forces IntelliJ to keep the previous imports, otherwise it marks them as unused
+  // forces IntelliJ to keep the refined-pureconfig import, otherwise it marks it as unused
   {
-    exportReader[List[Int]]
     refTypeConfigConvert[Refined, String, NonEmpty]
   }
 
@@ -71,12 +65,5 @@ object InputLoader {
     NonEmptyList.of(configReaderFailures.head, configReaderFailures.tail: _*).map { f =>
       InputError(f.description, f.origin.map(_.url.toString), f.origin.map(_.lineNumber))
     }
-
-  /** Render a configuration into a String. Used mostly after loading the preferences from a table, in order to integrate them into the canonical input. */
-  def render(input: InputModel): String = {
-    // TODO drop constraints/settings/other that are empty. Also give a better order to sections, instead of just alphabetical.
-    val config: ConfigValue = ConfigWriter[InputModel].to(input)
-    config.atKey("gaston").root().render(renderConfig)
-  }
 
 }
