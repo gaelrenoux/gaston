@@ -169,14 +169,22 @@ final case class SlotSchedule(
   }
 
   /**
+    * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to partial schedules
+    */
+  lazy val isPartialSolution: Boolean = {
+    lazy val recordsOk = records.forall(_.isUnfilledSolution) // Records don't have a partial status: if they exist, they're planned. They can only be unfilled.
+    lazy val maxTopicsOk = slot.maxTopics >= topics.size
+    lazy val constraintsOk = problem.slotLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
+    recordsOk && maxTopicsOk && constraintsOk
+  }
+
+  /**
     * Unfilled Schedules are schedule where topics are matched, but not all persons are assigned yet.
     * @return true if this respects all constraints applicable to unfilled schedules
     */
-  lazy val isUnfilledSolution: Boolean = {
-    lazy val recordsOk = records.forall(_.isUnfilledSolution)
-    lazy val maxTopicsOk = slot.maxTopics >= topics.size
-    lazy val constraintsOk = problem.slotLevelConstraints.forall { c => !c.isApplicableToUnfilledSchedule || c.isRespectedSlot(this) }
-    recordsOk && maxTopicsOk && constraintsOk
+  lazy val isUnfilledSolution: Boolean = isPartialSolution && {
+    problem.slotLevelConstraints.forall { c => !c.isApplicableToUnfilledSchedule || c.isRespectedSlot(this) }
   }
 
   /** @return true if this respects all constraints */

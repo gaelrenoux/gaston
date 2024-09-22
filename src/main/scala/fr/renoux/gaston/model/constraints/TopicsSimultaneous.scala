@@ -10,6 +10,8 @@ final case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotL
   private val topicsSize = topics.size
   assert(topicsSize > 1)
 
+  override val isApplicableToPartialSchedule: Boolean = false
+
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = {
     val missing = topics.diff(schedule.topicsSet)
     missing.isEmpty || missing.size == topicsSize

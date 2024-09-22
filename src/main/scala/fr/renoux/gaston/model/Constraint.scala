@@ -11,6 +11,10 @@ package fr.renoux.gaston.model
   */
 trait Constraint {
 
+  /** Can we test a partial schedule ? For example, it's false for checking linked topics (because the missing topic may
+    * be added later). */
+  val isApplicableToPartialSchedule: Boolean = true
+
   /** Can we test an unfilled schedule ? For example, it's false for counting min numbers (because it may be reached
     * when we add more persons). */
   val isApplicableToUnfilledSchedule: Boolean = true

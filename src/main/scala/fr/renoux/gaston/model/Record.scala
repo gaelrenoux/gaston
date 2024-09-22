@@ -63,11 +63,11 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   }
 
   /**
-    * Unfilled Schedules are schedule where topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to unfilled schedules
+    * Unfilled records are records where not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to unfilled records
     */
   lazy val isUnfilledSolution: Boolean = {
-    topic.max >= countPersons && // topic.min <= pCount &&
+    topic.max >= countPersons && // can check the max but not the min, as more persons may be added later
       !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
       topic.slots.forall(_.contains(slot)) &&
       persons.forall(slot.personsPresent.contains)

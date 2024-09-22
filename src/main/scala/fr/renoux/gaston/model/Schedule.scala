@@ -155,11 +155,24 @@ final case class Schedule(
     noUbiquity && noDuplicates
   }
 
+  /** Partial schedules don't even have all of their topics planned yet (and they're obviously unfilled as well).
+    * @return true if this respects all constraints applicable to partial schedules
+    */
+  lazy val isPartialSolution: Boolean = {
+    lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
+
+    /* TODO: All constraints: they should never be an error, as the navigator should not allow for such a situation.
+        Kept temporarily to check if it's happening or not. Should have an option to disable, it might make the algorithm go faster. */
+    lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
+
+    allSlotsOk && constraintsOk
+  }
+
   /**
     * Unfilled Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
     * @return true if this respects all constraints applicable to unfilled schedules
     */
-  lazy val isUnfilledSolution: Boolean = {
+  lazy val isUnfilledSolution: Boolean = isPartialSolution && {
     lazy val allSlotsOk = slotSchedules.forall(_.isUnfilledSolution)
     lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
 
