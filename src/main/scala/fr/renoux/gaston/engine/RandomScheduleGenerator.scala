@@ -42,13 +42,14 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
     improver.improve(unimproved.get)
   }
 
-  @tailrec
+  // @tailrec Not any more
   private def backtrackAndFill(state: State)
     (implicit random: Random): Option[Schedule] = {
     backtrackAssignTopicsToSlots(state).toOption match {
       case None => None
+      case Some(newState) if !newState.unfilledSchedule.isUnfilledSolution => throw new UnsupportedOperationException("Unhandled constraint error")
       case Some(newState) => randomAssigner.fill(newState.unfilledSchedule) match {
-        case None => backtrackAndFill(newState)
+        case None => throw new UnsupportedOperationException("Unhandled unassignment error") // backtrackAndFill(newState) would restart from the same point
         case Some(schedule) => Some(schedule)
       }
     }
@@ -170,7 +171,7 @@ object RandomScheduleGenerator {
     }
 
     lazy val isGoodCandidate: Boolean =
-      candidate.isSound && candidate.isUnfilledSolution && !candidate.on(headSlot).isMinPersonsTooHigh
+      candidate.isSound && candidate.isPartialSolution && !candidate.on(headSlot).isMinPersonsTooHigh
 
   }
 
