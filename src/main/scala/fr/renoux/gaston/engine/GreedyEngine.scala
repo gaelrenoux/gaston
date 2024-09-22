@@ -41,9 +41,9 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
 
     val improvedSchedules =
       for {
-        ((partial, move), index) <- neighbours
+        ((unfilled, move), index) <- neighbours
         _ = log.debug(s"Trying that move: $move")
-        unimproved <- randomAssigner.fill(partial)(rand)
+        unimproved <- randomAssigner.fill(unfilled)(rand)
         improved = assignmentImprover.improve(unimproved)
         if improved.score > state.schedule.score
         _ = if (!improved.isSolution) {

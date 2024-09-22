@@ -22,15 +22,15 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
     import fr.renoux.gaston.MinimalTestModel.Topics._
 
     val randomAssigner = new RandomAssigner
-    val partialSchedule = Schedule.from(
+    val unfilledSchedule = Schedule.from(
       Topics.Unassigned.map { case (slot, topic) => Record(slot, topic) }.toSeq ++
         Morning(Fighting()) ++ Afternoon(Machines()) ++ Evening(Leading()) ++ Night(Party())
     )
-    val filledSchedule = randomAssigner.fill(partialSchedule)
+    val filledSchedule = randomAssigner.fill(unfilledSchedule)
 
     filledSchedule.nonEmpty should be(true)
     println(filledSchedule.get.toFormattedString)
-    filledSchedule.get.isPartialSolution should be(true)
+    filledSchedule.get.isUnfilledSolution should be(true)
     filledSchedule.get.isSolution should be(true)
   }
 
@@ -65,12 +65,12 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
 
     val randomAssigner = new RandomAssigner
 
-    val partialSchedule = SimpleTestModel.Solutions.BestWithUnassignedTopics.clearSlots(Slots.All.flatten: _*)
-    val filledSchedule = randomAssigner.fill(partialSchedule)
+    val unfilledSchedule = SimpleTestModel.Solutions.BestWithUnassignedTopics.clearSlots(Slots.All.flatten: _*)
+    val filledSchedule = randomAssigner.fill(unfilledSchedule)
 
     filledSchedule.nonEmpty should be(true)
     println(filledSchedule.get.toFormattedString)
-    filledSchedule.get.isPartialSolution should be(true)
+    filledSchedule.get.isUnfilledSolution should be(true)
     filledSchedule.get.isSolution should be(true)
   }
 

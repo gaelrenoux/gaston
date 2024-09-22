@@ -76,7 +76,7 @@ final case class Schedule(
     if (records.isEmpty) this else updateSlotSchedule(slot)(_.addAll(records))
   }
 
-  /** Clear all non-mandatory persons on the given slots. Returned schedule is partial, obviously. */
+  /** Clear all non-mandatory persons on the given slots. Returned schedule is unfilled, obviously. */
   def clearSlots(slots: Slot*): Schedule = updateWrapped {
     val updatedSlots = slots.map { s => s -> on(s).cleared }
     wrapped ++ updatedSlots
@@ -87,7 +87,7 @@ final case class Schedule(
   def addTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
-    * schedule is probably unsound and/or partial. */
+    * schedule is probably unsound and/or unfilled. */
   def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = updateWrapped {
     val (slot1, topic1) = st1
     val (slot2, topic2) = st2
@@ -97,7 +97,7 @@ final case class Schedule(
   }
 
   /** Swap two groups of topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
-    * schedule is probably unsound and/or partial. */
+    * schedule is probably unsound and/or unfilled. */
   def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = updateWrapped {
     val (slot1, topics1) = st1
     val (slot2, topics2) = st2
@@ -107,7 +107,7 @@ final case class Schedule(
   }
 
   /** Replace an existing topic by a new one (typically unscheduled, on a slot). Mandatory persons are set on the new
-    * topic and no one else, so the schedule is probably unsound and/or partial. */
+    * topic and no one else, so the schedule is probably unsound and/or unfilled. */
   def replaceTopic(slot: Slot, oldTopic: Topic, newTopic: Topic): Schedule =
     updateSlotSchedule(slot)(_.replaceTopic(oldTopic, newTopic))
 
@@ -156,16 +156,16 @@ final case class Schedule(
   }
 
   /**
-    * Partial Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to partial schedules
+    * Unfilled Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to unfilled schedules
     */
-  lazy val isPartialSolution: Boolean = {
-    lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
+  lazy val isUnfilledSolution: Boolean = {
+    lazy val allSlotsOk = slotSchedules.forall(_.isUnfilledSolution)
     lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
 
     /* TODO: All constraints: they should never be an error, as the navigator should not allow for such a situation.
         Kept temporarily to check if it's happening or not. Should have an option to disable, it might make the algorithm go faster. */
-    lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespected(this) }
+    lazy val constraintsOk = problem.globalLevelConstraints.forall { c => !c.isApplicableToUnfilledSchedule || c.isRespected(this) }
 
     lazy val followupTopicsOk = problem.topicsWithFollowups.isEmpty || {
       slotSchedules.forall { ss =>
@@ -187,9 +187,9 @@ final case class Schedule(
 
   /** @return true if this respects all constraints */
   lazy val isSolution: Boolean = {
-    isPartialSolution &&
+    isUnfilledSolution &&
       slotSchedules.forall(_.isSolution) &&
-      problem.globalLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespected(this) }
+      problem.globalLevelConstraints.forall { c => c.isApplicableToUnfilledSchedule || c.isRespected(this) }
   }
 
   lazy val errors: Seq[String] = if (isSolution) Nil else {

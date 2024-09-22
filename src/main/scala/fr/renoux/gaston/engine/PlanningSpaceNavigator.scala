@@ -10,14 +10,14 @@ import scala.util.Random
 
 
 /** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
-  * partial (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
+  * unfilled (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
   * topics at the same time). */
 @immutable
 final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
   private val log: Logger = Logger[PlanningSpaceNavigator]
 
-  /** Return a LazyList of neighbouring partial schedules to the initial one. */
+  /** Return a LazyList of neighbouring unfilled schedules to the initial one. */
   def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {
 
     lazy val allAdds = possibleAdds(schedule)
@@ -50,15 +50,15 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     followupTopicsToAdd = topicsToAdd.flatMap(_.followup)
     if followupTopicsToAdd.isEmpty || slot.hasNext
 
-    /* Create a new partial schedule with the followup topics added if possible */
-    partialNextSlotModified <-
+    /* Create a new unfilled schedule with the followup topics added if possible */
+    unfilledNextSlotModified <-
       if (followupTopicsToAdd.isEmpty) Some(schedule)
       else swapFollowupTopics(schedule, slot.next.get, followupTopicsToAdd, Set.empty)
 
-    /* Create a new partial schedule with the added topics */
-    partial = partialNextSlotModified.clearSlots(slot).addTopics(slot, topicsToAdd)
+    /* Create a new unfilled schedule with the added topics */
+    unfilled = unfilledNextSlotModified.clearSlots(slot).addTopics(slot, topicsToAdd)
 
-  } yield (partial, Move.Add(slot, topicsToAdd))
+  } yield (unfilled, Move.Add(slot, topicsToAdd))
 
   private def isAddPossible(slotSchedule: SlotSchedule, topicsToAdd: Set[Topic]): Boolean = {
     lazy val slotIsNotFull = slotSchedule.maxTopicsLeft >= topicsToAdd.size
@@ -95,8 +95,8 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     followupTopics2 = topics2.flatMap(_.followup)
     if (followupTopics1.isEmpty || slot2.hasNext) && (followupTopics2.isEmpty || slot1.hasNext)
 
-    /* Create a new partial schedule with the followup topics swapped if possible */
-    partialNextSlotModified <-
+    /* Create a new unfilled schedule with the followup topics swapped if possible */
+    unfilledNextSlotModified <-
       if (followupTopics1.isEmpty && followupTopics2.isEmpty) Some(schedule)
       else {
         swapFollowupTopics(schedule, slot2.next.get, followupTopics1, followupTopics2)
@@ -104,9 +104,9 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
       }
 
     /* Generate the swap */
-    partial = partialNextSlotModified.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
+    unfilled = unfilledNextSlotModified.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
 
-  } yield (partial, Move.Swap(topics1, topics2, isExt = false))
+  } yield (unfilled, Move.Swap(topics1, topics2, isExt = false))
 
   private def isSwapPossible(slotSchedule1: SlotSchedule, slotSchedule2: SlotSchedule, topics1: Set[Topic], topics2: Set[Topic]): Boolean = {
     lazy val slot1IsNotFull = slotSchedule1.maxTopicsLeft >= topics2.size - topics1.size
@@ -157,15 +157,15 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     followupTopicsToAdd = newTopics.flatMap(_.followup)
     if followupTopicsToAdd.isEmpty || slot.hasNext
 
-    /* Create a new partial schedule with the followup topics added/removed if possible */
-    partialNextSlotModified <-
+    /* Create a new unfilled schedule with the followup topics added/removed if possible */
+    unfilledNextSlotModified <-
       if (followupTopicsToRemove.isEmpty && followupTopicsToAdd.isEmpty) Some(schedule)
       else swapFollowupTopics(schedule, slot.next.get, followupTopicsToAdd, followupTopicsToRemove)
 
     /* Generate the swap */
-    partial = partialNextSlotModified.clearSlots(slot).replaceTopics(slot, oldTopics, newTopics)
+    unfilled = unfilledNextSlotModified.clearSlots(slot).replaceTopics(slot, oldTopics, newTopics)
 
-  } yield (partial, Move.Swap(oldTopics, newTopics, isExt = true))
+  } yield (unfilled, Move.Swap(oldTopics, newTopics, isExt = true))
 
   private def isExtSwapPossible(slotSchedule: SlotSchedule, topicsToRemove: Set[Topic], topicsToAdd: Set[Topic]): Boolean = {
     lazy val slotIsNotFull = slotSchedule.maxTopicsLeft >= topicsToAdd.size - topicsToRemove.size
@@ -197,14 +197,14 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     /* Get followup topics on next slot */
     followupTopicsToRemove = topicsToRemove.flatMap(_.followup)
 
-    /* Create a new partial schedule with the followup topics removed if possible */
-    partialNextSlotModified <-
+    /* Create a new unfilled schedule with the followup topics removed if possible */
+    unfilledNextSlotModified <-
       if (followupTopicsToRemove.isEmpty) Some(schedule) else swapFollowupTopics(schedule, slot.next.get, Set.empty, followupTopicsToRemove)
 
     /* Generate the swap */
-    partial = partialNextSlotModified.removeTopics(slot, topicsToRemove)
+    unfilled = unfilledNextSlotModified.removeTopics(slot, topicsToRemove)
 
-  } yield (partial, Move.Remove(slot, topicsToRemove))
+  } yield (unfilled, Move.Remove(slot, topicsToRemove))
 
   private def isRemovalPossible(slotSchedule: SlotSchedule, topicsToRemove: Set[Topic]): Boolean = {
     lazy val maxPersonsPossible = slotSchedule.topics.foldLeft(0)(_ + _.max) - topicsToRemove.foldLeft(0)(_ + _.max)

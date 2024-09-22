@@ -296,7 +296,7 @@ Some vocabulary:
     - Therefore, a planning is a schedule with no one assigned apart from the mandatory persons.
 - Assignment is when we assign persons to an existing planning.
 - Scheduling is doing both.
-- A partial schedule is a schedule where only the planning is done, most persons are not assigned yet.
+- An unfilled schedule is a schedule where only the planning is done, most persons are not assigned yet. Some persons may have been assigned, which is why we don't call it unassigned.
 
 The Engine produces a lazy list of schedules, each new schedule being better than the next one. The list ends when no
 further improvement can be found, which never happens on real-world examples. It starts with a seed for all random

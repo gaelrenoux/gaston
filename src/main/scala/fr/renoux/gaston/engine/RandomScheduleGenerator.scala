@@ -47,7 +47,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
     (implicit random: Random): Option[Schedule] = {
     backtrackAssignTopicsToSlots(state).toOption match {
       case None => None
-      case Some(newState) => randomAssigner.fill(newState.partialSchedule) match {
+      case Some(newState) => randomAssigner.fill(newState.unfilledSchedule) match {
         case None => backtrackAndFill(newState)
         case Some(schedule) => Some(schedule)
       }
@@ -55,9 +55,9 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
   }
 
   /**
-    * Uses backtracking to construct a partial schedule with all topics assigned to slots, and mandatory people assigned
-    * to their topics. Returns the current backtracking state (including the schedule), so that we may start again if
-    * needed.
+    * Uses backtracking to construct an unfilled schedule with all topics assigned to slots, and mandatory people
+    * assigned to their topics. Returns the current backtracking state (including the schedule), so that we may start
+    * again if needed.
     * @return The state of the backtracking, with a schedule that fits.
     */
   // scalastyle:off method.length
@@ -118,14 +118,14 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
 object RandomScheduleGenerator {
 
   /** Backtracking state
-    * @param partialSchedule Partial schedule we are starting from
+    * @param unfilledSchedule Unfilled schedule we are starting from
     * @param slotsLeft All slots on which we can still add some stuff, ordered by priority (we do a round-robin). Head is the current slot.
     * @param topicsLeft Topics we can try for the current slot.
     * @param topicsPassed Topics that won't work for the current slot, but may work for ulterior slots.
     */
-  private final case class State(partialSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
+  private final case class State(unfilledSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
 
-    private implicit val problem: Problem = partialSchedule.problem
+    private implicit val problem: Problem = unfilledSchedule.problem
 
     lazy val isSlotsEmpty: Boolean = slotsLeft.isEmpty
 
@@ -139,15 +139,15 @@ object RandomScheduleGenerator {
 
     lazy val headSlot: Slot = slotsLeft.head
 
-    lazy val headSlotSchedule: SlotSchedule = partialSchedule.on(headSlot)
+    lazy val headSlotSchedule: SlotSchedule = unfilledSchedule.on(headSlot)
 
     lazy val headTopic: Topic = topicsLeft.head
 
     lazy val nextRecord: Record = Record(headSlot, headTopic, headTopic.mandatory)
 
-    lazy val withHeadSlotSatisfied: State = State(partialSchedule, slotsLeft.tail, topicsLeft ::: topicsPassed)
+    lazy val withHeadSlotSatisfied: State = State(unfilledSchedule, slotsLeft.tail, topicsLeft ::: topicsPassed)
 
-    lazy val withPassedHeadTopic: State = State(partialSchedule, slotsLeft, topicsLeft.tail, headTopic :: topicsPassed)
+    lazy val withPassedHeadTopic: State = State(unfilledSchedule, slotsLeft, topicsLeft.tail, headTopic :: topicsPassed)
 
     private lazy val topicsSimultaneousWithHeadTopic = problem.simultaneousTopicByTopic(headTopic)
 
@@ -155,7 +155,7 @@ object RandomScheduleGenerator {
       val record = Record(headSlot, headTopic, headTopic.mandatory)
 
       val additionalRecords = topicsSimultaneousWithHeadTopic.map(t => Record(headSlot, t, t.mandatory))
-      partialSchedule.add(record).addAll(headSlot, additionalRecords)
+      unfilledSchedule.add(record).addAll(headSlot, additionalRecords)
     }
 
     lazy val withCandidateAcknowledged: State = {
@@ -170,7 +170,7 @@ object RandomScheduleGenerator {
     }
 
     lazy val isGoodCandidate: Boolean =
-      candidate.isSound && candidate.isPartialSolution && !candidate.on(headSlot).isMinPersonsTooHigh
+      candidate.isSound && candidate.isUnfilledSolution && !candidate.on(headSlot).isMinPersonsTooHigh
 
   }
 

@@ -63,10 +63,10 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   }
 
   /**
-    * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to partial schedules
+    * Unfilled Schedules are schedule where topics are matched, but not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to unfilled schedules
     */
-  lazy val isPartialSolution: Boolean = {
+  lazy val isUnfilledSolution: Boolean = {
     topic.max >= countPersons && // topic.min <= pCount &&
       !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&
       topic.slots.forall(_.contains(slot)) &&
@@ -75,7 +75,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 
   /** @return true if this respects all constraints */
   lazy val isSolution: Boolean =
-    isPartialSolution && topic.min <= countPersons
+    isUnfilledSolution && topic.min <= countPersons
 
   lazy val errors: Seq[String] = if (isSolution) Nil else {
     val maxError = if (topic.max < countPersons) Some(s"Too many persons in ${slot.name}/${topic.name}") else None

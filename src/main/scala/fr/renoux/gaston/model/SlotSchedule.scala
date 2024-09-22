@@ -69,7 +69,7 @@ final case class SlotSchedule(
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
 
-  /** Clear all non-mandatory persons. Returned schedule is partial, obviously. */
+  /** Clear all non-mandatory persons. Returned schedule is unfilled, obviously. */
   lazy val cleared: SlotSchedule = updateWrapped(wrapped.mapValuesStrict(_.cleared))
 
   /** Get the records for a specific Topic */
@@ -94,7 +94,7 @@ final case class SlotSchedule(
   def removeTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped -- topics)
 
   /** Replace an existing topic by a new one (typically unscheduled). Mandatory persons are set on the new topic and no
-    * one else, so the schedule is probably unsound and/or partial. */
+    * one else, so the schedule is probably unsound and/or unfilled. */
   def replaceTopic(oldTopic: Topic, newTopic: Topic): SlotSchedule = updateWrapped {
     wrapped - oldTopic + (newTopic -> Record(slot, newTopic, newTopic.mandatory))
   }
@@ -169,21 +169,21 @@ final case class SlotSchedule(
   }
 
   /**
-    * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to partial schedules
+    * Unfilled Schedules are schedule where topics are matched, but not all persons are assigned yet.
+    * @return true if this respects all constraints applicable to unfilled schedules
     */
-  lazy val isPartialSolution: Boolean = {
-    lazy val recordsOk = records.forall(_.isPartialSolution)
+  lazy val isUnfilledSolution: Boolean = {
+    lazy val recordsOk = records.forall(_.isUnfilledSolution)
     lazy val maxTopicsOk = slot.maxTopics >= topics.size
-    lazy val constraintsOk = problem.slotLevelConstraints.forall { c => !c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
+    lazy val constraintsOk = problem.slotLevelConstraints.forall { c => !c.isApplicableToUnfilledSchedule || c.isRespectedSlot(this) }
     recordsOk && maxTopicsOk && constraintsOk
   }
 
   /** @return true if this respects all constraints */
   lazy val isSolution: Boolean = {
-    isPartialSolution &&
+    isUnfilledSolution &&
       records.forall(_.isSolution) &&
-      problem.slotLevelConstraints.forall { c => c.isApplicableToPartialSchedule || c.isRespectedSlot(this) }
+      problem.slotLevelConstraints.forall { c => c.isApplicableToUnfilledSchedule || c.isRespectedSlot(this) }
   }
 
   lazy val errors: Seq[String] = if (isSolution) Nil else {
