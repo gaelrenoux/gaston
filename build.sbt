@@ -7,7 +7,7 @@ version := "0.10.0"
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
 
-scalaVersion := "2.13.10"
+scalaVersion := "2.13.14"
 
 lazy val gaston = (project in file("."))
   .configs(SlowTest)
@@ -71,32 +71,31 @@ scalacOptions ++= Seq(
   "-Xlint:deprecation" // Enable linted deprecations.
 )
 
-val catsVersion = "2.6.1"
-val refinedVersion = "0.9.26"
+val catsVersion = "2.12.0"
+val refinedVersion = "0.11.2"
 
 libraryDependencies ++= Seq(
 
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4",
-  "ch.qos.logback" % "logback-classic" % "1.2.3",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+  "ch.qos.logback" % "logback-classic" % "1.5.8",
 
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
-  "org.typelevel" %% "mouse" % "1.0.3",
+  "org.typelevel" %% "mouse" % "1.3.2",
 
-  "com.typesafe" % "config" % "1.4.1",
-  "com.github.pureconfig" %% "pureconfig" % "0.16.0",
-  "com.github.scopt" %% "scopt" % "4.0.1",
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.3",
+  "com.typesafe" % "config" % "1.4.3",
+  "com.github.pureconfig" %% "pureconfig" % "0.17.7",
+  "com.github.scopt" %% "scopt" % "4.1.0",
 
   "eu.timepit" %% "refined" % refinedVersion,
   "eu.timepit" %% "refined-pureconfig" % refinedVersion,
   "eu.timepit" %% "refined-scopt" % refinedVersion,
 
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.8",
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.9",
 
   /* Tests */
-  "com.softwaremill.diffx" %% "diffx-core" % "0.5.0" % Test,
-  "org.scalatest" %% "scalatest" % "3.2.16" % Test,
+  "com.softwaremill.diffx" %% "diffx-core" % "0.9.0" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.19" % Test,
   "com.google.guava" % "guava" % "33.2.1-jre" % Test
 )
 
