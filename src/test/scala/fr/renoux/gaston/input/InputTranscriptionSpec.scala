@@ -51,7 +51,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
       problem.preferencesByPerson(p"Caroline").collect {
         case PersonTopicPreference(_, t, s) => (t, s)
-      } should be(topics.map(_ -> Score.PersonTotalScore))
+      } should be(topics.map(_ -> Constants.PersonTotalScore))
     }
 
     they should "be exclusive except for mandatory people" in {

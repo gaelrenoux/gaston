@@ -46,7 +46,7 @@ object Main {
     * and it triggers an exception and a crash. */
   private def run(commandLine: CommandLine): Either[InputErrors, Unit] = for {
     input <- loadInput(commandLine)
-    problem <- transcribe(input)
+    problem <- InputTranscription.transcribe(input)
   } yield {
     implicit val output: Output = Output(commandLine.silent)(problem)
     if (commandLine.generateInput) {

@@ -78,7 +78,7 @@ final case class InputTableSettings(
     minPersonsCol: Option[NonNegInt] = None,
     maxPersonsCol: NonNegInt = 3,
     personsCountAdd: NonNegInt = 0,
-    mandatoryPersonWeight: PosWeight = DefaultWeightRefined,
+    mandatoryPersonWeight: PosWeight = Constants.DefaultWeightRefined,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
 )
@@ -145,7 +145,7 @@ object InputTopic {
 
 final case class InputPerson(
     name: NonEmptyString,
-    weight: PosWeight = DefaultWeightRefined,
+    weight: PosWeight = Constants.DefaultWeightRefined,
     baseScore: Score = Score.Zero,
     absences: Set[NonEmptyString] = Set.empty,
     mandatory: Set[NonEmptyString] = Set.empty,

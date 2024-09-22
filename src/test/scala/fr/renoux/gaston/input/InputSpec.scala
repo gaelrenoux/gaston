@@ -70,7 +70,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
 
   it should "contain the correct preferences" in {
     import expected.implicits._
-    val scalingFactor: Double = Score.PersonTotalScore.value / 7
+    val scalingFactor: Double = Constants.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
       t <- Set(expected.topics.unassignedA, expected.topics.unassignedB, expected.topics.unassignedC)
       p <- Set(expected.persons.bernard, expected.persons.hoagie, expected.persons.laverne)
