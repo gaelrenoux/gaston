@@ -6,7 +6,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 // scalastyle:off magic.number
-class PersonsTopicPreferenceSpec extends AnyFlatSpec with Matchers {
+class PersonTopicPreferenceSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._
   import fr.renoux.gaston.MinimalTestModel.Problems._

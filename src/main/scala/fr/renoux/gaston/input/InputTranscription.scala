@@ -202,19 +202,39 @@ private[input] final class InputTranscription(rawInput: InputModel) {
           PersonGroupAntiPreference(person, group.toBitSet, settings.incompatibilityAntiPreference)
       }
 
-    /** Person wishes are scaled so that everyone has the same maximum score. This avoids the problem where someone puts
-      * few preferences or with low value only, where he would always stay "unhappy" and therefore privileged when
-      * improving the schedule. Right now, we do not handle negative preferences well. */
+    /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
+      * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
+      * high values that everyone else's preference don't matter any more.
+      *
+      * We do not handle negative preferences here (they're excluded from the total). */
+    // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes.
+    lazy val personScoreFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
+      val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
+      val totalPersonWishesScore = inPerson.personWishes.filter(_._2.value > 0).values.sum.value
+      val totalWishScore = totalTopicWishesScore + totalPersonWishesScore
+      val scoreFactor = Score.PersonTotalScore.value / totalWishScore
+      inPerson.name -> scoreFactor
+    }.toMap
+
     lazy val personTopicPreferences: Set[PersonTopicPreference] =
       for {
         inPerson <- input.personsSet
         person = personsByName(inPerson.name)
-        totalInputScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value // TODO Right now, negative prefs are ignored in the total count
-        scoreFactor = Score.PersonTotalScore.value / totalInputScore
+        scoreFactor = personScoreFactors(inPerson.name)
         inWish <- inPerson.wishes
         wishedTopicName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
         topic <- topicsByName(wishedTopicName)
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
+
+    lazy val personPersonPreferences: Set[PersonPersonPreference] =
+      for {
+        inPerson <- input.personsSet
+        person = personsByName(inPerson.name)
+        scoreFactor = personScoreFactors(inPerson.name)
+        inWish <- inPerson.personWishes
+        wishedPersonName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
+        wishedPerson = personsByName(wishedPersonName)
+      } yield PersonPersonPreference(person, wishedPerson, inWish._2 * scoreFactor)
 
     def getUnassignedAntiPreference(inPerson: InputPerson): Score = settings.unassigned.personAntiPreferenceScaling match {
       case None => settings.unassigned.personAntiPreference
@@ -248,6 +268,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         linkedParts ++
         groupDislikes ++
         personTopicPreferences ++
+        personPersonPreferences ++
         unassignedTopicPreferences ++
         unassignedTopicsExclusivePreferences
     }

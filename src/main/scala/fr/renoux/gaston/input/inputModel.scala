@@ -151,7 +151,8 @@ final case class InputPerson(
     mandatory: Set[NonEmptyString] = Set.empty,
     forbidden: Set[NonEmptyString] = Set.empty,
     incompatible: Set[NonEmptyString] = Set.empty,
-    wishes: Map[String, Score] = Map.empty // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
+    wishes: Map[String, Score] = Map.empty, // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
+    personWishes: Map[String, Score] = Map.empty
 )
 
 final case class InputGlobalConstraints(

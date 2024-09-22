@@ -3,7 +3,7 @@ package fr.renoux.gaston.input
 import com.softwaremill.quicklens._
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.input.InputRefinements.NonPosScore
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive}
+import fr.renoux.gaston.model.preferences.{PersonPersonPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -158,4 +158,96 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
   }
 
+
+
+  behavior of "Wishes"
+
+  {
+    it should "load topic wishes" in {
+      val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+      val inputTopics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma"))
+      val inputPersons = List(InputPerson("Arnold", wishes = Map("alpha" -> Score(50), "gamma" -> Score(100))))
+      val inputModel = InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = inputPersons
+      )
+      implicit val problem: Problem = from(inputModel)
+      val arnold = problem.personsList.find(_.name == "Arnold").get
+      val alpha = problem.topicsList.find(_.name == "alpha").get
+      val gamma = problem.topicsList.find(_.name == "gamma").get
+      val wishes = problem.personalPreferencesListByPerson(arnold)
+      wishes.size should be(2)
+      val wishAlpha = wishes.collectFirst { case ptp: PersonTopicPreference if ptp.topic.name == "alpha" => ptp }
+      wishAlpha.nonEmpty should be(true)
+      wishAlpha.get.person should be(arnold)
+      wishAlpha.get.topic should be(alpha)
+      wishAlpha.get.reward.value should be(333.3 +- 0.1)
+      val wishGamma = wishes.collectFirst { case ptp: PersonTopicPreference if ptp.topic.name == "gamma" => ptp }
+      wishGamma.nonEmpty should be(true)
+      wishGamma.get.person should be(arnold)
+      wishGamma.get.topic should be(gamma)
+      wishGamma.get.reward.value should be(666.6 +- 0.1)
+    }
+
+    it should "load person wishes" in {
+      val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+      val inputTopics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma"))
+      val inputPersons = List(
+        InputPerson("Arnold", personWishes = Map("Bianca" -> Score(50), "Charlie" -> Score(100))),
+        InputPerson("Bianca"), InputPerson("Charlie")
+      )
+      val inputModel = InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = inputPersons
+      )
+      implicit val problem: Problem = from(inputModel)
+      val arnold = problem.personsList.find(_.name == "Arnold").get
+      val bianca = problem.personsList.find(_.name == "Bianca").get
+      val charlie = problem.personsList.find(_.name == "Charlie").get
+      val wishes = problem.personalPreferencesListByPerson(arnold)
+      wishes.size should be(2)
+      val wishBianca = wishes.collectFirst { case ppp: PersonPersonPreference if ppp.targetPerson.name == "Bianca" => ppp }
+      wishBianca.nonEmpty should be(true)
+      wishBianca.get.person should be(arnold)
+      wishBianca.get.targetPerson should be(bianca)
+      wishBianca.get.reward.value should be(333.3 +- 0.1)
+      val wishCharlie = wishes.collectFirst { case ppp: PersonPersonPreference if ppp.targetPerson.name == "Charlie" => ppp }
+      wishCharlie.nonEmpty should be(true)
+      wishCharlie.get.person should be(arnold)
+      wishCharlie.get.targetPerson should be(charlie)
+      wishCharlie.get.reward.value should be(666.6 +- 0.1)
+    }
+
+    it should "take topic and person wishes together" in {
+      val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+      val inputTopics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma"))
+      val inputPersons = List(
+        InputPerson("Arnold", wishes = Map("alpha" -> Score(50)), personWishes = Map("Charlie" -> Score(100))),
+        InputPerson("Bianca"), InputPerson("Charlie")
+      )
+      val inputModel = InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = inputPersons
+      )
+      implicit val problem: Problem = from(inputModel)
+      val arnold = problem.personsList.find(_.name == "Arnold").get
+      val alpha = problem.topicsList.find(_.name == "alpha").get
+      val charlie = problem.personsList.find(_.name == "Charlie").get
+      val wishes = problem.personalPreferencesListByPerson(arnold)
+      wishes.size should be(2)
+      val wishAlpha = wishes.collectFirst { case ptp: PersonTopicPreference if ptp.topic.name == "alpha" => ptp }
+      wishAlpha.nonEmpty should be(true)
+      wishAlpha.get.person should be(arnold)
+      wishAlpha.get.topic should be(alpha)
+      wishAlpha.get.reward.value should be(333.3 +- 0.1)
+      val wishCharlie = wishes.collectFirst { case ppp: PersonPersonPreference if ppp.targetPerson.name == "Charlie" => ppp }
+      wishCharlie.nonEmpty should be(true)
+      wishCharlie.get.person should be(arnold)
+      wishCharlie.get.targetPerson should be(charlie)
+      wishCharlie.get.reward.value should be(666.6 +- 0.1)
+    }
+  }
 }
