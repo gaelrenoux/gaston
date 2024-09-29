@@ -99,7 +99,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 
-mainClass in assembly := Some("fr.renoux.gaston.command.Main")
+assembly / mainClass := Some("fr.renoux.gaston.command.Main")
 
 Test / fork := true
 Test / testOptions += Tests.Argument("-oD") // show test duration
