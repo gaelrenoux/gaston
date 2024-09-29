@@ -7,7 +7,7 @@ version := "1.0.0"
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
 
-scalaVersion := "2.13.15"
+scalaVersion := "3.3.3"
 
 lazy val gaston = (project in file("."))
   .configs(SlowTest)
@@ -66,7 +66,7 @@ lazy val scala3Options = Seq(
   "-Wunused:implicits", // Warn if an implicit parameter is unused.
   "-Wunused:imports", // Warn when imports are unused.
   "-Wunused:locals", // Warn if a local definition is unused.
-  "-Wunused:patvars", // Warn if a variable bound in a pattern is unused.
+  // "-Wunused:patvars", // Warn if a variable bound in a pattern is unused.
   "-Wunused:privates", // Warn if a private member is unused.
   "-Wvalue-discard", // Warn when non-Unit expression results are unused.
 
@@ -100,9 +100,12 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 
-libraryDependencies += {
-  if (scalaVersion.value.startsWith("3.")) "com.github.pureconfig" %% "pureconfig-core" % "0.17.7"
-  else "com.github.pureconfig" %% "pureconfig" % "0.17.7"
+libraryDependencies ++= {
+  if (scalaVersion.value.startsWith("3.")) Seq(
+    "com.github.pureconfig" %% "pureconfig-core" % "0.17.7",
+    "org.typelevel" %% "shapeless3-deriving" % "3.4.3"
+  )
+  else Seq("com.github.pureconfig" %% "pureconfig" % "0.17.7")
 }
 
 assembly / mainClass := Some("fr.renoux.gaston.command.Main")
