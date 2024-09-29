@@ -12,6 +12,8 @@ import fr.renoux.gaston.util.{NumberUtils, Opt}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
+// TODO Drop all unsafeFrom calls once https://github.com/fthomas/refined/issues/932 is solved
+
 /* All line and column indices are zero-based */
 
 /* These classes defined the model as it is represented in the canonical input (.conf files). It is made to be as
@@ -36,7 +38,7 @@ final case class InputModel(
 }
 
 final case class InputSettings(
-    incompatibilityAntiPreference: NonPosScore = NonPosScore(-1000.0),
+    incompatibilityAntiPreference: NonPosScore = NonPosScore.unsafeFrom(-1000.0),
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
     defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
     defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
@@ -49,9 +51,9 @@ object InputSettings {
   /** Settings for unassigned topics. */
   final case class Unassigned(
       allowed: Boolean = false, // all other values in this class are unused when this is false
-      minPersons: NonNegInt = 0, // O allow to not remove the topic, which let us skip a step when optimizing
+      minPersons: NonNegInt = NonNegInt.unsafeFrom(0), // O allow to not remove the topic, which let us skip a step when optimizing
       maxPersons: PosInt = NumberUtils.IntLowMaxValue,
-      personAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
+      personAntiPreference: NonPosScore = NonPosScore.unsafeFrom(-1000.0), // default is the negative of Score.PersonTotalScore
       personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
       personMultipleAntiPreference: Option[NonPosScore] = None
   )
@@ -61,22 +63,22 @@ object InputSettings {
     * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal value.
     */
   final case class UnassignedAntiPreferenceScaling(
-      maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
+      maximumAntiPreference: NonPosScore = NonPosScore.unsafeFrom(-1.0),
       forbiddenRatioForMaximum: Double = 0.75,
   )
 }
 
 final case class InputTableSettings(
-    separator: NonEmptyString = "\t",
-    personsRow: NonNegInt = 0,
-    wishesStartRow: NonNegInt = 1,
-    personsStartCol: NonNegInt = 4,
-    topicCol: NonNegInt = 0,
+    separator: NonEmptyString = NonEmptyString.unsafeFrom("\t"),
+    personsRow: NonNegInt = NonNegInt.unsafeFrom(0),
+    wishesStartRow: NonNegInt = NonNegInt.unsafeFrom(1),
+    personsStartCol: NonNegInt = NonNegInt.unsafeFrom(4),
+    topicCol: NonNegInt = NonNegInt.unsafeFrom(0),
     topicOccurrencesCol: Option[NonNegInt] = None,
-    mandatoryPersonCol: NonNegInt = 1,
+    mandatoryPersonCol: NonNegInt = NonNegInt.unsafeFrom(1),
     minPersonsCol: Option[NonNegInt] = None,
-    maxPersonsCol: NonNegInt = 3,
-    personsCountAdd: NonNegInt = 0,
+    maxPersonsCol: NonNegInt = NonNegInt.unsafeFrom(3),
+    personsCountAdd: NonNegInt = NonNegInt.unsafeFrom(0),
     mandatoryPersonWeight: PosWeight = Constants.DefaultWeightRefined,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
@@ -99,10 +101,10 @@ final case class InputTopic(
 ) {
 
   /** Occurrence needs to be an Option to not appear when not needed */
-  lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1: PosInt)
+  lazy val forcedOccurrences: PosInt = occurrences.getOrElse(PosInt.unsafeFrom(1))
 
   /** Duration needs to be an Option to not appear when not needed */
-  lazy val forcedDuration: PosInt = duration.getOrElse(1: PosInt)
+  lazy val forcedDuration: PosInt = duration.getOrElse(PosInt.unsafeFrom(1))
 
   lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
     if (forcedOccurrences.value == 1) Seq(InputTopic.Occurrence(this))
@@ -185,6 +187,8 @@ object InputRefinements {
 
   object NonPosScore {
     def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).getOrElse(throw new IllegalArgumentException(s.toString))
+
+    def unsafeFrom(d: Double): NonPosScore = refineV[ScoreNonPositive](Score(d)).getOrElse(throw new IllegalArgumentException(d.toString))
   }
 
   final class WeightPositive
