@@ -13,28 +13,28 @@ import java.util.concurrent.atomic.AtomicInteger
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
 
-  val strongPreference = Score(5)
-  val weakPreference = Score(1)
+  val strongPreference: Score = Score(5)
+  val weakPreference: Score = Score(1)
 
   object Persons {
     private val index = new AtomicInteger(0)
-    val Arthur = Person(index.getAndIncrement(), "Arthur")
-    val Bianca = Person(index.getAndIncrement(), "Bianca")
-    val Corwin = Person(index.getAndIncrement(), "Corwin")
-    val Daniela = Person(index.getAndIncrement(), "Daniela")
-    val Eric = Person(index.getAndIncrement(), "Eric")
-    val Fiona = Person(index.getAndIncrement(), "Fiona")
-    val Garion = Person(index.getAndIncrement(), "Garion")
-    val Hercule = Person(index.getAndIncrement(), "Hercule")
-    val Iago = Person(index.getAndIncrement(), "Iago")
+    val Arthur: Person = Person(index.getAndIncrement(), "Arthur")
+    val Bianca: Person = Person(index.getAndIncrement(), "Bianca")
+    val Corwin: Person = Person(index.getAndIncrement(), "Corwin")
+    val Daniela: Person = Person(index.getAndIncrement(), "Daniela")
+    val Eric: Person = Person(index.getAndIncrement(), "Eric")
+    val Fiona: Person = Person(index.getAndIncrement(), "Fiona")
+    val Garion: Person = Person(index.getAndIncrement(), "Garion")
+    val Hercule: Person = Person(index.getAndIncrement(), "Hercule")
+    val Iago: Person = Person(index.getAndIncrement(), "Iago")
     val All: Set[Person] = Set(Arthur, Bianca, Corwin, Daniela, Eric, Fiona, Garion, Hercule, Iago)
   }
 
   object Slots {
     private val index = new AtomicInteger(0)
-    lazy val Morning = Slot(index.getAndIncrement(), "morning", Persons.All - Persons.Eric, Some(AfterNoon))
-    lazy val AfterNoon = Slot(index.getAndIncrement(), "afternoon", Persons.All - Persons.Iago, Some(Evening))
-    lazy val Evening = Slot(index.getAndIncrement(), "evening", Persons.All - Persons.Arthur, None)
+    lazy val Morning: Slot = Slot(index.getAndIncrement(), "morning", Persons.All - Persons.Eric, Some(AfterNoon))
+    lazy val AfterNoon: Slot = Slot(index.getAndIncrement(), "afternoon", Persons.All - Persons.Iago, Some(Evening))
+    lazy val Evening: Slot = Slot(index.getAndIncrement(), "evening", Persons.All - Persons.Arthur, None)
 
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, AfterNoon, Evening))
     val Count = All.flatten.size
@@ -50,17 +50,17 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val UnassignedAfternoon: Topic = Topic.unassigned(index.getAndIncrement(), SimpleTestModel.Slots.AfterNoon)
     val UnassignedEvening: Topic = Topic.unassigned(index.getAndIncrement(), Slots.Evening)
 
-    val Acting = Topic(index.getAndIncrement(), "Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
-    val Bathing = Topic(index.getAndIncrement(), "Bathing", mandatory = Set(Bianca), forbidden = Set(Corwin), min = 2, max = 5)
-    val Cooking = Topic(index.getAndIncrement(), "Cooking", mandatory = Set(Corwin), forbidden = Set(Daniela), min = 2, max = 5)
-    val Dancing = Topic(index.getAndIncrement(), "Dancing", mandatory = Set(Daniela), forbidden = Set(Eric), min = 2, max = 5)
-    val Eating = Topic(index.getAndIncrement(), "Eating", mandatory = Set(Eric), forbidden = Set(Fiona), min = 2, max = 5)
-    val Fighting = Topic(index.getAndIncrement(), "Fighting", mandatory = Set(Fiona), forbidden = Set(Garion), min = 2, max = 5)
-    val Grinding = Topic(index.getAndIncrement(), "Grinding", mandatory = Set(Garion), forbidden = Set(Hercule), min = 2, max = 5)
-    val Helping = Topic(index.getAndIncrement(), "Helping", mandatory = Set(Hercule), forbidden = Set(Iago), min = 2, max = 5)
-    val Inking = Topic(index.getAndIncrement(), "Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
+    val Acting: Topic = Topic(index.getAndIncrement(), "Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
+    val Bathing: Topic = Topic(index.getAndIncrement(), "Bathing", mandatory = Set(Bianca), forbidden = Set(Corwin), min = 2, max = 5)
+    val Cooking: Topic = Topic(index.getAndIncrement(), "Cooking", mandatory = Set(Corwin), forbidden = Set(Daniela), min = 2, max = 5)
+    val Dancing: Topic = Topic(index.getAndIncrement(), "Dancing", mandatory = Set(Daniela), forbidden = Set(Eric), min = 2, max = 5)
+    val Eating: Topic = Topic(index.getAndIncrement(), "Eating", mandatory = Set(Eric), forbidden = Set(Fiona), min = 2, max = 5)
+    val Fighting: Topic = Topic(index.getAndIncrement(), "Fighting", mandatory = Set(Fiona), forbidden = Set(Garion), min = 2, max = 5)
+    val Grinding: Topic = Topic(index.getAndIncrement(), "Grinding", mandatory = Set(Garion), forbidden = Set(Hercule), min = 2, max = 5)
+    val Helping: Topic = Topic(index.getAndIncrement(), "Helping", mandatory = Set(Hercule), forbidden = Set(Iago), min = 2, max = 5)
+    val Inking: Topic = Topic(index.getAndIncrement(), "Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
 
-    val Unassigned = Map(
+    val Unassigned: Map[Slot,Topic] = Map(
       SimpleTestModel.Slots.Morning -> UnassignedMorning,
       SimpleTestModel.Slots.AfterNoon -> UnassignedAfternoon,
       SimpleTestModel.Slots.Evening -> UnassignedEvening
@@ -77,7 +77,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import Topics._
 
-    val BathingAndEatingAreSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
+    val BathingAndEatingAreSimultaneous: TopicsSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
 
     val All: Set[Constraint] = Set(
       BathingAndEatingAreSimultaneous
@@ -90,27 +90,27 @@ class SimpleTestModel(implicit settings: InputSettings) {
     import ProblemCounts.CompleteCounts
     import Topics._
 
-    val AB = PersonTopicPreference(Arthur, Bathing, strongPreference)
-    val BC = PersonTopicPreference(Bianca, Cooking, strongPreference)
-    val CD = PersonTopicPreference(Corwin, Dancing, strongPreference)
-    val DE = PersonTopicPreference(Daniela, Eating, strongPreference)
-    val EF = PersonTopicPreference(Eric, Fighting, strongPreference)
-    val FG = PersonTopicPreference(Fiona, Grinding, strongPreference)
-    val GH = PersonTopicPreference(Garion, Helping, strongPreference)
-    val HI = PersonTopicPreference(Hercule, Inking, strongPreference)
-    val IA = PersonTopicPreference(Iago, Acting, strongPreference)
+    val AB: PersonTopicPreference = PersonTopicPreference(Arthur, Bathing, strongPreference)
+    val BC: PersonTopicPreference = PersonTopicPreference(Bianca, Cooking, strongPreference)
+    val CD: PersonTopicPreference = PersonTopicPreference(Corwin, Dancing, strongPreference)
+    val DE: PersonTopicPreference = PersonTopicPreference(Daniela, Eating, strongPreference)
+    val EF: PersonTopicPreference = PersonTopicPreference(Eric, Fighting, strongPreference)
+    val FG: PersonTopicPreference = PersonTopicPreference(Fiona, Grinding, strongPreference)
+    val GH: PersonTopicPreference = PersonTopicPreference(Garion, Helping, strongPreference)
+    val HI: PersonTopicPreference = PersonTopicPreference(Hercule, Inking, strongPreference)
+    val IA: PersonTopicPreference = PersonTopicPreference(Iago, Acting, strongPreference)
 
-    val AC = PersonTopicPreference(Arthur, Cooking, weakPreference)
-    val BD = PersonTopicPreference(Bianca, Dancing, weakPreference)
-    val CE = PersonTopicPreference(Corwin, Eating, weakPreference)
-    val DF = PersonTopicPreference(Daniela, Fighting, weakPreference)
-    val EG = PersonTopicPreference(Eric, Grinding, weakPreference)
-    val FH = PersonTopicPreference(Fiona, Helping, weakPreference)
-    val GI = PersonTopicPreference(Garion, Inking, weakPreference)
-    val HA = PersonTopicPreference(Hercule, Acting, weakPreference)
-    val IB = PersonTopicPreference(Iago, Bathing, weakPreference)
+    val AC: PersonTopicPreference = PersonTopicPreference(Arthur, Cooking, weakPreference)
+    val BD: PersonTopicPreference = PersonTopicPreference(Bianca, Dancing, weakPreference)
+    val CE: PersonTopicPreference = PersonTopicPreference(Corwin, Eating, weakPreference)
+    val DF: PersonTopicPreference = PersonTopicPreference(Daniela, Fighting, weakPreference)
+    val EG: PersonTopicPreference = PersonTopicPreference(Eric, Grinding, weakPreference)
+    val FH: PersonTopicPreference = PersonTopicPreference(Fiona, Helping, weakPreference)
+    val GI: PersonTopicPreference = PersonTopicPreference(Garion, Inking, weakPreference)
+    val HA: PersonTopicPreference = PersonTopicPreference(Hercule, Acting, weakPreference)
+    val IB: PersonTopicPreference = PersonTopicPreference(Iago, Bathing, weakPreference)
 
-    val ArthurHatesFionaAndDaniela = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference.value)
+    val ArthurHatesFionaAndDaniela: PersonGroupAntiPreference = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference.value)
 
     val All: Set[Preference] = Set(
       AB, BC, CD, DE, EF, FG, GH, HI, IA,

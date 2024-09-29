@@ -13,7 +13,7 @@ import scala.io.Source
 
 class TableReaderSpec extends AnyFlatSpec with Matchers {
 
-  val tableSettings = InputTableSettings(
+  val tableSettings: InputTableSettings = InputTableSettings(
     separator = "\t",
     personsRow = 0,
     wishesStartRow = 1,
@@ -29,13 +29,13 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     preferencesScoreMapping = Some(Map("1" -> Score(1), "2" -> Score(5)))
   )
 
-  val settings = InputSettings(
+  val settings: InputSettings = InputSettings(
     incompatibilityAntiPreference = NonPosScore(-1000.0),
     defaultMinPersonsPerTopic = 4,
     defaultMaxPersonsPerTopic = 6
   )
 
-  val input = InputModel(
+  val input: InputModel = InputModel(
     settings = settings,
     tableSettings = tableSettings,
     slots = List(

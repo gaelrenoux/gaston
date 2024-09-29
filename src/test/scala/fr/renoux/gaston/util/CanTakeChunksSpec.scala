@@ -8,11 +8,11 @@ import org.scalatest.matchers.should.Matchers
   * Created by gael on 07/05/17.
   */
 class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
-  val log = Logger[CanTakeChunksSpec]
+  val log: Logger = Logger[CanTakeChunksSpec]
 
   import CanTakeChunks._
 
-  val testList = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
+  val testList: List[String] = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
 
   behavior of "SeqOps.take"
   it should "return a list with as much elements as the argument list" in {

@@ -11,12 +11,12 @@ object MinimalTestModel {
 
   object Persons {
     private val index = new AtomicInteger(0)
-    val Leonardo = Person(index.getAndIncrement(), "Leonardo")
-    val Raphael = Person(index.getAndIncrement(), "Raphael")
-    val Donatello = Person(index.getAndIncrement(), "Donatello")
-    val Michelangelo = Person(index.getAndIncrement(), "Michelangelo")
-    val Bebop = Person(index.getAndIncrement(), "Bebop")
-    val Rocksteady = Person(index.getAndIncrement(), "Rocksteady")
+    val Leonardo: Person = Person(index.getAndIncrement(), "Leonardo")
+    val Raphael: Person = Person(index.getAndIncrement(), "Raphael")
+    val Donatello: Person = Person(index.getAndIncrement(), "Donatello")
+    val Michelangelo: Person = Person(index.getAndIncrement(), "Michelangelo")
+    val Bebop: Person = Person(index.getAndIncrement(), "Bebop")
+    val Rocksteady: Person = Person(index.getAndIncrement(), "Rocksteady")
 
     val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
     val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
@@ -26,10 +26,10 @@ object MinimalTestModel {
 
   object Topics {
     private val index = new AtomicInteger(0)
-    val Leading = Topic(index.getAndIncrement(), "leading")
-    val Fighting = Topic(index.getAndIncrement(), "fighting")
-    val Machines = Topic(index.getAndIncrement(), "machines")
-    val Party = Topic(index.getAndIncrement(), "party")
+    val Leading: Topic = Topic(index.getAndIncrement(), "leading")
+    val Fighting: Topic = Topic(index.getAndIncrement(), "fighting")
+    val Machines: Topic = Topic(index.getAndIncrement(), "machines")
+    val Party: Topic = Topic(index.getAndIncrement(), "party")
 
     val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> Topic.unassigned(index.getAndIncrement(), s)).toMap
     val Concrete: Set[Topic] = Set(Leading, Fighting, Machines, Party)
@@ -39,10 +39,10 @@ object MinimalTestModel {
 
   object Slots {
     private val index = new AtomicInteger(0)
-    lazy val Morning = Slot(index.getAndIncrement(), "morning", Persons.All, Some(Afternoon))
-    lazy val Afternoon = Slot(index.getAndIncrement(), "afternoon", Persons.All, Some(Evening))
-    lazy val Evening = Slot(index.getAndIncrement(), "evening", Persons.All, Some(Night))
-    lazy val Night = Slot(index.getAndIncrement(), "night", Persons.All, None)
+    lazy val Morning: Slot = Slot(index.getAndIncrement(), "morning", Persons.All, Some(Afternoon))
+    lazy val Afternoon: Slot = Slot(index.getAndIncrement(), "afternoon", Persons.All, Some(Evening))
+    lazy val Evening: Slot = Slot(index.getAndIncrement(), "evening", Persons.All, Some(Night))
+    lazy val Night: Slot = Slot(index.getAndIncrement(), "night", Persons.All, None)
 
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
     implicit val SlotCount: Count[Slot] = util.Count[Slot](All.flatten.size)

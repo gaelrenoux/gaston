@@ -16,24 +16,24 @@ class InputSpec extends AnyFlatSpec with Matchers {
   object expected {
 
     object persons {
-      val bernard = Person(0, "bernard", Weight.Default)
-      val laverne = Person(1, "laverne", Weight(1))
-      val hoagie = Person(2, "hoagie", Weight(1.5))
+      val bernard: Person = Person(0, "bernard", Weight.Default)
+      val laverne: Person = Person(1, "laverne", Weight(1))
+      val hoagie: Person = Person(2, "hoagie", Weight(1.5))
       val all: Set[Person] = Set(bernard, laverne, hoagie)
     }
 
     object slots {
-      lazy val a = Slot(0, "A", persons.all, Some(b), maxTopics = 4)
-      lazy val b = Slot(1, "B", persons.all, None, maxTopics = Int.MaxValue)
-      lazy val c = Slot(2, "C", persons.all, None, maxTopics = Int.MaxValue)
+      lazy val a: Slot = Slot(0, "A", persons.all, Some(b), maxTopics = 4)
+      lazy val b: Slot = Slot(1, "B", persons.all, None, maxTopics = Int.MaxValue)
+      lazy val c: Slot = Slot(2, "C", persons.all, None, maxTopics = Int.MaxValue)
       val all: Set[Slot] = Set(a, b, c)
     }
 
     object topics {
-      lazy val alpha = Topic(0, "alpha", min = 5, max = 5, mandatory = Set(persons.bernard))
-      lazy val beta = Topic(1, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
-      lazy val gamma1 = Topic(2, "gamma ~1", min = 4, max = 6, followup = Some(gamma2))
-      lazy val gamma2 = Topic(3, "gamma ~2", min = 4, max = 6, isFollowup = true)
+      lazy val alpha: Topic = Topic(0, "alpha", min = 5, max = 5, mandatory = Set(persons.bernard))
+      lazy val beta: Topic = Topic(1, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
+      lazy val gamma1: Topic = Topic(2, "gamma ~1", min = 4, max = 6, followup = Some(gamma2))
+      lazy val gamma2: Topic = Topic(3, "gamma ~2", min = 4, max = 6, isFollowup = true)
       val unassignedA: Topic = Topic.unassigned(4, expected.slots.a)
       val unassignedB: Topic = Topic.unassigned(5, expected.slots.b)
       val unassignedC: Topic = Topic.unassigned(6, expected.slots.c)
