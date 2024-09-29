@@ -11,7 +11,7 @@ import org.scalatest.matchers.should.Matchers
 class InputSpec extends AnyFlatSpec with Matchers {
   // TODO That and InputTranscriptionSpec are redundant, merge them
 
-  val problem: Problem = problemFromClassPath("test-application").force
+  val problem: Problem = problemFromClassPath("rendering-test").force
 
   object expected {
 
