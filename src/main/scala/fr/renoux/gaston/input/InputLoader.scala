@@ -7,11 +7,14 @@ import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.collection.NonEmpty
 import eu.timepit.refined.types.string.NonEmptyString
+import fr.renoux.gaston.input.InputRefinements.ScoreNonPositive
+import fr.renoux.gaston.model.Score
 import fr.renoux.gaston.util.testOnly
 import pureconfig.ConfigSource
 import pureconfig.error.ConfigReaderFailures
 
 import java.io.{File, PrintWriter}
+import fr.renoux.gaston.input.InputRefinements.NonPosScore
 import java.nio.file.Path
 
 
@@ -27,9 +30,11 @@ object InputLoader {
   import pureconfig.generic.derivation.default._
 
   val test1 = ConfigSource.default.at(Namespace).load[NonEmptyString]
-  val test2 = ConfigSource.default.at(Namespace).load[NonPosScore]
-  val test3 = ConfigSource.default.at(Namespace).load[InputSettings]
-  val test4 = ConfigSource.default.at(Namespace).load[InputModel]
+  val test2: ConfigReader[Score] = implicitly[ConfigReader[Score]]
+  val test3: ConfigReader[NonPosScore] = refTypeConfigConvert[Refined, Score, ScoreNonPositive]
+  val test4 = ConfigSource.default.at(Namespace).load[NonPosScore]
+  val test99 = ConfigSource.default.at(Namespace).load[InputSettings]
+  val test999 = ConfigSource.default.at(Namespace).load[InputModel]
 
   // forces IntelliJ to keep the refined-pureconfig import, otherwise it marks it as unused
   {

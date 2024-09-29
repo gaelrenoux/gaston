@@ -1,11 +1,13 @@
 package fr.renoux.gaston.model
 
 import cats.Monoid
+import pureconfig.generic.derivation.default._
+import pureconfig._
 
 
 /** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
   * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
-final case class Score(value: Double) extends AnyVal with Ordered[Score] {
+final case class Score(value: Double) extends AnyVal with Ordered[Score] derives ConfigConvert {
 
   /** Adds two scores */
   @inline def +(s: Score): Score = Score(value + s.value)
