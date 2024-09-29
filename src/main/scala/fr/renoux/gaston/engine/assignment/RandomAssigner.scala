@@ -34,7 +34,10 @@ final class RandomAssigner(implicit private val problem: Problem) {
       None
     } else {
       log.debug("Unfilled schedule was filled")
-      val scheduleMap = slotSchedules.map { case Some(ss) => ss.slot -> ss }.toMap
+      val scheduleMap = slotSchedules.map {
+        case Some(ss) => ss.slot -> ss
+        case None => throw new IllegalStateException
+      }.toMap
       Some(unfilledSchedule.replaceAllSlotSchedules(scheduleMap))
     }
   }

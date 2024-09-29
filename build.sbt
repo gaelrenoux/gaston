@@ -17,6 +17,7 @@ lazy val gaston = (project in file("."))
 lazy val SlowTest = config("test-slow") extend (Test)
 
 scalacOptions ++= Seq(
+  "-Xsource:3",
 
   "-language:implicitConversions",
   "-language:higherKinds",

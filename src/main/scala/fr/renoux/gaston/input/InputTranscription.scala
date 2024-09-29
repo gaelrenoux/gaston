@@ -74,7 +74,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     }
 
   lazy val basicTopicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] = {
-    input.topics.map { inTopic: InputTopic =>
+    input.topics.map { (inTopic: InputTopic) =>
       val mandatory = input.personsSet.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsByName)
       val forbidden = input.personsSet.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsByName)
       val min = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
@@ -140,7 +140,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         val topicsByOccurrenceIndex: Map[Int, Set[Topic]] = inConstraint.topics.flatMap { topicName =>
           topicsFirstPartByOccurrenceIndexByName(topicName)
         }.groupToMap
-        topicsByOccurrenceIndex.values.map(TopicsSimultaneous)
+        topicsByOccurrenceIndex.values.map(TopicsSimultaneous.apply)
       }
 
     lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
@@ -191,7 +191,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     lazy val linkedParts: Set[TopicsLinked] = input.topics.view
       .filter(_.forcedDuration > 1)
       .flatMap { inTopic => topicsByPartIndexByOccurrenceIndexByName(inTopic.name).values }
-      .map { partsInOccurrence: Map[Int, Topic] => TopicsLinked(partsInOccurrence.values.toBitSet) }
+      .map { (partsInOccurrence: Map[Int, Topic]) => TopicsLinked(partsInOccurrence.values.toBitSet) }
       .toSet
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
