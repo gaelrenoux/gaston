@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 object InputRenderer {
 
   import eu.timepit.refined.pureconfig._
-  import pureconfig.generic.auto._
+  import pureconfig.generic.derivation.default._
 
   // forces IntelliJ to keep the refined-pureconfig import, otherwise it marks it as unused
   {

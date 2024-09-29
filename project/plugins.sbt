@@ -1,4 +1,4 @@
-addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.7.0")
+// addSbtPlugin("ch.epfl.scala" % "sbt-scala3-migrate" % "0.7.0")
 
 logLevel := Level.Warn
 

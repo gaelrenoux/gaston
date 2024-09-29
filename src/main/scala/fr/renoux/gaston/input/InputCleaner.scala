@@ -4,7 +4,6 @@ import cats.data.NonEmptyList
 import eu.timepit.refined.api.Refined
 import fr.renoux.gaston.model.{Record, Score, Weight}
 import fr.renoux.gaston.util.StringImplicits._
-import shapeless._
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -79,17 +78,18 @@ object InputCleaner {
       Refined.unsafeApply[A, R](aCleaner.clean(ref.value)) // TODO Very ugly, should do for now
     }
 
-  /* Shapeless definition for case classes */
+  /* Definitions for tuples and case classes */
 
-  implicit object HnilInputCleaner extends InputCleaner[HNil] {
-    override def clean(a: HNil): HNil = a
+  implicit object EmptyTupleInputCleaner extends InputCleaner[EmptyTuple] {
+    override def clean(a: EmptyTuple): EmptyTuple = a
   }
 
-  implicit final def hListInputCleaner[H, T <: HList](implicit hCleaner: InputCleaner[H], tCLeaner: InputCleaner[T]): InputCleaner[H :: T] =
-    instance { case h :: t => hCleaner.clean(h) :: tCLeaner.clean(t) }
-
-  implicit final def genericInputCleaner[A, R](implicit gen: Generic.Aux[A, R], enc: InputCleaner[R]): InputCleaner[A] =
-    instance(a => gen.from(enc.clean(gen.to(a))))
+  implicit final def nonEmptyTupleInputCleaner[A: InputCleaner, B <: Tuple : InputCleaner]: InputCleaner[A *: B] =
+    (ab: A *: B) => {
+      val cleanA = implicitly[InputCleaner[A]].clean(ab.head)
+      val cleanB = implicitly[InputCleaner[B]].clean(ab.tail)
+      cleanA *: cleanB
+    }
 
   implicit final class InputCleanerOps[A](wrapped: A)(implicit aCleaner: InputCleaner[A]) {
     @inline def clean(): A = aCleaner.clean(wrapped)
