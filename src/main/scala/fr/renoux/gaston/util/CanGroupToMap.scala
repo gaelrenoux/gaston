@@ -67,7 +67,7 @@ object CanGroupToMap {
     @inline def groupToMap: Map[A, Map[B, F[C]]] = typeClassInstance.groupToMap3(self)(functorInstance)
   }
 
-  object ops { // scalastyle:ignore object.name
+  object ops {
     @inline implicit def toCoupleOps[F[_] : CanGroupToMap, A, B](target: F[(A, B)]): CoupleOps[F, A, B] =
       new CoupleOps[F, A, B] {
         @inline val self: F[(A, B)] = target

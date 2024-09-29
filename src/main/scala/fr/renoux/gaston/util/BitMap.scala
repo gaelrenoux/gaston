@@ -42,10 +42,10 @@ object BitMap {
         BitMap.from[A, B](count.value, default)(wrapped)
 
       @inline def toBitMap(size: Int)(implicit tagB: ClassTag[B], ev: Null <:< B): BitMap[A, B] =
-        BitMap.from[A, B](size, ev(null))(wrapped) // scalastyle:ignore null
+        BitMap.from[A, B](size, ev(null))(wrapped)
 
       @inline def toBitMap(implicit tagB: ClassTag[B], ev: Null <:< B, count: Count[A]): BitMap[A, B] =
-        BitMap.from[A, B](count.value, ev(null))(wrapped) // scalastyle:ignore null
+        BitMap.from[A, B](count.value, ev(null))(wrapped)
     }
   }
 

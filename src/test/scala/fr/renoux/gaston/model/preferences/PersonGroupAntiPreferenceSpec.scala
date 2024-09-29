@@ -5,7 +5,6 @@ import fr.renoux.gaston.util.Context
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class PersonGroupAntiPreferenceSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._

@@ -12,7 +12,7 @@ package object input {
 
   type InputErrors = NonEmptyList[InputError]
 
-  def InputErrors(hDesc: String, tDesc: String*): InputErrors = // scalastyle:ignore method.name
+  def InputErrors(hDesc: String, tDesc: String*): InputErrors =
     NonEmptyList.of(InputError(hDesc), tDesc.map(InputError(_)): _*)
 
   /** Commodity method for tests: loads a problem from a specifically-named file if the classpath. */

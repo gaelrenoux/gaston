@@ -31,11 +31,11 @@ class CombinerAnonymizer(seed: Long, val altOneList: Seq[String], val altTwoList
   /** All anonymizations already decided. */
   private val anonymizations = mutable.Map[String, String]()
 
-  private var firstPass = true // scalastyle:ignore var.field
+  private var firstPass = true
   private val altOneLeftsFirstPass: mutable.Set[Int] = mutable.Set.tabulate(altOneCount)(identity)
   private val altTwoLeftsFirstPass: mutable.Set[Int] = mutable.Set.tabulate(altTwoCount)(identity)
 
-  private var secondPass = true // scalastyle:ignore var.field
+  private var secondPass = true
   private val combinationsLeftSecondPass: mutable.Set[Int] = mutable.Set.tabulate(MaxBaseCombinations)(identity)
 
   private lazy val numberingThirdPass: Array[Int] = Array.fill(MaxBaseCombinations)(2)

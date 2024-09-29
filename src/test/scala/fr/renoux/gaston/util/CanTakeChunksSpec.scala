@@ -7,7 +7,6 @@ import org.scalatest.matchers.should.Matchers
 /**
   * Created by gael on 07/05/17.
   */
-// scalastyle:off magic.number
 class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
   val log = Logger[CanTakeChunksSpec]
 

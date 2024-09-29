@@ -25,21 +25,21 @@ package object model {
   implicit final class SlotMapOps[A >: Null](val wrapped: Map[Slot, A]) extends AnyVal {
     @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] = toBitMap()
 
-    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] = // scalastyle:ignore null
+    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] =
       BitMap.from[Slot, A](counts.slots, default)(wrapped)
   }
 
   implicit final class TopicMapOps[A >: Null](val wrapped: Map[Topic, A]) extends AnyVal {
     @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] = toBitMap()
 
-    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] = // scalastyle:ignore null
+    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] =
       BitMap.from[Topic, A](counts.topics, default)(wrapped)
   }
 
   implicit final class PersonMapOps[A >: Null](val wrapped: Map[Person, A]) extends AnyVal {
     @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] = toBitMap()
 
-    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] = // scalastyle:ignore null
+    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] =
       BitMap.from[Person, A](counts.persons, default)(wrapped)
   }
 

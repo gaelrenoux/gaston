@@ -14,7 +14,6 @@ import java.time.Instant
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-// scalastyle:off magic.number
 class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   import Ordering.Double.IeeeOrdering
@@ -103,5 +102,3 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
     }(ExecutionContext.global)
   }
 }
-
-// scalastyle:on magic.number

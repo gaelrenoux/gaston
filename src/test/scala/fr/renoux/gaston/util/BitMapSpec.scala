@@ -3,7 +3,6 @@ package fr.renoux.gaston.util
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class BitMapSpec extends AnyFlatSpec with Matchers {
 
   import BitMapSpec._
@@ -53,7 +52,7 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm.size should be(3)
     bm(gromit) should be(rope)
     bm(lassie) should be(stick)
-    bm(milou) should be(null) // scalastyle:ignore null
+    bm(milou) should be(null)
     an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
   }
 
@@ -64,7 +63,7 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm.size should be(3)
     bm(gromit) should be(rope)
     bm(lassie) should be(stick)
-    bm(milou) should be(null) // scalastyle:ignore null
+    bm(milou) should be(null)
     an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
   }
 }

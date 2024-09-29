@@ -11,8 +11,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
 import scala.util.Random
 
-// scalastyle:off magic.number
-
 //TODO Add a version with unassigned topics
 class ComplexTestModel(seed: Long) {
 
@@ -110,5 +108,3 @@ object ComplexTestModel {
 
   def apply(seed: Long): ComplexTestModel = cache.getOrElseUpdate(seed, new ComplexTestModel(seed))
 }
-
-// scalastyle:on magic.number

@@ -6,7 +6,6 @@ import org.scalatest.matchers.should.Matchers
 import scala.util.Random
 
 
-// scalastyle:off magic.number
 class RandomImplicitsSpec extends AnyFlatSpec with Matchers {
 
   import RandomImplicits._

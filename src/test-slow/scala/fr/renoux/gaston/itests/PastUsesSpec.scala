@@ -14,7 +14,6 @@ import org.scalatest.time.Span
 
 import scala.concurrent.duration.DurationInt
 
-// scalastyle:off magic.number
 class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester with TimeLimitedTests {
 
   override val timeLimit: Span = 5.minute

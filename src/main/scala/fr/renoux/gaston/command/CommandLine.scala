@@ -25,7 +25,6 @@ object CommandLine {
 
   private implicit val finiteDurationRead: Read[Duration] = Read.reads(Duration(_))
 
-  // scalastyle:off multiple.string.literals named.argument
   private val parser = new scopt.OptionParser[CommandLine]("gaston") {
     head("gaston", "0.1")
 
@@ -74,7 +73,6 @@ object CommandLine {
 
     help("help").text("prints this usage text")
   }
-  // scalastyle:on multiple.string.literals named.argument
 
   def parse(args: Seq[String]): CommandLine =
     parser.parse(args, CommandLine()) match {

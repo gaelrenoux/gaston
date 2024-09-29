@@ -60,7 +60,6 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
     * again if needed.
     * @return The state of the backtracking, with a schedule that fits.
     */
-  // scalastyle:off method.length
   private def backtrackAssignTopicsToSlots(
       state: State,
       failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)
@@ -111,7 +110,6 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
       }
     }
   }
-  // scalastyle:on method.length
 
 }
 

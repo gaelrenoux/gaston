@@ -3,7 +3,6 @@ package fr.renoux.gaston.util
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class BitSetSpec extends AnyFlatSpec with Matchers {
 
   import BitSet.syntax._

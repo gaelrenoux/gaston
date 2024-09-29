@@ -8,7 +8,6 @@ import fr.renoux.gaston.model.{Problem, Score}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   // TODO Improve this test !
   // TODO missing test for Simultaneous

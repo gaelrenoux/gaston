@@ -4,7 +4,6 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 
-// scalastyle:off magic.number
 class StringImplicitsSpec extends AnyFlatSpec with Matchers {
 
   import StringImplicits._

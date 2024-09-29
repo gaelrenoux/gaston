@@ -8,7 +8,6 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
 
   private implicit val context: Context = Context.Default

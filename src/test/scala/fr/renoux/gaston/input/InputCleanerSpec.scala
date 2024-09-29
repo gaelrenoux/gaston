@@ -3,7 +3,6 @@ package fr.renoux.gaston.input
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class InputCleanerSpec extends AnyFlatSpec with Matchers {
 
   import InputCleaner._

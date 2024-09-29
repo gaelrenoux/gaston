@@ -38,7 +38,7 @@ final class Renderer(
     val summariesFromBestToWorse = summaryByPerson.sortBy(_._2).reverse
 
     val summaryTextBody = summariesFromBestToWorse.map { case (name, score, baseScore, satisfied, mandatoryCount) =>
-      val nameTxt = name.padTo(8, ' ').take(8) // scalastyle:ignore magic.number
+      val nameTxt = name.padTo(8, ' ').take(8)
       val scoreTxt = ScoreDecimalFormat.format(score)
       val baseScoreTxt = if (baseScore == 0.0) "" else ScoreDecimalFormat.format(baseScore) + " "
       val mandatoryTxt = if (mandatoryCount == 0) "" else Seq.fill(mandatoryCount)(Record.MandatoryMarker).mkString("", " ", " ")

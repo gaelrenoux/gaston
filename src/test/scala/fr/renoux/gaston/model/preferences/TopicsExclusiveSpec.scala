@@ -5,7 +5,6 @@ import fr.renoux.gaston.util.{BitSet, Context}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-// scalastyle:off magic.number
 class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
 
   import fr.renoux.gaston.MinimalTestModel.Persons._

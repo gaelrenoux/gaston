@@ -9,7 +9,6 @@ import fr.renoux.gaston.util.{BitMap, Context}
 
 import java.util.concurrent.atomic.AtomicInteger
 
-// scalastyle:off magic.number
 
 /** 9 persons, 9 topics, 3 slots */
 class SimpleTestModel(implicit settings: InputSettings) {
@@ -187,5 +186,3 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
 
 object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.force.settings)
-
-// scalastyle:on magic.number

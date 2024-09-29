@@ -50,7 +50,7 @@ object InputLoader {
   /** Loads from a String. Used only in tests. */
   @testOnly
   def fromString(config: String): Either[InputErrors, InputModel] = {
-    val file = File.createTempFile("gaston-input-", null) // scalastyle:ignore null
+    val file = File.createTempFile("gaston-input-", null)
     new PrintWriter(file) {
       write(config)
       close()

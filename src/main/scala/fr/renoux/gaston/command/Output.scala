@@ -23,7 +23,7 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
   private val log = Logger[Output]
   private val notSilent = !silent
 
-  private var bestScore: Score = Score.MinValue // scalastyle:ignore var.field
+  private var bestScore: Score = Score.MinValue
 
   private def shortString(l: Long) = {
     if (l < 10000) l.toString

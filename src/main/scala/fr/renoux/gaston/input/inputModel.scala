@@ -13,7 +13,6 @@ import fr.renoux.gaston.util.{NumberUtils, Opt}
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 /* All line and column indices are zero-based */
-// scalastyle:off magic.number
 
 /* These classes defined the model as it is represented in the canonical input (.conf files). It is made to be as
 user-friendly as possible in the configuration file, and in second to be comfortable to use by the developer. However,
@@ -200,5 +199,3 @@ object InputRefinements {
   }
 
 }
-
-// scalastyle:on magic.number

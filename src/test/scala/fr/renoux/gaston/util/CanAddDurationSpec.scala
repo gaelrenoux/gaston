@@ -6,7 +6,6 @@ import org.scalatest.matchers.should.Matchers
 import java.time.Instant
 import scala.concurrent.duration.DurationInt
 
-// scalastyle:off magic.number
 class CanAddDurationSpec extends AnyFlatSpec with Matchers {
 
   import CanAddDuration._

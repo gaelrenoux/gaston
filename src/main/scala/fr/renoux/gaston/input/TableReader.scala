@@ -29,7 +29,6 @@ final class TableReader(input: InputModel) {
   }
 
   /** Read the table as a CSV text */
-  // scalastyle:off method.length
   def read(table: String): InputModel = {
     // TODO replace calls to unsafeFrom with proper validation
     val lines: IndexedSeq[String] = table.split("\n", -1).filter(_.trim.nonEmpty).toIndexedSeq
@@ -109,8 +108,6 @@ final class TableReader(input: InputModel) {
       constraints = InputGlobalConstraints()
     )
   }
-
-  // scalastyle:on method.length
 
   def wishValueToScoreOption(value: String): Option[Score] =
     if (value.isEmpty) None
