@@ -1,11 +1,12 @@
 package fr.renoux.gaston.input
 
 import cats.data.NonEmptyList
-import cats.implicits._
+import cats.implicits.*
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.collection.NonEmpty
+import eu.timepit.refined.types.string.NonEmptyString
 import fr.renoux.gaston.util.testOnly
 import pureconfig.ConfigSource
 import pureconfig.error.ConfigReaderFailures
@@ -21,8 +22,14 @@ object InputLoader {
 
   private val log = Logger[InputLoader.type]
 
-  import eu.timepit.refined.pureconfig._
-  import pureconfig.generic.auto._
+  import eu.timepit.refined.pureconfig.refTypeConfigConvert
+  import pureconfig._
+  import pureconfig.generic.derivation.default._
+
+  val test1 = ConfigSource.default.at(Namespace).load[NonEmptyString]
+  val test2 = ConfigSource.default.at(Namespace).load[NonPosScore]
+  val test3 = ConfigSource.default.at(Namespace).load[InputSettings]
+  val test4 = ConfigSource.default.at(Namespace).load[InputModel]
 
   // forces IntelliJ to keep the refined-pureconfig import, otherwise it marks it as unused
   {
