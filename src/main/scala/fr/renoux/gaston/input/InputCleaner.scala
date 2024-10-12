@@ -1,9 +1,9 @@
 package fr.renoux.gaston.input
 
 import cats.data.NonEmptyList
-import eu.timepit.refined.api.Refined
 import fr.renoux.gaston.model.{Record, Score, Weight}
 import fr.renoux.gaston.util.StringImplicits.*
+import io.github.iltotore.iron.*
 
 import scala.annotation.targetName
 import scala.concurrent.duration.FiniteDuration
@@ -84,8 +84,8 @@ object InputCleaner {
 
   /* Refined stuff */
 
-  given [A: InputCleaner, R]: InputCleaner[A Refined R] =
-    instance { ref => Refined.unsafeApply[A, R](ref.value.clean) } // TODO Very ugly, should do for now
+  given [A: InputCleaner, C](using Constraint[A, C]): InputCleaner[A :| C] =
+    instance { ref => ref.clean.asInstanceOf[A :| C] } // TODO Very ugly, should do for now
 
 
   /* Definitions for tuples */

@@ -73,8 +73,11 @@ lazy val scala3Options = Seq(
   // "-XX:MaxInlineLevel=18", // see https://github.com/scala/bug/issues/11627#issuecomment-514619316 // check if still valid for Scala 3
 )
 
+/* Adds Sonatype snapshots, required for Iron */
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+
 val catsVersion = "2.12.0"
-val refinedVersion = "0.11.2"
+val ironVersion = "2.6.0-12-a077d1-SNAPSHOT" // TODO Move to 2.7 as soon as it's released
 
 libraryDependencies ++= Seq(
 
@@ -89,9 +92,8 @@ libraryDependencies ++= Seq(
   // "com.github.pureconfig" %% "pureconfig" % "0.17.7",
   "com.github.scopt" %% "scopt" % "4.1.0",
 
-  "eu.timepit" %% "refined" % refinedVersion,
-  "eu.timepit" %% "refined-pureconfig" % refinedVersion,
-  "eu.timepit" %% "refined-scopt" % refinedVersion,
+  "io.github.iltotore" %% "iron" % ironVersion,
+  "io.github.iltotore" %% "iron-pureconfig" % ironVersion,
 
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.9",
 
