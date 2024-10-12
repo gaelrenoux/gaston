@@ -61,7 +61,7 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
 
     val randomAssigner = new RandomAssigner
 
-    val unfilledSchedule = SimpleTestModel.Solutions.BestWithUnassignedTopics.clearSlots(Slots.All.flatten: _*)
+    val unfilledSchedule = SimpleTestModel.Solutions.BestWithUnassignedTopics.clearSlots(Slots.All.flatten*)
     val filledSchedule = randomAssigner.fill(unfilledSchedule)
 
     filledSchedule.nonEmpty should be(true)
