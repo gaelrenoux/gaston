@@ -73,7 +73,7 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
-      val newNextStatusTime = if (now isAfter nextStatusTime) {
+      val newNextStatusTime = if (now > nextStatusTime) {
         output.writeScheduleIfBetter(best)
         output.writeAttempts(totalCount, best)
         now.plusMillis(statusDisplayIntervalMs)
