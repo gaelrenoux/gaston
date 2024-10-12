@@ -13,8 +13,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   // TODO missing test for Simultaneous
   // TODO missing test for NotSimultaneous
 
-
-  import fr.renoux.gaston.TestUtils._
+  import fr.renoux.gaston.TestUtils.*
 
   private def from(model: InputModel): Problem = {
     new InputTranscription(model).result.valueOr(e => throw new IllegalArgumentException(e.toString))
