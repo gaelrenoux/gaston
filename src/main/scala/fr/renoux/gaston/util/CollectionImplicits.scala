@@ -13,7 +13,8 @@ object CollectionImplicits {
 
     @inline def zipWith[B](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
 
-    @inline def cross[B](bs: Iterable[B]): CC[(A, B)] = for {
+    // TODO use operator x instead, would be better
+    @inline infix def cross[B](bs: Iterable[B]): CC[(A, B)] = for {
       a <- wrapped
       b <- bs
     } yield (a, b)
