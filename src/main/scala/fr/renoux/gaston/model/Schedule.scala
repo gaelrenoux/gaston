@@ -1,10 +1,10 @@
 package fr.renoux.gaston.model
 
 import cats.Monoid
-import cats.implicits._
+import cats.implicits.*
 import fr.renoux.gaston.util.CanGroupToMap.ops.toCoupleOps
-import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.RandomImplicits._
+import fr.renoux.gaston.util.CollectionImplicits.*
+import fr.renoux.gaston.util.RandomImplicits.*
 import fr.renoux.gaston.util.{BitSet, Context, testOnly}
 
 import scala.util.Random
@@ -24,7 +24,7 @@ final case class Schedule(
     ctx: Context
 ) {
 
-  import Schedule._
+  import Schedule.*
   import problem.counts
 
   @inline private def updateWrapped(w: Map[Slot, SlotSchedule]): Schedule =

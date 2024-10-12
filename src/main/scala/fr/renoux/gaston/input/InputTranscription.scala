@@ -9,8 +9,8 @@ import fr.renoux.gaston.model.preferences.*
 import fr.renoux.gaston.util.CanGroupToMap.ops.*
 import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.{BitMap, BitSet, Count}
-import io.github.iltotore.iron.{Constraint as _, *}
 import io.github.iltotore.iron.constraint.all.*
+import io.github.iltotore.iron.{Constraint as _, *}
 import mouse.map.*
 
 import java.util.concurrent.atomic.AtomicInteger

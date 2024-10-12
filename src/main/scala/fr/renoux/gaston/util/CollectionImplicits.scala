@@ -1,9 +1,8 @@
 package fr.renoux.gaston.util
 
-import mouse.map._
+import mouse.map.*
 
-import scala.collection.IterableOps
-import scala.collection.IterableOnceOps
+import scala.collection.{IterableOnceOps, IterableOps}
 
 
 /** A bunch of extension mehtods over collections. */

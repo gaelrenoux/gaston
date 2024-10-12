@@ -1,15 +1,15 @@
 package fr.renoux.gaston.command
 
-import fr.renoux.gaston.engine._
+import fr.renoux.gaston.engine.*
 import fr.renoux.gaston.model.{Problem, Schedule}
-import fr.renoux.gaston.util.CanAddDuration._
+import fr.renoux.gaston.util.CanAddDuration.*
 import fr.renoux.gaston.util.Context
 
 import java.time.Instant
-import scala.Ordering.Implicits._
+import scala.Ordering.Implicits.*
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 import scala.util.Random
 

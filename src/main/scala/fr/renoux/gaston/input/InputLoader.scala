@@ -7,6 +7,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.util.testOnly
 import pureconfig.ConfigSource
 import pureconfig.error.ConfigReaderFailures
+
 import java.io.{File, PrintWriter}
 import java.nio.file.Path
 

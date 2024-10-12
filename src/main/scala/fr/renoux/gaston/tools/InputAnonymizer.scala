@@ -1,9 +1,8 @@
 package fr.renoux.gaston.tools
 
+import com.softwaremill.quicklens.*
 import fr.renoux.gaston.input.InputModel
 import fr.renoux.gaston.util.Resources.readNamesFile
-
-import com.softwaremill.quicklens._
 
 import scala.util.Random
 
