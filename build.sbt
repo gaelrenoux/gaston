@@ -99,6 +99,7 @@ libraryDependencies ++= Seq(
 
   /* Tests */
   "com.softwaremill.diffx" %% "diffx-core" % "0.9.0" % Test,
+  // TODO diffx is deprecated, move to difflicious
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 

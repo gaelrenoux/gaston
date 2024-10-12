@@ -1,7 +1,8 @@
 package fr.renoux.gaston.input
 
 import com.softwaremill.diffx
-import com.softwaremill.diffx.generic.auto._
+import com.softwaremill.diffx.generic.auto.*
+import com.softwaremill.diffx.generic.auto.given
 import eu.timepit.refined.auto._
 import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
