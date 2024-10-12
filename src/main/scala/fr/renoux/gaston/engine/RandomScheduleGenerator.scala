@@ -1,11 +1,11 @@
 package fr.renoux.gaston.engine
 
-import cats.implicits._
+import cats.implicits.*
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
-import fr.renoux.gaston.model._
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.model.*
+import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.Context
 
 import scala.collection.immutable.Queue
@@ -19,7 +19,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
 
   private val log = Logger[RandomScheduleGenerator]
 
-  import RandomScheduleGenerator._
+  import RandomScheduleGenerator.*
 
   private val randomAssigner = new RandomAssigner
   private val improver = new AssignmentImprover
