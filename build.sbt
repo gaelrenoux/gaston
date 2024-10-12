@@ -53,7 +53,7 @@ lazy val scala3Options = Seq(
   "-language:higherKinds",
   "-language:existentials",
 
-  "-Werror", // Fail the compilation if there are any warnings.
+  // "-Werror", // Fail the compilation if there are any warnings. // TODO restore once Scala 3 migration is done
   "-explain", // Explain type errors in more detail.
 
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
