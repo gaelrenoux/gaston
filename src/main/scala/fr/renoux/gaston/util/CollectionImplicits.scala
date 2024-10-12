@@ -40,7 +40,7 @@ object CollectionImplicits {
     }
   }
 
-  @inline implicit final class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {
+  @inline implicit final class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, ?]) extends AnyVal {
     @inline def unzipEither: (CC[A], CC[B]) = {
       val lefts = wrapped.collect { case Left(a) => a }
       val rights = wrapped.collect { case Right(b) => b }
@@ -48,7 +48,7 @@ object CollectionImplicits {
     }
   }
 
-  @inline implicit final class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, _], CCO, _]) extends AnyVal {
+  @inline implicit final class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, ?], CCO, ?]) extends AnyVal {
     @inline def mapMap[B](f: A => B): CCO[CCI[B]] = wrapped.map(_.map(f))
   }
 
