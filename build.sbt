@@ -7,7 +7,7 @@ version := "1.0.0"
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
 
-scalaVersion := "3.3.3"
+scalaVersion := "3.5.1"
 
 lazy val gaston = (project in file("."))
   .configs(SlowTest)
@@ -60,7 +60,7 @@ lazy val scala3Options = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
   "-unchecked", // Enable additional warnings where generated code depends on assumptions.
 
-  "-Ysafe-init", // Wrap field accessors to throw an exception on uninitialized access.
+  "-Wsafe-init", // Wrap field accessors to throw an exception on uninitialized access.
 
   "-Wunused:explicits", // Warn if an explicit parameter is unused.
   "-Wunused:implicits", // Warn if an implicit parameter is unused.
