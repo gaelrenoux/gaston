@@ -9,6 +9,12 @@ import scala.util.Random
 
 /** Anonymize an input. Class can only be used once, re-instantiate for each usage. Mutable. */
 class InputAnonymizer(in: InputModel, val seed: Long = 0) {
+
+  // TODO Should move this to some utility
+  given QuicklensFunctor[Set] with {
+    override def map[A](as: Set[A])(f: A => A): Set[A] = as.map(f)
+  }
+
   private val rand = new Random(seed)
 
   val personAnonymizer = new CombinerAnonymizer(
