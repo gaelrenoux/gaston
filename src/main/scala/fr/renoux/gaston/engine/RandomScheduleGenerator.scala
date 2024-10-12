@@ -36,7 +36,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
     // TODO need to handle followup topics !
     val (forcedTopics, unforcedTopics) = problem.topicsList.filterNot(_.isFollowup).partition(_.forced)
     val topics = random.shuffle(forcedTopics) ::: random.shuffle(unforcedTopics)
-    val state = State(Schedule.empty(chainSeed), Queue(slots: _*), topics)
+    val state = State(Schedule.empty(chainSeed), Queue(slots*), topics)
     val unimproved = backtrackAndFill(state)
     improver.improve(unimproved.get)
   }

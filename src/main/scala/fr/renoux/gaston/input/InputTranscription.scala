@@ -292,7 +292,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   lazy val result: ValidatedNel[InputError, Problem] = errors.toList.sorted.map(InputError(_)) match {
     case Nil => problem.valid
-    case h :: q => NonEmptyList.of(h, q: _*).invalid[Problem]
+    case h :: q => NonEmptyList.of(h, q*).invalid[Problem]
   }
 
 }

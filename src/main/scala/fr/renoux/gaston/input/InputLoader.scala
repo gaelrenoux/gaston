@@ -62,7 +62,7 @@ object InputLoader {
 
   /** Converts PureConfig's errors into our own InputErrors, that can be made readable to an end-user. */
   private def transformErrors(configReaderFailures: ConfigReaderFailures): NonEmptyList[InputError] =
-    NonEmptyList.of(configReaderFailures.head, configReaderFailures.tail: _*).map { f =>
+    NonEmptyList.of(configReaderFailures.head, configReaderFailures.tail*).map { f =>
       InputError(f.description, f.origin.map(_.url.toString), f.origin.map(_.lineNumber))
     }
 

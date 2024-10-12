@@ -11,7 +11,7 @@ scalaVersion := "3.5.1"
 
 lazy val gaston = (project in file("."))
   .configs(SlowTest)
-  .settings(inConfig(SlowTest)(Defaults.testSettings): _*)
+  .settings(inConfig(SlowTest)(Defaults.testSettings)*)
 
 /* Those tests are much slower */
 lazy val SlowTest = config("test-slow") extend (Test)
