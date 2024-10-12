@@ -1,10 +1,9 @@
 package fr.renoux.gaston.input
 
-import com.softwaremill.quicklens._
-import eu.timepit.refined.auto._
-import fr.renoux.gaston.input.InputRefinements.NonPosScore
+import com.softwaremill.quicklens.*
 import fr.renoux.gaston.model.preferences.{PersonPersonPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
+import io.github.iltotore.iron.autoRefine
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

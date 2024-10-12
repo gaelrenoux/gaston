@@ -3,11 +3,11 @@ package fr.renoux.gaston.input
 import com.softwaremill.diffx
 import com.softwaremill.diffx.generic.auto.*
 import com.softwaremill.diffx.generic.auto.given
-import eu.timepit.refined.auto._
-import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.input.InputRefinements.{NonPosScore, PosWeight}
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.model.Score
+import io.github.iltotore.iron.autoRefine
 import org.scalatest.flatspec.AnyFlatSpec
+import fr.renoux.gaston.model.Weight
 import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source
@@ -25,7 +25,7 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     topicOccurrencesCol = None,
     personsCountAdd = 1,
     mandatoryPersonCol = 1,
-    mandatoryPersonWeight = PosWeight(1.5),
+    mandatoryPersonWeight = Weight(1.5),
     forbiddenPersonMarker = Some("0"),
     preferencesScoreMapping = Some(Map("1" -> Score(1), "2" -> Score(5)))
   )
@@ -55,8 +55,8 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check a small one first, easier to debug */
-    val ib = input.persons.find(_.name.value == "Boojum")
-    val eb = expected.persons.find(_.name.value == "Boojum")
+    val ib = input.persons.find(_.name == "Boojum")
+    val eb = expected.persons.find(_.name == "Boojum")
     //val smallDiff = DiffShow.diff(ib, eb) //TODO make it work with refined
     //if (!smallDiff.isIdentical) println(smallDiff.string)
     ib should be(eb)
