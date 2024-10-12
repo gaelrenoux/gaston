@@ -1,8 +1,8 @@
 package fr.renoux.gaston.input
 
-import com.softwaremill.diffx
-import com.softwaremill.diffx.generic.auto.*
-import com.softwaremill.diffx.generic.auto.given
+//import com.softwaremill.diffx
+//import com.softwaremill.diffx.generic.auto.*
+//import com.softwaremill.diffx.generic.auto.given
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.model.Score
 import io.github.iltotore.iron.autoRefine
@@ -13,6 +13,7 @@ import org.scalatest.matchers.should.Matchers
 import scala.io.Source
 
 class TableReaderSpec extends AnyFlatSpec with Matchers {
+  // TODO Replace diffx by difflicious
 
   val tableSettings: InputTableSettings = InputTableSettings(
     separator = "\t",
