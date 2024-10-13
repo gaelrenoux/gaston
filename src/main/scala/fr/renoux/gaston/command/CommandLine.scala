@@ -1,9 +1,8 @@
 package fr.renoux.gaston.command
 
-import java.nio.file.{Path, Paths}
-
 import scopt.Read
 
+import java.nio.file.{Path, Paths}
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.util.Random
 

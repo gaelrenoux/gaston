@@ -2,7 +2,7 @@ package fr.renoux.gaston.engine
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.Context
 
 import scala.util.Random

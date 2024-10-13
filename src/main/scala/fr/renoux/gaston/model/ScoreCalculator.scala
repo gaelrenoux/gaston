@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-import cats.implicits._
+import cats.implicits.*
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 /** Calculate scores on a given schedule. */
 final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
 
-  import ScoreCalculator._
+  import ScoreCalculator.*
 
   /** Score for each person, regardless of its weight. All personal scores are slot-level, so the whole computation is done per slot. */
   lazy val unweightedScoresByPerson: Map[Person, Score] = chrono("ScoreCalculator > unweightedScoresByPerson") {

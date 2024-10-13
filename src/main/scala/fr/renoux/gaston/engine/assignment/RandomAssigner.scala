@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine.assignment
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.immutable
 
 import scala.util.Random

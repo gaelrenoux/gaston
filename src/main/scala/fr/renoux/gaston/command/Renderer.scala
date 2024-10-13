@@ -1,16 +1,16 @@
 package fr.renoux.gaston.command
 
-import java.text.DecimalFormat
-
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.preferences.PersonTopicPreference
+
+import java.text.DecimalFormat
 
 /** A tool to render a solution as a pretty String. */
 final class Renderer(
     val problem: Problem
 ) {
 
-  import Renderer._
+  import Renderer.*
 
   import Ordering.Double.IeeeOrdering
 

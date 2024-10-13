@@ -1,6 +1,6 @@
 package fr.renoux.gaston.tools
 
-import cats.implicits._
+import cats.implicits.*
 import fr.renoux.gaston.model.{Person, Problem, Record, Schedule, Slot, SlotSchedule}
 import fr.renoux.gaston.util.Context
 

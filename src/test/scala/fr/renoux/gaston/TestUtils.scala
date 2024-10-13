@@ -38,11 +38,11 @@ object TestUtils {
     val topicsByName: Map[String, Topic] = problem.topicsSet.map(p => p.name -> p).toMap
     val personsByName: Map[String, Person] = problem.personsSet.map(p => p.name -> p).toMap
 
-    def slot(args: Any*): Slot = slotsByName(sc.s(args: _*))
+    def slot(args: Any*): Slot = slotsByName(sc.s(args*))
 
-    def t(args: Any*): Topic = topicsByName(sc.s(args: _*))
+    def t(args: Any*): Topic = topicsByName(sc.s(args*))
 
-    def p(args: Any*): Person = personsByName(sc.s(args: _*))
+    def p(args: Any*): Person = personsByName(sc.s(args*))
   }
 
 }

@@ -2,9 +2,9 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.model.constraints.{TopicsNotSimultaneous, TopicsSimultaneous}
 import fr.renoux.gaston.util.BitMap
-import fr.renoux.gaston.util.CanGroupToMap.ops._
-import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.TupleImplicits._
+import fr.renoux.gaston.util.CanGroupToMap.ops.*
+import fr.renoux.gaston.util.CollectionImplicits.*
+import fr.renoux.gaston.util.TupleImplicits.*
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 final case class Problem(

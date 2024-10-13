@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 
 
 /** Typeclass for collections where elements can be taken by chunks rather than one by one */
-trait CanTakeChunks[T[_] <: Iterable[_]] {
+trait CanTakeChunks[T[_] <: Iterable[?]] {
 
   /** Commodity method with varargs for `takeChunks(T[A], Iterable[Int])` */
   @inline
@@ -49,7 +49,7 @@ object CanTakeChunks {
       }
   }
 
-  implicit final class Ops[T[_] <: Iterable[_], A](val wrapped: T[A]) extends AnyVal {
+  implicit final class Ops[T[_] <: Iterable[?], A](val wrapped: T[A]) extends AnyVal {
 
     /** Takes chunks from the list, with a specific size. */
     @inline

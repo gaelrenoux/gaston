@@ -2,7 +2,7 @@ package fr.renoux.gaston.util
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 object Resources {
 

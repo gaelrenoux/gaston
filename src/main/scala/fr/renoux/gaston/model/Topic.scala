@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.util.{Identified, NumberUtils}
+import fr.renoux.gaston.input.Constants
+import fr.renoux.gaston.util.Identified
 
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
   * whatever.
@@ -59,7 +60,7 @@ object Topic {
 
   /** Create a special "unassigned" topic */
   // TODO maybe find a better name than 'unassigned', maybe 'pending' ?
-  def unassigned(id: Int, slot: Slot, min: Int = 0, max: Int = NumberUtils.IntLowMaxValue.value): Topic = {
+  def unassigned(id: Int, slot: Slot, min: Int = 0, max: Int = Constants.IntLowMaxValue): Topic = {
     val realMin = if (min <= 1) 0 else min
     Topic(id, unassignedName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = min == 0, isUnassigned = true)
   }

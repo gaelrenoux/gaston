@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model.{Preference, _}
+import fr.renoux.gaston.model.{Preference, *}
 import fr.renoux.gaston.util.BitSet
 
 /** Every person on any of these topics, must be on all of these topics. Note that the 'reward' is applied for each anomaly. */

@@ -1,21 +1,10 @@
 package fr.renoux.gaston.input
 
-import com.typesafe.config.ConfigRenderOptions
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.collection.NonEmpty
-import pureconfig.ConfigWriter
-
-import scala.jdk.CollectionConverters._
+ import com.typesafe.config.ConfigRenderOptions
+ import pureconfig.ConfigWriter
+ import scala.jdk.CollectionConverters._
 
 object InputRenderer {
-
-  import eu.timepit.refined.pureconfig._
-  import pureconfig.generic.auto._
-
-  // forces IntelliJ to keep the refined-pureconfig import, otherwise it marks it as unused
-  {
-    refTypeConfigConvert[Refined, String, NonEmpty]
-  }
 
   /** Style to use when rendering the input. Useful after we integrated table preferences into the canonical input. */
   private lazy val renderConfig = ConfigRenderOptions.defaults()
@@ -56,10 +45,11 @@ object InputRenderer {
 
   /** Generated indentation is four spaces, this reduces it to two instead. */
   private def fixIndentation(line: String): String = {
-    val indentation = line.takeWhile(_ == ' ').size
+    val indentation = line.takeWhile(_ == ' ').length
     val newIndentation = indentation / 2
     (" " * newIndentation) + line.trim()
   }
 
   private def addIndentation(line: String): String = "  " + line
+
 }

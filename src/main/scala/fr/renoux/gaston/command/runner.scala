@@ -1,15 +1,15 @@
 package fr.renoux.gaston.command
 
-import fr.renoux.gaston.engine._
+import fr.renoux.gaston.engine.*
 import fr.renoux.gaston.model.{Problem, Schedule}
-import fr.renoux.gaston.util.CanAddDuration._
+import fr.renoux.gaston.util.CanAddDuration.*
 import fr.renoux.gaston.util.Context
 
 import java.time.Instant
-import scala.Ordering.Implicits._
+import scala.Ordering.Implicits.*
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 import scala.util.Random
 
@@ -73,7 +73,7 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
 
     } else {
       /* If the last log is old enough, render the current best schedule */
-      val newNextStatusTime = if (now isAfter nextStatusTime) {
+      val newNextStatusTime = if (now > nextStatusTime) {
         output.writeScheduleIfBetter(best)
         output.writeAttempts(totalCount, best)
         now.plusMillis(statusDisplayIntervalMs)

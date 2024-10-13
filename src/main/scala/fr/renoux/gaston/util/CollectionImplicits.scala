@@ -1,9 +1,8 @@
 package fr.renoux.gaston.util
 
-import mouse.map._
+import mouse.map.*
 
-import scala.collection.IterableOps
-import scala.collection.IterableOnceOps
+import scala.collection.{IterableOnceOps, IterableOps}
 
 
 /** A bunch of extension mehtods over collections. */
@@ -14,7 +13,8 @@ object CollectionImplicits {
 
     @inline def zipWith[B](f: A => B): CC[(A, B)] = wrapped.map(a => a -> f(a))
 
-    @inline def cross[B](bs: Iterable[B]): CC[(A, B)] = for {
+    // TODO use operator x instead, would be better
+    @inline infix def cross[B](bs: Iterable[B]): CC[(A, B)] = for {
       a <- wrapped
       b <- bs
     } yield (a, b)
@@ -40,7 +40,7 @@ object CollectionImplicits {
     }
   }
 
-  @inline implicit final class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, _]) extends AnyVal {
+  @inline implicit final class IterableEitherOps[A, B, CC[_]](val wrapped: IterableOps[Either[A, B], CC, ?]) extends AnyVal {
     @inline def unzipEither: (CC[A], CC[B]) = {
       val lefts = wrapped.collect { case Left(a) => a }
       val rights = wrapped.collect { case Right(b) => b }
@@ -48,7 +48,7 @@ object CollectionImplicits {
     }
   }
 
-  @inline implicit final class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, _], CCO, _]) extends AnyVal {
+  @inline implicit final class IterableIterableOps[A, CCI[_], CCO[_]](val wrapped: IterableOps[IterableOps[A, CCI, ?], CCO, ?]) extends AnyVal {
     @inline def mapMap[B](f: A => B): CCO[CCI[B]] = wrapped.map(_.map(f))
   }
 

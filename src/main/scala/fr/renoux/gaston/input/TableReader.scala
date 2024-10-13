@@ -1,12 +1,11 @@
 package fr.renoux.gaston.input
 
 import com.typesafe.scalalogging.Logger
-import eu.timepit.refined.auto._
-import eu.timepit.refined.types.numeric.PosInt
-import eu.timepit.refined.types.string.NonEmptyString
-import fr.renoux.gaston.model.Score
-import fr.renoux.gaston.util.CanGroupToMap.ops._
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.model.{Score, Weight}
+import fr.renoux.gaston.util.CanGroupToMap.ops.*
+import fr.renoux.gaston.util.CollectionImplicits.*
+import io.github.iltotore.iron.*
+import io.github.iltotore.iron.constraint.all.*
 
 import scala.util.Try
 
@@ -21,11 +20,11 @@ final class TableReader(input: InputModel) {
   private val log = Logger[TableReader]
 
   private implicit object InputTopicOrdering extends Ordering[InputTopic] {
-    override def compare(x: InputTopic, y: InputTopic): Int = x.name.value.compareTo(y.name.value)
+    override def compare(x: InputTopic, y: InputTopic): Int = x.name.compareTo(y.name)
   }
 
   private implicit object InputPersonOrdering extends Ordering[InputPerson] {
-    override def compare(x: InputPerson, y: InputPerson): Int = x.name.value.compareTo(y.name.value)
+    override def compare(x: InputPerson, y: InputPerson): Int = x.name.compareTo(y.name)
   }
 
   /** Read the table as a CSV text */
@@ -43,14 +42,15 @@ final class TableReader(input: InputModel) {
       cellsWithContent.map { row =>
         val topicName: String = row(tableSettings.topicCol)
         val max: Option[PosInt] =
-          row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
+          row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(_.refineUnsafe[Positive]: PosInt)
+          // TODO Submit ticket to Iron for this? It's annoying having to declare the type. It might be solved by something like _.refineUnsafeTo[PosInt] instead.
         val min: Option[PosInt] =
-          tableSettings.minPersonsCol.map(_.value).map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd).map(PosInt.unsafeFrom)
+          tableSettings.minPersonsCol.map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd).map(_.refineUnsafe[Positive]: PosInt)
         val occurrences: Option[PosInt] =
-          tableSettings.topicOccurrencesCol.map(_.value).map(row).flatMap(_.toIntOption).map(PosInt.unsafeFrom)
+          tableSettings.topicOccurrencesCol.map(row).flatMap(_.toIntOption).map(_.refineUnsafe[Positive]: PosInt)
 
         InputTopic(
-          name = NonEmptyString.unsafeFrom(topicName),
+          name = topicName.refineUnsafe[Not[Empty]],
           min = min.filterNot(_ == settings.defaultMinPersonsPerTopic),
           max = max.filterNot(_ == settings.defaultMaxPersonsPerTopic),
           occurrences = occurrences
@@ -62,9 +62,9 @@ final class TableReader(input: InputModel) {
 
     /* For each person's names, a list of mandatory topic's names */
     val mandatoryPersonsToTopics: Map[NonEmptyString, Set[NonEmptyString]] = cellsWithContent.map { row =>
-      val topicName = NonEmptyString.from(row(tableSettings.topicCol))
+      val topicName = row(tableSettings.topicCol).refineOption[Not[Empty]]
         .getOrElse(throw new IllegalArgumentException("Topic column is empty"))
-      val mandatoryName = NonEmptyString.from(row(tableSettings.mandatoryPersonCol))
+      val mandatoryName = row(tableSettings.mandatoryPersonCol).refineOption[Not[Empty]]
         .getOrElse(throw new IllegalArgumentException("Mandatory person column is empty"))
       mandatoryName -> topicName
     }.groupToMap.mapValuesStrict(_.toSet)
@@ -72,7 +72,7 @@ final class TableReader(input: InputModel) {
     /* The persons, */
     val indexedPersonNames = cellsPersonsRow.zipWithIndex.drop(tableSettings.personsStartCol)
     val persons = indexedPersonNames.map { case (maybePerson, personColumnIndex) =>
-      val person = NonEmptyString.unsafeFrom(maybePerson)
+      val person = maybePerson.refineUnsafe[Not[Empty]]
 
       val personColumn = cellsWithContent.map { row =>
         if (row.length <= personColumnIndex) "" else row(personColumnIndex).trim
@@ -84,13 +84,13 @@ final class TableReader(input: InputModel) {
         topicNames.zip(personColumn).filter(_._2 == marker).map(_._1).toSet
       }.getOrElse(Set.empty)
 
-      val scoresByTopic = topicsSeq.zip(personColumn).flatMap {
-        case (topic, value) => wishValueToScoreOption(value).map(topic.name.value -> _)
+      val scoresByTopic: Map[String, Score] = topicsSeq.zip(personColumn).flatMap {
+        case (topic, value) => wishValueToScoreOption(value).map(topic.name -> _)
       }.toMap
 
       InputPerson(
         name = person,
-        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else Constants.DefaultWeightRefined,
+        weight = if (mandatoryTopics.nonEmpty) tableSettings.mandatoryPersonWeight else Weight.Default,
         mandatory = mandatoryTopics,
         forbidden = forbiddenTopics,
         wishes = scoresByTopic

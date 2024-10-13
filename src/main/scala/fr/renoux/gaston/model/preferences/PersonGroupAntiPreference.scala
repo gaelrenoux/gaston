@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.BitSet
 
 /**

@@ -15,7 +15,7 @@ class TopicsLinkedSpec extends AnyFlatSpec with Matchers {
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default
 
-  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps: _*)))
+  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps*)))
 
   behavior of "TopicsLinked"
   val mustFightAndPartyAndMachines: Preference = TopicsLinked(Set(Fighting, Party, Machines).toBitSet)
