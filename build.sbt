@@ -113,6 +113,10 @@ libraryDependencies ++= {
 }
 
 assembly / mainClass := Some("fr.renoux.gaston.command.Main")
+assembly / assemblyMergeStrategy := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case _                        => MergeStrategy.first
+}
 
 Test / fork := true
 Test / testOptions += Tests.Argument("-oD") // show test duration
