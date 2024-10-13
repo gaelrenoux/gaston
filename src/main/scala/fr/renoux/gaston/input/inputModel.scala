@@ -4,7 +4,8 @@ import fr.renoux.gaston.model.{Score, Weight}
 import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.Opt
 import pureconfig.*
-import pureconfig.generic.derivation.default.*
+import pureconfig.generic.*
+import pureconfig.generic.semiauto.deriveConvert
 import io.github.iltotore.iron.*
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.pureconfig.given
@@ -23,33 +24,33 @@ def NonPosScore(i: Double :| Negative0): NonPosScore = Score(i).asInstanceOf[Non
 
 given Constraint[Score, Positive] with {
   override inline def test(inline value: Score): Boolean = value.value > 0
+
   override inline def message: String = "Should be strictly positive"
 }
 
 given Constraint[Score, Positive0] with {
   override inline def test(inline value: Score): Boolean = value.value >= 0
+
   override inline def message: String = "Should be positive or zero"
 }
 
 given Constraint[Score, Negative] with {
   override inline def test(inline value: Score): Boolean = value.value < 0
+
   override inline def message: String = "Should be strictly negative"
 }
 
 given Constraint[Score, Negative0] with {
   override inline def test(inline value: Score): Boolean = value.value <= 0
+
   override inline def message: String = "Should be negative or zero"
 }
 
 given Constraint[Weight, Positive] with {
   override inline def test(inline value: Weight): Boolean = value.value > 0
+
   override inline def message: String = "Should be strictly positive"
 }
-
-given ConfigReader[Score] = ConfigReader[Double].map(Score.apply)
-given ConfigReader[NonPosScore] = ConfigReader[Double :| Negative0].map(i => NonPosScore(i))
-
-given ConfigReader[Weight] = ConfigReader[Double :| Positive].map(Weight.apply)
 
 /* All line and column indices are zero-based */
 
@@ -81,7 +82,7 @@ final case class InputModel(
     persons: List[InputPerson] = Nil,
     topics: List[InputTopic] = Nil,
     constraints: InputGlobalConstraints = InputGlobalConstraints()
-) derives ConfigReader {
+) {
   lazy val slotsSet: Set[InputSlot] = slots.flatten.toSet
   lazy val topicsSet: Set[InputTopic] = topics.toSet
   lazy val personsSet: Set[InputPerson] = persons.toSet
@@ -98,7 +99,7 @@ final case class InputSettings(
     defaultMaxPersonsPerTopic: PosInt = Constants.DefaultTopicMax,
     unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
     statusDisplayInterval: FiniteDuration = 20.seconds
-) derives ConfigReader
+)
 
 object InputSettings {
 
@@ -136,12 +137,12 @@ final case class InputTableSettings(
     mandatoryPersonWeight: Weight = Weight.Default,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
-) derives ConfigReader
+)
 
 final case class InputSlot(
     name: NonEmptyString,
     maxTopics: Option[PosInt] = None
-) derives ConfigReader
+)
 
 final case class InputTopic(
     name: NonEmptyString,
@@ -152,7 +153,7 @@ final case class InputTopic(
     slots: Option[Set[NonEmptyString]] = None,
     presence: Option[Score] = None,
     forced: Boolean = false
-) derives ConfigReader {
+) {
 
   /** Occurrence needs to be an Option to not appear when not needed */
   lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1)
@@ -209,36 +210,45 @@ final case class InputPerson(
     incompatible: Set[NonEmptyString] = Set.empty,
     wishes: Map[String, Score] = Map.empty, // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
     personWishes: Map[String, Score] = Map.empty
-) derives ConfigReader
+)
 
 final case class InputGlobalConstraints(
     simultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     notSimultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     exclusive: Set[InputExclusiveConstraint] = Set.empty,
     linked: Set[InputLinkedConstraint] = Set.empty,
-) derives ConfigReader
+)
 
 final case class InputSimultaneousConstraint(
     topics: Set[NonEmptyString]
-) derives ConfigReader
+)
 
 final case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
     exemptions: Set[NonEmptyString] = Set.empty
-) derives ConfigReader
+)
 
 final case class InputLinkedConstraint(
     topics: Set[NonEmptyString]
-) derives ConfigReader
+)
 
+/* All necessary config-readers and config-writers */
+given [A, C](using ConfigWriter[A]): ConfigWriter[IronType[A, C]] = ConfigWriter[A].contramap(identity)
 
+given ConfigConvert[Score] = ConfigConvert[Double].xmap(Score.apply, _.value)
+given ConfigReader[NonPosScore] = ConfigReader[Double :| Negative0].map(i => NonPosScore(i))
+given ConfigReader[Weight] = ConfigReader[Double :| Positive].map(Weight.apply)
+given ConfigWriter[Weight] = ConfigWriter[Double].contramap(_.value)
 
-
-
-val a = summon[ConfigReader[NonEmptyString]]
-val c = summon[ConfigReader[Int]]
-val d = summon[ConfigReader[NonNegInt]]
-val e = summon[ConfigReader[Weight]]
-val os = summon[ConfigReader[Option[String]]]
-val mss = summon[ConfigReader[Option[Map[String, Score]]]]
-
+given ConfigConvert[InputLinkedConstraint] = deriveConvert[InputLinkedConstraint]
+given ConfigConvert[InputExclusiveConstraint] = deriveConvert[InputExclusiveConstraint]
+given ConfigConvert[InputSimultaneousConstraint] = deriveConvert[InputSimultaneousConstraint]
+given ConfigConvert[InputGlobalConstraints] = deriveConvert[InputGlobalConstraints]
+given ConfigConvert[InputPerson] = deriveConvert[InputPerson]
+given ConfigConvert[InputTopic] = deriveConvert[InputTopic]
+given ConfigConvert[InputSlot] = deriveConvert[InputSlot]
+given ConfigConvert[InputTableSettings] = deriveConvert[InputTableSettings]
+given ConfigConvert[InputSettings.UnassignedAntiPreferenceScaling] = deriveConvert[InputSettings.UnassignedAntiPreferenceScaling]
+given ConfigConvert[InputSettings.Unassigned] = deriveConvert[InputSettings.Unassigned]
+given ConfigConvert[InputSettings] = deriveConvert[InputSettings]
+given ConfigConvert[InputModel] = deriveConvert[InputModel]

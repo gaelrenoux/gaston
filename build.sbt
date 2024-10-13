@@ -106,6 +106,7 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= {
   if (scalaVersion.value.startsWith("3.")) Seq(
     "com.github.pureconfig" %% "pureconfig-core" % "0.17.7",
+    "com.github.pureconfig" %% "pureconfig-generic-scala3" % "0.17.7",
     "org.typelevel" %% "shapeless3-deriving" % "3.4.3"
   )
   else Seq("com.github.pureconfig" %% "pureconfig" % "0.17.7")
