@@ -16,39 +16,7 @@ lazy val gaston = (project in file("."))
 /* Those tests are much slower */
 lazy val SlowTest = config("test-slow") extend (Test)
 
-scalacOptions ++= {
-  if (scalaVersion.value.startsWith("3.")) scala3Options
-  else scala2Options
-}
-
-lazy val scala2Options = Seq(
-  "-Xsource:3",
-
-  "-language:implicitConversions",
-  "-language:higherKinds",
-  "-language:existentials",
-
-  // "-XX:MaxInlineLevel=18", // see https://github.com/scala/bug/issues/11627#issuecomment-514619316
-
-  "-explaintypes", // Explain type errors in more detail.
-  "-Werror", // Fail the compilation if there are any warnings.
-
-  "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-  "-deprecation", // Emit warning and location for usages of deprecated APIs.
-  "-unchecked", // Enable additional warnings where generated code depends on assumptions.
-  "-Xcheckinit", // Wrap field accessors to throw an exception on uninitialized access.
-  //  "-Xdev", // Indicates user is a developer - issue warnings about anything which seems amiss
-
-  "-Wunused:explicits", // Warn if an explicit parameter is unused.
-  "-Wunused:implicits", // Warn if an implicit parameter is unused.
-  "-Wunused:imports", // Warn when imports are unused.
-  "-Wunused:locals", // Warn if a local definition is unused.
-  "-Wunused:patvars", // Warn if a variable bound in a pattern is unused.
-  "-Wunused:privates", // Warn if a private member is unused.
-  "-Wvalue-discard", // Warn when non-Unit expression results are unused.
-)
-
-lazy val scala3Options = Seq(
+scalacOptions ++= Seq(
   "-language:implicitConversions",
   "-language:higherKinds",
   "-language:existentials",
@@ -89,7 +57,9 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "mouse" % "1.3.2",
 
   "com.typesafe" % "config" % "1.4.3",
-  // "com.github.pureconfig" %% "pureconfig" % "0.17.7",
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.7",
+  "com.github.pureconfig" %% "pureconfig-generic-scala3" % "0.17.7",
+  "org.typelevel" %% "shapeless3-deriving" % "3.4.3",
   "com.github.scopt" %% "scopt" % "4.1.0",
 
   "io.github.iltotore" %% "iron" % ironVersion,
@@ -103,14 +73,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 
-libraryDependencies ++= {
-  if (scalaVersion.value.startsWith("3.")) Seq(
-    "com.github.pureconfig" %% "pureconfig-core" % "0.17.7",
-    "com.github.pureconfig" %% "pureconfig-generic-scala3" % "0.17.7",
-    "org.typelevel" %% "shapeless3-deriving" % "3.4.3"
-  )
-  else Seq("com.github.pureconfig" %% "pureconfig" % "0.17.7")
-}
 
 assembly / mainClass := Some("fr.renoux.gaston.command.Main")
 assembly / assemblyMergeStrategy := {
