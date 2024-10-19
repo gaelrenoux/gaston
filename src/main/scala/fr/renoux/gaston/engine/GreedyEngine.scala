@@ -52,6 +52,8 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
         }
       } yield GreedyEngine.State(improved, move, state.attemptsCount + index + 1)
 
+    // FIXME All the schedules we've tried are not counted if find no acceptable schedule !
+
     improvedSchedules.headOption
   }
 }
