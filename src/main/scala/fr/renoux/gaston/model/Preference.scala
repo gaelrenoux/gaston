@@ -1,13 +1,13 @@
 package fr.renoux.gaston.model
 
 /**
-  * The more preferences are satisfied the better, but it's not mandatory. Preferences should implement `equals()` and
-  * `hashCode()` to allow deduplication.
-  */
+ * The more preferences are satisfied the better, but it's not mandatory. Preferences should implement `equals()` and
+ * `hashCode()` to allow deduplication.
+ */
 trait Preference {
 
   /** Score you get each time you satisfy this constraint. Anti-preferences (stuff you would like no to happen) should
-    * have a negative reward */
+   * have a negative reward */
   def reward: Score
 
   def score(schedule: Schedule): Score
@@ -31,7 +31,7 @@ object Preference {
   trait GlobalLevel extends Preference {
 
     /** Indicates wether persons assignement matter for this preference. It's true in most case, but there are some
-      * global-level preferences that only looks at how the topics are arranged. */
+     * global-level preferences that only looks at how the topics are arranged. */
     def personsMatter: Boolean = true
 
     /** Score the schedule according to this preference. */

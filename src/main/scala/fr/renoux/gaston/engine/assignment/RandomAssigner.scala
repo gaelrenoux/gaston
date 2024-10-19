@@ -7,21 +7,21 @@ import fr.renoux.gaston.util.immutable
 import scala.util.Random
 
 /**
-  * Fills an unfilled schedule with persons, ignoring preferences but respecting constraints.
-  */
+ * Fills an unfilled schedule with persons, ignoring preferences but respecting constraints.
+ */
 @immutable
 final class RandomAssigner(implicit private val problem: Problem) {
 
   private val log = Logger[RandomAssigner]
 
   /** Starts with an unfilled schedule satisfying all constraints except number constraint (including having all
-    * mandatory persons correctly assigned on their topics), and generates a random schedule respecting all constraints,
-    * using backtracking as necessary.
-    *
-    * Input schedule must have a workable one, where the totals of min and max on topics are compatible with the number
-    * of persons present on their slot). In rare cases, it can be impossible to build a working schedule, for example
-    * if too many persons are forbidden on several of the available topics in one slot.
-    */
+   * mandatory persons correctly assigned on their topics), and generates a random schedule respecting all constraints,
+   * using backtracking as necessary.
+   *
+   * Input schedule must have a workable one, where the totals of min and max on topics are compatible with the number
+   * of persons present on their slot). In rare cases, it can be impossible to build a working schedule, for example
+   * if too many persons are forbidden on several of the available topics in one slot.
+   */
   def fill(unfilledSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
     log.debug("Starting to fill the unfilled schedule")
     val slotSchedules =
@@ -50,12 +50,12 @@ final class RandomAssigner(implicit private val problem: Problem) {
   }
 
   /**
-    * First, fills in persons on topics that need to reach their minimum number of persons. Then, delegates filling up
-    * the rest to assignRemainingPersons.
-    * @param recordsInNeed Records where the topic needs more people to reach its min.
-    * @param personsLeft Persons that can be assigned to the head of recordsInNeed.
-    * @param personsSkipped Persons that have been looked at and skipped for the head of topicsInNeed.
-    */
+   * First, fills in persons on topics that need to reach their minimum number of persons. Then, delegates filling up
+   * the rest to assignRemainingPersons.
+   * @param recordsInNeed Records where the topic needs more people to reach its min.
+   * @param personsLeft Persons that can be assigned to the head of recordsInNeed.
+   * @param personsSkipped Persons that have been looked at and skipped for the head of topicsInNeed.
+   */
   private def backtrackFillPersons(unfilledSlotSchedule: SlotSchedule)
     (recordsInNeed: List[Record], personsLeft: List[Person], personsSkipped: List[Person] = Nil)
     (implicit random: Random): Option[SlotSchedule] =
@@ -86,11 +86,11 @@ final class RandomAssigner(implicit private val problem: Problem) {
     }
 
   /**
-    * Fills in persons on topics that can still take more persons. Assumes that the provided slot-schedule has enough persons on each topic to reach the min.
-    * @param personsLeft Persons that we still need to assign.
-    * @param recordsOpen Records where we can add the head of personsLeft.
-    * @param recordsSkipped Records that have been looked at and skipped for the head of personsLeft.
-    */
+   * Fills in persons on topics that can still take more persons. Assumes that the provided slot-schedule has enough persons on each topic to reach the min.
+   * @param personsLeft Persons that we still need to assign.
+   * @param recordsOpen Records where we can add the head of personsLeft.
+   * @param recordsSkipped Records that have been looked at and skipped for the head of personsLeft.
+   */
   private def assignRemainingPersons(unfilledSlotSchedule: SlotSchedule)
     (personsLeft: List[Person], recordsOpen: List[Record], recordsSkipped: List[Record] = Nil): Option[SlotSchedule] =
     (personsLeft, recordsOpen) match {

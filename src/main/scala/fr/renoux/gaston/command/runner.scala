@@ -14,11 +14,11 @@ import scala.concurrent.{Await, Future}
 import scala.util.Random
 
 /** A Runner is a class that will use an Engine to generate schedules over and over again. If an Engine-produced lazy
-  * sequence finishes, it is the responsibility of the Runner to start a new one, using its own random generator to
-  * make a new seed for the new sequence.
-  *
-  * Runners may be mutable, as they typically handle their own random generator, and are NOT thread-safe.
-  */
+ * sequence finishes, it is the responsibility of the Runner to start a new one, using its own random generator to
+ * make a new seed for the new sequence.
+ *
+ * Runners may be mutable, as they typically handle their own random generator, and are NOT thread-safe.
+ */
 abstract class Runner(seed: Long, statusDisplayInterval: FiniteDuration) {
 
   /** Interval of time between each status output */
@@ -27,8 +27,8 @@ abstract class Runner(seed: Long, statusDisplayInterval: FiniteDuration) {
   protected implicit val random: Random = new Random(seed)
 
   /** Generate schedules over time, outputting them at the statusFrequency interval. Will only terminate if some
-    * termination conditions are set. If it terminates, its result is the best schedule found and the count of schedules
-    * examined. */
+   * termination conditions are set. If it terminates, its result is the best schedule found and the count of schedules
+   * examined. */
   def run(termination: Termination): (Schedule, Long)
 }
 
@@ -39,7 +39,7 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
   extends Runner(seed, statusDisplayInterval) {
 
   /** Runs the schedule generation. The argument controls when to stop the process. If no termination condition is set,
-    * this method never terminates. */
+   * this method never terminates. */
   override def run(termination: Termination): (Schedule, Long) = {
     implicit val random: Random = new Random(seed)
     output.writeStartThread(seed)
@@ -99,14 +99,14 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
 
 
 /** Runs multiple parallel SyncRunners, with different seeds, in parallel, then aggregate the results if they terminate.
-  * Note that termination conditions must be met on all parallel runners for this one to terminate. */
+ * Note that termination conditions must be met on all parallel runners for this one to terminate. */
 // TODO Find a way to terminate early as soon as a minimum score is reached, but not for other termination conditions.
 class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = ParallelRunner.defaultParallelism(), statusDisplayInterval: FiniteDuration = 1.day)
   (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
   extends Runner(seed, statusDisplayInterval) {
 
   /** Runs multiple Runners, in parallel, then wait for them to finish. Note that if no termination conditions are set,
-    * this method will never terminate. */
+   * this method will never terminate. */
   def run(termination: Termination): (Schedule, Long) = {
     val now = Instant.now()
     val maxDuration = termination.timeout.map(_ - now)

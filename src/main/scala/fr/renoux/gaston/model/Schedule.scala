@@ -10,11 +10,11 @@ import fr.renoux.gaston.util.{BitSet, Context, testOnly}
 import scala.util.Random
 
 /**
-  * A schedule is an association of people, to topics, to slots.
-  * What we're trying and testing and looking for a good one.
-  * @param chainSeed The seed for the chain that has been used to produce this schedule. Allows to rerun it if debugging.
-  * @param isAbysmal Flag to force this schedule to report the minimum possible score.
-  */
+ * A schedule is an association of people, to topics, to slots.
+ * What we're trying and testing and looking for a good one.
+ * @param chainSeed The seed for the chain that has been used to produce this schedule. Allows to rerun it if debugging.
+ * @param isAbysmal Flag to force this schedule to report the minimum possible score.
+ */
 final case class Schedule(
     chainSeed: Long,
     private val wrapped: Map[Slot, SlotSchedule],
@@ -87,7 +87,7 @@ final case class Schedule(
   def addTopics(slot: Slot, topics: Set[Topic]): Schedule = updateSlotSchedule(slot)(_.addTopics(topics))
 
   /** Swap two topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
-    * schedule is probably unsound and/or unfilled. */
+   * schedule is probably unsound and/or unfilled. */
   def swapTopic(st1: (Slot, Topic), st2: (Slot, Topic)): Schedule = updateWrapped {
     val (slot1, topic1) = st1
     val (slot2, topic2) = st2
@@ -107,7 +107,7 @@ final case class Schedule(
   }
 
   /** Replace an existing topic by a new one (typically unscheduled, on a slot). Mandatory persons are set on the new
-    * topic and no one else, so the schedule is probably unsound and/or unfilled. */
+   * topic and no one else, so the schedule is probably unsound and/or unfilled. */
   def replaceTopic(slot: Slot, oldTopic: Topic, newTopic: Topic): Schedule =
     updateSlotSchedule(slot)(_.replaceTopic(oldTopic, newTopic))
 
@@ -129,8 +129,8 @@ final case class Schedule(
 
 
   /** This methods helps by not calculating the whole schedule's score until we're sure it's needed. However, it doesn't
-    * work if there are any global preferences that depends on person assignment, as we still need to recalculate global
-    * score in that case. */
+   * work if there are any global preferences that depends on person assignment, as we still need to recalculate global
+   * score in that case. */
   // TODO the whole method itself is a minor (5%) hot-spot
   // TODO can be improved by handling global preferences
   def deltaScoreIfSwapPerson(slot: Slot, tp1: (Topic, Person), tp2: (Topic, Person)): Option[Score] =
@@ -156,8 +156,8 @@ final case class Schedule(
   }
 
   /** Partial schedules don't even have all of their topics planned yet (and they're obviously unfilled as well).
-    * @return true if this respects all constraints applicable to partial schedules
-    */
+   * @return true if this respects all constraints applicable to partial schedules
+   */
   lazy val isPartialSolution: Boolean = {
     lazy val allSlotsOk = slotSchedules.forall(_.isPartialSolution)
 
@@ -169,9 +169,9 @@ final case class Schedule(
   }
 
   /**
-    * Unfilled Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to unfilled schedules
-    */
+   * Unfilled Schedules are schedule where slots and topics are matched, but not all persons are assigned yet.
+   * @return true if this respects all constraints applicable to unfilled schedules
+   */
   lazy val isUnfilledSolution: Boolean = isPartialSolution && {
     lazy val allSlotsOk = slotSchedules.forall(_.isUnfilledSolution)
     lazy val forcedTopicsOk = problem.forcedTopics.forall(scheduledTopics.contains)
@@ -274,7 +274,7 @@ object Schedule {
   def abysmal(implicit problem: Problem, ctx: Context): Schedule = Schedule(chainSeed = 0, Map.empty, isAbysmal = true)
 
   /** Schedule where only the forced topics are placed (randomly). Forced topics contain their mandatory persons plus
-    * the minimum number of persons to make them valid. Other persons are on the "unassigned" topics. */
+   * the minimum number of persons to make them valid. Other persons are on the "unassigned" topics. */
   def startingUnassignedOrForced(chainSeed: Long)(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
     /* Everything complicated in here is for the forced-slots */
     val forcedTopicsCountPerSlot = Array.fill(problem.slotsSet.size)(0)

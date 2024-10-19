@@ -10,8 +10,8 @@ import io.github.iltotore.iron.constraint.all.*
 import scala.util.Try
 
 /**
-  * Reads a table of preferences to complement the input settings.
-  */
+ * Reads a table of preferences to complement the input settings.
+ */
 final class TableReader(input: InputModel) {
 
   val tableSettings: InputTableSettings = input.tableSettings
@@ -43,7 +43,7 @@ final class TableReader(input: InputModel) {
         val topicName: String = row(tableSettings.topicCol)
         val max: Option[PosInt] =
           row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(_.refineUnsafe[Positive]: PosInt)
-          // TODO Submit ticket to Iron for this? It's annoying having to declare the type. It might be solved by something like _.refineUnsafeTo[PosInt] instead.
+        // TODO Submit ticket to Iron for this? It's annoying having to declare the type. It might be solved by something like _.refineUnsafeTo[PosInt] instead.
         val min: Option[PosInt] =
           tableSettings.minPersonsCol.map(row).flatMap(_.toIntOption).map(_ + tableSettings.personsCountAdd).map(_.refineUnsafe[Positive]: PosInt)
         val occurrences: Option[PosInt] =

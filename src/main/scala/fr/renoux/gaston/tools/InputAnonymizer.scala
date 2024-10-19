@@ -42,7 +42,7 @@ class InputAnonymizer(in: InputModel, val seed: Long = 0) {
     .modify(_.persons).using(_.sortBy(_.name))
 
   /** Anonymize topics first, then persons. The hypothesis is that there won't be any topic name appearing in a person
-    * name, but the reverse might be true. */
+   * name, but the reverse might be true. */
   def anonymizeTable(table: String): String = {
     val tableTopicsAnonymized = topicAnonymizer.getCorrespondances.foldLeft(table) {
       case (table, (oldTopic, newTopic)) => table.replace(oldTopic, newTopic)

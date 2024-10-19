@@ -8,17 +8,17 @@ import scala.collection.mutable
 import scala.util.Random
 
 /** Anonymize some names, replacing them by using a combination of two strings picked from two different lists.
-  *
-  * Class is mutable, and should be kept as long as you keep anonymizing the same model (as it prevents duplicates in
-  * the names).
-  *
-  * Works through a series of passes. Whenever we are asked to anonymize a new name:
-  * - We'll try getting Strings from the lists that where not used before (neither of them).
-  * - Once all have been used, we'll try getting a combination that was not used before.
-  * - Once all have been used, we'll start adding numbers at the end.
-  *
-  * We assume that the multiplying the size of all lists still lead to an Int.
-  */
+ *
+ * Class is mutable, and should be kept as long as you keep anonymizing the same model (as it prevents duplicates in
+ * the names).
+ *
+ * Works through a series of passes. Whenever we are asked to anonymize a new name:
+ * - We'll try getting Strings from the lists that where not used before (neither of them).
+ * - Once all have been used, we'll try getting a combination that was not used before.
+ * - Once all have been used, we'll start adding numbers at the end.
+ *
+ * We assume that the multiplying the size of all lists still lead to an Int.
+ */
 class CombinerAnonymizer(seed: Long, val altOneList: Seq[String], val altTwoList: Seq[String], prefix: String = "", suffix: String = "") {
 
   type NonEmptyString = String :| Not[Empty]

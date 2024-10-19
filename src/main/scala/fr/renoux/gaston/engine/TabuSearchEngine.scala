@@ -10,11 +10,11 @@ import scala.annotation.tailrec
 import scala.util.Random
 
 /** Use tabu search to improve a schedule. Not a real tabu search as we stop a step when we found a better schedule,
-  * instead of always looking for the best.
-  *
-  * Doesn't seem to be very good.
-  * TODO Rework or drop
-  */
+ * instead of always looking for the best.
+ *
+ * Doesn't seem to be very good.
+ * TODO Rework or drop
+ */
 final class TabuSearchEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context)
   extends Engine(triggerOnBacktrackingFailure) {
 

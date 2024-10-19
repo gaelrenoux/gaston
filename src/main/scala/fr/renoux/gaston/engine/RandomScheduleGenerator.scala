@@ -12,9 +12,9 @@ import scala.collection.immutable.Queue
 import scala.util.Random
 
 /**
-  * Uses backtracking to produce a valid schedule, making random choices to provide a planning. Given the planning,
-  * assignment of persons is optimized.
-  */
+ * Uses backtracking to produce a valid schedule, making random choices to provide a planning. Given the planning,
+ * assignment of persons is optimized.
+ */
 final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
 
   private val log = Logger[RandomScheduleGenerator]
@@ -36,7 +36,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
     // TODO need to handle followup topics !
     val (forcedTopics, unforcedTopics) = problem.topicsList.filterNot(_.isFollowup).partition(_.forced)
     val topics = random.shuffle(forcedTopics) ::: random.shuffle(unforcedTopics)
-    val state = State(Schedule.empty(chainSeed), Queue(slots*), topics)
+    val state = State(Schedule.empty(chainSeed), Queue(slots *), topics)
     val unimproved = backtrackAndFill(state)
     improver.improve(unimproved.get)
   }
@@ -55,11 +55,11 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
   }
 
   /**
-    * Uses backtracking to construct an unfilled schedule with all topics assigned to slots, and mandatory people
-    * assigned to their topics. Returns the current backtracking state (including the schedule), so that we may start
-    * again if needed.
-    * @return The state of the backtracking, with a schedule that fits.
-    */
+   * Uses backtracking to construct an unfilled schedule with all topics assigned to slots, and mandatory people
+   * assigned to their topics. Returns the current backtracking state (including the schedule), so that we may start
+   * again if needed.
+   * @return The state of the backtracking, with a schedule that fits.
+   */
   private def backtrackAssignTopicsToSlots(
       state: State,
       failures: BacktrackingFailures = BacktrackingFailures(triggerOnFailures)
@@ -116,11 +116,11 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
 object RandomScheduleGenerator {
 
   /** Backtracking state
-    * @param unfilledSchedule Unfilled schedule we are starting from
-    * @param slotsLeft All slots on which we can still add some stuff, ordered by priority (we do a round-robin). Head is the current slot.
-    * @param topicsLeft Topics we can try for the current slot.
-    * @param topicsPassed Topics that won't work for the current slot, but may work for ulterior slots.
-    */
+   * @param unfilledSchedule Unfilled schedule we are starting from
+   * @param slotsLeft All slots on which we can still add some stuff, ordered by priority (we do a round-robin). Head is the current slot.
+   * @param topicsLeft Topics we can try for the current slot.
+   * @param topicsPassed Topics that won't work for the current slot, but may work for ulterior slots.
+   */
   private final case class State(unfilledSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
 
     private implicit val problem: Problem = unfilledSchedule.problem

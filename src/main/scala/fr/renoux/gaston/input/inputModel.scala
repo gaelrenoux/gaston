@@ -114,9 +114,9 @@ object InputSettings {
   )
 
   /** If this is enabled, the anti-preference for unassigned will scale with the number of forbidden topics for each person.
-    * @param maximumAntiPreference The maximum value of the anti-preference (i.e., closest to zero).
-    * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal value.
-    */
+   * @param maximumAntiPreference The maximum value of the anti-preference (i.e., closest to zero).
+   * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal value.
+   */
   final case class UnassignedAntiPreferenceScaling(
       maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
       forbiddenRatioForMaximum: Double = 0.75,

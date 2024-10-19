@@ -33,12 +33,12 @@ final case class SlotSchedule(
   lazy val topicsList: List[Topic] = topics.toList
 
   /** Topics that can be moved to another slot. Can't move followup directly (move the base topic instead), and can't
-    * move if it's restricted to this very slot. */
+   * move if it's restricted to this very slot. */
   lazy val movableTopics: Iterable[Topic] = topics.filterNot(t => t.isFollowup || t.requiresSingleSpecificSlot)
   lazy val movableTopicsSet: Set[Topic] = movableTopics.toSet
 
   /** Topics that can be removed from the schedule. Can't remove followup directly (remove the base topic instead), and
-    * can't remove forced topics. */
+   * can't remove forced topics. */
   lazy val removableTopics: Iterable[Topic] = topics.filterNot(t => t.forced || t.isFollowup)
 
   lazy val persons: Iterable[Person] = wrapped.values.flatMap(_.persons)
@@ -94,7 +94,7 @@ final case class SlotSchedule(
   def removeTopics(topics: Set[Topic]): SlotSchedule = updateWrapped(wrapped -- topics)
 
   /** Replace an existing topic by a new one (typically unscheduled). Mandatory persons are set on the new topic and no
-    * one else, so the schedule is probably unsound and/or unfilled. */
+   * one else, so the schedule is probably unsound and/or unfilled. */
   def replaceTopic(oldTopic: Topic, newTopic: Topic): SlotSchedule = updateWrapped {
     wrapped - oldTopic + (newTopic -> Record(slot, newTopic, newTopic.mandatory))
   }
@@ -169,9 +169,9 @@ final case class SlotSchedule(
   }
 
   /**
-    * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to partial schedules
-    */
+   * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
+   * @return true if this respects all constraints applicable to partial schedules
+   */
   lazy val isPartialSolution: Boolean = {
     lazy val recordsOk = records.forall(_.isUnfilledSolution) // Records don't have a partial status: if they exist, they're planned. They can only be unfilled.
     lazy val maxTopicsOk = slot.maxTopics >= topics.size
@@ -180,9 +180,9 @@ final case class SlotSchedule(
   }
 
   /**
-    * Unfilled Schedules are schedule where topics are matched, but not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to unfilled schedules
-    */
+   * Unfilled Schedules are schedule where topics are matched, but not all persons are assigned yet.
+   * @return true if this respects all constraints applicable to unfilled schedules
+   */
   lazy val isUnfilledSolution: Boolean = isPartialSolution && {
     problem.slotLevelConstraints.forall { c => !c.isApplicableToUnfilledSchedule || c.isRespectedSlot(this) }
   }

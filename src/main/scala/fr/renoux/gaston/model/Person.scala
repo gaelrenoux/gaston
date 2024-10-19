@@ -5,8 +5,8 @@ import fr.renoux.gaston.util.Identified
 // TODO get the weight out of person and have the person inside the weight object ? It is only used during the scoring in Problem.
 
 /** Someone.
-  * @param baseScore Always added to this person by default, independently of their preferences.
-  */
+ * @param baseScore Always added to this person by default, independently of their preferences.
+ */
 final case class Person(
     id: Person.Id,
     name: String,

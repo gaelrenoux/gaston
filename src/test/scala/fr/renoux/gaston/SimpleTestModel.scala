@@ -60,7 +60,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val Helping: Topic = Topic(index.getAndIncrement(), "Helping", mandatory = Set(Hercule), forbidden = Set(Iago), min = 2, max = 5)
     val Inking: Topic = Topic(index.getAndIncrement(), "Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
 
-    val Unassigned: Map[Slot,Topic] = Map(
+    val Unassigned: Map[Slot, Topic] = Map(
       SimpleTestModel.Slots.Morning -> UnassignedMorning,
       SimpleTestModel.Slots.AfterNoon -> UnassignedAfternoon,
       SimpleTestModel.Slots.Evening -> UnassignedEvening

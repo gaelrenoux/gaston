@@ -15,7 +15,7 @@ class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default
 
-  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps*)))
+  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
   behavior of "TopicsExclusive"
   val cannotLeadAndPartyExceptLeo: Preference = TopicsExclusive(Set(Leading, Party).toBitSet, Set(Leonardo).toBitSet)

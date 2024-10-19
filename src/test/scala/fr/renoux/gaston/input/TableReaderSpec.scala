@@ -3,6 +3,7 @@ package fr.renoux.gaston.input
 //import com.softwaremill.diffx
 //import com.softwaremill.diffx.generic.auto.*
 //import com.softwaremill.diffx.generic.auto.given
+
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.model.Score
 import io.github.iltotore.iron.autoRefine
@@ -63,14 +64,14 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     ib should be(eb)
 
     /* Check all */
-//    if (input != expected) {
-//      diffx.compare(expected.settings, input.settings)
-//      diffx.compare(expected.tableSettings, input.tableSettings)
-//      diffx.compare(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
-//      diffx.compare(expected.topics, input.topics)
-//      diffx.compare(expected.persons, input.persons)
-//      diffx.compare(expected.constraints, input.constraints)
-//    }
+    //    if (input != expected) {
+    //      diffx.compare(expected.settings, input.settings)
+    //      diffx.compare(expected.tableSettings, input.tableSettings)
+    //      diffx.compare(expected.slots.map(_.toList).toList, input.slots.map(_.toList).toList) //diff can't compare Seq
+    //      diffx.compare(expected.topics, input.topics)
+    //      diffx.compare(expected.persons, input.persons)
+    //      diffx.compare(expected.constraints, input.constraints)
+    //    }
     input.settings should be(expected.settings)
     input.tableSettings should be(expected.tableSettings)
     input.slots should be(expected.slots)
@@ -88,15 +89,15 @@ class TableReaderSpec extends AnyFlatSpec with Matchers {
     val expected = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force
 
     /* Check all */
-//    if (evaluated != expected) {
-//      println(rendered)
-//      diffx.compare(evaluated.settings, expected.settings)
-//      diffx.compare(evaluated.tableSettings, expected.tableSettings)
-//      diffx.compare(evaluated.slots.map(_.toList), expected.slots.map(_.toList)) //diff can't compare Seq
-//      diffx.compare(evaluated.topics, expected.topics)
-//      diffx.compare(evaluated.persons, expected.persons)
-//      diffx.compare(evaluated.constraints, expected.constraints)
-//    }
+    //    if (evaluated != expected) {
+    //      println(rendered)
+    //      diffx.compare(evaluated.settings, expected.settings)
+    //      diffx.compare(evaluated.tableSettings, expected.tableSettings)
+    //      diffx.compare(evaluated.slots.map(_.toList), expected.slots.map(_.toList)) //diff can't compare Seq
+    //      diffx.compare(evaluated.topics, expected.topics)
+    //      diffx.compare(evaluated.persons, expected.persons)
+    //      diffx.compare(evaluated.constraints, expected.constraints)
+    //    }
     evaluated should be(expected)
   }
 

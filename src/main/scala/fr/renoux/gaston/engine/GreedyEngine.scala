@@ -11,8 +11,8 @@ import fr.renoux.gaston.util.Context.chrono
 import scala.util.Random
 
 /** A specific implementation of the Engine. At each step, we find a better neighbour and move there. The lazy-seq
-  * produced has an ever-increasing score, and stops when there is no better neighbour (that is, at a local optimum).
-  */
+ * produced has an ever-increasing score, and stops when there is no better neighbour (that is, at a local optimum).
+ */
 final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context)
   extends Engine(triggerOnBacktrackingFailure) {
 
@@ -61,7 +61,7 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
 object GreedyEngine {
 
   /** In addition to the latest schedule and attempts-count, the state contains the latest move. It's used to avoid
-    * trying again the previous schedule, but mostly it's useful as a debug tool. */
+   * trying again the previous schedule, but mostly it's useful as a debug tool. */
   final case class State(
       schedule: Schedule,
       previousMove: Move,

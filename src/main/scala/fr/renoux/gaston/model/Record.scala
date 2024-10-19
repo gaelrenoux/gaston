@@ -63,9 +63,9 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   }
 
   /**
-    * Unfilled records are records where not all persons are assigned yet.
-    * @return true if this respects all constraints applicable to unfilled records
-    */
+   * Unfilled records are records where not all persons are assigned yet.
+   * @return true if this respects all constraints applicable to unfilled records
+   */
   lazy val isUnfilledSolution: Boolean = {
     topic.max >= countPersons && // can check the max but not the min, as more persons may be added later
       !topic.forbidden.exists(persons.contains) && topic.mandatory.forall(persons.contains) &&

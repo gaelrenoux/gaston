@@ -4,12 +4,12 @@ import fr.renoux.gaston.input.Constants
 import fr.renoux.gaston.util.Identified
 
 /** Something some persons are doing during a slot on the schedule. A roleplaying session, a round table, a class,
-  * whatever.
-  * @param slots Slots on which the topic must be, None meaning it can be on any slot.
-  * @param isFollowup true Only if this topic is another's topic followup
-  * @param forced Topic must be on the schedule.
-  * @param isUnassigned Special flag on synthetic topics that actually stores unassigned persons.
-  */
+ * whatever.
+ * @param slots Slots on which the topic must be, None meaning it can be on any slot.
+ * @param isFollowup true Only if this topic is another's topic followup
+ * @param forced Topic must be on the schedule.
+ * @param isUnassigned Special flag on synthetic topics that actually stores unassigned persons.
+ */
 final case class Topic(
     id: Int,
     name: String,
@@ -53,7 +53,7 @@ final case class Topic(
 object Topic {
 
   /** A prefix on the topic-name for synthetic topics (topics created by Gaston, not present in the input). Currently
-    * only unassigned topics, but reserving it just in case. */
+   * only unassigned topics, but reserving it just in case. */
   val SyntheticPrefix = "@"
 
   def unassignedName(slotName: String): String = s"${Topic.SyntheticPrefix}Unassigned ($slotName)"

@@ -44,6 +44,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
           InputPerson("Caroline", wishes = Map("alpha" -> Score(50))),
         )
       ))
+
       problem.mandatoryTopicsByPerson(p"Arnold") should be(topics)
       problem.forbiddenTopicsByPerson(p"Bianca") should be(topics)
       problem.preferencesByPerson(p"Caroline").collect {
@@ -59,6 +60,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
           InputPerson("Willy", mandatory = Set())
         )
       ))
+
       val expected = Set(Array.fill(3)(true).toSeq -> Array(true, false).toSeq)
       problem.preferences.collect {
         case TopicsExclusive(ts, ex, _) => (ts.safeContent, ex.safeContent)
@@ -67,7 +69,6 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     }
 
   }
-
 
 
   behavior of "Unassigned"
@@ -90,6 +91,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
     it should "have a basic anti-preference (when no scaling)" in {
       given problem: Problem = from(inputModel)
+
       val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
         case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
@@ -116,6 +118,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
           )
         ))
       )
+
       val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
         case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
@@ -135,7 +138,6 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   }
 
 
-
   behavior of "Incompatible topics per slot"
 
   {
@@ -148,13 +150,14 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
+
       given problem: Problem = from(inputModel)
+
       problem.incompatibleTopicsBySlot(slot"one") should be(Set(t"alpha"))
       problem.incompatibleTopicsBySlot(slot"two") should be(Set.empty)
     }
 
   }
-
 
 
   behavior of "Wishes"
@@ -169,7 +172,9 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
+
       given problem: Problem = from(inputModel)
+
       val arnold = problem.personsList.find(_.name == "Arnold").get
       val alpha = problem.topicsList.find(_.name == "alpha").get
       val gamma = problem.topicsList.find(_.name == "gamma").get
@@ -199,7 +204,9 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
+
       given problem: Problem = from(inputModel)
+
       val arnold = problem.personsList.find(_.name == "Arnold").get
       val bianca = problem.personsList.find(_.name == "Bianca").get
       val charlie = problem.personsList.find(_.name == "Charlie").get
@@ -229,7 +236,9 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
+
       given problem: Problem = from(inputModel)
+
       val arnold = problem.personsList.find(_.name == "Arnold").get
       val alpha = problem.topicsList.find(_.name == "alpha").get
       val charlie = problem.personsList.find(_.name == "Charlie").get

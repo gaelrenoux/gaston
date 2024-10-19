@@ -101,7 +101,7 @@ final case class Problem(
     topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap(Set.empty)
 
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
-    * are mandatory). */
+   * are mandatory). */
   lazy val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]] = {
     val conflictingMandatories = for {
       topic1 <- topicsSet
@@ -119,7 +119,7 @@ final case class Problem(
   }
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
-    * is missing). */
+   * is missing). */
   lazy val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slotsSet

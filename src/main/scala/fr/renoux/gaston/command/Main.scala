@@ -42,8 +42,8 @@ object Main {
   }
 
   /** Run the application with command line arguments. The only kinds of errors it can return are input errors, are
-    * those are the only ones that should happen in normal usage. Any other error is a program bug or a system issue,
-    * and it triggers an exception and a crash. */
+   * those are the only ones that should happen in normal usage. Any other error is a program bug or a system issue,
+   * and it triggers an exception and a crash. */
   private def run(commandLine: CommandLine): Either[InputErrors, Unit] = for {
     input <- loadInput(commandLine)
     problem <- InputTranscription.transcribe(input)

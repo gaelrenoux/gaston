@@ -5,8 +5,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 /**
-  * Created by gael on 07/05/17.
-  */
+ * Created by gael on 07/05/17.
+ */
 class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
   val log: Logger = Logger[CanTakeChunksSpec]
 

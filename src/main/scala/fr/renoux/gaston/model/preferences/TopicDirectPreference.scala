@@ -14,6 +14,6 @@ final case class TopicDirectPreference(topic: Topic, reward: Score) extends Pref
 
   override lazy val toLongString: String = s"TopicDirectPreference(${topic.toShortString}, $reward)"
 
-  override lazy val toAbstract: (String, Int, Double) = ("TopicDirectPreference",  topic.id, reward.value)
+  override lazy val toAbstract: (String, Int, Double) = ("TopicDirectPreference", topic.id, reward.value)
 }
 

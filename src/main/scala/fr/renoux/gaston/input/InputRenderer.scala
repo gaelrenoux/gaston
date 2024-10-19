@@ -1,8 +1,8 @@
 package fr.renoux.gaston.input
 
- import com.typesafe.config.ConfigRenderOptions
- import pureconfig.ConfigWriter
- import scala.jdk.CollectionConverters._
+import com.typesafe.config.ConfigRenderOptions
+import pureconfig.ConfigWriter
+import scala.jdk.CollectionConverters._
 
 object InputRenderer {
 
@@ -13,7 +13,7 @@ object InputRenderer {
     .setJson(false)
 
   /** Render a configuration into a String. Used mostly after loading the preferences from a table, in order to
-    * integrate them into the canonical input. */
+   * integrate them into the canonical input. */
   def render(input: InputModel): String = {
     // We don't render directly, in order to control the order of the sections. We render each section one by one.
 

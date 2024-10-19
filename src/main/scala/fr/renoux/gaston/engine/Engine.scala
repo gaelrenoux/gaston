@@ -9,12 +9,12 @@ import scala.util.Random
 
 
 /** Main class for the engine. Its main method, `lazySeq`, produces a lazy list of schedules until it reaches somewhere
-  * it cannot generate any more schedules. There is no guarantee about the time it may takes to reach the end, and it
-  * might turn out being infinite. It is up to the caller to responsibly iterate on the lazy list.
-  *
-  * The Engine is immutable and thread-safe. You can use the same instance in multiple parallel threads to produce
-  * different lazy sequences of schedule.
-  */
+ * it cannot generate any more schedules. There is no guarantee about the time it may takes to reach the end, and it
+ * might turn out being infinite. It is up to the caller to responsibly iterate on the lazy list.
+ *
+ * The Engine is immutable and thread-safe. You can use the same instance in multiple parallel threads to produce
+ * different lazy sequences of schedule.
+ */
 abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context) {
 
   private val log = Logger[Engine]
@@ -24,12 +24,12 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
   type State <: Engine.State
 
   /** Generates a lazy sequence of generally-improving schedules: we might have some setbacks but as a whole, it should
-    * go up and up. Each schedule is accompanied with the number of schedules attempted since the beginning of the lazy
-    * sequence.
-    * TODO: detail what can of setback we can have.
-    *
-    * The generated sequence is non-empty as it always contain at least the initial schedule passed as an argument.
-    */
+   * go up and up. Each schedule is accompanied with the number of schedules attempted since the beginning of the lazy
+   * sequence.
+   * TODO: detail what can of setback we can have.
+   *
+   * The generated sequence is non-empty as it always contain at least the initial schedule passed as an argument.
+   */
   final def lazySeq(chainSeed: Long, termination: Termination): LazyList[(Schedule, Long)] = {
     implicit val rand: Random = new Random(chainSeed)
 
@@ -65,8 +65,8 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
   protected def initialState(schedule: Schedule): State
 
   /** Given a state of the engine, returns the next state generated. That state contains at least the next schedule to
-    * return and the number of schedules tried since the start. If this method returns None, this is the end of the lazy
-    * sequence. */
+   * return and the number of schedules tried since the start. If this method returns None, this is the end of the lazy
+   * sequence. */
   protected def step(state: State, termination: Termination)(implicit rand: Random): Option[State]
 
 }
@@ -77,7 +77,7 @@ object Engine {
     val schedule: Schedule
 
     /** This is how many schedules we've tried out since the beginning of the chain, including the ones that we rejected
-      * because they weren't good enough. */
+     * because they weren't good enough. */
     val attemptsCount: Long
 
     /** The result of the latest step. */

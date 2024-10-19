@@ -16,11 +16,11 @@ import mouse.map.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /** Converts the Input object (canonical input) to the Problem object (internal representation of the problem to
-  * optimize).
-  *
-  * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
-  * result in the `result` field.
-  */
+ * optimize).
+ *
+ * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
+ * result in the `result` field.
+ */
 private[input] final class InputTranscription(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription.*
@@ -201,10 +201,10 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       }
 
     /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
-      * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
-      * high values that everyone else's preference don't matter any more.
-      *
-      * We do not handle negative preferences here (they're excluded from the total). */
+     * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
+     * high values that everyone else's preference don't matter any more.
+     *
+     * We do not handle negative preferences here (they're excluded from the total). */
     // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes.
     lazy val personScoreFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
       val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
@@ -271,7 +271,6 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         unassignedTopicsExclusivePreferences
     }
   }
-
 
 
   /* Construction of the Problem */

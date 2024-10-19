@@ -4,8 +4,8 @@ import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 /** A class to measure how much time a piece of code is doing.
-  * @param blocking If true, storing the time spent after the code is done is blocking. Otherwise, it's deported into a Future.
-  * */
+ * @param blocking If true, storing the time spent after the code is done is blocking. Otherwise, it's deported into a Future.
+ * */
 sealed class Chrono(blocking: Boolean = false) {
 
   private val _times: mutable.Map[String, Long] = mutable.Map[String, Long]().withDefaultValue(0L)
@@ -13,7 +13,7 @@ sealed class Chrono(blocking: Boolean = false) {
   private val _counts: mutable.Map[String, Long] = mutable.Map[String, Long]().withDefaultValue(0L)
 
   /** Time spent in the block of code as second-argument, is going to be stored with the name given. You can then access
-    * all time spent using the `times` method. */
+   * all time spent using the `times` method. */
   @inline def apply[A](name: String)(a: => A): A = {
     val start = System.currentTimeMillis()
     val evaluated = a

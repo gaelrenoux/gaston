@@ -11,7 +11,7 @@ trait CanTakeChunks[T[_] <: Iterable[?]] {
   def takeChunks[A](as: T[A], elementsCount: Int*): (T[T[A]], T[A]) = takeChunks(as, elementsCount)
 
   /** Takes chunks from the list, with a specific size for each chunk. Returns a collection of the chunks taken and all
-    * elements left. */
+   * elements left. */
   def takeChunks[A](as: T[A], elementsCount: Iterable[Int]): (T[T[A]], T[A])
 }
 

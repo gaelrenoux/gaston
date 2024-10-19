@@ -4,7 +4,7 @@ import cats.Monoid
 
 
 /** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
-  * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
+ * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
 final case class Score(value: Double) extends AnyVal with Ordered[Score] {
 
   /** Adds two scores */

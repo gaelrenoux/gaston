@@ -52,8 +52,8 @@ final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
   }
 
   /** Score that solution for the current problem. Returns a global score prioritizing the score of the least satisfied
-    * person, with the total score as a tie breaker. Personal scores are divided by the person's weight before
-    * comparison. */
+   * person, with the total score as a tie breaker. Personal scores are divided by the person's weight before
+   * comparison. */
   lazy val globalScore: Score = chrono("ScoreCalculator > globalScore") {
     if (impersonalScore.isNegativeInfinity) impersonalScore else {
       impersonalScore + personalScore

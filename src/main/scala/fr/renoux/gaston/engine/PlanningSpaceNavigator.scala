@@ -10,8 +10,8 @@ import scala.util.Random
 
 
 /** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
-  * unfilled (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
-  * topics at the same time). */
+ * unfilled (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
+ * topics at the same time). */
 @immutable
 final class PlanningSpaceNavigator(implicit private val problem: Problem) {
 
@@ -259,8 +259,8 @@ object PlanningSpaceNavigator {
     }
 
     /**
-      * @param isExt Swap is between scheduled and unscheduled topics. If `true`, `right` are the topics being scheduled in.
-      */
+     * @param isExt Swap is between scheduled and unscheduled topics. If `true`, `right` are the topics being scheduled in.
+     */
     final case class Swap(left: Set[Topic], right: Set[Topic], isExt: Boolean) extends Move {
       override def reverts(m: Move): Boolean = m match {
         case Swap(left2, right2, isExt2) if isExt == isExt2 && ((left == left2 && right == right2) || (left == right2 && right == left2)) => true

@@ -1,8 +1,8 @@
 package fr.renoux.gaston.util
 
 /**
-  * Commodity class to have optional arguments on methods or classes without having to pass them as Some[A].
-  */
+ * Commodity class to have optional arguments on methods or classes without having to pass them as Some[A].
+ */
 final case class Opt[+A](toOption: Option[A]) extends AnyVal
 
 

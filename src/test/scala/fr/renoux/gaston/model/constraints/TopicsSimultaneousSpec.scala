@@ -17,9 +17,9 @@ class TopicsSimultaneousSpec extends AnyFlatSpec with Matchers {
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default
 
-  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps*)))
+  def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
-  def scheduled(s: Slot, ts: Topic*): Schedule = Schedule.from(s(ts.map(_.apply())*))
+  def scheduled(s: Slot, ts: Topic*): Schedule = Schedule.from(s(ts.map(_.apply()) *))
 
   behavior of "TopicsSimultaneous"
   val leadingFightingMachinesSimultaneous: Constraint = TopicsSimultaneous(Set(Leading, Fighting, Machines))

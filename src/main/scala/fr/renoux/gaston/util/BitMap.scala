@@ -3,10 +3,10 @@ package fr.renoux.gaston.util
 import scala.reflect.ClassTag
 
 /** An immutable map where the key is only identified by its integer ID. Like in a bitset, you cannot get the keys back,
-  * you can just find the associated value. Identifier can only go from 0 until its size (excluded).
-  *
-  * The wrapped array contains null for missing entries, as it is faster to check than an option.
-  */
+ * you can just find the associated value. Identifier can only go from 0 until its size (excluded).
+ *
+ * The wrapped array contains null for missing entries, as it is faster to check than an option.
+ */
 final class BitMap[A <: Identified, B](private val wrapped: Array[B]) extends AnyVal {
 
   @inline def size: Int = wrapped.length

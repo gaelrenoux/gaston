@@ -15,14 +15,14 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm(gromit) should be(ball)
     bm(lassie) should be(ball)
     bm(milou) should be(ball)
-    an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
 
     val bm2 = bm.map(_.name)
     bm2.size should be(3)
     bm2.apply(gromit) should be("Ball")
     bm2.apply(lassie) should be("Ball")
     bm2.apply(milou) should be("Ball")
-    an[IndexOutOfBoundsException] should be thrownBy(bm2(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bm2(rintintin))
   }
 
   it should "work from a Map, with explicit default and count" in {
@@ -32,7 +32,7 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm(gromit) should be(rope)
     bm(lassie) should be(stick)
     bm(milou) should be(ball)
-    an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
 
   it should "work from a Map, with implicit count and explicit default" in {
@@ -43,7 +43,7 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm(gromit) should be(rope)
     bm(lassie) should be(stick)
     bm(milou) should be(ball)
-    an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
 
   it should "work from a Map, with null default and explicit count" in {
@@ -53,7 +53,7 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm(gromit) should be(rope)
     bm(lassie) should be(stick)
     bm(milou) should be(null)
-    an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
 
   it should "work from a Map, with null default and implicit count" in {
@@ -64,7 +64,7 @@ class BitMapSpec extends AnyFlatSpec with Matchers {
     bm(gromit) should be(rope)
     bm(lassie) should be(stick)
     bm(milou) should be(null)
-    an[IndexOutOfBoundsException] should be thrownBy(bm(rintintin))
+    an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
 }
 

@@ -5,11 +5,11 @@ import fr.renoux.gaston.model.Score
 import java.time.Instant
 
 /**
-  * This class defines on which condition schedule generation can terminate.
-  * @param score Stop once you reach a schedule with this score.
-  * @param count Maximum number of schedules we want to examine.
-  * @param timeout A timestamp when to stop.
-  */
+ * This class defines on which condition schedule generation can terminate.
+ * @param score Stop once you reach a schedule with this score.
+ * @param count Maximum number of schedules we want to examine.
+ * @param timeout A timestamp when to stop.
+ */
 final case class Termination( // TODO Rename to Controls, or maybe TerminationConditions? And add class doc.
     score: Option[Score] = None,
     count: Option[Long] = None,
