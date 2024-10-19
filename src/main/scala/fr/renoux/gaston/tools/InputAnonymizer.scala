@@ -1,14 +1,19 @@
 package fr.renoux.gaston.tools
 
+import com.softwaremill.quicklens.*
 import fr.renoux.gaston.input.InputModel
 import fr.renoux.gaston.util.Resources.readNamesFile
-
-import com.softwaremill.quicklens._
 
 import scala.util.Random
 
 /** Anonymize an input. Class can only be used once, re-instantiate for each usage. Mutable. */
 class InputAnonymizer(in: InputModel, val seed: Long = 0) {
+
+  // TODO Should move this to some utility
+  given QuicklensFunctor[Set] with {
+    override def map[A](as: Set[A], f: A => A): Set[A] = as.map(f)
+  }
+
   private val rand = new Random(seed)
 
   val personAnonymizer = new CombinerAnonymizer(
@@ -33,8 +38,8 @@ class InputAnonymizer(in: InputModel, val seed: Long = 0) {
     .modify(_.constraints.notSimultaneous.each.topics.each).using(topicAnonymizer.anonymizedNonEmpty)
 
   val anonymizedReordered: InputModel = anonymized
-    .modify(_.topics).using(_.sortBy(_.name.value))
-    .modify(_.persons).using(_.sortBy(_.name.value))
+    .modify(_.topics).using(_.sortBy(_.name))
+    .modify(_.persons).using(_.sortBy(_.name))
 
   /** Anonymize topics first, then persons. The hypothesis is that there won't be any topic name appearing in a person
     * name, but the reverse might be true. */

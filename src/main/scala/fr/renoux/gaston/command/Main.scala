@@ -1,12 +1,12 @@
 package fr.renoux.gaston.command
 
-import cats.implicits._
+import cats.implicits.*
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
-import fr.renoux.gaston.input._
+import fr.renoux.gaston.input.*
 import fr.renoux.gaston.model.Problem
-import fr.renoux.gaston.util.CanAddDuration._
+import fr.renoux.gaston.util.CanAddDuration.*
 import fr.renoux.gaston.util.Context
 import org.slf4j.LoggerFactory
 

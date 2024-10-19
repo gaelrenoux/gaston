@@ -1,20 +1,17 @@
 package fr.renoux.gaston.input
 
 import cats.data.{NonEmptyList, ValidatedNel}
-import cats.implicits._
+import cats.implicits.*
 import com.typesafe.scalalogging.Logger
-import eu.timepit.refined.auto._
-import eu.timepit.refined.collection.NonEmpty
-import eu.timepit.refined.refineV
-import eu.timepit.refined.types.string.NonEmptyString
-import fr.renoux.gaston.input.InputCleaner._
-import fr.renoux.gaston.model._
-import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences._
-import fr.renoux.gaston.util.CanGroupToMap.ops._
-import fr.renoux.gaston.util.CollectionImplicits._
+import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.constraints.*
+import fr.renoux.gaston.model.preferences.*
+import fr.renoux.gaston.util.CanGroupToMap.ops.*
+import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.{BitMap, BitSet, Count}
-import mouse.map._
+import io.github.iltotore.iron.constraint.all.*
+import io.github.iltotore.iron.{Constraint as _, *}
+import mouse.map.*
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -26,11 +23,12 @@ import java.util.concurrent.atomic.AtomicInteger
   */
 private[input] final class InputTranscription(rawInput: InputModel) {
 
-  import fr.renoux.gaston.input.InputTranscription._
+  import fr.renoux.gaston.input.InputTranscription.*
 
   private val log = Logger[InputTranscription]
 
-  val input: InputModel = rawInput.clean()
+  // val input: InputModel = rawInput.clean // TODO Restore cleaner here
+  val input: InputModel = rawInput
   val settings: InputSettings = input.settings
 
   /* Checking errors */
@@ -39,7 +37,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   /* Persons */
   lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (p, ix) => Person(ix, p.name, p.weight, p.baseScore) }.toArray
-  lazy val personsByName: Map[NonEmptyString, Person] = personsById.map { p => NonEmptyString.unsafeFrom(p.name) -> p }.toMap
+  lazy val personsByName: Map[NonEmptyString, Person] = personsById.map { p => (p.name.refineUnsafe[Not[Empty]]: NonEmptyString) -> p }.toMap
 
 
   /* Slots */
@@ -49,7 +47,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     // Then we do a second pass to set the nextSlot (we need to iterate in reverse for this).
     val slotsBase = inSequence.map { inSlot => // not setting the next-slot yet
       val personsPresent = input.personsSet.filterNot(_.absences.contains(inSlot.name)).map(p => personsByName(p.name))
-      inSlot.name -> Slot(slotIx.getAndIncrement(), inSlot.name, personsPresent, None, inSlot.maxTopics.fold(Int.MaxValue)(_.value))
+      inSlot.name -> Slot(slotIx.getAndIncrement(), inSlot.name, personsPresent, None, inSlot.maxTopics.getOrElse(Int.MaxValue))
     }
     slotsBase.reverseIterator.mapWithState(Option.empty[Slot]) { case ((slotName, slot), nextSlot) =>
       val newSlot = slot.copy(next = nextSlot)
@@ -67,7 +65,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       log.info("Unassigned persons are allowed")
       input.slotsSet.map { inSlot =>
         val slot = slotsByName(inSlot.name)
-        val name = NonEmptyString.unsafeFrom(Topic.unassignedName(inSlot.name))
+        val name = Topic.unassignedName(inSlot.name).refineUnsafe[Not[Empty]]
         val topic = Topic.unassigned(topicIx.getAndIncrement(), slot, min = settings.unassigned.minPersons, max = settings.unassigned.maxPersons)
         (name, slot) -> topic
       }.toMap
@@ -222,7 +220,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         person = personsByName(inPerson.name)
         scoreFactor = personScoreFactors(inPerson.name)
         inWish <- inPerson.wishes
-        wishedTopicName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
+        wishedTopicName <- inWish._1.refineOption[Not[Empty]].toSet[NonEmptyString]
         topic <- topicsByName(wishedTopicName)
       } yield PersonTopicPreference(person, topic, inWish._2 * scoreFactor)
 
@@ -232,7 +230,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         person = personsByName(inPerson.name)
         scoreFactor = personScoreFactors(inPerson.name)
         inWish <- inPerson.personWishes
-        wishedPersonName <- NonEmptyString.from(inWish._1).toOption.toSet[NonEmptyString]
+        wishedPersonName <- inWish._1.refineOption[Not[Empty]].toSet[NonEmptyString]
         wishedPerson = personsByName(wishedPersonName)
       } yield PersonPersonPreference(person, wishedPerson, inWish._2 * scoreFactor)
 
@@ -292,7 +290,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   lazy val result: ValidatedNel[InputError, Problem] = errors.toList.sorted.map(InputError(_)) match {
     case Nil => problem.valid
-    case h :: q => NonEmptyList.of(h, q: _*).invalid[Problem]
+    case h :: q => NonEmptyList.of(h, q *).invalid[Problem]
   }
 
 }
@@ -376,7 +374,7 @@ object InputTranscription {
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badTopics = p.wishes.keys.map(refineV[NonEmpty](_)).collect {
+        val badTopics = p.wishes.keys.map(_.refineEither[Not[Empty]]).collect {
           case Left(_) => "[]" // empty name
           case Right(t) if !input.topicsNameSet.contains(t) => s"[$t]"
         }

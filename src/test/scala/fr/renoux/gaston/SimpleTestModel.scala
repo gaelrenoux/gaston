@@ -110,7 +110,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val HA: PersonTopicPreference = PersonTopicPreference(Hercule, Acting, weakPreference)
     val IB: PersonTopicPreference = PersonTopicPreference(Iago, Bathing, weakPreference)
 
-    val ArthurHatesFionaAndDaniela: PersonGroupAntiPreference = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference.value)
+    val ArthurHatesFionaAndDaniela: PersonGroupAntiPreference = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference)
 
     val All: Set[Preference] = Set(
       AB, BC, CD, DE, EF, FG, GH, HI, IA,

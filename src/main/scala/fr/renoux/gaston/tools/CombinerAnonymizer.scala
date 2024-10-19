@@ -1,7 +1,8 @@
 package fr.renoux.gaston.tools
 
-import eu.timepit.refined.types.string.NonEmptyString
-import fr.renoux.gaston.util.RandomImplicits._
+import fr.renoux.gaston.util.RandomImplicits.*
+import io.github.iltotore.iron.*
+import io.github.iltotore.iron.constraint.collection.Empty
 
 import scala.collection.mutable
 import scala.util.Random
@@ -19,6 +20,8 @@ import scala.util.Random
   * We assume that the multiplying the size of all lists still lead to an Int.
   */
 class CombinerAnonymizer(seed: Long, val altOneList: Seq[String], val altTwoList: Seq[String], prefix: String = "", suffix: String = "") {
+
+  type NonEmptyString = String :| Not[Empty]
 
   private val altOneCount: Int = altOneList.size
   private val altTwoCount: Int = altTwoList.size
@@ -42,8 +45,7 @@ class CombinerAnonymizer(seed: Long, val altOneList: Seq[String], val altTwoList
 
   def getCorrespondances: Map[String, String] = anonymizations.toMap
 
-  def anonymizedNonEmpty(name: NonEmptyString): NonEmptyString =
-    NonEmptyString.unsafeFrom(anonymized(name.value))
+  def anonymizedNonEmpty(name: NonEmptyString): NonEmptyString = anonymized(name).refineUnsafe
 
   def anonymized(name: String): String = anonymizations.getOrElseUpdate(name, {
     createNameFirstPass() orElse createNameSecondPass() getOrElse createNameThirdPass()

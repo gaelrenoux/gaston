@@ -24,7 +24,7 @@ object Preference {
 
 
   trait Anti extends Preference {
-    assert(reward.value <= 0, s"AntiPreference $this should have a negative reward")
+    assert(reward.value <= 0, s"AntiPreference should have a negative reward")
   }
 
   /** Trait for preferences which can be evaluated only on the global level, not slot by slot or record by record */

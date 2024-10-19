@@ -1,10 +1,9 @@
 package fr.renoux.gaston.input
 
-import com.softwaremill.quicklens._
-import eu.timepit.refined.auto._
-import fr.renoux.gaston.input.InputRefinements.NonPosScore
+import com.softwaremill.quicklens.*
 import fr.renoux.gaston.model.preferences.{PersonPersonPreference, PersonTopicPreference, TopicsExclusive}
 import fr.renoux.gaston.model.{Problem, Score}
+import io.github.iltotore.iron.autoRefine
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -13,8 +12,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   // TODO missing test for Simultaneous
   // TODO missing test for NotSimultaneous
 
-
-  import fr.renoux.gaston.TestUtils._
+  import fr.renoux.gaston.TestUtils.*
 
   private def from(model: InputModel): Problem = {
     new InputTranscription(model).result.valueOr(e => throw new IllegalArgumentException(e.toString))
@@ -30,7 +28,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
     val topicNames = Set("alpha #1", "alpha #2", "alpha #3")
 
-    def topics(implicit problem: Problem) = problem.topicsSet.filter(t => topicNames.contains(t.name))
+    def topics(using problem: Problem) = problem.topicsSet.filter(t => topicNames.contains(t.name))
 
     they should "be different topics" in {
       val problem = from(InputModel(topics = inputTopics))
@@ -38,7 +36,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     }
 
     they should "all have the same mandatory, forbidden and wishes" in {
-      implicit val problem = from(InputModel(
+      given problem: Problem = from(InputModel(
         topics = inputTopics,
         persons = List(
           InputPerson("Arnold", mandatory = Set("alpha")),
@@ -54,7 +52,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     }
 
     they should "be exclusive except for mandatory people" in {
-      implicit val problem = from(InputModel(
+      given problem: Problem = from(InputModel(
         topics = inputTopics,
         persons = List(
           InputPerson("Arnold", mandatory = Set("alpha")),
@@ -91,7 +89,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     )
 
     it should "have a basic anti-preference (when no scaling)" in {
-      implicit val problem: Problem = from(inputModel)
+      given problem: Problem = from(inputModel)
       val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
         case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
       }
@@ -110,7 +108,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
     }
 
     it should "have a scaled anti-preference (with scaling enabled)" in {
-      implicit val problem: Problem = from(
+      given problem: Problem = from(
         inputModel.modify(_.settings.unassigned.personAntiPreferenceScaling).setTo(Some(
           InputSettings.UnassignedAntiPreferenceScaling(
             forbiddenRatioForMaximum = 0.5,
@@ -150,7 +148,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
-      implicit val problem: Problem = from(inputModel)
+      given problem: Problem = from(inputModel)
       problem.incompatibleTopicsBySlot(slot"one") should be(Set(t"alpha"))
       problem.incompatibleTopicsBySlot(slot"two") should be(Set.empty)
     }
@@ -171,7 +169,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
-      implicit val problem: Problem = from(inputModel)
+      given problem: Problem = from(inputModel)
       val arnold = problem.personsList.find(_.name == "Arnold").get
       val alpha = problem.topicsList.find(_.name == "alpha").get
       val gamma = problem.topicsList.find(_.name == "gamma").get
@@ -201,7 +199,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
-      implicit val problem: Problem = from(inputModel)
+      given problem: Problem = from(inputModel)
       val arnold = problem.personsList.find(_.name == "Arnold").get
       val bianca = problem.personsList.find(_.name == "Bianca").get
       val charlie = problem.personsList.find(_.name == "Charlie").get
@@ -231,7 +229,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         topics = inputTopics,
         persons = inputPersons
       )
-      implicit val problem: Problem = from(inputModel)
+      given problem: Problem = from(inputModel)
       val arnold = problem.personsList.find(_.name == "Arnold").get
       val alpha = problem.topicsList.find(_.name == "alpha").get
       val charlie = problem.personsList.find(_.name == "Charlie").get

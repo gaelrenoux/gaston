@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 /** A Record is a triplet of slot, topic and assigned persons */
 final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
 
-  import Record._
+  import Record.*
   import problem.counts
 
   lazy val personsList: List[Person] = persons.toList

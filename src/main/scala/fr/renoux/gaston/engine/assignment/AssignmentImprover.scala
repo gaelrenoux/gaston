@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine.assignment
 
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
@@ -37,7 +37,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
   private def recImprove(
       schedule: Schedule,
       maxRounds: Int,
-      slots: Queue[Slot] = Queue(problem.slotsList: _*),
+      slots: Queue[Slot] = Queue(problem.slotsList*),
       slotRoundsLimit: Int = defaultMaxSuccessiveRoundsCountPerSlot
   )(implicit rand: Random): Schedule =
     if (maxRounds == 0) {

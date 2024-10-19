@@ -1,11 +1,9 @@
 package fr.renoux.gaston.input
 
 import cats.data.NonEmptyList
-import cats.implicits._
+import cats.implicits.*
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import eu.timepit.refined.api.Refined
-import eu.timepit.refined.collection.NonEmpty
 import fr.renoux.gaston.util.testOnly
 import pureconfig.ConfigSource
 import pureconfig.error.ConfigReaderFailures
@@ -20,14 +18,6 @@ object InputLoader {
   val Namespace = "gaston"
 
   private val log = Logger[InputLoader.type]
-
-  import eu.timepit.refined.pureconfig._
-  import pureconfig.generic.auto._
-
-  // forces IntelliJ to keep the refined-pureconfig import, otherwise it marks it as unused
-  {
-    refTypeConfigConvert[Refined, String, NonEmpty]
-  }
 
   /** Loads from default values (in application.conf). */
   def fromDefault: Either[InputErrors, InputModel] =
@@ -62,7 +52,7 @@ object InputLoader {
 
   /** Converts PureConfig's errors into our own InputErrors, that can be made readable to an end-user. */
   private def transformErrors(configReaderFailures: ConfigReaderFailures): NonEmptyList[InputError] =
-    NonEmptyList.of(configReaderFailures.head, configReaderFailures.tail: _*).map { f =>
+    NonEmptyList.of(configReaderFailures.head, configReaderFailures.tail*).map { f =>
       InputError(f.description, f.origin.map(_.url.toString), f.origin.map(_.lineNumber))
     }
 

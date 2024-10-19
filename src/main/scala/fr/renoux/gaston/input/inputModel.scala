@@ -1,16 +1,56 @@
 package fr.renoux.gaston.input
 
-import eu.timepit.refined.api.{Refined, Validate}
-import eu.timepit.refined.auto._
-import eu.timepit.refined.refineV
-import eu.timepit.refined.types.numeric._
-import eu.timepit.refined.types.string.NonEmptyString
-import fr.renoux.gaston.input.InputRefinements._
-import fr.renoux.gaston.model.{Score, Topic, Weight}
-import fr.renoux.gaston.util.CollectionImplicits._
-import fr.renoux.gaston.util.{NumberUtils, Opt}
+import fr.renoux.gaston.model.{Score, Weight}
+import fr.renoux.gaston.util.CollectionImplicits.*
+import fr.renoux.gaston.util.Opt
+import pureconfig.*
+import pureconfig.generic.*
+import pureconfig.generic.semiauto.deriveConvert
+import io.github.iltotore.iron.*
+import io.github.iltotore.iron.constraint.all.*
+import io.github.iltotore.iron.pureconfig.given
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
+
+// TODO Drop all unsafeFrom calls once https://github.com/fthomas/refined/issues/932 is solved
+
+type NonEmptyString = String :| Not[Empty]
+type PosInt = Int :| Positive
+type NonNegInt = Int :| Positive0
+
+type NonPosScore = Score :| Negative0
+
+def NonPosScore(i: Double :| Negative0): NonPosScore = Score(i).asInstanceOf[NonPosScore] // TODO Ugly, but changing Scores soon
+
+given Constraint[Score, Positive] with {
+  override inline def test(inline value: Score): Boolean = value.value > 0
+
+  override inline def message: String = "Should be strictly positive"
+}
+
+given Constraint[Score, Positive0] with {
+  override inline def test(inline value: Score): Boolean = value.value >= 0
+
+  override inline def message: String = "Should be positive or zero"
+}
+
+given Constraint[Score, Negative] with {
+  override inline def test(inline value: Score): Boolean = value.value < 0
+
+  override inline def message: String = "Should be strictly negative"
+}
+
+given Constraint[Score, Negative0] with {
+  override inline def test(inline value: Score): Boolean = value.value <= 0
+
+  override inline def message: String = "Should be negative or zero"
+}
+
+given Constraint[Weight, Positive] with {
+  override inline def test(inline value: Weight): Boolean = value.value > 0
+
+  override inline def message: String = "Should be strictly positive"
+}
 
 /* All line and column indices are zero-based */
 
@@ -18,6 +58,23 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 user-friendly as possible in the configuration file, and in second to be comfortable to use by the developer. However,
 it is not optimized for performance.
 */
+
+// TODO Shouldn't be used outside of the input package
+object Constants {
+
+  val DefaultTopicMin: PosInt = 1
+
+  val DefaultTopicMax: PosInt = 10
+
+  /** What score should a person have if all its preferences are satisfied ? */
+  val PersonTotalScore: Score = Score(1000.0)
+
+  /** A low "max-value", so that we can still add it and not overflow, but which can still be used as a max value when we want to max. */
+  // TODO that's horrible, remove this. But it helps for now.
+  val IntLowMaxValue: PosInt = 10000
+
+}
+
 final case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),
@@ -36,10 +93,10 @@ final case class InputModel(
 }
 
 final case class InputSettings(
-    incompatibilityAntiPreference: NonPosScore = NonPosScore(-1000.0),
+    incompatibilityAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
     defaultMaxTopicsPerSlot: Option[PosInt] = None,
-    defaultMinPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMin),
-    defaultMaxPersonsPerTopic: PosInt = PosInt.unsafeFrom(Topic.DefaultMax),
+    defaultMinPersonsPerTopic: PosInt = Constants.DefaultTopicMin,
+    defaultMaxPersonsPerTopic: PosInt = Constants.DefaultTopicMax,
     unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
     statusDisplayInterval: FiniteDuration = 20.seconds
 )
@@ -50,7 +107,7 @@ object InputSettings {
   final case class Unassigned(
       allowed: Boolean = false, // all other values in this class are unused when this is false
       minPersons: NonNegInt = 0, // O allow to not remove the topic, which let us skip a step when optimizing
-      maxPersons: PosInt = NumberUtils.IntLowMaxValue,
+      maxPersons: PosInt = Constants.IntLowMaxValue,
       personAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
       personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
       personMultipleAntiPreference: Option[NonPosScore] = None
@@ -77,7 +134,7 @@ final case class InputTableSettings(
     minPersonsCol: Option[NonNegInt] = None,
     maxPersonsCol: NonNegInt = 3,
     personsCountAdd: NonNegInt = 0,
-    mandatoryPersonWeight: PosWeight = Constants.DefaultWeightRefined,
+    mandatoryPersonWeight: Weight = Weight.Default,
     forbiddenPersonMarker: Option[String] = None,
     preferencesScoreMapping: Option[Map[String, Score]] = None
 )
@@ -99,13 +156,13 @@ final case class InputTopic(
 ) {
 
   /** Occurrence needs to be an Option to not appear when not needed */
-  lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1: PosInt)
+  lazy val forcedOccurrences: PosInt = occurrences.getOrElse(1)
 
   /** Duration needs to be an Option to not appear when not needed */
-  lazy val forcedDuration: PosInt = duration.getOrElse(1: PosInt)
+  lazy val forcedDuration: PosInt = duration.getOrElse(1)
 
   lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
-    if (forcedOccurrences.value == 1) Seq(InputTopic.Occurrence(this))
+    if (forcedOccurrences == 1) Seq(InputTopic.Occurrence(this))
     else (1 to forcedOccurrences).map(InputTopic.Occurrence(this, _))
 
   if (forcedDuration > 2) throw new IllegalArgumentException("Currently, Gaston does not handle durations > 2")
@@ -113,6 +170,7 @@ final case class InputTopic(
 }
 
 object InputTopic {
+
   val OccurrenceMarker = "#"
 
   val PartMarker = "~"
@@ -123,11 +181,11 @@ object InputTopic {
       index: Opt[Int] = Opt.Missing // present only if there are multiple occurrences
   ) {
     lazy val name: String =
-      index.fold(inputTopic.name.value)(i => s"${inputTopic.name} $OccurrenceMarker$i")
+      index.fold(inputTopic.name)(i => s"${inputTopic.name} $OccurrenceMarker$i")
 
     /** Produce one part per duration unit of the topic */
     lazy val partInstances: Seq[InputTopic.Part] =
-      if (inputTopic.forcedDuration.value == 1) Seq(Part(this))
+      if (inputTopic.forcedDuration == 1) Seq(Part(this))
       else (1 to inputTopic.forcedDuration).map(Part(this, _))
   }
 
@@ -144,7 +202,7 @@ object InputTopic {
 
 final case class InputPerson(
     name: NonEmptyString,
-    weight: PosWeight = Constants.DefaultWeightRefined,
+    weight: Weight = Weight.Default,
     baseScore: Score = Score.Zero,
     absences: Set[NonEmptyString] = Set.empty,
     mandatory: Set[NonEmptyString] = Set.empty,
@@ -174,28 +232,23 @@ final case class InputLinkedConstraint(
     topics: Set[NonEmptyString]
 )
 
-object InputRefinements {
+/* All necessary config-readers and config-writers */
+given [A, C](using ConfigWriter[A]): ConfigWriter[IronType[A, C]] = ConfigWriter[A].contramap(identity)
 
-  final class ScoreNonPositive
+given ConfigConvert[Score] = ConfigConvert[Double].xmap(Score.apply, _.value)
+given ConfigReader[NonPosScore] = ConfigReader[Double :| Negative0].map(i => NonPosScore(i))
+given ConfigReader[Weight] = ConfigReader[Double :| Positive].map(Weight.apply)
+given ConfigWriter[Weight] = ConfigWriter[Double].contramap(_.value)
 
-  implicit val scoreNonPositiveValidate: Validate.Plain[Score, ScoreNonPositive] =
-    Validate.fromPredicate(s => s.value <= 0, s => s"($s is negative or zero)", new ScoreNonPositive)
-
-  type NonPosScore = Score Refined ScoreNonPositive
-
-  object NonPosScore {
-    def apply(s: NonPosDouble): NonPosScore = refineV[ScoreNonPositive](Score(s)).getOrElse(throw new IllegalArgumentException(s.toString))
-  }
-
-  final class WeightPositive
-
-  implicit val weightPositiveValidate: Validate.Plain[Weight, WeightPositive] =
-    Validate.fromPredicate(w => w.value > 0, w => s"($w is positive)", new WeightPositive)
-
-  type PosWeight = Weight Refined WeightPositive
-
-  object PosWeight {
-    def apply(w: PosDouble): PosWeight = refineV[WeightPositive](Weight(w)).getOrElse(throw new IllegalArgumentException(w.toString))
-  }
-
-}
+given ConfigConvert[InputLinkedConstraint] = deriveConvert[InputLinkedConstraint]
+given ConfigConvert[InputExclusiveConstraint] = deriveConvert[InputExclusiveConstraint]
+given ConfigConvert[InputSimultaneousConstraint] = deriveConvert[InputSimultaneousConstraint]
+given ConfigConvert[InputGlobalConstraints] = deriveConvert[InputGlobalConstraints]
+given ConfigConvert[InputPerson] = deriveConvert[InputPerson]
+given ConfigConvert[InputTopic] = deriveConvert[InputTopic]
+given ConfigConvert[InputSlot] = deriveConvert[InputSlot]
+given ConfigConvert[InputTableSettings] = deriveConvert[InputTableSettings]
+given ConfigConvert[InputSettings.UnassignedAntiPreferenceScaling] = deriveConvert[InputSettings.UnassignedAntiPreferenceScaling]
+given ConfigConvert[InputSettings.Unassigned] = deriveConvert[InputSettings.Unassigned]
+given ConfigConvert[InputSettings] = deriveConvert[InputSettings]
+given ConfigConvert[InputModel] = deriveConvert[InputModel]

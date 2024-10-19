@@ -29,7 +29,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     implicit val p: Problem = problem
     implicit val engine: Engine = new GreedyEngine
     implicit val output: Output = Output.silent
-    val runner = new SyncRunner(seed = 42)
+    val runner = new SyncRunner(seed = 43)
     val termination: Termination = Termination(count = Some(iterations))
     runner.run(termination)
   }

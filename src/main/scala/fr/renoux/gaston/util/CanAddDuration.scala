@@ -1,8 +1,7 @@
 package fr.renoux.gaston.util
 
 import java.time.Instant
-
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 trait CanAddDuration[A] {
 

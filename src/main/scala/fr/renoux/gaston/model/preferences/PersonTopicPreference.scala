@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 
 /** Might be an anti-preference if the person really doesn't want to. */
 final case class PersonTopicPreference(
