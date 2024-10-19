@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model.*
-import fr.renoux.gaston.util.BitSet
+import fr.renoux.gaston.util.ArraySet
 
 /**
  * That one person doesn't want to share a schedule record with any person from that group. The reward here is
@@ -10,7 +10,7 @@ import fr.renoux.gaston.util.BitSet
  */
 final case class PersonGroupAntiPreference(
     person: Person,
-    group: BitSet[Person],
+    group: ArraySet[Person],
     reward: Score
 ) extends Preference.RecordLevel with Preference.Anti with Preference.Personal {
 

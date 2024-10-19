@@ -8,7 +8,7 @@ import fr.renoux.gaston.model.constraints.*
 import fr.renoux.gaston.model.preferences.*
 import fr.renoux.gaston.util.CanGroupToMap.ops.*
 import fr.renoux.gaston.util.CollectionImplicits.*
-import fr.renoux.gaston.util.{BitMap, BitSet, Count}
+import fr.renoux.gaston.util.{ArrayMap, ArraySet, Count}
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.{Constraint as _, *}
 import mouse.map.*
@@ -143,7 +143,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
     lazy val notSimultaneousTopics: Set[TopicsNotSimultaneous] =
       input.constraints.notSimultaneous.map { inConstraint =>
-        TopicsNotSimultaneous(inConstraint.topics.flatMap(topicsByName).toBitSet)
+        TopicsNotSimultaneous(inConstraint.topics.flatMap(topicsByName).toArraySet)
       }
 
     // TODO Merge simultaneous constraint (ex: Sim(1, 2) and Sim(2, 3) can be merged into Sim(1, 2, 3))
@@ -168,7 +168,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     lazy val exclusiveTopics: Set[TopicsExclusive] =
       input.constraints.exclusive.map { inConstraint =>
         // topic-parts are always linked, so we only need to mark the exclusivity on the first part
-        TopicsExclusive(inConstraint.topics.flatMap(topicsFirstPartByName).toBitSet, inConstraint.exemptions.map(personsByName).toBitSet)
+        TopicsExclusive(inConstraint.topics.flatMap(topicsFirstPartByName).toArraySet, inConstraint.exemptions.map(personsByName).toArraySet)
       }
 
     lazy val exclusiveOccurrences: Set[TopicsExclusive] = input.topics.view
@@ -177,19 +177,19 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         // Because all topic-parts are linked (same persons on each), we can just check exclusivity on the first topic-part (index 1)
         val topicsByOccurrenceIndex = topicsFirstPartByOccurrenceIndexByName(inTopic.name)
         val mandatoryPersons = topicsByOccurrenceIndex.head._2.mandatory // mandatories are the same on all instances, take the first one
-        TopicsExclusive(topicsByOccurrenceIndex.values.toBitSet, mandatoryPersons.toBitSet)
+        TopicsExclusive(topicsByOccurrenceIndex.values.toArraySet, mandatoryPersons.toArraySet)
       }
       .toSet
 
     lazy val linkedTopics: Set[TopicsLinked] =
       input.constraints.linked.map { inConstraint =>
-        TopicsLinked(inConstraint.topics.flatMap(topicsByName).toBitSet)
+        TopicsLinked(inConstraint.topics.flatMap(topicsByName).toArraySet)
       }
 
     lazy val linkedParts: Set[TopicsLinked] = input.topics.view
       .filter(_.forcedDuration > 1)
       .flatMap { inTopic => topicsByPartIndexByOccurrenceIndexByName(inTopic.name).values }
-      .map { (partsInOccurrence: Map[Int, Topic]) => TopicsLinked(partsInOccurrence.values.toBitSet) }
+      .map { (partsInOccurrence: Map[Int, Topic]) => TopicsLinked(partsInOccurrence.values.toArraySet) }
       .toSet
 
     lazy val groupDislikes: Set[PersonGroupAntiPreference] =
@@ -197,7 +197,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         case ip: InputPerson if ip.incompatible.nonEmpty =>
           val person = personsByName(ip.name)
           val group = ip.incompatible.map(personsByName)
-          PersonGroupAntiPreference(person, group.toBitSet, settings.incompatibilityAntiPreference)
+          PersonGroupAntiPreference(person, group.toArraySet, settings.incompatibilityAntiPreference)
       }
 
     /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
@@ -253,7 +253,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
     lazy val unassignedTopicsExclusivePreferences: Set[TopicsExclusive] =
       input.settings.unassigned.personMultipleAntiPreference.fold(Set.empty[TopicsExclusive]) { reward =>
-        Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toBitSet, BitSet.empty, reward))
+        Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toArraySet, ArraySet.empty, reward))
       }
 
 
@@ -278,7 +278,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     val p = new Problem(
       slotSequences,
       topicsByName.values.flatten.toSet,
-      if (unassignedTopicsByNameAndSlot.isEmpty) BitMap.empty else unassignedTopicsByNameAndSlot.mapKeys(_._2).toBitMap(),
+      if (unassignedTopicsByNameAndSlot.isEmpty) ArrayMap.empty else unassignedTopicsByNameAndSlot.mapKeys(_._2).toArrayMap(),
       personsByName.values.toSet,
       Constraints.all,
       Preferences.all

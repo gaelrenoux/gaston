@@ -3,21 +3,21 @@ package fr.renoux.gaston.util
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class BitSetSpec extends AnyFlatSpec with Matchers {
+class ArraySetSpec extends AnyFlatSpec with Matchers {
 
-  import BitSet.syntax._
-  import BitSetSpec._
+  import ArraySet.syntax._
+  import ArraySetSpec._
 
-  behavior of "BitSet"
+  behavior of "ArraySet"
   it should "work from scratch" in {
-    val bs = BitSet.from[Dog](3)(Nil)
+    val bs = ArraySet.from[Dog](3)(Nil)
     bs(gromit) should be(false)
     bs(lassie) should be(false)
     bs(milou) should be(false)
     an[IndexOutOfBoundsException] should be thrownBy (bs(rintintin))
 
     bs.nonEmpty should be(false)
-    bs.actualEquals(BitSet.from[Dog](3)(Nil)) should be(true)
+    bs.actualEquals(ArraySet.from[Dog](3)(Nil)) should be(true)
     bs.safeContent should be(Seq(false, false, false))
 
     val bsuc = bs.unsafeContent
@@ -27,14 +27,14 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
 
   it should "work from a Set, with explicit count" in {
     val set = Set(gromit, milou)
-    val bs = set.toBitSet(3)
+    val bs = set.toArraySet(3)
     bs(gromit) should be(true)
     bs(lassie) should be(false)
     bs(milou) should be(true)
     an[IndexOutOfBoundsException] should be thrownBy (bs(rintintin))
 
     bs.nonEmpty should be(true)
-    bs.actualEquals(set.toBitSet(3)) should be(true)
+    bs.actualEquals(set.toArraySet(3)) should be(true)
     bs.safeContent should be(Seq(true, false, true))
 
     val bsuc = bs.unsafeContent
@@ -45,14 +45,14 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
   it should "work from a Set, with implicit count" in {
     implicit val cd: Count[Dog] = Count[Dog](3)
     val set = Set(gromit, milou)
-    val bs = set.toBitSet
+    val bs = set.toArraySet
     bs(gromit) should be(true)
     bs(lassie) should be(false)
     bs(milou) should be(true)
     an[IndexOutOfBoundsException] should be thrownBy (bs(rintintin))
 
     bs.nonEmpty should be(true)
-    bs.actualEquals(set.toBitSet(3)) should be(true)
+    bs.actualEquals(set.toArraySet(3)) should be(true)
     bs.safeContent should be(Seq(true, false, true))
 
     val bsuc = bs.unsafeContent
@@ -60,9 +60,9 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
     bs(gromit) should be(false)
   }
 
-  "empty" should "create an empty BitSet" in {
+  "empty" should "create an empty ArraySet" in {
     implicit val c: Count[Dog] = Count[Dog](3)
-    val bs = BitSet.empty[Dog]
+    val bs = ArraySet.empty[Dog]
     bs(gromit) should be(false)
     bs(lassie) should be(false)
     bs(milou) should be(false)
@@ -70,7 +70,7 @@ class BitSetSpec extends AnyFlatSpec with Matchers {
 
 }
 
-object BitSetSpec {
+object ArraySetSpec {
   case class Dog(id: Int, name: String) extends Identified
 
   case class Toy(name: String)

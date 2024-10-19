@@ -18,7 +18,7 @@ class PersonGroupAntiPreferenceSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
   behavior of "PersonGroupAntiPreference"
-  val leonardoHatesEnemies: Preference = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady).toBitSet, Score(-150))
+  val leonardoHatesEnemies: Preference = PersonGroupAntiPreference(Leonardo, Set(Bebop, Rocksteady).toArraySet, Score(-150))
 
   it should "return a negative score for just one hated person" in {
     leonardoHatesEnemies.score(scheduled(Morning, Fighting, Leonardo, Raphael, Bebop)

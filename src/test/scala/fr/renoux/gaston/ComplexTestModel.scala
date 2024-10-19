@@ -73,7 +73,7 @@ class ComplexTestModel(seed: Long) {
     } yield PersonTopicPreference(p, t, str)
     val Incompatibilities: Set[Preference] = Set {
       val p = random.pick(Persons.All, 3)
-      PersonGroupAntiPreference(p.head, p.tail.toBitSet, -strongPreference)
+      PersonGroupAntiPreference(p.head, p.tail.toArraySet, -strongPreference)
     }
 
     val Unassigned: Set[Preference] = for {
@@ -90,7 +90,7 @@ class ComplexTestModel(seed: Long) {
       val p = new Problem(
         Slots.AllSequence,
         Topics.All,
-        Topics.Unassigned.toBitMap,
+        Topics.Unassigned.toArrayMap,
         Persons.All,
         Set.empty,
         Preferences.All ++ Preferences.Unassigned

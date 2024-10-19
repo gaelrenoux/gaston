@@ -5,7 +5,7 @@ import cats.implicits.*
 import fr.renoux.gaston.util.CanGroupToMap.ops.toCoupleOps
 import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.RandomImplicits.*
-import fr.renoux.gaston.util.{BitSet, Context, testOnly}
+import fr.renoux.gaston.util.{ArraySet, Context, testOnly}
 
 import scala.util.Random
 
@@ -54,7 +54,7 @@ final case class Schedule(
   lazy val planning: Planning = wrapped.mapValuesStrict(_.topics)
   lazy val topicToSlot: Map[Topic, Slot] = planning.flatMap { case (s, ts) => ts.map(_ -> s) }
   lazy val scheduledTopics: Set[Topic] = slotSchedulesSet.flatMap(_.topics)
-  lazy val scheduledTopicsBitSet: BitSet[Topic] = scheduledTopics.toBitSet
+  lazy val scheduledTopicsArraySet: ArraySet[Topic] = scheduledTopics.toArraySet
   lazy val unscheduledTopics: Set[Topic] = (problem.topicsSet -- scheduledTopics)
 
   lazy val personGroups: Iterable[Set[Person]] = personsByTopic.values.filter(_.nonEmpty) // not a Set: we do not want to deduplicate identical groups!

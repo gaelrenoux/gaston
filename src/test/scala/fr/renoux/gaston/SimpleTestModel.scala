@@ -4,8 +4,8 @@ import fr.renoux.gaston.TestUtils._
 import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.constraints._
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.model.{Problem, _}
-import fr.renoux.gaston.util.{BitMap, Context}
+import fr.renoux.gaston.model.*
+import fr.renoux.gaston.util.{ArrayMap, Context}
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -110,7 +110,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
     val HA: PersonTopicPreference = PersonTopicPreference(Hercule, Acting, weakPreference)
     val IB: PersonTopicPreference = PersonTopicPreference(Iago, Bathing, weakPreference)
 
-    val ArthurHatesFionaAndDaniela: PersonGroupAntiPreference = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toBitSet, settings.incompatibilityAntiPreference)
+    val ArthurHatesFionaAndDaniela: PersonGroupAntiPreference = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toArraySet, settings.incompatibilityAntiPreference)
 
     val All: Set[Preference] = Set(
       AB, BC, CD, DE, EF, FG, GH, HI, IA,
@@ -123,8 +123,8 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
     import ProblemCounts.CompleteCounts
 
-    val WithUnassignedTopics = new Problem(Slots.All, Topics.All, Topics.Unassigned.toBitMap, Persons.All, Constraints.All, Preferences.All)
-    val NoUnassignedTopics = new Problem(Slots.All, Topics.Concrete, BitMap.empty[Slot, Topic], Persons.All, Constraints.All, Preferences.All)
+    val WithUnassignedTopics = new Problem(Slots.All, Topics.All, Topics.Unassigned.toArrayMap, Persons.All, Constraints.All, Preferences.All)
+    val NoUnassignedTopics = new Problem(Slots.All, Topics.Concrete, ArrayMap.empty[Slot, Topic], Persons.All, Constraints.All, Preferences.All)
   }
 
   object Solutions {

@@ -1,6 +1,6 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.util.{BitMap, BitSet}
+import fr.renoux.gaston.util.{ArrayMap, ArraySet}
 
 import scala.reflect.ClassTag
 
@@ -8,39 +8,39 @@ import scala.reflect.ClassTag
 package object model {
 
   implicit final class SlotSetOps(val wrapped: Iterable[Slot]) extends AnyVal {
-    @inline def toBitSet(implicit counts: Counts): BitSet[Slot] =
-      BitSet.from[Slot](counts.slots)(wrapped)
+    @inline def toArraySet(implicit counts: Counts): ArraySet[Slot] =
+      ArraySet.from[Slot](counts.slots)(wrapped)
   }
 
   implicit final class TopicSetOps(val wrapped: Iterable[Topic]) extends AnyVal {
-    @inline def toBitSet(implicit counts: Counts): BitSet[Topic] =
-      BitSet.from[Topic](counts.topics)(wrapped)
+    @inline def toArraySet(implicit counts: Counts): ArraySet[Topic] =
+      ArraySet.from[Topic](counts.topics)(wrapped)
   }
 
   implicit final class PersonSetOps(val wrapped: Iterable[Person]) extends AnyVal {
-    @inline def toBitSet(implicit counts: Counts): BitSet[Person] =
-      BitSet.from[Person](counts.persons)(wrapped)
+    @inline def toArraySet(implicit counts: Counts): ArraySet[Person] =
+      ArraySet.from[Person](counts.persons)(wrapped)
   }
 
   implicit final class SlotMapOps[A >: Null](val wrapped: Map[Slot, A]) extends AnyVal {
-    @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] = toBitMap()
+    @inline def toArrayMap(implicit counts: Counts, tag: ClassTag[A]): ArrayMap[Slot, A] = toArrayMap()
 
-    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Slot, A] =
-      BitMap.from[Slot, A](counts.slots, default)(wrapped)
+    @inline def toArrayMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): ArrayMap[Slot, A] =
+      ArrayMap.from[Slot, A](counts.slots, default)(wrapped)
   }
 
   implicit final class TopicMapOps[A >: Null](val wrapped: Map[Topic, A]) extends AnyVal {
-    @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] = toBitMap()
+    @inline def toArrayMap(implicit counts: Counts, tag: ClassTag[A]): ArrayMap[Topic, A] = toArrayMap()
 
-    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Topic, A] =
-      BitMap.from[Topic, A](counts.topics, default)(wrapped)
+    @inline def toArrayMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): ArrayMap[Topic, A] =
+      ArrayMap.from[Topic, A](counts.topics, default)(wrapped)
   }
 
   implicit final class PersonMapOps[A >: Null](val wrapped: Map[Person, A]) extends AnyVal {
-    @inline def toBitMap(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] = toBitMap()
+    @inline def toArrayMap(implicit counts: Counts, tag: ClassTag[A]): ArrayMap[Person, A] = toArrayMap()
 
-    @inline def toBitMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): BitMap[Person, A] =
-      BitMap.from[Person, A](counts.persons, default)(wrapped)
+    @inline def toArrayMap(default: A = null)(implicit counts: Counts, tag: ClassTag[A]): ArrayMap[Person, A] =
+      ArrayMap.from[Person, A](counts.persons, default)(wrapped)
   }
 
 }

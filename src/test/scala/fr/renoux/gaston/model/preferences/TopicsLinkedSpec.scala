@@ -18,7 +18,7 @@ class TopicsLinkedSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
   behavior of "TopicsLinked"
-  val mustFightAndPartyAndMachines: Preference = TopicsLinked(Set(Fighting, Party, Machines).toBitSet)
+  val mustFightAndPartyAndMachines: Preference = TopicsLinked(Set(Fighting, Party, Machines).toArraySet)
 
   it should "return zero if a person does both" in {
     mustFightAndPartyAndMachines.score(scheduled(Morning, Fighting, Donatello, Michelangelo) ++

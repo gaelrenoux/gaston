@@ -22,7 +22,7 @@ class TopicsNotSimultaneousSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, ts: Topic*): Schedule = Schedule.from(s(ts.map(_.apply()) *))
 
   behavior of "TopicsNotSimultaneous"
-  val leadingFightingMachinesSimultaneous: Constraint = TopicsNotSimultaneous(Set(Leading, Fighting, Machines).toBitSet)
+  val leadingFightingMachinesSimultaneous: Constraint = TopicsNotSimultaneous(Set(Leading, Fighting, Machines).toArraySet)
 
   it should "not break if the topics are on different slots" in {
     leadingFightingMachinesSimultaneous.isRespected(

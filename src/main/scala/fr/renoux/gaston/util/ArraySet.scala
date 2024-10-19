@@ -4,7 +4,9 @@ import java.util
 
 /** A set of something with an integer Id, which can only be used to test if it contains an A (but not iterate on that
  * A or get it back). Immutable. */
-final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
+final class ArraySet[A <: Identified](private val wrapped: Array[Boolean]) extends AnyVal {
+
+  @inline def capacity: Int = wrapped.length
 
   @inline def apply(a: A): Boolean = wrapped(a.id)
 
@@ -12,7 +14,7 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
 
   @inline def containsId(id: Int): Boolean = wrapped(id)
 
-  @inline def countIntersection(that: BitSet[A]): Int = {
+  @inline def countIntersection(that: ArraySet[A]): Int = {
     // while loop used for performance
     var i = 0
     var total = 0
@@ -30,11 +32,11 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
 
   @inline def size: Int = wrapped.count(identity)
 
-  @inline def actualEquals(that: BitSet[A]): Boolean = util.Arrays.equals(wrapped, that.wrapped)
+  @inline def actualEquals(that: ArraySet[A]): Boolean = util.Arrays.equals(wrapped, that.wrapped)
 
   @inline def actualHashCode: Int = util.Arrays.hashCode(wrapped)
 
-  /** Returns the actual array in this BitSet, so changing it would change the set as well! */
+  /** Returns the actual array in this ArraySet, so changing it would change the set as well! */
   @inline def unsafeContent: Array[Boolean] = wrapped
 
   /** Returns the a wrapped array, so it cannot be changed from the outside. Slower. */
@@ -46,21 +48,21 @@ final class BitSet[A <: Identified](private val wrapped: Array[Boolean]) extends
   override def toString: String = wrapped.view.zipWithIndex.filter(_._1).map(_._2).mkString("[", ", ", "]")
 }
 
-object BitSet {
-  def from[A <: Identified](size: Int)(it: Iterable[A]): BitSet[A] = {
+object ArraySet {
+  def from[A <: Identified](size: Int)(it: Iterable[A]): ArraySet[A] = {
     val tmp = Array.fill(size)(false)
     it.foreach { a => tmp(a.id) = true }
-    new BitSet[A](tmp)
+    new ArraySet[A](tmp)
   }
 
-  def empty[A <: Identified](implicit c: Count[A]): BitSet[A] =
-    new BitSet[A](Array.fill(c.value)(false))
+  def empty[A <: Identified](implicit c: Count[A]): ArraySet[A] =
+    new ArraySet[A](Array.fill(c.value)(false))
 
   object syntax {
-    implicit final class BitSetConversionOps[A <: Identified](val wrapped: Iterable[A]) extends AnyVal {
-      @inline def toBitSet(size: Int): BitSet[A] = BitSet.from[A](size)(wrapped)
+    implicit final class ArraySetConversionOps[A <: Identified](val wrapped: Iterable[A]) extends AnyVal {
+      @inline def toArraySet(size: Int): ArraySet[A] = ArraySet.from[A](size)(wrapped)
 
-      @inline def toBitSet(implicit count: Count[A]): BitSet[A] = BitSet.from[A](count.value)(wrapped)
+      @inline def toArraySet(implicit count: Count[A]): ArraySet[A] = ArraySet.from[A](count.value)(wrapped)
     }
   }
 

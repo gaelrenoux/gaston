@@ -10,7 +10,7 @@ final case class TopicDirectPreference(topic: Topic, reward: Score) extends Pref
 
   /** Specific implementation, faster than the default */
   override def scoreSchedule(schedule: Schedule): Score =
-    if (schedule.scheduledTopicsBitSet.contains(topic)) reward else Score.Zero
+    if (schedule.scheduledTopicsArraySet.contains(topic)) reward else Score.Zero
 
   override lazy val toLongString: String = s"TopicDirectPreference(${topic.toShortString}, $reward)"
 

@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model
 
-import fr.renoux.gaston.util.{BitSet, testOnly}
+import fr.renoux.gaston.util.{ArraySet, testOnly}
 
 import scala.annotation.tailrec
 
@@ -17,7 +17,7 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
   lazy val countOpenPositions: Int = topic.max - countPersons
 
 
-  lazy val personsBitSet: BitSet[Person] = persons.toBitSet
+  lazy val personsArraySet: ArraySet[Person] = persons.toArraySet
 
   /* No need to compare persons, on a given schedule there is not two records with the same slot and topic */
   override def compare(that: Record): Int = {

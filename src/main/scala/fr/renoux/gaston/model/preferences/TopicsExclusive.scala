@@ -1,13 +1,13 @@
 package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model.*
-import fr.renoux.gaston.util.BitSet
+import fr.renoux.gaston.util.ArraySet
 
 /** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot).
  *
  * This is often used as a soft-constraint (very high negative score, in order to make sure it's always respected).
  */
-final case class TopicsExclusive(topics: BitSet[Topic], exemptions: BitSet[Person], reward: Score = Preference.NecessaryPreferenceScore)
+final case class TopicsExclusive(topics: ArraySet[Topic], exemptions: ArraySet[Person], reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti with Preference.Impersonal {
   // TODO add score scaling: the more times we break the rule, the lower it goes (e.g. it's -50 on two topics but -200 on three)
 

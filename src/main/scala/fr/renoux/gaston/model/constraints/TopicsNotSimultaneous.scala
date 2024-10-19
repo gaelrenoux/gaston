@@ -1,13 +1,13 @@
 package fr.renoux.gaston.model.constraints
 
 import fr.renoux.gaston.model.{Constraint, SlotSchedule, Topic}
-import fr.renoux.gaston.util.BitSet
+import fr.renoux.gaston.util.ArraySet
 
 import scala.annotation.tailrec
 
 /** None of those topics may be on the same slot. I.e., a slot may contain one (or none), but not several of them. */
 @hardCoded
-final case class TopicsNotSimultaneous(topics: BitSet[Topic]) extends Constraint.SlotLevel {
+final case class TopicsNotSimultaneous(topics: ArraySet[Topic]) extends Constraint.SlotLevel {
 
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = check(schedule.topicsList)
 

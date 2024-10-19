@@ -5,7 +5,7 @@ import fr.renoux.gaston.model.{Constraint, SlotSchedule, Topic}
 /** All those topics must be on the same slot. I.e., a slot must either contain both or none. */
 @hardCoded
 final case class TopicsSimultaneous(topics: Set[Topic]) extends Constraint.SlotLevel {
-  //TODO maybe topics should be a BitSet?
+  //TODO maybe topics should be an ArraySet?
 
   private val topicsSize = topics.size
   assert(topicsSize > 1)

@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model
 
 import fr.renoux.gaston.model.constraints.{TopicsNotSimultaneous, TopicsSimultaneous}
-import fr.renoux.gaston.util.BitMap
+import fr.renoux.gaston.util.ArrayMap
 import fr.renoux.gaston.util.CanGroupToMap.ops.*
 import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.TupleImplicits.*
@@ -10,7 +10,7 @@ import fr.renoux.gaston.util.TupleImplicits.*
 final case class Problem(
     slotSequences: Seq[Seq[Slot]],
     topicsSet: Set[Topic],
-    unassignedTopics: BitMap[Slot, Topic],
+    unassignedTopics: ArrayMap[Slot, Topic],
     personsSet: Set[Person],
     constraints: Set[Constraint],
     preferences: Set[Preference]
@@ -56,7 +56,7 @@ final case class Problem(
 
   lazy val preferencesList: List[Preference] = preferences.toList
   lazy val personalPreferencesList: List[Preference.Personal] = preferencesList.collect { case pp: Preference.Personal => pp }
-  lazy val personalPreferencesListByPerson: BitMap[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toBitMap(Nil)
+  lazy val personalPreferencesListByPerson: ArrayMap[Person, List[Preference.Personal]] = personalPreferencesList.groupBy(_.person).toArrayMap(Nil)
 
 
   private lazy val (
@@ -79,9 +79,9 @@ final case class Problem(
   lazy val hasGlobalPreferencesWherePersonsMatter: Boolean = globalLevelPreferences.exists(_.personsMatter)
 
   /** For everyone, their personal preferences */
-  lazy val preferencesByPerson: BitMap[Person, Set[Preference.Personal]] = preferences.collect {
+  lazy val preferencesByPerson: ArrayMap[Person, Set[Preference.Personal]] = preferences.collect {
     case p: Preference.Personal => p
-  }.groupBy(_.person).toBitMap(Set.empty)
+  }.groupBy(_.person).toArrayMap(Set.empty)
 
 
 
@@ -94,15 +94,15 @@ final case class Problem(
       case s: Constraint => Right(s)
     }.unzipEither
 
-  lazy val mandatoryTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toBitMap(Set.empty)
+  lazy val mandatoryTopicsByPerson: ArrayMap[Person, Set[Topic]] =
+    topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toArrayMap(Set.empty)
 
-  lazy val forbiddenTopicsByPerson: BitMap[Person, Set[Topic]] =
-    topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toBitMap(Set.empty)
+  lazy val forbiddenTopicsByPerson: ArrayMap[Person, Set[Topic]] =
+    topicsSet.flatMap(t => t.forbidden.map(_ -> t)).groupToMap.toArrayMap(Set.empty)
 
   /** For each topic, the topics that cannot be held in the same slot because of some constraints (like the same persons
    * are mandatory). */
-  lazy val incompatibleTopicsByTopic: BitMap[Topic, Set[Topic]] = {
+  lazy val incompatibleTopicsByTopic: ArrayMap[Topic, Set[Topic]] = {
     val conflictingMandatories = for {
       topic1 <- topicsSet
       topic2 <- topicsSet
@@ -115,24 +115,24 @@ final case class Problem(
         topics.cross(topics)
     }.flatten
 
-    (conflictingMandatories ++ notSimultaneous).groupToMap.toBitMap(Set.empty)
+    (conflictingMandatories ++ notSimultaneous).groupToMap.toArrayMap(Set.empty)
   }
 
   /** For each slot, the topics that cannot be held in that slot because of some constraints (like some mandatory person
    * is missing). */
-  lazy val incompatibleTopicsBySlot: BitMap[Slot, Set[Topic]] = {
+  lazy val incompatibleTopicsBySlot: ArrayMap[Slot, Set[Topic]] = {
     val couples = for {
       slot <- slotsSet
       topic <- topicsSet
       if topic.mandatory.exists(!slot.personsPresent.contains(_)) || topic.slots.exists(!_.contains(slot))
     } yield (slot, topic)
-    couples.groupToMap.toBitMap(Set.empty)
+    couples.groupToMap.toArrayMap(Set.empty)
   }
 
-  lazy val simultaneousTopicByTopic: BitMap[Topic, Set[Topic]] = {
+  lazy val simultaneousTopicByTopic: ArrayMap[Topic, Set[Topic]] = {
     constraints.collect {
       case TopicsSimultaneous(ts) => ts.map(t => t -> (ts - t))
-    }.flatten.toMap.toBitMap(Set.empty)
+    }.flatten.toMap.toArrayMap(Set.empty)
   }
 
 
@@ -165,5 +165,5 @@ final case class Problem(
 }
 
 object Problem {
-  val Empty: Problem = new Problem(Seq.empty, Set.empty, BitMap.empty, Set.empty, Set.empty, Set.empty)(Counts.Empty)
+  val Empty: Problem = new Problem(Seq.empty, Set.empty, ArrayMap.empty, Set.empty, Set.empty, Set.empty)(Counts.Empty)
 }

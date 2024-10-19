@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model.preferences
 
 import fr.renoux.gaston.model._
-import fr.renoux.gaston.util.{BitSet, Context}
+import fr.renoux.gaston.util.{ArraySet, Context}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -18,7 +18,7 @@ class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
   behavior of "TopicsExclusive"
-  val cannotLeadAndPartyExceptLeo: Preference = TopicsExclusive(Set(Leading, Party).toBitSet, Set(Leonardo).toBitSet)
+  val cannotLeadAndPartyExceptLeo: Preference = TopicsExclusive(Set(Leading, Party).toArraySet, Set(Leonardo).toArraySet)
 
   it should "return the reward if a person does both" in {
     cannotLeadAndPartyExceptLeo.score(scheduled(Morning, Leading, Donatello, Michelangelo) ++
@@ -45,7 +45,7 @@ class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "break if a person does two out of three" in {
-    TopicsExclusive(Set(Leading, Party, Machines).toBitSet, BitSet.empty[Person]).score(scheduled(Morning, Leading, Leonardo, Michelangelo) ++
+    TopicsExclusive(Set(Leading, Party, Machines).toArraySet, ArraySet.empty[Person]).score(scheduled(Morning, Leading, Leonardo, Michelangelo) ++
       scheduled(Afternoon, Party, Raphael, Michelangelo) ++ scheduled(Evening, Machines, Donatello)
     ) should be(cannotLeadAndPartyExceptLeo.reward)
   }
