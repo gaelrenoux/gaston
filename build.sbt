@@ -2,7 +2,7 @@ import sbt.Keys._
 
 organization := "gael.renoux"
 name := "gaston"
-version := "1.0.0"
+version := "1.1.0"
 
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
@@ -41,7 +41,7 @@ scalacOptions ++= Seq(
   // "-XX:MaxInlineLevel=18", // see https://github.com/scala/bug/issues/11627#issuecomment-514619316 // check if still valid for Scala 3
 )
 
-/* Adds Sonatype snapshots, required for Iron */
+/* Adds Sonatype snapshots, required for Iron's snapshot version */
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 val catsVersion = "2.12.0"
