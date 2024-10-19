@@ -43,7 +43,7 @@ final class RandomAssigner(implicit private val problem: Problem) {
   }
 
   @inline
-  private def fillSlot(slotSchedule: SlotSchedule)(implicit random: Random): Option[SlotSchedule] = {
+  def fillSlot(slotSchedule: SlotSchedule)(implicit random: Random): Option[SlotSchedule] = {
     val personsLeft = random.shuffle(slotSchedule.unscheduledPersonsList)
     val records = random.shuffle(slotSchedule.recordsList)
     backtrackFillPersons(slotSchedule)(records, personsLeft)

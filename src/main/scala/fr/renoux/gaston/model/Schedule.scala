@@ -97,7 +97,7 @@ final case class Schedule(
   }
 
   /** Swap two groups of topics from two different slots. Mandatory persons are set on the new topics and no one else, so the
-    * schedule is probably unsound and/or unfilled. */
+   * schedule is probably unsound and/or unfilled. */
   def swapTopics(st1: (Slot, Set[Topic]), st2: (Slot, Set[Topic])): Schedule = updateWrapped {
     val (slot1, topics1) = st1
     val (slot2, topics2) = st2
@@ -317,6 +317,6 @@ object Schedule {
   /** Commodity method for tests */
   @testOnly def from(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
     new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
-      case (s, rs) => s -> SlotSchedule.from(s, rs)
+      case (s, rs) => s -> SlotSchedule.from(s, rs *)
     })
 }

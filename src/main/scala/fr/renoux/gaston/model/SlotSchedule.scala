@@ -252,7 +252,7 @@ object SlotSchedule {
     }
 
   /** Commodity method */
-  @testOnly def from(slot: Slot, entries: Seq[Record]*)(implicit problem: Problem): SlotSchedule = {
-    new SlotSchedule(slot, entries.flatten.groupBy(_.topic).mapValuesStrict(_.reduce(_ ++ _)))
+  @testOnly def from(slot: Slot, entries: Record*)(implicit problem: Problem): SlotSchedule = {
+    new SlotSchedule(slot, entries.groupBy(_.topic).mapValuesStrict(_.reduce(_ ++ _)))
   }
 }
