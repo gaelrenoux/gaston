@@ -7,11 +7,11 @@ import org.scalatest.matchers.should.Matchers
 
 class ScheduleParserSpec extends AnyFlatSpec with Matchers {
 
-  import fr.renoux.gaston.SimpleTestModel.Persons._
-  import fr.renoux.gaston.SimpleTestModel.Problems._
-  import fr.renoux.gaston.SimpleTestModel.Slots._
-  import fr.renoux.gaston.SimpleTestModel.Solutions._
-  import fr.renoux.gaston.SimpleTestModel.Topics._
+  import fr.renoux.gaston.SimpleTestModel.Persons.*
+  import fr.renoux.gaston.SimpleTestModel.Problems.*
+  import fr.renoux.gaston.SimpleTestModel.Slots.*
+  import fr.renoux.gaston.SimpleTestModel.Solutions.*
+  import fr.renoux.gaston.SimpleTestModel.Topics.*
 
   private implicit val problem: Problem = WithUnassignedTopics
   private implicit val context: Context = Context.Default

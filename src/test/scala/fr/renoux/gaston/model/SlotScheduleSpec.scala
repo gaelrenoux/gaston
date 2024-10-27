@@ -6,11 +6,11 @@ import org.scalatest.matchers.should.Matchers
 
 class SlotScheduleSpec extends AnyFlatSpec with Matchers {
 
-  import fr.renoux.gaston.SimpleTestModel.Persons._
-  import fr.renoux.gaston.SimpleTestModel.Problems._
-  import fr.renoux.gaston.SimpleTestModel.Slots._
-  import fr.renoux.gaston.SimpleTestModel.Solutions._
-  import fr.renoux.gaston.SimpleTestModel.Topics._
+  import fr.renoux.gaston.SimpleTestModel.Persons.*
+  import fr.renoux.gaston.SimpleTestModel.Problems.*
+  import fr.renoux.gaston.SimpleTestModel.Slots.*
+  import fr.renoux.gaston.SimpleTestModel.Solutions.*
+  import fr.renoux.gaston.SimpleTestModel.Topics.*
 
   implicit val problem: Problem = WithUnassignedTopics
 

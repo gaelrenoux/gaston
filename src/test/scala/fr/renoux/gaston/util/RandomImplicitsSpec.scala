@@ -8,7 +8,7 @@ import scala.util.Random
 
 class RandomImplicitsSpec extends AnyFlatSpec with Matchers {
 
-  import RandomImplicits._
+  import RandomImplicits.*
 
 
   "pick" should "work for one element" in {

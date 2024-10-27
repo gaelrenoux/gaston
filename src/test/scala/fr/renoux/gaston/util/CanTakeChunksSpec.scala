@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
   val log: Logger = Logger[CanTakeChunksSpec]
 
-  import CanTakeChunks._
+  import CanTakeChunks.*
 
   val testList: List[String] = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
 

@@ -5,8 +5,8 @@ import org.scalatest.matchers.should.Matchers
 
 class ArrayMapSpec extends AnyFlatSpec with Matchers {
 
-  import ArrayMapSpec.*
   import ArrayMap.*
+  import ArrayMapSpec.*
 
   behavior of "ArrayMap"
   it should "work from scratch" in {

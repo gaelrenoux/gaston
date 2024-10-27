@@ -1,6 +1,6 @@
 package fr.renoux.gaston.itests
 
-import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.command.{Output, SyncRunner}
 import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
 import fr.renoux.gaston.input.problemFromClassPath

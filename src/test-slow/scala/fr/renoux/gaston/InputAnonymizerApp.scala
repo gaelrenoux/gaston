@@ -1,6 +1,6 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputRenderer, InputTranscription}
 import fr.renoux.gaston.tools.InputAnonymizer
 

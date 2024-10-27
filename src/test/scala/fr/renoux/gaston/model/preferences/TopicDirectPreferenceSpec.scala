@@ -1,16 +1,16 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.Context
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class TopicDirectPreferenceSpec extends AnyFlatSpec with Matchers {
 
-  import fr.renoux.gaston.MinimalTestModel.Persons._
-  import fr.renoux.gaston.MinimalTestModel.Problems._
-  import fr.renoux.gaston.MinimalTestModel.Slots._
-  import fr.renoux.gaston.MinimalTestModel.Topics._
+  import fr.renoux.gaston.MinimalTestModel.Persons.*
+  import fr.renoux.gaston.MinimalTestModel.Problems.*
+  import fr.renoux.gaston.MinimalTestModel.Slots.*
+  import fr.renoux.gaston.MinimalTestModel.Topics.*
 
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default

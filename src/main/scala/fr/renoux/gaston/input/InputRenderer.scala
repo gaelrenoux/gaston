@@ -2,7 +2,8 @@ package fr.renoux.gaston.input
 
 import com.typesafe.config.ConfigRenderOptions
 import pureconfig.ConfigWriter
-import scala.jdk.CollectionConverters._
+
+import scala.jdk.CollectionConverters.*
 
 object InputRenderer {
 

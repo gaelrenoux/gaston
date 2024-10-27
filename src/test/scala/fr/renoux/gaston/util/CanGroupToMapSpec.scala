@@ -5,8 +5,8 @@ import org.scalatest.matchers.should.Matchers
 
 class CanGroupToMapSpec extends AnyFlatSpec with Matchers {
 
-  import CanGroupToMap.ops._
-  import CanGroupToMapSpec._
+  import CanGroupToMap.ops.*
+  import CanGroupToMapSpec.*
 
   behavior of "List"
   it should "works on a non-empty List" in {

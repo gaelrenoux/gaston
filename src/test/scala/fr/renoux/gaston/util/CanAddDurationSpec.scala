@@ -8,7 +8,7 @@ import scala.concurrent.duration.DurationInt
 
 class CanAddDurationSpec extends AnyFlatSpec with Matchers {
 
-  import CanAddDuration._
+  import CanAddDuration.*
 
   behavior of "+"
   it should "add a positive duration" in {

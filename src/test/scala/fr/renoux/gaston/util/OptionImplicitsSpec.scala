@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class OptionImplicitsSpec extends AnyFlatSpec with Matchers {
 
-  import OptionImplicits._
+  import OptionImplicits.*
 
   "optional" should "work" in {
     "Something".optional(Option.empty[String])(_ + _) should be("Something")

@@ -8,11 +8,11 @@ import scala.util.Random
 
 class ScheduleSpec extends AnyFlatSpec with Matchers {
 
-  import fr.renoux.gaston.SimpleTestModel.Persons._
-  import fr.renoux.gaston.SimpleTestModel.Problems._
-  import fr.renoux.gaston.SimpleTestModel.Slots._
-  import fr.renoux.gaston.SimpleTestModel.Solutions._
-  import fr.renoux.gaston.SimpleTestModel.Topics._
+  import fr.renoux.gaston.SimpleTestModel.Persons.*
+  import fr.renoux.gaston.SimpleTestModel.Problems.*
+  import fr.renoux.gaston.SimpleTestModel.Slots.*
+  import fr.renoux.gaston.SimpleTestModel.Solutions.*
+  import fr.renoux.gaston.SimpleTestModel.Topics.*
   import fr.renoux.gaston.SimpleTestModel.strongPreference
 
   private implicit val problem: Problem = WithUnassignedTopics

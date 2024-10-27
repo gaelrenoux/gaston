@@ -2,10 +2,10 @@ package fr.renoux.gaston
 
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.input.Constants
-import fr.renoux.gaston.model.Score.ScoreIsFractional._
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.Score.ScoreIsFractional.*
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.util.RandomImplicits._
+import fr.renoux.gaston.util.RandomImplicits.*
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable

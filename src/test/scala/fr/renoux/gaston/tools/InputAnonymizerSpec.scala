@@ -1,6 +1,6 @@
 package fr.renoux.gaston.tools
 
-import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

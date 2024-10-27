@@ -1,11 +1,11 @@
 package fr.renoux.gaston.input
 
-import java.io.File
-
-import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.model._
+import fr.renoux.gaston.TestUtils.*
+import fr.renoux.gaston.model.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
+import java.io.File
 
 class InputLoaderSpec extends AnyFlatSpec with Matchers {
 

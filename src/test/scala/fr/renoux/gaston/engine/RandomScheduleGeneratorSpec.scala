@@ -1,7 +1,7 @@
 package fr.renoux.gaston.engine
 
 import fr.renoux.gaston.SimpleTestModel
-import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.Context

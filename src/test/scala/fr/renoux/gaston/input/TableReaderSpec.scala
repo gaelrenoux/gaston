@@ -5,10 +5,9 @@ package fr.renoux.gaston.input
 //import com.softwaremill.diffx.generic.auto.given
 
 import fr.renoux.gaston.TestUtils.*
-import fr.renoux.gaston.model.Score
+import fr.renoux.gaston.model.{Score, Weight}
 import io.github.iltotore.iron.autoRefine
 import org.scalatest.flatspec.AnyFlatSpec
-import fr.renoux.gaston.model.Weight
 import org.scalatest.matchers.should.Matchers
 
 import scala.io.Source

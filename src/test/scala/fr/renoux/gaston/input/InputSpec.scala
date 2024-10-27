@@ -1,8 +1,8 @@
 package fr.renoux.gaston.input
 
-import fr.renoux.gaston.TestUtils._
-import fr.renoux.gaston.model._
-import fr.renoux.gaston.model.constraints._
+import fr.renoux.gaston.TestUtils.*
+import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.constraints.*
 import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive, TopicsLinked}
 import fr.renoux.gaston.util.Count
 import org.scalatest.flatspec.AnyFlatSpec
@@ -70,7 +70,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "contain the correct preferences" in {
-    import expected.implicits._
+    import expected.implicits.*
     val scalingFactor: Double = Constants.PersonTotalScore.value / 7
     val initialTopicsPreferences = for {
       t <- Set(expected.topics.unassignedA, expected.topics.unassignedB, expected.topics.unassignedC)

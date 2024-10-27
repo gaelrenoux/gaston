@@ -1,10 +1,10 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputSettings}
-import fr.renoux.gaston.model.constraints._
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.constraints.*
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.{ArrayMap, Context}
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -42,7 +42,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Topics {
 
-    import Persons._
+    import Persons.*
 
     private val index = new AtomicInteger(0)
 
@@ -75,7 +75,7 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Constraints {
 
-    import Topics._
+    import Topics.*
 
     val BathingAndEatingAreSimultaneous: TopicsSimultaneous = TopicsSimultaneous(Set(Bathing, Eating))
 
@@ -86,9 +86,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Preferences {
 
-    import Persons._
+    import Persons.*
     import ProblemCounts.CompleteCounts
-    import Topics._
+    import Topics.*
 
     val AB: PersonTopicPreference = PersonTopicPreference(Arthur, Bathing, strongPreference)
     val BC: PersonTopicPreference = PersonTopicPreference(Bianca, Cooking, strongPreference)
@@ -129,9 +129,9 @@ class SimpleTestModel(implicit settings: InputSettings) {
 
   object Solutions {
 
-    import Persons._
-    import Slots._
-    import Topics._
+    import Persons.*
+    import Slots.*
+    import Topics.*
 
     private implicit val context: Context = Context.Default
 

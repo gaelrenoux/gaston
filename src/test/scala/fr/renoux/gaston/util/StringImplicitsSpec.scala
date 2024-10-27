@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class StringImplicitsSpec extends AnyFlatSpec with Matchers {
 
-  import StringImplicits._
+  import StringImplicits.*
 
   "replaceRec" should "work" in {
     "Hello www www whatever www".replace("ww", "-w") shouldNot be("Hello --w --w whatever --w")

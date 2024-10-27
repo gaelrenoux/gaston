@@ -1,11 +1,10 @@
 package fr.renoux.gaston.command
 
-import java.nio.file.Paths
-
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.concurrent.duration._
+import java.nio.file.Paths
+import scala.concurrent.duration.*
 
 class CommandLineTest extends AnyFlatSpec with Matchers {
 

@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 
 class TupleImplicitsSpec extends AnyFlatSpec with Matchers {
 
-  import TupleImplicits._
+  import TupleImplicits.*
 
   "map1" should "work" in {
     ("Hello", "Woooooorld").map1(_.length) should be((5, "Woooooorld"))

@@ -1,17 +1,17 @@
 package fr.renoux.gaston.benchmarks
 
-import fr.renoux.gaston.TestUtils._
+import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.command.{Output, ParallelRunner}
-import fr.renoux.gaston.engine._
-import fr.renoux.gaston.input._
+import fr.renoux.gaston.engine.*
+import fr.renoux.gaston.input.*
 import fr.renoux.gaston.model.{Problem, Score}
-import fr.renoux.gaston.util.CanAddDuration._
+import fr.renoux.gaston.util.CanAddDuration.*
 import fr.renoux.gaston.util.{Context, Opt}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 import java.time.Instant
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future}
 
 class RegressionBenchmark extends AnyFlatSpec with Matchers {

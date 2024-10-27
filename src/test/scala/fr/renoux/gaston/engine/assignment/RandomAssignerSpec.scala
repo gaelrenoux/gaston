@@ -17,9 +17,9 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
   it should "be filled in" in {
     implicit val rand: Random = new Random(0)
     implicit val problem: Problem = MinimalTestModel.Problems.Minimal
-    import fr.renoux.gaston.MinimalTestModel.Slots._
+    import fr.renoux.gaston.MinimalTestModel.Slots.*
     import fr.renoux.gaston.MinimalTestModel.Topics
-    import fr.renoux.gaston.MinimalTestModel.Topics._
+    import fr.renoux.gaston.MinimalTestModel.Topics.*
 
     val randomAssigner = new RandomAssigner
     val unfilledSchedule = Schedule.from(
@@ -39,9 +39,9 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
   it should "fill in a schedule where one person is unscheduled" in {
     implicit val rand: Random = new Random(0)
     implicit val problem: Problem = SimpleTestModel.Problems.WithUnassignedTopics
-    import fr.renoux.gaston.SimpleTestModel.Slots._
-    import fr.renoux.gaston.SimpleTestModel.Topics._
-    import fr.renoux.gaston.SimpleTestModel.Persons._
+    import fr.renoux.gaston.SimpleTestModel.Persons.*
+    import fr.renoux.gaston.SimpleTestModel.Slots.*
+    import fr.renoux.gaston.SimpleTestModel.Topics.*
 
     val randomAssigner = new RandomAssigner
 
