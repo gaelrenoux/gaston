@@ -5,8 +5,8 @@ import org.scalatest.matchers.should.Matchers
 
 class ArraySetSpec extends AnyFlatSpec with Matchers {
 
-  import ArraySet.syntax._
-  import ArraySetSpec._
+  import ArraySet.*
+  import ArraySetSpec.*
 
   behavior of "ArraySet"
   it should "work from scratch" in {
