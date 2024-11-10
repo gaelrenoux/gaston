@@ -3,7 +3,7 @@ package fr.renoux.gaston.util
 
 extension [K, V](wrapped: Map[K, V]) {
 
-  inline def minKeyOption(implicit o: Ordering[K]): Option[V] = if (wrapped.isEmpty) None else Some(wrapped.minBy(_._1)._2)
+  inline def minKeyOption(using o: Ordering[K]): Option[V] = if (wrapped.isEmpty) None else Some(wrapped.minBy(_._1)._2)
 
   inline def updateAtKeyOrElse(k: K)(f: V => V, v: => V): Map[K, V] =
     wrapped.updatedWith(k) {

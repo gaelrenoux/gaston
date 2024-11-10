@@ -14,7 +14,7 @@ sealed class Chrono(blocking: Boolean = false) {
 
   /** Time spent in the block of code as second-argument, is going to be stored with the name given. You can then access
    * all time spent using the `times` method. */
-  @inline def apply[A](name: String)(a: => A): A = {
+  def apply[A](name: String)(a: => A): A = {
     val start = System.currentTimeMillis()
     val evaluated = a
     val duration = System.currentTimeMillis() - start
@@ -68,7 +68,7 @@ sealed class Chrono(blocking: Boolean = false) {
 object Chrono {
 
   object NoOp extends Chrono {
-    @inline override def apply[A](name: String)(a: => A): A = a
+    override inline def apply[A](name: String)(a: => A): A = a
 
     override val timesTotal: Map[String, Long] = Map.empty
 

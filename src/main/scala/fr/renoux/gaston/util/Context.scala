@@ -11,7 +11,7 @@ object Context {
 
   val Debug: Context = Context(debugMode = true)
 
-  @inline def chrono[A](name: String)(a: => A)(implicit c: Context): A = {
+  inline def chrono[A](name: String)(a: => A)(using c: Context): A = {
     c.tools.chrono(name)(a)
   }
 }
