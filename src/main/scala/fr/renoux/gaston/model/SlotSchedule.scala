@@ -1,8 +1,7 @@
 package fr.renoux.gaston.model
 
 import cats.implicits.*
-import fr.renoux.gaston.util.CollectionImplicits.*
-import fr.renoux.gaston.util.testOnly
+import fr.renoux.gaston.util.*
 
 import scala.annotation.tailrec
 

@@ -7,8 +7,7 @@ import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.constraints.*
 import fr.renoux.gaston.model.preferences.*
 import fr.renoux.gaston.util.CanGroupToMap.ops.*
-import fr.renoux.gaston.util.CollectionImplicits.*
-import fr.renoux.gaston.util.{ArrayMap, ArraySet, Count}
+import fr.renoux.gaston.util.*
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.{Constraint as _, *}
 import mouse.map.*
@@ -114,7 +113,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   lazy val topicsFirstPartByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Topic]] =
     topicsByPartIndexByOccurrenceIndexByName.mapValuesStrict { topicsByPartIndexByOccurrenceIndex =>
-      topicsByPartIndexByOccurrenceIndex.mapValuesStrict(_.getMinKey.get)
+      topicsByPartIndexByOccurrenceIndex.mapValuesStrict(_.minKeyOption.get)
     }
 
   lazy val topicsByName: Map[NonEmptyString, Set[Topic]] =

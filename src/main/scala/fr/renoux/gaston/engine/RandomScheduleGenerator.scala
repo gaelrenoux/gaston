@@ -5,8 +5,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
 import fr.renoux.gaston.model.*
-import fr.renoux.gaston.util.CollectionImplicits.*
-import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.util.*
 
 import scala.collection.immutable.Queue
 import scala.util.Random
@@ -181,10 +180,10 @@ object RandomScheduleGenerator {
     if (total > 0) triggerOnFailures(this)
 
     def addNoTopics(slot: Slot): BacktrackingFailures =
-      copy(noTopics = noTopics.updatedWithOrElse(slot)(_ + 1, 1), total = total + 1)
+      copy(noTopics = noTopics.updateAtKeyOrElse(slot)(_ + 1, 1), total = total + 1)
 
     def addMaxParallelizationReached(slot: Slot): BacktrackingFailures =
-      copy(maxParallelizationReached = maxParallelizationReached.updatedWithOrElse(slot)(_ + 1, 1), total = total + 1)
+      copy(maxParallelizationReached = maxParallelizationReached.updateAtKeyOrElse(slot)(_ + 1, 1), total = total + 1)
   }
 
 }

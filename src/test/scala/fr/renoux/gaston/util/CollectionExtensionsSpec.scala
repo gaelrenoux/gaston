@@ -3,10 +3,9 @@ package fr.renoux.gaston.util
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class CollectionImplicitsSpec extends AnyFlatSpec with Matchers {
+class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
 
-  import CollectionImplicits.*
-  import CollectionImplicitsSpec.*
+  import CollectionExtensionsSpec.*
 
   "zipWith" should "work" in {
     Seq("alpha", "beta", "gamma").zipWith(_.length) should be(Seq("alpha" -> 5, "beta" -> 4, "gamma" -> 5))
@@ -37,7 +36,7 @@ class CollectionImplicitsSpec extends AnyFlatSpec with Matchers {
   }
 
   "cross" should "work" in {
-    val result = List(1, 2, 3) cross List("red", "green")
+    val result = List(1, 2, 3) x List("red", "green")
     result should be(List(1 -> "red", 1 -> "green", 2 -> "red", 2 -> "green", 3 -> "red", 3 -> "green"))
   }
 
@@ -72,41 +71,20 @@ class CollectionImplicitsSpec extends AnyFlatSpec with Matchers {
   }
 
   "getMinKey" should "work" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").getMinKey should be(Some("kiwi"))
+    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").minKeyOption should be(Some("kiwi"))
   }
 
   "getMinKey" should "work on empty Map" in {
-    Map.empty[String, Dog].getMinKey should be(None)
-  }
-
-  "updatedWith" should "work to replace a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updatedWith(8) {
-      case None => Some("apple")
-      case Some(fruit) => Some(fruit + fruit)
-    } should be(Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomatotomato"))
-  }
-
-  it should "work to add a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updatedWith(9) {
-      case None => Some("apple")
-      case Some(fruit) => Some(fruit + fruit)
-    } should be(Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato", 9 -> "apple"))
-  }
-
-  it should "work to remove a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updatedWith(8) {
-      case None => Some("apple")
-      case Some(_) => None
-    } should be(Map(3 -> "orange", 2 -> "kiwi"))
+    Map.empty[String, Dog].minKeyOption should be(None)
   }
 
   "updatedWithOrElse" should "work to replace a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updatedWithOrElse(8)(f => f + f, "apple") should
+    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updateAtKeyOrElse(8)(f => f + f, "apple") should
       be(Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomatotomato"))
   }
 
   it should "work to add a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updatedWithOrElse(9)(f => f + f, "apple") should
+    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updateAtKeyOrElse(9)(f => f + f, "apple") should
       be(Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato", 9 -> "apple"))
   }
 
@@ -162,7 +140,7 @@ class CollectionImplicitsSpec extends AnyFlatSpec with Matchers {
   }
 }
 
-object CollectionImplicitsSpec {
+object CollectionExtensionsSpec {
   sealed trait Animal
 
   case class Dog(name: String) extends Animal

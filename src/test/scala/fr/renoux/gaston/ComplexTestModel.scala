@@ -5,7 +5,7 @@ import fr.renoux.gaston.input.Constants
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.Score.given
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
-import fr.renoux.gaston.util.RandomImplicits.*
+import fr.renoux.gaston.util.*
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable

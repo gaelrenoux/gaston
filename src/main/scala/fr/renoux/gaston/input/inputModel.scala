@@ -1,8 +1,7 @@
 package fr.renoux.gaston.input
 
 import fr.renoux.gaston.model.{Score, Weight}
-import fr.renoux.gaston.util.CollectionImplicits.*
-import fr.renoux.gaston.util.Opt
+import fr.renoux.gaston.util.*
 import pureconfig.*
 import pureconfig.generic.*
 import pureconfig.generic.semiauto.deriveConvert

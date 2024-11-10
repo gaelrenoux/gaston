@@ -6,10 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import scala.util.Random
 
 
-class RandomImplicitsSpec extends AnyFlatSpec with Matchers {
-
-  import RandomImplicits.*
-
+class RandomExtensionSpec extends AnyFlatSpec with Matchers {
 
   "pick" should "work for one element" in {
     val random = new Random(0) // always the same values

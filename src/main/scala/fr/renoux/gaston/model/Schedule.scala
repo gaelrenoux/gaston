@@ -3,9 +3,7 @@ package fr.renoux.gaston.model
 import cats.Monoid
 import cats.implicits.*
 import fr.renoux.gaston.util.CanGroupToMap.ops.toCoupleOps
-import fr.renoux.gaston.util.CollectionImplicits.*
-import fr.renoux.gaston.util.RandomImplicits.*
-import fr.renoux.gaston.util.{ArraySet, Context, testOnly}
+import fr.renoux.gaston.util.*
 
 import scala.math.Ordered.orderingToOrdered
 import scala.util.Random
