@@ -8,7 +8,6 @@ import fr.renoux.gaston.util.RandomImplicits.*
 import fr.renoux.gaston.util.{ArraySet, Context, testOnly}
 
 import scala.math.Ordered.orderingToOrdered
-import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
 
 /**
