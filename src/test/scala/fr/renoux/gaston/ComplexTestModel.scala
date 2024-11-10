@@ -3,12 +3,13 @@ package fr.renoux.gaston
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.input.Constants
 import fr.renoux.gaston.model.*
-import fr.renoux.gaston.model.Score.ScoreIsFractional.*
+import fr.renoux.gaston.model.Score.given
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.RandomImplicits.*
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
+import scala.math.Fractional.Implicits.infixFractionalOps
 import scala.util.Random
 
 //TODO Add a version with unassigned topics

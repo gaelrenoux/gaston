@@ -7,6 +7,7 @@ import fr.renoux.gaston.input.{InputModel, InputRenderer}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
 import java.time.Instant
+import scala.math.Ordering.Implicits.infixOrderingOps
 
 /** Destination of all information in Gaston. It writes stuff both to the log file and the standard output. It has some
  * business-aware method, to make sure it only prints new schedules if they are better than schedules found

@@ -8,6 +8,7 @@ import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
+import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
 
 /** A specific implementation of the Engine. At each step, we find a better neighbour and move there. The lazy-seq

@@ -7,6 +7,7 @@ import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Context
 
 import scala.annotation.tailrec
+import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
 
 /** Use tabu search to improve a schedule. Not a real tabu search as we stop a step when we found a better schedule,
