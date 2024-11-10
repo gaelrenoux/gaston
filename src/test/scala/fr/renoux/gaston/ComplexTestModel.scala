@@ -9,6 +9,7 @@ import fr.renoux.gaston.util.RandomImplicits.*
 
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.mutable
+import scala.math.Fractional.Implicits.infixFractionalOps
 import scala.util.Random
 
 //TODO Add a version with unassigned topics

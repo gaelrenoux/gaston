@@ -2,41 +2,44 @@ package fr.renoux.gaston.model
 
 import cats.Monoid
 
-
-/** A Score evaluate how nuch a preference or a set of preferences is satisfied. The higher the better. Scores are added
+/** A Score evaluate how much a preference or a set of preferences is satisfied. The higher the better. Scores are added
  * when combining preferences. Negative preferences ("I'd rather not...") have a negative score when triggered. */
-final case class Score(value: Double) extends AnyVal with Ordered[Score] {
+opaque type Score = Double
 
-  /** Adds two scores */
-  @inline def +(s: Score): Score = Score(value + s.value)
+object Score {
 
-  /** Subtract two scores */
-  def -(s: Score): Score = Score(value - s.value)
+  extension (s: Score) {
 
-  /** Multiply a score by a constant factor */
-  @inline def *(i: Int): Score = Score(value * i)
+    inline def value: Double = s
 
-  /** Multiply a score by a constant factor */
-  @inline def *(l: Long): Score = Score(value * l)
+    /** Adds two scores */
+    inline def +(t: Score): Score = s + t
 
-  /** Multiply a score by a constant factor */
-  @inline def *(d: Double): Score = Score(value * d)
+    /** Subtract two scores */
+    inline def -(t: Score): Score = Score(s - t)
 
-  /** Divide a score by a weight */
-  @inline def /(w: Weight): Score = Score(value / w.value)
+    /** Multiply a score by a constant factor */
+    inline def *(i: Int): Score = s * i
 
-  @inline def negative: Score = Score(-value)
+    /** Multiply a score by a constant factor */
+    inline def *(l: Long): Score = s * l
 
-  @inline override def compare(that: Score): Int = this.value.compare(that.value)
+    /** Multiply a score by a constant factor */
+    inline def *(d: Double): Score = s * d
 
-  @inline def toFormattedString: String = Score.TwoDecimalsFormat.format(value)
+    /** Divide a score by a weight */
+    inline def /(w: Weight): Score = s / w.value
 
-  @inline def isNegativeInfinity: Boolean = value.isNegInfinity
+    inline def negative: Score = -s
 
-  @inline def isPositive: Boolean = value > 0
-}
+    inline def toFormattedString: String = Score.TwoDecimalsFormat.format(s)
 
-object Score extends (Double => Score) {
+    inline def isNegativeInfinity: Boolean = s.isNegInfinity
+
+    inline def isPositive: Boolean = s > 0
+  }
+
+  def apply(s: Double): Score = s
 
   private val TwoDecimalsFormat = new java.text.DecimalFormat("####.00")
 
@@ -46,16 +49,18 @@ object Score extends (Double => Score) {
 
   val NegativeInfinity: Score = Score(Double.NegativeInfinity)
 
+  given Ordering[Score] with {
+    override def compare(x: Score, y: Score): Int = x.compareTo(y)
+  }
 
-  implicit object ScoreIsMonoid extends Monoid[Score] {
+  given Monoid[Score] with {
     override val empty: Score = Score.Zero
-
     override def combine(a: Score, b: Score): Score = a + b
   }
 
 
   /** Implementation of the Fractional typeclass for Score */
-  implicit object ScoreIsFractional extends Fractional[Score] {
+  given Fractional[Score] with {
     override def plus(x: Score, y: Score): Score = Score(x.value + y.value)
 
     override def minus(x: Score, y: Score): Score = Score(x.value - y.value)
@@ -80,11 +85,11 @@ object Score extends (Double => Score) {
 
     override def abs(x: Score): Score = Score(math.abs(x.value))
 
-    override def parseString(str: String): Option[Score] = str.toDoubleOption.map(Score)
+    override def parseString(str: String): Option[Score] = str.toDoubleOption
   }
 
   def sum[A](it: Iterable[A])(f: A => Score): Score =
     if (it.isEmpty) Score.Zero
-    else Score(it.foldLeft(0.0)(_ + f(_).value))
+    else it.foldLeft(Score.Zero)(_ + f(_))
 
 }

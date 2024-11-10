@@ -7,6 +7,8 @@ import fr.renoux.gaston.util.CollectionImplicits.*
 import fr.renoux.gaston.util.RandomImplicits.*
 import fr.renoux.gaston.util.{ArraySet, Context, testOnly}
 
+import scala.math.Ordered.orderingToOrdered
+import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
 
 /**
@@ -264,7 +266,7 @@ object Schedule {
   type Planning = Map[Slot, Iterable[Topic]]
 
   implicit object ScheduleIsOrdered extends scala.math.Ordering[Schedule] {
-    override def compare(x: Schedule, y: Schedule): Int = x.score.compare(y.score)
+    override def compare(x: Schedule, y: Schedule): Int = x.score.compareTo(y.score)
   }
 
   /** Empty schedule for a problem */

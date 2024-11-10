@@ -3,6 +3,7 @@ package fr.renoux.gaston.engine
 import fr.renoux.gaston.model.Score
 
 import java.time.Instant
+import scala.math.Ordering.Implicits.infixOrderingOps
 
 /**
  * This class defines on which condition schedule generation can terminate.

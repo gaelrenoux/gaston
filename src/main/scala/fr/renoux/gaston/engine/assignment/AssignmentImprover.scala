@@ -7,6 +7,7 @@ import fr.renoux.gaston.util.Context.chrono
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
+import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random
 
 
