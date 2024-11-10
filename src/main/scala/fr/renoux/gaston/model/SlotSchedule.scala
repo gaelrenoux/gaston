@@ -46,7 +46,7 @@ final case class SlotSchedule(
   lazy val permanentlyIncompatibleTopics: Set[Topic] = problem.incompatibleTopicsBySlot(slot)
 
   /** Topics that cannot be added on this slot as it now (but may be added later if the configuration of the slot changes) */
-  lazy val currentlyIncompatibleTopics: Set[Topic] = topicsSet.flatMap(problem.incompatibleTopicsByTopic)
+  lazy val currentlyIncompatibleTopics: Set[Topic] = topicsSet.flatMap(problem.incompatibleTopicsByTopic.apply)
 
   /** Topics that cannot be added on this slot, because of the slot or other topics */
   lazy val incompatibleTopics: Set[Topic] = permanentlyIncompatibleTopics ++ currentlyIncompatibleTopics

@@ -56,13 +56,13 @@ object ArraySet {
     tmp
   }
 
-  def empty[A <: Identified](implicit c: Count[A]): ArraySet[A] =
+  def empty[A <: Identified](using c: Count[A]): ArraySet[A] =
     Array.fill(c.value)(false)
 
   extension [A <: Identified](it: Iterable[A]) {
     inline def toArraySet(inline size: Int): ArraySet[A] = ArraySet.from[A](size)(it)
 
-    inline def toArraySet(implicit count: Count[A]): ArraySet[A] = ArraySet.from[A](count.value)(it)
+    inline def toArraySet(using count: Count[A]): ArraySet[A] = ArraySet.from[A](count.value)(it)
   }
 
 }

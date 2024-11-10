@@ -30,21 +30,19 @@ object ArrayMap {
     tmp
   }
 
-  implicit def toFunction[A <: Identified, B](arrayMap: ArrayMap[A, B]): Function[A, B] = arrayMap.apply
-
   extension [A <: Identified, B](wrapped: Iterable[(A, B)]) {
 
-    inline def toArrayMap(size: Int, default: B)(implicit tagB: ClassTag[B]): ArrayMap[A, B] =
+    inline def toArrayMap(size: Int, default: B)(using tagB: ClassTag[B]): ArrayMap[A, B] =
       ArrayMap.from[A, B](size, default)(wrapped)
 
-    inline def toArrayMap(default: B)(implicit tagB: ClassTag[B], count: Count[A]): ArrayMap[A, B] =
+    inline def toArrayMap(default: B)(using tagB: ClassTag[B], count: Count[A]): ArrayMap[A, B] =
       ArrayMap.from[A, B](count.value, default)(wrapped)
 
     /** Uses null as a default value. */
-    inline def toArrayMap(size: Int)(implicit tagB: ClassTag[B], ev: Null <:< B): ArrayMap[A, B] =
+    inline def toArrayMap(size: Int)(using tagB: ClassTag[B], ev: Null <:< B): ArrayMap[A, B] =
       ArrayMap.from[A, B](size, ev(null))(wrapped)
 
-    inline def toArrayMap(implicit tagB: ClassTag[B], ev: Null <:< B, count: Count[A]): ArrayMap[A, B] =
+    inline def toArrayMap(using tagB: ClassTag[B], ev: Null <:< B, count: Count[A]): ArrayMap[A, B] =
       ArrayMap.from[A, B](count.value, ev(null))(wrapped)
 
   }
