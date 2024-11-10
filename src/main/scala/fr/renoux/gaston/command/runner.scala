@@ -35,7 +35,7 @@ abstract class Runner(seed: Long, statusDisplayInterval: FiniteDuration) {
 
 /** A SyncRunner simply runs in the current thread. */
 class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
-  (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
+  (using problem: Problem, engine: Engine, output: Output, ctx: Context)
   extends Runner(seed, statusDisplayInterval) {
 
   /** Runs the schedule generation. The argument controls when to stop the process. If no termination condition is set,
@@ -54,7 +54,7 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
       previousChainsCount: Long,
       best: Schedule,
       nextSchedules: LazyList[(Schedule, Long)] = LazyList.empty
-  )(termination: Termination)(implicit random: Random): (Schedule, Long) = {
+  )(termination: Termination)(using random: Random): (Schedule, Long) = {
     val now = Instant.now()
     val totalCount = currentChainCount + previousChainsCount
 
@@ -102,7 +102,7 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
  * Note that termination conditions must be met on all parallel runners for this one to terminate. */
 // TODO Find a way to terminate early as soon as a minimum score is reached, but not for other termination conditions.
 class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = ParallelRunner.defaultParallelism(), statusDisplayInterval: FiniteDuration = 1.day)
-  (implicit problem: Problem, engine: Engine, output: Output, ctx: Context)
+  (using problem: Problem, engine: Engine, output: Output, ctx: Context)
   extends Runner(seed, statusDisplayInterval) {
 
   /** Runs multiple Runners, in parallel, then wait for them to finish. Note that if no termination conditions are set,

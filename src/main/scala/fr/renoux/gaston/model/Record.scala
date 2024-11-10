@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 
 
 /** A Record is a triplet of slot, topic and assigned persons */
-final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit val problem: Problem) extends Ordered[Record] {
+final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(using val problem: Problem) extends Ordered[Record] {
 
   import Record.*
   import problem.counts
@@ -105,11 +105,11 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(implicit
 }
 
 object Record {
-  def fromTuple(tuple: (Slot, Topic, Set[Person]))(implicit problem: Problem): Record = Record(tuple._1, tuple._2, tuple._3)
+  def fromTuple(tuple: (Slot, Topic, Set[Person]))(using problem: Problem): Record = Record(tuple._1, tuple._2, tuple._3)
 
-  def fromTuple2(tuple: ((Slot, Topic), Set[Person]))(implicit problem: Problem): Record = Record(tuple._1._1, tuple._1._2, tuple._2)
+  def fromTuple2(tuple: ((Slot, Topic), Set[Person]))(using problem: Problem): Record = Record(tuple._1._1, tuple._1._2, tuple._2)
 
-  def apply(slot: Slot, topic: Topic, persons: Person*)(implicit problem: Problem): Record = apply(slot, topic, persons.toSet)
+  def apply(slot: Slot, topic: Topic, persons: Person*)(using problem: Problem): Record = apply(slot, topic, persons.toSet)
 
   // All this should be in an IO package, in an object containing constants.
   val FormattedTopicPersonsSeparator: String = "==>"

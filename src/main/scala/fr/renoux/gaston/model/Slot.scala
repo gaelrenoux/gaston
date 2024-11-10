@@ -13,7 +13,7 @@ final case class Slot(
 ) extends Identified {
 
   /** To facilitate writing schedules */
-  def apply(records: (Topic, Set[Person])*)(implicit problem: Problem): Seq[Record] =
+  def apply(records: (Topic, Set[Person])*)(using problem: Problem): Seq[Record] =
     records.map(r => Record(this, r._1, r._2))
 
   lazy val personsPresentCount: Int = personsPresent.size

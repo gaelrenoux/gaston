@@ -14,7 +14,7 @@ import scala.util.Random
 /** A specific implementation of the Engine. At each step, we find a better neighbour and move there. The lazy-seq
  * produced has an ever-increasing score, and stops when there is no better neighbour (that is, at a local optimum).
  */
-final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context)
+final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(using problem: Problem, ctx: Context)
   extends Engine(triggerOnBacktrackingFailure) {
 
   type State = GreedyEngine.State
@@ -29,7 +29,7 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
   override protected def initialState(schedule: Schedule): State = GreedyEngine.State(schedule, Move.Nothing, 1)
 
   /** Take an already improved schedule, and return the first better schedule it can find by swapping topics. */
-  override protected def step(state: State, termination: Termination)(implicit rand: Random): Option[State] = chrono("GreedyEngine > step") {
+  override protected def step(state: State, termination: Termination)(using rand: Random): Option[State] = chrono("GreedyEngine > step") {
     log.debug("New engine step")
 
     val neighbours: LazyList[((Schedule, Move), Int)] = navigator.neighbours(state.schedule)
@@ -44,7 +44,7 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
       for {
         ((unfilled, move), index) <- neighbours
         _ = log.debug(s"Trying that move: $move")
-        unimproved <- randomAssigner.fill(unfilled)(rand)
+        unimproved <- randomAssigner.fill(unfilled)(using rand)
         improved = assignmentImprover.improve(unimproved)
         if improved.score > state.schedule.score
         _ = if (!improved.isSolution) {

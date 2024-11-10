@@ -12,7 +12,7 @@ final case class Problem(
     personsSet: Set[Person],
     constraints: Set[Constraint],
     preferences: Set[Preference]
-)(implicit val counts: Counts) {
+)(using val counts: Counts) {
 
   /* SLOTS */
 
@@ -163,5 +163,5 @@ final case class Problem(
 }
 
 object Problem {
-  val Empty: Problem = new Problem(Seq.empty, Set.empty, ArrayMap.empty, Set.empty, Set.empty, Set.empty)(Counts.Empty)
+  val Empty: Problem = new Problem(Seq.empty, Set.empty, ArrayMap.empty, Set.empty, Set.empty, Set.empty)(using Counts.Empty)
 }

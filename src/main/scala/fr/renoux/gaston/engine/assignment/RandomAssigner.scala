@@ -10,7 +10,7 @@ import scala.util.Random
  * Fills an unfilled schedule with persons, ignoring preferences but respecting constraints.
  */
 @immutable
-final class RandomAssigner(implicit private val problem: Problem) {
+final class RandomAssigner(using private val problem: Problem) {
 
   private val log = Logger[RandomAssigner]
 
@@ -22,7 +22,7 @@ final class RandomAssigner(implicit private val problem: Problem) {
    * of persons present on their slot). In rare cases, it can be impossible to build a working schedule, for example
    * if too many persons are forbidden on several of the available topics in one slot.
    */
-  def fill(unfilledSchedule: Schedule)(implicit random: Random): Option[Schedule] = {
+  def fill(unfilledSchedule: Schedule)(using random: Random): Option[Schedule] = {
     log.debug("Starting to fill the unfilled schedule")
     val slotSchedules =
       problem.slotsList.view
@@ -43,7 +43,7 @@ final class RandomAssigner(implicit private val problem: Problem) {
   }
 
   @inline
-  def fillSlot(slotSchedule: SlotSchedule)(implicit random: Random): Option[SlotSchedule] = {
+  def fillSlot(slotSchedule: SlotSchedule)(using random: Random): Option[SlotSchedule] = {
     val personsLeft = random.shuffle(slotSchedule.unscheduledPersonsList)
     val records = random.shuffle(slotSchedule.recordsList)
     backtrackFillPersons(slotSchedule)(records, personsLeft)
@@ -58,7 +58,7 @@ final class RandomAssigner(implicit private val problem: Problem) {
    */
   private def backtrackFillPersons(unfilledSlotSchedule: SlotSchedule)
     (recordsInNeed: List[Record], personsLeft: List[Person], personsSkipped: List[Person] = Nil)
-    (implicit random: Random): Option[SlotSchedule] =
+    (using random: Random): Option[SlotSchedule] =
     (recordsInNeed, personsLeft) match {
       case (Nil, _) =>
         // all topics in need were filled. We know need to assign the remaining persons

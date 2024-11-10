@@ -49,7 +49,7 @@ object MinimalTestModel {
   }
 
   object Problems {
-    implicit val MinimalCounts: Counts = Counts.fromCounts(Slots.SlotCount, Topics.TopicCount, Persons.PersonCount)
+    implicit val MinimalCounts: Counts = Counts.fromCounts(using Slots.SlotCount, Topics.TopicCount, Persons.PersonCount)
     val Minimal = new Problem(Slots.All, Topics.All, Topics.Unassigned.toArrayMap, Persons.All, Set.empty, Set.empty)
   }
 

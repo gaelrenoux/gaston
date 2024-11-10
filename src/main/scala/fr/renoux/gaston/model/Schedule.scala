@@ -18,7 +18,7 @@ final case class Schedule(
     chainSeed: Long,
     private val wrapped: Map[Slot, SlotSchedule],
     private val isAbysmal: Boolean = false
-)(implicit
+)(using
     val problem: Problem,
     ctx: Context
 ) {
@@ -267,14 +267,14 @@ object Schedule {
   }
 
   /** Empty schedule for a problem */
-  def empty(chainSeed: Long)(implicit problem: Problem, ctx: Context): Schedule = Schedule(chainSeed, Map.empty)
+  def empty(chainSeed: Long)(using problem: Problem, ctx: Context): Schedule = Schedule(chainSeed, Map.empty)
 
   /** Same as `empty`, except the schedule is marked as having the worst score. */
-  def abysmal(implicit problem: Problem, ctx: Context): Schedule = Schedule(chainSeed = 0, Map.empty, isAbysmal = true)
+  def abysmal(using problem: Problem, ctx: Context): Schedule = Schedule(chainSeed = 0, Map.empty, isAbysmal = true)
 
   /** Schedule where only the forced topics are placed (randomly). Forced topics contain their mandatory persons plus
    * the minimum number of persons to make them valid. Other persons are on the "unassigned" topics. */
-  def startingUnassignedOrForced(chainSeed: Long)(implicit problem: Problem, ctx: Context, rand: Random): Schedule = {
+  def startingUnassignedOrForced(chainSeed: Long)(using problem: Problem, ctx: Context, rand: Random): Schedule = {
     /* Everything complicated in here is for the forced-slots */
     val forcedTopicsCountPerSlot = Array.fill(problem.slotsSet.size)(0)
     val forcedTopicsBySlot: Map[Slot, Seq[Topic]] =
@@ -314,7 +314,7 @@ object Schedule {
   }
 
   /** Commodity method for tests */
-  @testOnly def from(entries: Seq[Record]*)(implicit problem: Problem, ctx: Context): Schedule =
+  @testOnly def from(entries: Seq[Record]*)(using problem: Problem, ctx: Context): Schedule =
     new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
       case (s, rs) => s -> SlotSchedule.from(s, rs *)
     })

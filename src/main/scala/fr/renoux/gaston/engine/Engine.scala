@@ -15,7 +15,7 @@ import scala.util.Random
  * The Engine is immutable and thread-safe. You can use the same instance in multiple parallel threads to produce
  * different lazy sequences of schedule.
  */
-abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context) {
+abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(using problem: Problem, ctx: Context) {
 
   private val log = Logger[Engine]
 
@@ -67,7 +67,7 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
   /** Given a state of the engine, returns the next state generated. That state contains at least the next schedule to
    * return and the number of schedules tried since the start. If this method returns None, this is the end of the lazy
    * sequence. */
-  protected def step(state: State, termination: Termination)(implicit rand: Random): Option[State]
+  protected def step(state: State, termination: Termination)(using rand: Random): Option[State]
 
 }
 

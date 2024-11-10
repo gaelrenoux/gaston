@@ -5,7 +5,7 @@ import fr.renoux.gaston.model.{Person, Problem, Record, Schedule, Slot, SlotSche
 import fr.renoux.gaston.util.Context
 
 /** Parse a schedule from various formats */
-final class ScheduleParser(implicit problem: Problem, context: Context) {
+final class ScheduleParser(using problem: Problem, context: Context) {
 
   type ErrorOr[A] = Either[String, A]
 

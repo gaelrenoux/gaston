@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.Context.chrono
 import scala.annotation.tailrec
 
 /** Calculate scores on a given schedule. */
-final class ScoreCalculator(schedule: Schedule)(implicit ctx: Context) {
+final class ScoreCalculator(schedule: Schedule)(using ctx: Context) {
 
   import ScoreCalculator.*
 

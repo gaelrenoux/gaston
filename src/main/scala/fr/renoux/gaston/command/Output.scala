@@ -15,7 +15,7 @@ import scala.math.Ordering.Implicits.infixOrderingOps
  *
  * It is thread-safe and can be used by all runners concurrently.
  */
-final class Output private(silent: Boolean)(implicit val problem: Problem) {
+final class Output private(silent: Boolean)(using val problem: Problem) {
 
   import Ordering.Double.IeeeOrdering
 
@@ -102,9 +102,9 @@ final class Output private(silent: Boolean)(implicit val problem: Problem) {
 }
 
 object Output {
-  def apply(silent: Boolean = false)(implicit problem: Problem): Output = new Output(silent)
+  def apply(silent: Boolean = false)(using problem: Problem): Output = new Output(silent)
 
-  def standard(implicit problem: Problem): Output = new Output(silent = false)
+  def standard(using problem: Problem): Output = new Output(silent = false)
 
-  def silent(implicit problem: Problem): Output = new Output(silent = true)
+  def silent(using problem: Problem): Output = new Output(silent = true)
 }

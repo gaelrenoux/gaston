@@ -9,7 +9,7 @@ import scala.annotation.tailrec
 final case class SlotSchedule(
     slot: Slot,
     private val wrapped: Map[Topic, Record]
-)(implicit val problem: Problem) {
+)(using val problem: Problem) {
 
   @inline private def updateWrapped(w: Map[Topic, Record]): SlotSchedule =
     copy(wrapped = w)
@@ -240,10 +240,10 @@ final case class SlotSchedule(
 
 object SlotSchedule {
 
-  def empty(slot: Slot)(implicit problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
+  def empty(slot: Slot)(using problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
 
   /** Slot schedule where everyone is on an "unassigned" topic, no other topic. Doesn't work if unassignes isn't allowed. */
-  def everyoneUnassigned(slot: Slot)(implicit problem: Problem): SlotSchedule =
+  def everyoneUnassigned(slot: Slot)(using problem: Problem): SlotSchedule =
     if (problem.unassignedTopics.isEmpty) throw new IllegalStateException("Cannot call everyoneUnassigned, persons cannot be unassigned")
     else {
       val t = problem.unassignedTopics(slot)
@@ -251,7 +251,7 @@ object SlotSchedule {
     }
 
   /** Commodity method */
-  @testOnly def from(slot: Slot, entries: Record*)(implicit problem: Problem): SlotSchedule = {
+  @testOnly def from(slot: Slot, entries: Record*)(using problem: Problem): SlotSchedule = {
     new SlotSchedule(slot, entries.groupBy(_.topic).mapValuesStrict(_.reduce(_ ++ _)))
   }
 }

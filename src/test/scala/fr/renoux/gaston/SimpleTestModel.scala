@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 
 /** 9 persons, 9 topics, 3 slots */
-class SimpleTestModel(implicit settings: InputSettings) {
+class SimpleTestModel(using settings: InputSettings) {
 
   val strongPreference: Score = Score(5)
   val weakPreference: Score = Score(1)
@@ -185,4 +185,4 @@ class SimpleTestModel(implicit settings: InputSettings) {
 }
 
 
-object SimpleTestModel extends SimpleTestModel()(InputLoader.fromDefault.force.settings)
+object SimpleTestModel extends SimpleTestModel(using InputLoader.fromDefault.force.settings)

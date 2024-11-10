@@ -293,7 +293,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "Empty schedule" should "have a zero score on empty problem" in {
-    Schedule.empty(0)(Problem.Empty, Context.Default).score should be(Score.Zero)
+    Schedule.empty(0)(using Problem.Empty, Context.Default).score should be(Score.Zero)
   }
 
   it should "have a negative-or-zero score on current problem" in {

@@ -14,7 +14,7 @@ import scala.util.Random
  * Uses backtracking to produce a valid schedule, making random choices to provide a planning. Given the planning,
  * assignment of persons is optimized.
  */
-final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(implicit problem: Problem, ctx: Context) {
+final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(using problem: Problem, ctx: Context) {
 
   private val log = Logger[RandomScheduleGenerator]
 
@@ -29,7 +29,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
   }
 
   /** Generates just one schedule. */
-  def create(chainSeed: Long)(implicit random: Random): Schedule = {
+  def create(chainSeed: Long)(using random: Random): Schedule = {
     log.debug("Generating a single schedule")
     val slots = random.shuffle(problem.slotsList)
     // TODO need to handle followup topics !
@@ -42,7 +42,7 @@ final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => U
 
   // @tailrec Not any more
   private def backtrackAndFill(state: State)
-    (implicit random: Random): Option[Schedule] = {
+    (using random: Random): Option[Schedule] = {
     backtrackAssignTopicsToSlots(state).toOption match {
       case None => None
       case Some(newState) if !newState.unfilledSchedule.isUnfilledSolution => throw new UnsupportedOperationException("Unhandled constraint error")

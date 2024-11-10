@@ -48,7 +48,7 @@ object Main {
     input <- loadInput(commandLine)
     problem <- InputTranscription.transcribe(input)
   } yield {
-    implicit val output: Output = Output(commandLine.silent)(problem)
+    implicit val output: Output = Output(commandLine.silent)(using problem)
     if (commandLine.generateInput) {
       output.writeInput(input)
     } else {

@@ -16,7 +16,7 @@ import scala.util.Random
  * Doesn't seem to be very good.
  * TODO Rework or drop
  */
-final class TabuSearchEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(implicit problem: Problem, ctx: Context)
+final class TabuSearchEngine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit = _ => ())(using problem: Problem, ctx: Context)
   extends Engine(triggerOnBacktrackingFailure) {
 
   type State = TabuSearchEngine.State
@@ -34,7 +34,7 @@ final class TabuSearchEngine(triggerOnBacktrackingFailure: BacktrackingFailures 
   )
 
   // TODO termination is unused, figure out if this class is useful before implementing it
-  override protected def step(state: State, termination: Termination)(implicit rand: Random): Option[State] = {
+  override protected def step(state: State, termination: Termination)(using rand: Random): Option[State] = {
     log.debug(s"Size of tabu is ${state.tabu.size}")
 
     val neighbours = navigator.neighbours(state.current).map(_._1).distinctBy(_.planning)
@@ -42,7 +42,7 @@ final class TabuSearchEngine(triggerOnBacktrackingFailure: BacktrackingFailures 
     val neighborhood: LazyList[Schedule] = for {
       n <- neighbours
       if !state.tabu.contains(n.planning)
-      unimproved <- randomAssigner.fill(n)(rand)
+      unimproved <- randomAssigner.fill(n)(using rand)
       improved = assignmentImprover.improve(unimproved)
     } yield improved
 

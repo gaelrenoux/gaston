@@ -13,12 +13,12 @@ import scala.util.Random
  * unfilled (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
  * topics at the same time). */
 @immutable
-final class PlanningSpaceNavigator(implicit private val problem: Problem) {
+final class PlanningSpaceNavigator(using private val problem: Problem) {
 
   private val log: Logger = Logger[PlanningSpaceNavigator]
 
   /** Return a LazyList of neighbouring unfilled schedules to the initial one. */
-  def neighbours(schedule: Schedule)(implicit rand: Random): LazyList[(Schedule, Move)] = {
+  def neighbours(schedule: Schedule)(using rand: Random): LazyList[(Schedule, Move)] = {
 
     lazy val allAdds = possibleAdds(schedule)
     lazy val allExternalSwaps = possibleExtSwaps(schedule)
@@ -29,7 +29,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
   }
 
   /** Add an unscheduled topic */
-  private def possibleAdds(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleAdds(schedule: Schedule)(using rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Additions on slot ${slot.name}")
@@ -71,7 +71,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
   }
 
   /** Swap two scheduled topics */
-  private def possibleSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleSwaps(schedule: Schedule)(using rand: Random): View[(Schedule, Move)] = for {
     (slot1, slot2) <- shuffled(problem.slotCouplesList).view
     slotSchedule1 = schedule.on(slot1)
     slotSchedule2 = schedule.on(slot2)
@@ -133,7 +133,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
   }
 
   /** Swap topics between unscheduled and scheduled */
-  private def possibleExtSwaps(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleExtSwaps(schedule: Schedule)(using rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Ext Swaps on slot ${slot.name}")
@@ -183,7 +183,7 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
   }
 
   /** Remove a scheduled topic */
-  private def possibleRemovals(schedule: Schedule)(implicit rand: Random): View[(Schedule, Move)] = for {
+  private def possibleRemovals(schedule: Schedule)(using rand: Random): View[(Schedule, Move)] = for {
     slot <- shuffled(problem.slotsList).view
     slotSchedule = schedule.on(slot)
     _ = log.debug(s"Checking for possible Removals on slot ${slot.name}")
@@ -235,11 +235,11 @@ final class PlanningSpaceNavigator(implicit private val problem: Problem) {
     }
   }
 
-  private def shuffled[A](set: Set[A])(implicit rand: Random): Seq[A] = shuffled(set.toSeq)
+  private def shuffled[A](set: Set[A])(using rand: Random): Seq[A] = shuffled(set.toSeq)
 
-  private def shuffled[A](seq: Seq[A])(implicit rand: Random): Seq[A] = rand.shuffle(seq)
+  private def shuffled[A](seq: Seq[A])(using rand: Random): Seq[A] = rand.shuffle(seq)
 
-  private def shuffled[A](it: Iterable[A])(implicit rand: Random): Iterable[A] = rand.shuffle(it)
+  private def shuffled[A](it: Iterable[A])(using rand: Random): Iterable[A] = rand.shuffle(it)
 
   private def simultaneousTopics(topic: Topic): Set[Topic] = problem.simultaneousTopicByTopic(topic) + topic
 

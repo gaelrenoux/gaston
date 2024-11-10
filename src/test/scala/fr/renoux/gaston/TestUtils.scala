@@ -32,7 +32,7 @@ object TestUtils {
   }
 
 
-  implicit final class ProblemInterpolation(sc: StringContext)(implicit problem: Problem) {
+  implicit final class ProblemInterpolation(sc: StringContext)(using problem: Problem) {
 
     val slotsByName: Map[String, Slot] = problem.slotsSet.map(p => p.name -> p).toMap
     val topicsByName: Map[String, Topic] = problem.topicsSet.map(p => p.name -> p).toMap

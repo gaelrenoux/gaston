@@ -15,7 +15,7 @@ import scala.util.Random
  * Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them. Every person
  * should already be assigned somewhere (this will not assign unassigned persons).
  */
-final class AssignmentImprover(implicit private val problem: Problem, private val ctx: Context) {
+final class AssignmentImprover(using private val problem: Problem, private val ctx: Context) {
 
   private val log = Logger[AssignmentImprover]
 
@@ -26,7 +26,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   /** Main method. Returns a schedule that's better than the initial one. Ends either because the schedule can't be
    * perfected any more or because the limit number of rounds has been reached. */
-  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(implicit rand: Random): Schedule =
+  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(using rand: Random): Schedule =
     chrono("PersonPlacementImprover >  improve") {
       recImprove(schedule, maxRounds)
     }
@@ -40,7 +40,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
       maxRounds: Int,
       slots: Queue[Slot] = Queue(problem.slotsList *),
       slotRoundsLimit: Int = defaultMaxSuccessiveRoundsCountPerSlot
-  )(implicit rand: Random): Schedule =
+  )(using rand: Random): Schedule =
     if (maxRounds == 0) {
       log.warn(s"Stopping assignment improvement because max number of rounds was reached. Slots left to optimize are: ${slots.view.map(_.name).toList}.")
       schedule
@@ -66,7 +66,7 @@ final class AssignmentImprover(implicit private val problem: Problem, private va
 
   /** Returns the first move or swap it finds that makes the schedule better, or None if there is nothing to do on that
    * slot anymore. */
-  private def goodMoveOnSlot(currentSchedule: Schedule, slot: Slot)(implicit rand: Random): Option[Schedule] =
+  private def goodMoveOnSlot(currentSchedule: Schedule, slot: Slot)(using rand: Random): Option[Schedule] =
     chrono("PersonPlacementImprover >  improve > goodMoveOnSlot") {
       val slotSchedule = currentSchedule.on(slot)
 
