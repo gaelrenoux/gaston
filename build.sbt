@@ -7,7 +7,7 @@ version := "1.1.0"
 /* Allows to overwrite with publishLocal */
 isSnapshot := true
 
-scalaVersion := "3.5.1"
+scalaVersion := "3.5.2"
 
 lazy val gaston = (project in file("."))
   .configs(SlowTest)
