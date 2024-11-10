@@ -3,7 +3,7 @@ package fr.renoux.gaston.input
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.{Score, Weight}
 import fr.renoux.gaston.util.*
-import fr.renoux.gaston.util.CanGroupToMap.ops.*
+import fr.renoux.gaston.util.CanGroupToMap.given
 import io.github.iltotore.iron.*
 import io.github.iltotore.iron.constraint.all.*
 

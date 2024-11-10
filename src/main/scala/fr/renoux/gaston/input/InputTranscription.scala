@@ -6,7 +6,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.constraints.*
 import fr.renoux.gaston.model.preferences.*
-import fr.renoux.gaston.util.CanGroupToMap.ops.*
+import fr.renoux.gaston.util.CanGroupToMap.given
 import fr.renoux.gaston.util.*
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.{Constraint as _, *}

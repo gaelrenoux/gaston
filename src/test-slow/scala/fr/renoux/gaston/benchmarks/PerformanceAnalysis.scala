@@ -5,7 +5,7 @@ import fr.renoux.gaston.command.{Output, ParallelRunner}
 import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.Problem
-import fr.renoux.gaston.util.CanAddDuration.*
+import fr.renoux.gaston.util.CanAddDuration.given
 import fr.renoux.gaston.util.{Chrono, Context, Tools}
 
 import java.time.Instant

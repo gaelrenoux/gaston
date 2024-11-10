@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 
 class CanGroupToMapSpec extends AnyFlatSpec with Matchers {
 
-  import CanGroupToMap.ops.*
+  import CanGroupToMap.given
   import CanGroupToMapSpec.*
 
   behavior of "List"

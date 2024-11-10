@@ -10,7 +10,7 @@ import org.scalatest.matchers.should.Matchers
 class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
   val log: Logger = Logger[CanTakeChunksSpec]
 
-  import CanTakeChunks.*
+  import CanTakeChunks.given
 
   val testList: List[String] = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
 
@@ -41,7 +41,7 @@ class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
 
   behavior of "ListOps.takeWithRemainder"
   it should "return a filled remainder if there is one" in {
-    val x: (List[List[String]], List[String]) = testList.takeChunks(List(3, 5, 1))
+    val x: (List[List[String]], List[String]) = testList.takeChunksWith(List(3, 5, 1))
     x should be((List(
       List("adam", "brigit", "cedric"),
       List("daniel", "edward", "fatima", "george", "hermione"),
@@ -49,14 +49,14 @@ class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
     ), List("jennifer", "kevin")))
   }
   it should "return an empty remainder if the result is exactly contained in elements" in {
-    testList.takeChunks(List(3, 5, 3)) should be((List(
+    testList.takeChunksWith(List(3, 5, 3)) should be((List(
       List("adam", "brigit", "cedric"),
       List("daniel", "edward", "fatima", "george", "hermione"),
       List("isidore", "jennifer", "kevin")
     ), Nil))
   }
   it should "return an empty remainder if it is forced to truncate" in {
-    testList.takeChunks(List(3, 5, 6, 2, 1)) should be((List(
+    testList.takeChunksWith(List(3, 5, 6, 2, 1)) should be((List(
       List("adam", "brigit", "cedric"),
       List("daniel", "edward", "fatima", "george", "hermione"),
       List("isidore", "jennifer", "kevin"),

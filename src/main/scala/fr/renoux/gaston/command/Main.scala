@@ -6,7 +6,7 @@ import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
 import fr.renoux.gaston.input.*
 import fr.renoux.gaston.model.Problem
-import fr.renoux.gaston.util.CanAddDuration.*
+import fr.renoux.gaston.util.CanAddDuration.given
 import fr.renoux.gaston.util.Context
 import org.slf4j.LoggerFactory
 

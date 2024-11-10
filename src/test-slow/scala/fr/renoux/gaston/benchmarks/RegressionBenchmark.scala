@@ -5,7 +5,7 @@ import fr.renoux.gaston.command.{Output, ParallelRunner}
 import fr.renoux.gaston.engine.*
 import fr.renoux.gaston.input.*
 import fr.renoux.gaston.model.{Problem, Score}
-import fr.renoux.gaston.util.CanAddDuration.*
+import fr.renoux.gaston.util.CanAddDuration.given
 import fr.renoux.gaston.util.{Context, Opt}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

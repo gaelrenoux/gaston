@@ -2,7 +2,7 @@ package fr.renoux.gaston.model
 
 import cats.Monoid
 import cats.implicits.*
-import fr.renoux.gaston.util.CanGroupToMap.ops.toCoupleOps
+import fr.renoux.gaston.util.CanGroupToMap.given
 import fr.renoux.gaston.util.*
 
 import scala.math.Ordered.orderingToOrdered

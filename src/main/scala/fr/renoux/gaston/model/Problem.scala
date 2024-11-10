@@ -2,7 +2,7 @@ package fr.renoux.gaston.model
 
 import fr.renoux.gaston.model.constraints.{TopicsNotSimultaneous, TopicsSimultaneous}
 import fr.renoux.gaston.util.*
-import fr.renoux.gaston.util.CanGroupToMap.ops.*
+import fr.renoux.gaston.util.CanGroupToMap.given
 
 /** Basic information about a problem. Not getting into the details of preferences and constraints. */
 final case class Problem(

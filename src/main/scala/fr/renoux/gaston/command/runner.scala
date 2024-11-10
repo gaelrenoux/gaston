@@ -2,7 +2,7 @@ package fr.renoux.gaston.command
 
 import fr.renoux.gaston.engine.*
 import fr.renoux.gaston.model.{Problem, Schedule}
-import fr.renoux.gaston.util.CanAddDuration.*
+import fr.renoux.gaston.util.CanAddDuration.given
 import fr.renoux.gaston.util.Context
 
 import java.time.Instant
