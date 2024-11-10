@@ -28,7 +28,7 @@ object Score {
     inline def *(d: Double): Score = s * d
 
     /** Divide a score by a weight */
-    inline def /(w: Weight): Score = s / w.value
+    inline def /(w: Weight): Score = s / w
 
     inline def negative: Score = -s
 
@@ -55,6 +55,7 @@ object Score {
 
   given Monoid[Score] with {
     override val empty: Score = Score.Zero
+
     override def combine(a: Score, b: Score): Score = a + b
   }
 
@@ -92,4 +93,18 @@ object Score {
     if (it.isEmpty) Score.Zero
     else it.foldLeft(Score.Zero)(_ + f(_))
 
+}
+
+/** The higher the weight of a person, the more its preferences matter when calculating a score for a set of preferences
+ * involving multiple persons. */
+opaque type Weight = Double
+
+object Weight {
+  extension (w: Weight) {
+    inline def value: Double = w
+  }
+
+  def apply(s: Double): Weight = if (s > 0) s else throw new IllegalArgumentException
+
+  val Default: Weight = 1.0
 }

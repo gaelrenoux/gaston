@@ -46,12 +46,6 @@ given Constraint[Score, Negative0] with {
   override inline def message: String = "Should be negative or zero"
 }
 
-given Constraint[Weight, Positive] with {
-  override inline def test(inline value: Weight): Boolean = value.value > 0
-
-  override inline def message: String = "Should be strictly positive"
-}
-
 /* All line and column indices are zero-based */
 
 /* These classes defined the model as it is represented in the canonical input (.conf files). It is made to be as
