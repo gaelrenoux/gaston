@@ -3,6 +3,7 @@ package fr.renoux.gaston
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.model.constraints.*
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.{ArrayMap, Context}

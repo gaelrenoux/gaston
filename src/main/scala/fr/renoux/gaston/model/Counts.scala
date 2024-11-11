@@ -18,6 +18,12 @@ final case class Counts(
 object Counts {
   val Empty: Counts = Counts(0, 0, 0)
 
-  implicit def fromCounts(using slotsCount: Count[Slot], topicsCount: Count[Topic], personsCount: Count[Person]): Counts =
+  given fromCounts(using slotsCount: Count[Slot], topicsCount: Count[Topic], personsCount: Count[Person]): Counts =
     Counts(slots = slotsCount.value, topics = topicsCount.value, persons = personsCount.value)
+
+  given (using counts: Counts): Count[Slot] = counts.slotsCount
+
+  given (using counts: Counts): Count[Topic] = counts.topicsCount
+
+  given (using counts: Counts): Count[Person] = counts.personsCount
 }

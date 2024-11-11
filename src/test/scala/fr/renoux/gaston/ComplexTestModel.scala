@@ -3,6 +3,7 @@ package fr.renoux.gaston
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.input.Constants
 import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.model.Score.given
 import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
 import fr.renoux.gaston.util.*

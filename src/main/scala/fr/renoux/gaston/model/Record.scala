@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model
 
+import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.util.{ArraySet, testOnly}
 
 import scala.annotation.tailrec

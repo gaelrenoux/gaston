@@ -4,10 +4,11 @@ import cats.data.{NonEmptyList, ValidatedNel}
 import cats.implicits.*
 import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.*
+import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.model.constraints.*
 import fr.renoux.gaston.model.preferences.*
-import fr.renoux.gaston.util.CanGroupToMap.given
 import fr.renoux.gaston.util.*
+import fr.renoux.gaston.util.CanGroupToMap.given
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.{Constraint as _, *}
 import mouse.map.*
@@ -277,7 +278,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     val p = new Problem(
       slotSequences,
       topicsByName.values.flatten.toSet,
-      if (unassignedTopicsByNameAndSlot.isEmpty) ArrayMap.empty else unassignedTopicsByNameAndSlot.mapKeys(_._2).toArrayMap(),
+      if (unassignedTopicsByNameAndSlot.isEmpty) ArrayMap.empty else unassignedTopicsByNameAndSlot.mapKeys(_._2).toArrayMap,
       personsByName.values.toSet,
       Constraints.all,
       Preferences.all

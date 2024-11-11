@@ -1,6 +1,7 @@
 package fr.renoux.gaston
 
-import fr.renoux.gaston.model.{Counts, Person, Problem, Slot, SlotMapOps, Topic}
+import fr.renoux.gaston.model.Counts.given
+import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.Count
 
 import java.util.concurrent.atomic.AtomicInteger

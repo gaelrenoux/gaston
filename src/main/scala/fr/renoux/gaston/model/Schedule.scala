@@ -2,8 +2,9 @@ package fr.renoux.gaston.model
 
 import cats.Monoid
 import cats.implicits.*
-import fr.renoux.gaston.util.CanGroupToMap.given
+import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.util.*
+import fr.renoux.gaston.util.CanGroupToMap.given
 
 import scala.math.Ordered.orderingToOrdered
 import scala.util.Random
