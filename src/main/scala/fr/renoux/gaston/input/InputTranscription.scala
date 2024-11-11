@@ -123,10 +123,11 @@ private[input] final class InputTranscription(rawInput: InputModel) {
   lazy val topicsFirstPartByName: Map[NonEmptyString, Set[Topic]] =
     topicsFirstPartByOccurrenceIndexByName.mapValuesStrict(_.values.toSet)
 
+
   /* Counts */
-  implicit val slotsCount: Count[Slot] = Count[Slot](slotsByName.size)
-  implicit val personsCount: Count[Person] = Count[Person](personsByName.size)
-  implicit val topicsCount: Count[Topic] = Count[Topic](topicsByName.values.flatten.size)
+  given Count[Slot] = Count[Slot](slotsByName.size)
+  given Count[Person] = Count[Person](personsByName.size)
+  given Count[Topic] = Count[Topic](topicsByName.values.flatten.size)
 
 
   /* Constraints */

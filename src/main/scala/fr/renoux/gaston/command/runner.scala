@@ -24,7 +24,7 @@ abstract class Runner(seed: Long, statusDisplayInterval: FiniteDuration) {
   /** Interval of time between each status output */
   protected val statusDisplayIntervalMs: Long = statusDisplayInterval.toMillis
 
-  protected implicit val random: Random = new Random(seed)
+  protected given random: Random = new Random(seed)
 
   /** Generate schedules over time, outputting them at the statusFrequency interval. Will only terminate if some
    * termination conditions are set. If it terminates, its result is the best schedule found and the count of schedules
@@ -41,7 +41,7 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
   /** Runs the schedule generation. The argument controls when to stop the process. If no termination condition is set,
    * this method never terminates. */
   override def run(termination: Termination): (Schedule, Long) = {
-    implicit val random: Random = new Random(seed)
+    given Random = new Random(seed)
     output.writeStartThread(seed)
     runRecursive(Instant.now().plusMillis(statusDisplayIntervalMs), 0, 0, Schedule.abysmal)(termination)
   }

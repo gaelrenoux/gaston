@@ -19,11 +19,11 @@ final class TableReader(input: InputModel) {
 
   private val log = Logger[TableReader]
 
-  private implicit object InputTopicOrdering extends Ordering[InputTopic] {
+  private given Ordering[InputTopic] with {
     override def compare(x: InputTopic, y: InputTopic): Int = x.name.compareTo(y.name)
   }
 
-  private implicit object InputPersonOrdering extends Ordering[InputPerson] {
+  private given Ordering[InputPerson] with {
     override def compare(x: InputPerson, y: InputPerson): Int = x.name.compareTo(y.name)
   }
 

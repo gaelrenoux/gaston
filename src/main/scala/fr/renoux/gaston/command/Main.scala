@@ -48,17 +48,17 @@ object Main {
     input <- loadInput(commandLine)
     problem <- InputTranscription.transcribe(input)
   } yield {
-    implicit val output: Output = Output(commandLine.silent)(using problem)
+    given output: Output = Output(commandLine.silent)(using problem)
     if (commandLine.generateInput) {
       output.writeInput(input)
     } else {
       log.info(problem.toFormattedString)
 
-      implicit val _problem: Problem = problem
-      implicit val context: Context = Context.Default
+      given Problem = problem
+      given Context = Context.Default
 
       // TODO Engine shouldn't be implicit, I think
-      implicit val engine: Engine = new GreedyEngine(
+      given engine: Engine = new GreedyEngine(
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
 

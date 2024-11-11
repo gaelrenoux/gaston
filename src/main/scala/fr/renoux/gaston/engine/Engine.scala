@@ -31,7 +31,7 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
    * The generated sequence is non-empty as it always contain at least the initial schedule passed as an argument.
    */
   final def lazySeq(chainSeed: Long, termination: Termination): LazyList[(Schedule, Long)] = {
-    implicit val rand: Random = new Random(chainSeed)
+    given Random = new Random(chainSeed)
 
     val initialSchedule: Schedule =
       if (problem.unassignedTopics.isEmpty) startingScheduleGenerator.create(chainSeed)

@@ -20,9 +20,9 @@ final case class CommandLine(
 
 object CommandLine {
 
-  private implicit val pathRead: Read[Path] = Read.reads(Paths.get(_))
+  private given Read[Path] = Read.reads(Paths.get(_))
 
-  private implicit val finiteDurationRead: Read[Duration] = Read.reads(Duration(_))
+  private given Read[Duration] = Read.reads(Duration(_))
 
   private val parser = new scopt.OptionParser[CommandLine]("gaston") {
     head("gaston", "0.1")

@@ -122,7 +122,7 @@ object RandomScheduleGenerator {
    */
   private final case class State(unfilledSchedule: Schedule, slotsLeft: Queue[Slot], topicsLeft: List[Topic], topicsPassed: List[Topic] = Nil) {
 
-    private implicit val problem: Problem = unfilledSchedule.problem
+    private given problem: Problem = unfilledSchedule.problem
 
     lazy val isSlotsEmpty: Boolean = slotsLeft.isEmpty
 
