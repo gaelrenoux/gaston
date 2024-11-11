@@ -17,8 +17,9 @@ final case class Problem(
 
   /* SLOTS */
 
-  val slotsSet: Set[Slot] = slotSequences.flatten.toSet
+  lazy val slotsSet: Set[Slot] = slotSequences.flatten.toSet
   lazy val slotsList: List[Slot] = slotsSet.toList.sortBy(_.id)
+  lazy val slotsByName: Map[String, Slot] = slotsSet.map(p => p.name -> p).toMap
   lazy val slotsToNextSlot: Map[Slot, Slot] = slotsSet.flatMap(s => s.next.map(s -> _)).toMap
   lazy val slotsToPreviousSlot: Map[Slot, Slot] = slotsToNextSlot.map(_.swap)
 
@@ -33,6 +34,7 @@ final case class Problem(
   /* TOPICS */
 
   lazy val topicsList: List[Topic] = topicsSet.toList.sortBy(_.id)
+  lazy val topicsByName: Map[String, Topic] = topicsSet.map(p => p.name -> p).toMap
   lazy val forcedTopics: Set[Topic] = topicsSet.filter(_.forced)
   /** All forced topics, starting with the ones that are limited to the least number of possible slots, up to the ones that can be on any slot. */
   lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
@@ -44,6 +46,7 @@ final case class Problem(
   /* PERSONS */
 
   lazy val personsList: List[Person] = personsSet.toList.sortBy(_.id)
+  lazy val personsByName: Map[String, Person] = personsSet.map(p => p.name -> p).toMap
   lazy val personsCount: Int = personsSet.size
   lazy val baseScoreByPerson: Map[Person, Score] =
     if (personsSet.exists(_.baseScore != Score.Zero)) personsSet.map(p => p -> p.baseScore).toMap
