@@ -11,10 +11,10 @@ import scala.util.Random
 
 class SpecialCasesSpec extends AnyFlatSpec with Matchers {
 
-  private implicit val r32019: Problem = problemFromClassPath("r32019/r32019.conf").force
+  given r32019: Problem = problemFromClassPath("r32019/r32019.conf").force
   private val assigner = new RandomAssigner()
 
-  implicit val rand: Random = new Random(0)
+  given Random = new Random(0)
 
   // FIXME This actually doesn't work. Not easy to fix, except by making "forbidden" topics anti-preferences instead of hard constraints.
   "Bad situation" should "work" ignore {

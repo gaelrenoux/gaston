@@ -18,8 +18,8 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
 
   import Ordering.Double.IeeeOrdering
 
-  private implicit val udoConProblem: Problem = problemFromClassPath("udocon2017/uc17.conf").force
-  private implicit val context: Context = Context.Default
+  given Problem = problemFromClassPath("udocon2017/uc17.conf").force
+  given Context = Context.Default
 
   behavior of "Engine"
 
@@ -55,8 +55,8 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
       expectsScore: Double,
       parallelRunCount: Opt[Int] = Opt.Missing
   ): Unit = {
-    implicit val engine: Engine = new GreedyEngine
-    implicit val output: Output = Output.silent
+    given Engine = new GreedyEngine
+    given Output = Output.silent
 
     val handler = logMinutes()
 

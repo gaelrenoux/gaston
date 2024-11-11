@@ -25,14 +25,14 @@ object PerformanceAnalysis extends App {
   // Score(927.674195444651) after 207 iterations
 
   val tools: Tools = Tools(new Chrono(blocking = true))
-  implicit val problem: Problem = udoConProblem
-  implicit val context: Context = Context(tools = tools)
+  given Problem = udoConProblem
+  given Context = Context(tools = tools)
 
   val duration: FiniteDuration = 1.minutes
   val globalSeed: Long = 0L
 
-  implicit val engine: Engine = new GreedyEngine
-  implicit val output: Output = Output.silent
+  given Engine = new GreedyEngine
+  given Output = Output.silent
   val orchestrator = new ParallelRunner(seed = globalSeed)
   val termination = Termination(timeout = Some(Instant.now() + duration))
 

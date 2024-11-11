@@ -18,7 +18,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
 
   override val timeLimit: Span = 5.minute
 
-  private implicit val context: Context = Context.Default
+  given Context = Context.Default
   private val udocon2017: Problem = problemFromClassPath("udocon2017/uc17.conf").force
   private val udocon2019: Problem = problemFromClassPath("udocon2019/uc19.conf").force
   private val r32019: Problem = problemFromClassPath("r32019/r32019.conf").force
@@ -26,9 +26,9 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
   private val r32024: Problem = problemFromClassPath("r32024/full.conf").force
 
   private def run(problem: Problem, iterations: Long): (Schedule, Long) = {
-    implicit val p: Problem = problem
-    implicit val engine: Engine = new GreedyEngine
-    implicit val output: Output = Output.silent
+    given Problem = problem
+    given Engine = new GreedyEngine
+    given Output = Output.silent
     val runner = new SyncRunner(seed = 43)
     val termination: Termination = Termination(count = Some(iterations))
     runner.run(termination)
