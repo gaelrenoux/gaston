@@ -35,8 +35,8 @@ class ArrayMapSpec extends AnyFlatSpec with Matchers {
     an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
 
-  it should "work from a Map, with implicit count and explicit default" in {
-    implicit val cd: Count[Dog] = Count[Dog](3)
+  it should "work from a Map, with given count and explicit default" in {
+    given Count[Dog] = Count[Dog](3)
     val map = Map(gromit -> rope, lassie -> stick)
     val bm = map.toArrayMap(ball)
     bm.capacity should be(3)
@@ -56,8 +56,8 @@ class ArrayMapSpec extends AnyFlatSpec with Matchers {
     an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
 
-  it should "work from a Map, with null default and implicit count" in {
-    implicit val cd: Count[Dog] = Count[Dog](3)
+  it should "work from a Map, with null default and given count" in {
+    given Count[Dog] = Count[Dog](3)
     val map = Map(gromit -> rope, lassie -> stick)
     val bm = map.toArrayMap
     bm.capacity should be(3)

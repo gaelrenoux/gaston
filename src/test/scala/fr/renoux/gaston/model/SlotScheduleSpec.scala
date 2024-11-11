@@ -12,7 +12,7 @@ class SlotScheduleSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Solutions.*
   import fr.renoux.gaston.SimpleTestModel.Topics.*
 
-  implicit val problem: Problem = WithUnassignedTopics
+  given Problem = WithUnassignedTopics
 
   private val bestMorning = BestWithUnassignedTopics.on(Morning)
 

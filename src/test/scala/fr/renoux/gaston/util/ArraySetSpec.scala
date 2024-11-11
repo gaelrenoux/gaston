@@ -42,8 +42,8 @@ class ArraySetSpec extends AnyFlatSpec with Matchers {
     bs(gromit) should be(false)
   }
 
-  it should "work from a Set, with implicit count" in {
-    implicit val cd: Count[Dog] = Count[Dog](3)
+  it should "work from a Set, with given count" in {
+    given Count[Dog] = Count[Dog](3)
     val set = Set(gromit, milou)
     val bs = set.toArraySet
     bs(gromit) should be(true)
@@ -61,7 +61,7 @@ class ArraySetSpec extends AnyFlatSpec with Matchers {
   }
 
   "empty" should "create an empty ArraySet" in {
-    implicit val c: Count[Dog] = Count[Dog](3)
+    given Count[Dog] = Count[Dog](3)
     val bs = ArraySet.empty[Dog]
     bs(gromit) should be(false)
     bs(lassie) should be(false)

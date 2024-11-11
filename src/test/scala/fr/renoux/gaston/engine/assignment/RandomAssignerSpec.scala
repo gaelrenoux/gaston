@@ -10,13 +10,13 @@ import scala.util.Random
 
 class RandomAssignerSpec extends AnyFlatSpec with Matchers {
 
-  implicit val context: Context = Context.Default
+  given Context = Context.Default
 
   behavior of "minimal model"
 
   it should "be filled in" in {
-    implicit val rand: Random = new Random(0)
-    implicit val problem: Problem = MinimalTestModel.Problems.Minimal
+    given Random = new Random(0)
+    given Problem = MinimalTestModel.Problems.Minimal
     import fr.renoux.gaston.MinimalTestModel.Slots.*
     import fr.renoux.gaston.MinimalTestModel.Topics
     import fr.renoux.gaston.MinimalTestModel.Topics.*
@@ -37,8 +37,8 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
   behavior of "simple model"
 
   it should "fill in a schedule where one person is unscheduled" in {
-    implicit val rand: Random = new Random(0)
-    implicit val problem: Problem = SimpleTestModel.Problems.WithUnassignedTopics
+    given Random = new Random(0)
+    given Problem = SimpleTestModel.Problems.WithUnassignedTopics
     import fr.renoux.gaston.SimpleTestModel.Persons.*
     import fr.renoux.gaston.SimpleTestModel.Slots.*
     import fr.renoux.gaston.SimpleTestModel.Topics.*
@@ -55,8 +55,8 @@ class RandomAssignerSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "fill in an empty schedule" in {
-    implicit val rand: Random = new Random(0)
-    implicit val problem: Problem = SimpleTestModel.Problems.WithUnassignedTopics
+    given Random = new Random(0)
+    given Problem = SimpleTestModel.Problems.WithUnassignedTopics
     import fr.renoux.gaston.SimpleTestModel.Slots
 
     val randomAssigner = new RandomAssigner

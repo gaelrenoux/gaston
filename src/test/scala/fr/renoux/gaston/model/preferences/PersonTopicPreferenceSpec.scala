@@ -12,8 +12,8 @@ class PersonTopicPreferenceSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.MinimalTestModel.Slots.*
   import fr.renoux.gaston.MinimalTestModel.Topics.*
 
-  private implicit val problem: Problem = Minimal
-  private implicit val context: Context = Context.Default
+  given Problem = Minimal
+  given Context = Context.Default
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 

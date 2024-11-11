@@ -15,8 +15,8 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Topics.*
   import fr.renoux.gaston.SimpleTestModel.strongPreference
 
-  private implicit val problem: Problem = WithUnassignedTopics
-  private implicit val context: Context = Context.Default
+  given Problem = WithUnassignedTopics
+  given Context = Context.Default
 
   private val Simple = Schedule.from(
     Morning(
@@ -301,7 +301,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   }
 
   "startingUnassignedOrForced" should "return a schedule with all unassigned topics" in {
-    implicit val rand: Random = new Random(0)
+    given Random = new Random(0)
     val s = Schedule.startingUnassignedOrForced(0)
     println(s.toFormattedString)
     List(Morning, AfterNoon, Evening).foreach { slot =>

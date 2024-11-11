@@ -13,8 +13,8 @@ class ScheduleParserSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Solutions.*
   import fr.renoux.gaston.SimpleTestModel.Topics.*
 
-  private implicit val problem: Problem = WithUnassignedTopics
-  private implicit val context: Context = Context.Default
+  given Problem = WithUnassignedTopics
+  given Context = Context.Default
 
   val parser = new ScheduleParser()
   val formatted: String = BestWithUnassignedTopics.toFormattedString

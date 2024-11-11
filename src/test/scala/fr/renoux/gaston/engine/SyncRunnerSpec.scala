@@ -10,12 +10,12 @@ import org.scalatest.matchers.should.Matchers
 
 class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
 
-  private implicit val context: Context = Context.Default
+  private given Context = Context.Default
 
   private def run(problem: Problem, iterations: Long, seed: Long): (Schedule, Long) = {
-    implicit val p: Problem = problem
-    implicit val engine: Engine = new GreedyEngine
-    implicit val output: Output = Output.silent
+    given Problem = problem
+    given Engine = new GreedyEngine
+    given Output = Output.silent
     val runner = new SyncRunner(seed)
     val termination: Termination = Termination(count = Some(iterations))
     runner.run(termination)
