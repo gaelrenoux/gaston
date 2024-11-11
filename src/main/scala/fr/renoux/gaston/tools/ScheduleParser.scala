@@ -15,7 +15,6 @@ final class ScheduleParser(using problem: Problem, context: Context) {
   def parseFormattedString(str: String): Either[String, Schedule] = {
     val lines = str.trim.linesIterator.toList
     for {
-      //TODO set state monad
       afterHeader <- readUselessLine(lines, "Schedule:")
       scheduleResult <- readAllSlotSchedules(0, afterHeader)
       (slotSchedules, afterSchedule) = scheduleResult

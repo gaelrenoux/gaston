@@ -57,8 +57,7 @@ object Main {
       given Problem = problem
       given Context = Context.Default
 
-      // TODO Engine shouldn't be implicit, I think
-      given engine: Engine = new GreedyEngine(
+      given Engine = new GreedyEngine(
         triggerOnBacktrackingFailure = output.writeBacktrackingFailure
       )
 
