@@ -262,7 +262,7 @@ object Schedule {
 
   type Planning = Map[Slot, Iterable[Topic]]
 
-  implicit object ScheduleIsOrdered extends scala.math.Ordering[Schedule] {
+  given scala.math.Ordering[Schedule] with {
     override def compare(x: Schedule, y: Schedule): Int = x.score.compareTo(y.score)
   }
 
