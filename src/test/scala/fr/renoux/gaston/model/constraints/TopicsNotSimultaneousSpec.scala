@@ -12,7 +12,7 @@ class TopicsNotSimultaneousSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.MinimalTestModel.Persons.*
   import fr.renoux.gaston.MinimalTestModel.Problems.*
   import fr.renoux.gaston.MinimalTestModel.Slots.*
-  import fr.renoux.gaston.MinimalTestModel.Topics.*
+  import fr.renoux.gaston.MinimalTestModel.Topics.{*, given}
 
   private implicit val problem: Problem = Minimal
   private implicit val context: Context = Context.Default

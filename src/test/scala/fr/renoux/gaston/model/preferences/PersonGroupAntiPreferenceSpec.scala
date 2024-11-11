@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 
 class PersonGroupAntiPreferenceSpec extends AnyFlatSpec with Matchers {
 
-  import fr.renoux.gaston.MinimalTestModel.Persons.*
+  import fr.renoux.gaston.MinimalTestModel.Persons.{*, given}
   import fr.renoux.gaston.MinimalTestModel.Problems.*
   import fr.renoux.gaston.MinimalTestModel.Slots.*
   import fr.renoux.gaston.MinimalTestModel.Topics.*

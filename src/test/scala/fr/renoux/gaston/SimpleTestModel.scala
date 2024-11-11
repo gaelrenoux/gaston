@@ -71,7 +71,7 @@ class SimpleTestModel(using settings: InputSettings) {
   }
 
   object ProblemCounts {
-    implicit val CompleteCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
+    given CompleteCounts: Counts = Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
   }
 
   object Constraints {
@@ -134,10 +134,10 @@ class SimpleTestModel(using settings: InputSettings) {
     import Slots.*
     import Topics.*
 
-    private implicit val context: Context = Context.Default
+    private given Context = Context.Default
 
     val BestWithUnassignedTopics: Schedule = {
-      implicit val problem: Problem = Problems.WithUnassignedTopics
+      given Problem = Problems.WithUnassignedTopics
       Schedule.from(
         Morning(
           Acting(Arthur, Iago, Hercule),
@@ -161,7 +161,7 @@ class SimpleTestModel(using settings: InputSettings) {
     }
 
     val BestNoUnassignedTopics: Schedule = {
-      implicit val problem: Problem = Problems.NoUnassignedTopics
+      given Problem = Problems.NoUnassignedTopics
       Schedule.from(
         Morning(
           Acting(Arthur, Iago, Hercule),

@@ -21,7 +21,7 @@ class ComplexTestModel(seed: Long) {
   private val strongPreference = Score(5)
   private val weakPreference = Score(1)
 
-  implicit val random: Random = new Random(seed)
+  given random: Random = new Random(seed)
 
   object Persons {
     private val index = new AtomicInteger(0)
@@ -60,7 +60,7 @@ class ComplexTestModel(seed: Long) {
   }
 
   object ProblemCounts {
-    implicit val CompleteCounts: model.Counts =
+    given CompleteCounts: model.Counts =
       model.Counts(slots = Slots.Count, topics = Topics.All.size, persons = Persons.All.size)
   }
 

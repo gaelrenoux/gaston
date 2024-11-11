@@ -22,7 +22,7 @@ object MinimalTestModel {
     val AllTurtles: Set[Person] = Set(Leonardo, Raphael, Donatello, Michelangelo)
     val AllEnemies: Set[Person] = Set(Bebop, Rocksteady)
     val All: Set[Person] = AllTurtles ++ AllEnemies
-    implicit val PersonCount: Count[Person] = util.Count[Person](All.size)
+    given PersonCount: Count[Person] = util.Count[Person](All.size)
   }
 
   object Topics {
@@ -35,7 +35,7 @@ object MinimalTestModel {
     val Unassigned: Map[Slot, Topic] = Slots.All.flatten.map(s => s -> Topic.unassigned(index.getAndIncrement(), s)).toMap
     val Concrete: Set[Topic] = Set(Leading, Fighting, Machines, Party)
     val All: Set[Topic] = Concrete ++ Unassigned.values
-    implicit val TopicCount: Count[Topic] = util.Count[Topic](All.size)
+    given TopicCount: Count[Topic] = util.Count[Topic](All.size)
   }
 
   object Slots {
@@ -46,11 +46,11 @@ object MinimalTestModel {
     lazy val Night: Slot = Slot(index.getAndIncrement(), "night", Persons.All, None)
 
     val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
-    implicit val SlotCount: Count[Slot] = util.Count[Slot](All.flatten.size)
+    given SlotCount: Count[Slot] = util.Count[Slot](All.flatten.size)
   }
 
   object Problems {
-    implicit val MinimalCounts: Counts = Counts.fromCounts(using Slots.SlotCount, Topics.TopicCount, Persons.PersonCount)
+    given MinimalCounts: Counts = Counts.fromCounts(using Slots.SlotCount, Topics.TopicCount, Persons.PersonCount)
     val Minimal = new Problem(Slots.All, Topics.All, Topics.Unassigned.toArrayMap, Persons.All, Set.empty, Set.empty)
   }
 
