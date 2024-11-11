@@ -68,8 +68,7 @@ libraryDependencies ++= Seq(
   "com.softwaremill.quicklens" %% "quicklens" % "1.9.9",
 
   /* Tests */
-  "com.softwaremill.diffx" %% "diffx-core" % "0.9.0" % Test,
-  // TODO diffx is deprecated, move to difflicious
+  "com.github.jatcwang" %% "difflicious-scalatest" % "0.4.3" % Test,
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
 
