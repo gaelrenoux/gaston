@@ -4,7 +4,6 @@ import fr.renoux.gaston.util.{Count as _, *}
 
 import scala.annotation.targetName
 import scala.collection.immutable.BitSet
-import scala.reflect.ClassTag
 
 opaque type Id = Int
 opaque type SlotId <: Id = Int
@@ -35,8 +34,20 @@ extension [I <: Id](s: SmallIdSet[I]) {
   inline def apply(id: I): Boolean =
     (s & (1L << id)) != 0L
 
+  inline def mapSumToScore(f: I => Score): Score = {
+    ???
+  }
+
   inline def foldLeft[A](a: A)(f: (A, I) => A): A = {
     ???
+  }
+
+  inline def +(id: I): SmallIdSet[I] = {
+    s & (1L << id)
+  }
+
+  inline def -(id: I): SmallIdSet[I] = {
+    s & ~(1L << id)
   }
 }
 
@@ -54,6 +65,14 @@ opaque type IdMap[I <: Id, A] = Array[A]
 
 extension [I <: Id, A](m: IdMap[I, A]) {
   inline def apply(id: I): A = m(id)
+
+  inline def mapWithIndexToScore(inline f: (A, I) => Score): IdMap[I, Score] = {
+    val result = new Array[Score](m.length)
+    m.fastForeachWithIndex { (a, i) =>
+      result(i) = f(a, i.asInstanceOf[I])
+    }
+    result
+  }
 
   inline def sortedValues[B >: A : Ordering]: Array[A] = m.sorted // CHECK the resulting bytecode
 }
@@ -127,3 +146,21 @@ extension [I <: Id, J <: Id, A](matrix: Matrix[I, J, A]) {
   //    result
   //  }
 }
+
+
+opaque type Matrix3[I <: Id, J <: Id, K <: Id, A] = Array[A] // using a flattened matrix
+
+extension [I <: Id, J <: Id, K <: Id, A](matrix: Matrix3[I, J, K, A]) {
+  inline def apply(i: I, j: J, k: K)(countI: Count[I], countJ: Count[J]): A = {
+    val index = i * countI * countJ + j * countJ + k
+    matrix(index)
+  }
+
+  inline def update(i: I, j: J, k: K)(a: A)(countI: Count[I], countJ: Count[J]) = {
+    val index = i * countI * countJ + j * countJ + k
+    matrix(index) = a
+  }
+}
+
+
+
