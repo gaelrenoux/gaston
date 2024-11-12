@@ -36,12 +36,14 @@ final class SmallProblem(
 
   // TODO inline this maybe ?
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
-    schedule.content.scoreSumLines { (pid: PersonId, tid: TopicId) =>
-      val topicsScore = prefsPersonTopic(pid, tid)(personsCount)
-      val otherPersons = schedule.personGroups(pid)
-      val otherPersonsScore = otherPersons.foldLeft(Score.Zero)(_ + prefsPersonPerson(pid, _)(personsCount))
-      topicsScore + otherPersonsScore
-    }(personsCount, slotsCount)
+    schedule.personTopics.mapWithIndexToScore { (topicIds, pid) =>
+      topicIds.mapSumToScore { tid =>
+        val topicsScore = prefsPersonTopic(pid, tid)(personsCount)
+        val otherPersons = schedule.topicsToPersons(tid) - pid
+        val otherPersonsScore = otherPersons.foldLeft(Score.Zero)(_ + prefsPersonPerson(pid, _)(personsCount))
+        topicsScore + otherPersonsScore
+      }
+    }
   }
 
   def score(schedule: Schedule): Score = {
