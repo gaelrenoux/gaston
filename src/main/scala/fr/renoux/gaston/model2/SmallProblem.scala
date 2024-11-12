@@ -27,20 +27,20 @@ final class SmallProblem(
     val personsWeight: IdMap[PersonId, Weight],
     val personsStartingScore: IdMap[PersonId, Score],
 
-    val prefsPersonTopic: Matrix[PersonId, TopicId, Score], // also includes forbidden topics
-    val prefsPersonPerson: Matrix[PersonId, PersonId, Score],
+    val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
+    val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
     val prefsTopicPure: IdMap[TopicId, Score], // score added for simply having this topic on schedule
-    val prefsTopicsExclusive: Matrix[TopicId, TopicId, Score], // prefered to having a set of exclusive topics, to avoid an if (helps branch prediction) => CHECK
-    val prefsTopicsLinked: Matrix[TopicId, TopicId, Score] // prefered to having a set of exclusive topics, to avoid an if (helps branch prediction) => CHECK
+    val prefsTopicsExclusive: IdMatrix[TopicId, TopicId, Score], // prefered to having a set of exclusive topics, to avoid an if (helps branch prediction) => CHECK
+    val prefsTopicsLinked: IdMatrix[TopicId, TopicId, Score] // prefered to having a set of exclusive topics, to avoid an if (helps branch prediction) => CHECK
 ) {
 
   // TODO inline this maybe ?
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
-    schedule.personTopics.mapWithIndexToScore { (topicIds, pid) =>
+    schedule.personToTopics.mapWithIndexToScore { (topicIds, pid) =>
       topicIds.mapSumToScore { tid =>
         val topicsScore = prefsPersonTopic(pid, tid)(personsCount)
         val otherPersons = schedule.topicsToPersons(tid) - pid
-        val otherPersonsScore = otherPersons.foldLeft(Score.Zero)(_ + prefsPersonPerson(pid, _)(personsCount))
+        val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
         topicsScore + otherPersonsScore
       }
     }
@@ -51,7 +51,7 @@ final class SmallProblem(
     val personalScoresTotal = personalScores.sortedValues.fastFoldRight(Score.Zero) { (score, acc) =>
       (SmallProblem.RankFactor * acc: Score) + score
     }
-    val topicsPureTotal = schedule.topicsPresent.foldLeft(Score.Zero)(_ + prefsTopicPure(_))
+    val topicsPureTotal = schedule.topicsPresent.mapSumToScore(prefsTopicPure(_))
     // TODO missing the other non-personal scores
     personalScoresTotal + topicsPureTotal
   }
