@@ -49,6 +49,15 @@ extension [A](inline as: Array[A]) {
     }
   }
 
+  inline def fastForeachWithIndex(inline f: (A, Int) => Unit): Unit = {
+    val asl = as.length
+    var ix = 0
+    while (ix < asl) {
+      f(as(ix), ix)
+      ix += 1
+    }
+  }
+
   inline def fastMap[B: ClassTag](inline f: A => B): Array[B] = {
     val asl = as.length
     val result = new Array[B](asl)
