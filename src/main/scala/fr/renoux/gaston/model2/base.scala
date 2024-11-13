@@ -6,6 +6,7 @@ import scala.annotation.targetName
 import scala.collection.immutable.BitSet
 
 
+
 /* ********************* Score and Weight ********************* */
 
 opaque type Score = Double
@@ -13,19 +14,24 @@ opaque type Score = Double
 extension (s: Score) {
   @targetName("plus")
   infix inline def +(t: Score): Score = s + t
+
+  @targetName("multiplyWeight")
+  infix inline def *(w: Weight): Score = w * s
 }
 
 object Score {
   inline def Zero: Score = 0.0
 
   inline def MinReward: Score = -1E9 // We still need to sum that sometimes, so it shouldn't overflow
+
+  inline def apply(d: Double): Score = d
 }
 
 opaque type Weight = Double
 
 extension (w: Weight) {
-  @targetName("plus")
-  infix inline def *(s: Score): Score = w + s
+  @targetName("multiplyScore")
+  infix inline def *(s: Score): Score = w * s
 }
 
 object Weight {
@@ -41,23 +47,33 @@ opaque type SlotId <: Id = Int
 opaque type TopicId <: Id = Int
 opaque type PersonId <: Id = Int
 
-opaque type Count[A <: Id] = Int
+extension (id: Id) {
+  inline def value: Int = id
+}
 
 // TODO inline all closures
 
 object SlotId {
   inline def None: SlotId = -1
+
+  inline def apply(id: Int): SlotId = id
 }
 
 object TopicId {
   inline def None: TopicId = -1
 
   inline def Absent: TopicId = 0 // Topic for someone who isn't there
+
+  inline def apply(id: Int): TopicId = id
 }
 
 object PersonId {
   inline def None: PersonId = -1
+
+  inline def apply(id: Int): PersonId = id
 }
+
+opaque type Count[A <: Id] = Int
 
 
 
@@ -67,6 +83,8 @@ object PersonId {
 opaque type SmallIdSet[I <: Id] = Long
 
 extension [I <: Id](s: SmallIdSet[I]) {
+  inline def underlying: Long = s
+
   inline def apply(id: I): Boolean = contains(id)
 
   inline def contains(id: I): Boolean =
@@ -87,9 +105,9 @@ extension [I <: Id](s: SmallIdSet[I]) {
     }
     result
   }
-  
+
   inline def added(id: I): SmallIdSet[I] = {
-    s & (1L << id)
+    s | (1L << id)
   }
 
   @targetName("plus")
@@ -105,6 +123,16 @@ extension [I <: Id](s: SmallIdSet[I]) {
 
 object SmallIdSet {
   inline def full[I <: Id]: SmallIdSet[I] = -1
+
+  inline def empty[I <: Id]: SmallIdSet[I] = 0
+
+  inline def apply[I <: Id](ids: I*): SmallIdSet[I] = {
+    var result = 0L
+    ids.fastForeach { id =>
+      result = result | (1L << id.value)
+    }
+    result
+  }
 }
 
 /** IdSet: a set of arbitrary Ids as an actual BitSet. */
