@@ -1,6 +1,8 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 class SmallIdSetTest extends TestBase {
   val testAllInts: Seq[Int] = (0 until 64).toList
@@ -196,6 +198,50 @@ class SmallIdSetTest extends TestBase {
           s2.contains(nid) should be(true)
         }
       }
+    }
+  }
+
+  "foreach" - {
+
+    "on empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      val result = mutable.Set[TopicId]()
+      set.foreach(result += _)
+      result.isEmpty should be(true)
+    }
+
+    "on non-empty set" in {
+      val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
+      val result = mutable.Set[TopicId]()
+      set.foreach(result += _)
+      result.toSet should be(Set(testOkIds*))
+    }
+
+    "on full set" in {
+      val set = SmallIdSet.full[TopicId]
+      val result = mutable.Set[TopicId]()
+      set.foreach(result += _)
+      result.toSet should be(Set(testAllIds*))
+    }
+  }
+
+  "mapSumToScore" - {
+    "on empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      val result = set.mapSumToScore(tid => Score(tid.value * 2))
+      result should be(Score(0))
+    }
+
+    "on non-empty set" in {
+      val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
+      val result = set.mapSumToScore(tid => Score(tid.value * 2))
+      result should be(Score(testOkInts.map(_ * 2).sum))
+    }
+
+    "on full set" in {
+      val set = SmallIdSet.full[TopicId]
+      val result = set.mapSumToScore(tid => Score(tid.value * 2))
+      result should be(Score(testAllInts.map(_ * 2).sum))
     }
   }
 }
