@@ -4,8 +4,7 @@ import fr.renoux.gaston.util.{Count as _, *}
 
 import scala.annotation.targetName
 import scala.collection.immutable.BitSet
-
-
+import scala.reflect.ClassTag
 
 /* ********************* Score and Weight ********************* */
 
@@ -22,7 +21,8 @@ extension (s: Score) {
 object Score {
   inline def Zero: Score = 0.0
 
-  inline def MinReward: Score = -1E9 // We still need to sum that sometimes, so it shouldn't overflow
+  inline def MinReward: Score =
+    -1e9 // We still need to sum that sometimes, so it shouldn't overflow
 
   inline def apply(d: Double): Score = d
 }
@@ -37,8 +37,6 @@ extension (w: Weight) {
 object Weight {
   def apply(w: Double): Weight = w
 }
-
-
 
 /* ********************* All of the IDs ********************* */
 
@@ -75,11 +73,11 @@ object PersonId {
 
 opaque type Count[A <: Id] = Int
 
-
-
 /* ********************* Various collections ********************* */
 
-/** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable, but very cheap to copy. */
+/** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable,
+  * but very cheap to copy.
+  */
 opaque type SmallIdSet[I <: Id] = Long
 
 extension [I <: Id](s: SmallIdSet[I]) {
@@ -142,28 +140,52 @@ extension [I <: Id](s: IdSet[I]) {
   inline def apply(id: I): Boolean = s(id)
 }
 
-/** IdMap: a mutable map from Ids to some value as an array. Note that there always is a value for each key (might be a default value). */
+/** IdMap: a mutable map from Ids to some value as an array. Note that there
+  * always is a value for each key (might be a default value).
+  */
 opaque type IdMap[I <: Id, A] = Array[A]
+
+object IdMap {
+  def from[I <: Id, A: ClassTag](
+      size: Int
+  )(it: Iterable[(I, A)]): IdMap[I, A] = {
+    val result = new Array[A](size)
+    it.foreach { (i, a) => result(i) = a }
+    result
+  }
+
+  def from[I <: Id, A: ClassTag](it: Iterable[(I, A)]): IdMap[I, A] =
+    from(it.view.map(_._1).max + 1)(it)
+
+  inline def apply[I <: Id, A: ClassTag](ias: (I, A)*): IdMap[I, A] =
+    from(ias)
+}
 
 extension [I <: Id, A](m: IdMap[I, A]) {
   inline def apply(id: I): A = m(id)
 
-  inline def mapWithIndexToScore(inline f: (A, I) => Score): IdMap[I, Score] = {
+  inline def toMap: Map[I, A] =
+    m.zipWithIndex.map { (a, id) => id.asInstanceOf[I] -> a }.toMap
+
+  inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
     val result = new Array[Score](m.length)
     m.fastForeachWithIndex { (a, i) =>
-      result(i) = f(a, i.asInstanceOf[I])
+      result(i) = f(i.asInstanceOf[I], a)
     }
     result
   }
 
-  inline def sortedValues[B >: A : Ordering]: Array[A] = m.sorted // CHECK the resulting bytecode
+  inline def sortedValues[B >: A: Ordering]: Array[A] =
+    m.sorted // CHECK the resulting bytecode
 }
 
 extension [I <: Id](m: IdMap[I, Score]) {
   inline def sortedValues: Array[Score] = m.sorted
 }
 
-/** IdMatrix: a mutable map from a couple of ids to some value, as a flattened array. Like IdMap, there always is a value for each key. */
+/** IdMatrix: a mutable map from a couple of ids to some value, as a flattened
+  * array. Like IdMap, there always is a value for each key.
+  */
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
 extension [I <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
@@ -173,7 +195,9 @@ extension [I <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
   }
 
   // CHECK that in the bytecode, it's actually the simple loop
-  inline def scoreSumLines(f: (I, A) => Score)(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
+  inline def scoreSumLines(
+      f: (I, A) => Score
+  )(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
     val result = new Array[Score](countI)
     var i = 0
     var indexBase = 0
@@ -189,19 +213,22 @@ extension [I <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
   }
 }
 
-
 /** IdMatrix3: like IdMatrix, except it's for id triplets. */
-opaque type IdMatrix3[I <: Id, J <: Id, K <: Id, A] = Array[A] // using a flattened matrix
+opaque type IdMatrix3[I <: Id, J <: Id, K <: Id, A] =
+  Array[A] // using a flattened matrix
 
 extension [I <: Id, J <: Id, K <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
-  inline def apply(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A = at(i, j, k)(countJ, countK)
+  inline def apply(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A =
+    at(i, j, k)(countJ, countK)
 
   inline def at(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A = {
     val index = i * countJ * countK + j * countK + k
     matrix(index)
   }
 
-  inline def update(i: I, j: J, k: K)(a: A)(countJ: Count[J], countK: Count[K]) = {
+  inline def update(i: I, j: J, k: K)(
+      a: A
+  )(countJ: Count[J], countK: Count[K]) = {
     val index = i * countJ * countK + j * countK + k
     matrix(index) = a
   }
@@ -211,7 +238,11 @@ extension [I <: Id, J <: Id, K <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
 /** Very specific stuff for the schedule matrix */
 extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
 
-  inline def listSmallTopicsByPerson(countS: Count[SlotId], countT: Count[TopicId], countP: Count[PersonId]): IdMap[PersonId, SmallIdSet[TopicId]] = {
+  inline def listSmallTopicsByPerson(
+      countS: Count[SlotId],
+      countT: Count[TopicId],
+      countP: Count[PersonId]
+  ): IdMap[PersonId, SmallIdSet[TopicId]] = {
     val result = new Array[SmallIdSet[TopicId]](countP) // initializes at zero
 
     // TODO could reorder T then P to limit the number of multiplications
@@ -232,7 +263,11 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     result
   }
 
-  inline def listSmallPersonsByTopic(countS: Count[SlotId], countT: Count[TopicId], countP: Count[PersonId]): IdMap[TopicId, SmallIdSet[PersonId]] = {
+  inline def listSmallPersonsByTopic(
+      countS: Count[SlotId],
+      countT: Count[TopicId],
+      countP: Count[PersonId]
+  ): IdMap[TopicId, SmallIdSet[PersonId]] = {
     val result = new Array[SmallIdSet[PersonId]](countT) // initializes at zero
 
     // TODO limit number of multiplications
@@ -249,7 +284,11 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     result
   }
 
-  inline def listSmallTopics(countS: Count[SlotId], countT: Count[TopicId], countP: Count[PersonId]): SmallIdSet[TopicId] = {
+  inline def listSmallTopics(
+      countS: Count[SlotId],
+      countT: Count[TopicId],
+      countP: Count[PersonId]
+  ): SmallIdSet[TopicId] = {
     var result: SmallIdSet[TopicId] = 0
 
     // TODO limit number of multiplications
@@ -270,6 +309,3 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     result
   }
 }
-
-
-
