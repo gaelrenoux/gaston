@@ -118,7 +118,7 @@ extension [I <: Id](s: SmallIdSet[I]) {
   }
 
   @targetName("minus")
-  inline def -(id: I): SmallIdSet[I] = added(id)
+  inline def -(id: I): SmallIdSet[I] = removed(id)
 }
 
 object SmallIdSet {
