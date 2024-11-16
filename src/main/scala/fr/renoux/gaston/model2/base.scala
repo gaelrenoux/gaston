@@ -8,10 +8,10 @@ import scala.reflect.ClassTag
 
 /* ********************* All of the IDs ********************* */
 
-opaque type Id = Int
-opaque type SlotId <: Id = Int
-opaque type TopicId <: Id = Int
-opaque type PersonId <: Id = Int
+opaque type Id >: Int = Int
+opaque type SlotId >: Int  <: Id = Int
+opaque type TopicId >: Int  <: Id = Int
+opaque type PersonId >: Int  <: Id = Int
 
 extension (id: Id) {
   inline def value: Int = id
@@ -21,22 +21,16 @@ extension (id: Id) {
 
 object SlotId {
   inline def None: SlotId = -1
-
-  inline def apply(id: Int): SlotId = id
 }
 
 object TopicId {
   inline def None: TopicId = -1
 
   inline def Absent: TopicId = 0 // Topic for someone who isn't there
-
-  inline def apply(id: Int): TopicId = id
 }
 
 object PersonId {
   inline def None: PersonId = -1
-
-  inline def apply(id: Int): PersonId = id
 }
 
 opaque type Count[I <: Id] = Int
@@ -48,7 +42,7 @@ opaque type Count[I <: Id] = Int
   */
 opaque type SmallIdSet[I <: Id] = Long
 
-extension [I <: Id](s: SmallIdSet[I]) {
+extension [I >: Int <: Id](s: SmallIdSet[I]) {
   inline def underlying: Long = s
 
   inline def apply(id: I): Boolean = contains(id)
@@ -58,8 +52,8 @@ extension [I <: Id](s: SmallIdSet[I]) {
 
   inline def foreach(inline f: I => Unit): Unit = {
     fastLoop(0, 64) { i =>
-      if (apply(i.asInstanceOf[I])) {
-        f(i.asInstanceOf[I])
+      if (apply(i)) {
+        f(i)
       }
     }
   }
