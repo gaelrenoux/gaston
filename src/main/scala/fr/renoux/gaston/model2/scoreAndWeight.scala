@@ -6,11 +6,12 @@ import scala.annotation.targetName
 opaque type Score >: Double = Double
 
 extension (s: Score) {
-  @targetName("plus")
-  infix inline def +(t: Score): Score = s + t
+  // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, those can go back to just being + and *
+  @targetName("scorePlusScore")
+  infix inline def <+>(t: Score): Score = s + t
 
-  @targetName("multiplyWeight")
-  infix inline def *(w: Weight): Score = w * s
+  @targetName("scoreMultiplyWeight")
+  infix inline def <*>(w: Weight): Score = w * s
 }
 
 object Score {
@@ -25,6 +26,7 @@ object Score {
 opaque type Weight >: Double = Double
 
 extension (w: Weight) {
-  @targetName("multiplyScore")
-  infix inline def *(s: Score): Score = w * s
+  // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, this can go back to just being *
+  @targetName("weightMultiplyScore")
+  infix inline def <*>(s: Score): Score = w * s
 }

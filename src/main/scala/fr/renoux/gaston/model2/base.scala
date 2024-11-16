@@ -61,12 +61,12 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
   inline def mapSumToScore(inline f: I => Score): Score = {
     var result: Score = 0.0
     foreach { i =>
-      result += f(i)
+      result = result <+> f(i)
     }
     result
   }
 
-  inline def added(id: I): SmallIdSet[I] = {
+  inline def inserted(id: I): SmallIdSet[I] = {
     s | mask(id)
   }
 
@@ -74,11 +74,11 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
     s & (~ mask(id))
   }
 
-  // TODO I'd love to add these methods back, but the + conflicts with the one on Score
-  // @targetName("plus")
+  // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, those can go be uncommented
+  // @targetName("SmallIdSetPlusId")
   // inline def +(id: I): SmallIdSet[I] = added(id)
   //
-  // @targetName("minus")
+  // @targetName("SmallIdSetMinusId")
   // inline def -(id: I): SmallIdSet[I] = removed(id)
 
   /** Shouldn't be necessary, but type issue otherwise */
@@ -172,7 +172,7 @@ extension [I <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
     while (i < countI) {
       val indexMax = indexBase + countJ
       fastLoop(indexBase, indexMax) { index =>
-        result(i) += f(i.asInstanceOf[I], matrix(index))
+        result(i) = result(i) <+> f(i.asInstanceOf[I], matrix(index))
       }
       i += 1
       indexBase += countI
@@ -266,7 +266,7 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
         var notFound = true // we know there's only one true
         while (pid < countP && notFound) {
           if (matrix.at(sid, tid, pid)(countT, countP)) {
-            result = result.added(tid)
+            result = result.inserted(tid)
             notFound = false
           }
           pid += 1

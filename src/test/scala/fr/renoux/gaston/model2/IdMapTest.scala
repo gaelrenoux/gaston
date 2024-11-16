@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
 
+
 class IdMapTest extends TestBase {
   val testAllInts: Seq[Int] = (0 until 64).toList
   val testAllIds: Seq[TopicId] = testAllInts
