@@ -35,6 +35,14 @@ object PersonId {
 
 opaque type Count[I <: Id] = Int
 
+extension [I >: Int <: Id] (c: Count[I]) {
+  // TODO Could be simply foreach when https://github.com/scala/scala3/issues/21959 is fixed
+  inline def foreachId(inline f: I => Unit) = fastLoop(0, c)(f)
+
+  inline def flatIndex[H <: Id](inline h: H, inline i: I) = h * c + i
+}
+
+
 /* ********************* Various collections ********************* */
 
 /** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable,
@@ -157,8 +165,8 @@ extension [I <: Id](m: IdMap[I, Score]) {
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
 extension [I >: Int <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
-  inline def apply(i: I, j: J)(count: Count[I]): A = {
-    val index = i * count + j
+  inline def apply(i: I, j: J)(countJ: Count[J]): A = {
+    val index = i * countJ + j
     matrix(index)
   }
 
@@ -175,7 +183,7 @@ extension [I >: Int <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
         result(i) = result(i) <+> f(i, matrix(index))
       }
       i += 1
-      indexBase += countI
+      indexBase += countJ
     }
     result
   }
@@ -214,8 +222,8 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     val result = new Array[SmallIdSet[TopicId]](countP) // initializes at zero
 
     // TODO could reorder T then P to limit the number of multiplications
-    fastLoop(0, countP) { pid =>
-      fastLoop(0, countT) { tid =>
+    countP.foreachId { pid =>
+      countT.foreachId { tid =>
         var sid: SlotId = 0
         var notFound = true // we know there's only one true
         while (sid < countS && notFound) {
@@ -239,9 +247,9 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     val result = new Array[SmallIdSet[PersonId]](countT) // initializes at zero
 
     // TODO limit number of multiplications
-    fastLoop(0, countS) { sid =>
-      fastLoop(0, countT) { tid =>
-        fastLoop(0, countP) { pid =>
+    countS.foreachId { sid =>
+      countT.foreachId { tid =>
+        countP.foreachId { pid =>
           if (matrix.at(sid, tid, pid)(countT, countP)) {
             result(tid) = result(tid) + pid
           }
@@ -260,8 +268,8 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     var result: SmallIdSet[TopicId] = 0
 
     // TODO limit number of multiplications
-    fastLoop(0, countS) { sid =>
-      fastLoop(0, countT) { tid =>
+    countS.foreachId { sid =>
+      countT.foreachId { tid =>
         var pid: PersonId = 0
         var notFound = true // we know there's only one true
         while (pid < countP && notFound) {
