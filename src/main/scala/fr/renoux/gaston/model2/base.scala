@@ -2,41 +2,9 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
-import scala.annotation.targetName
 import scala.collection.immutable.BitSet
 import scala.reflect.ClassTag
 
-/* ********************* Score and Weight ********************* */
-
-opaque type Score = Double
-
-extension (s: Score) {
-  @targetName("plus")
-  infix inline def +(t: Score): Score = s + t
-
-  @targetName("multiplyWeight")
-  infix inline def *(w: Weight): Score = w * s
-}
-
-object Score {
-  inline def Zero: Score = 0.0
-
-  inline def MinReward: Score =
-    -1e9 // We still need to sum that sometimes, so it shouldn't overflow
-
-  inline def apply(d: Double): Score = d
-}
-
-opaque type Weight = Double
-
-extension (w: Weight) {
-  @targetName("multiplyScore")
-  infix inline def *(s: Score): Score = w * s
-}
-
-object Weight {
-  def apply(w: Double): Weight = w
-}
 
 /* ********************* All of the IDs ********************* */
 
@@ -71,7 +39,7 @@ object PersonId {
   inline def apply(id: Int): PersonId = id
 }
 
-opaque type Count[A <: Id] = Int
+opaque type Count[I <: Id] = Int
 
 /* ********************* Various collections ********************* */
 
@@ -97,7 +65,7 @@ extension [I <: Id](s: SmallIdSet[I]) {
   }
 
   inline def mapSumToScore(inline f: I => Score): Score = {
-    var result = 0.0
+    var result: Score = 0.0
     foreach { i =>
       result += f(i)
     }
@@ -108,15 +76,16 @@ extension [I <: Id](s: SmallIdSet[I]) {
     s | (1L << id)
   }
 
-  @targetName("plus")
-  inline def +(id: I): SmallIdSet[I] = added(id)
-
   inline def removed(id: I): SmallIdSet[I] = {
     s & ~(1L << id)
   }
 
-  @targetName("minus")
-  inline def -(id: I): SmallIdSet[I] = removed(id)
+  // TODO I'd love to add these methods back, but the + conflicts with the one on Score
+  // @targetName("plus")
+  // inline def +(id: I): SmallIdSet[I] = added(id)
+  //
+  // @targetName("minus")
+  // inline def -(id: I): SmallIdSet[I] = removed(id)
 }
 
 object SmallIdSet {
@@ -127,7 +96,7 @@ object SmallIdSet {
   inline def apply[I <: Id](ids: I*): SmallIdSet[I] = {
     var result = 0L
     ids.fastForeach { id =>
-      result = result | (1L << id.value)
+      result = result | (1L << id)
     }
     result
   }
