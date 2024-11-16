@@ -48,7 +48,7 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
   inline def apply(id: I): Boolean = contains(id)
 
   inline def contains(id: I): Boolean =
-    (s & (1L << id)) != 0L
+    (s & mask(id)) != 0L
 
   inline def foreach(inline f: I => Unit): Unit = {
     fastLoop(0, 64) { i =>
@@ -67,11 +67,11 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
   }
 
   inline def added(id: I): SmallIdSet[I] = {
-    s | (1L << id)
+    s | mask(id)
   }
 
   inline def removed(id: I): SmallIdSet[I] = {
-    s & ~(1L << id)
+    s & (~ mask(id))
   }
 
   // TODO I'd love to add these methods back, but the + conflicts with the one on Score
@@ -80,6 +80,9 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
   //
   // @targetName("minus")
   // inline def -(id: I): SmallIdSet[I] = removed(id)
+
+  /** Shouldn't be necessary, but type issue otherwise */
+  private inline def mask(id: I): Long = SmallIdSet(id)
 }
 
 object SmallIdSet {
@@ -87,10 +90,12 @@ object SmallIdSet {
 
   inline def empty[I <: Id]: SmallIdSet[I] = 0
 
+  inline def apply[I <: Id](id: I): SmallIdSet[I] = 1L << id
+
   inline def apply[I <: Id](ids: I*): SmallIdSet[I] = {
     var result = 0L
     ids.fastForeach { id =>
-      result = result | (1L << id)
+      result = result | SmallIdSet(id)
     }
     result
   }
