@@ -6,11 +6,11 @@ import scala.collection.mutable.ListBuffer
 
 class SmallIdSetTest extends TestBase {
   val testAllInts: Seq[Int] = (0 until 64).toList
-  val testAllIds: Seq[TopicId] = testAllInts.map(TopicId(_))
+  val testAllIds: Seq[TopicId] = testAllInts
   val testOkInts: Seq[Int] = List(3, 8, 47, 63)
-  val testOkIds: Seq[TopicId] = testOkInts.map(TopicId(_))
+  val testOkIds: Seq[TopicId] = testOkInts
   val testKoInts: Seq[Int] = (testAllInts.toSet -- testOkInts).toList
-  val testKoIds: Seq[TopicId] = testKoInts.map(TopicId(_))
+  val testKoIds: Seq[TopicId] = testKoInts
 
   "Creation" - {
     "empty set" in {
@@ -65,12 +65,9 @@ class SmallIdSetTest extends TestBase {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       for (id <- testOkIds) {
-        val s1 = set + id
         val s2 = set.added(id)
-        s1.contains(id) should be(true)
         s2.contains(id) should be(true)
         testAllIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(false)
           s2.contains(nid) should be(false)
         }
       }
@@ -79,16 +76,12 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > non-existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testKoIds) {
-        val s1 = set + id
         val s2 = set.added(id)
-        s1.contains(id) should be(true)
         s2.contains(id) should be(true)
         testOkIds.foreach { nid =>
-          s1.contains(nid) should be(true)
           s2.contains(nid) should be(true)
         }
         testKoIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(false)
           s2.contains(nid) should be(false)
         }
       }
@@ -97,18 +90,13 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testOkIds) {
-        val s1 = set + id
         val s2 = set.added(id)
-        s1 should be(set)
         s2 should be(set)
-        s1.contains(id) should be(true)
         s2.contains(id) should be(true)
         testOkIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(true)
           s2.contains(nid) should be(true)
         }
         testKoIds.foreach { nid =>
-          s1.contains(nid) should be(false)
           s2.contains(nid) should be(false)
         }
       }
@@ -117,14 +105,10 @@ class SmallIdSetTest extends TestBase {
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
       for (id <- testAllIds) {
-        val s1 = set + id
         val s2 = set.added(id)
-        s1 should be(set)
         s2 should be(set)
-        s1.contains(id) should be(true)
         s2.contains(id) should be(true)
         testAllIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(true)
           s2.contains(nid) should be(true)
         }
       }
@@ -135,14 +119,10 @@ class SmallIdSetTest extends TestBase {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       for (id <- testOkIds) {
-        val s1 = set - id
         val s2 = set.removed(id)
-        s1 should be(set)
         s2 should be(set)
-        s1.contains(id) should be(false)
         s2.contains(id) should be(false)
         testAllIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(false)
           s2.contains(nid) should be(false)
         }
       }
@@ -151,18 +131,13 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > non-existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testKoIds) {
-        val s1 = set - id
         val s2 = set.removed(id)
-        s1 should be(set)
         s2 should be(set)
-        s1.contains(id) should be(false)
         s2.contains(id) should be(false)
         testOkIds.foreach { nid =>
-          s1.contains(nid) should be(true)
           s2.contains(nid) should be(true)
         }
         testKoIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(false)
           s2.contains(nid) should be(false)
         }
       }
@@ -171,16 +146,12 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testOkIds) {
-        val s1 = set - id
         val s2 = set.removed(id)
-        s1.contains(id) should be(false)
         s2.contains(id) should be(false)
         testOkIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(true)
           s2.contains(nid) should be(true)
         }
         testKoIds.foreach { nid =>
-          s1.contains(nid) should be(false)
           s2.contains(nid) should be(false)
         }
       }
@@ -189,12 +160,9 @@ class SmallIdSetTest extends TestBase {
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
       for (id <- testAllIds) {
-        val s1 = set - id
         val s2 = set.removed(id)
-        s1.contains(id) should be(false)
         s2.contains(id) should be(false)
         testAllIds.filterNot(_ == id).foreach { nid =>
-          s1.contains(nid) should be(true)
           s2.contains(nid) should be(true)
         }
       }
@@ -228,20 +196,20 @@ class SmallIdSetTest extends TestBase {
   "mapSumToScore" - {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
-      val result = set.mapSumToScore(tid => Score(tid.value * 2))
-      result should be(Score(0))
+      val result = set.mapSumToScore(tid => tid.value * 2)
+      result should be(Score.Zero)
     }
 
     "on non-empty set" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
-      val result = set.mapSumToScore(tid => Score(tid.value * 2))
-      result should be(Score(testOkInts.map(_ * 2).sum))
+      val result = set.mapSumToScore(tid => tid.value * 2)
+      result should be(testOkInts.map(_ * 2).sum)
     }
 
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
-      val result = set.mapSumToScore(tid => Score(tid.value * 2))
-      result should be(Score(testAllInts.map(_ * 2).sum))
+      val result = set.mapSumToScore(tid => tid.value * 2)
+      result should be(testAllInts.map(_ * 2).sum)
     }
   }
 }
