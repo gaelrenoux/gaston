@@ -2,7 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+
 
 class SmallIdSetTest extends TestBase {
   val testAllInts: Seq[Int] = (0 until 64).toList
@@ -65,7 +65,7 @@ class SmallIdSetTest extends TestBase {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       for (id <- testOkIds) {
-        val s2 = set.added(id)
+        val s2 = set.inserted(id)
         s2.contains(id) should be(true)
         testAllIds.filterNot(_ == id).foreach { nid =>
           s2.contains(nid) should be(false)
@@ -76,7 +76,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > non-existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testKoIds) {
-        val s2 = set.added(id)
+        val s2 = set.inserted(id)
         s2.contains(id) should be(true)
         testOkIds.foreach { nid =>
           s2.contains(nid) should be(true)
@@ -90,7 +90,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testOkIds) {
-        val s2 = set.added(id)
+        val s2 = set.inserted(id)
         s2 should be(set)
         s2.contains(id) should be(true)
         testOkIds.filterNot(_ == id).foreach { nid =>
@@ -105,7 +105,7 @@ class SmallIdSetTest extends TestBase {
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
       for (id <- testAllIds) {
-        val s2 = set.added(id)
+        val s2 = set.inserted(id)
         s2 should be(set)
         s2.contains(id) should be(true)
         testAllIds.filterNot(_ == id).foreach { nid =>
