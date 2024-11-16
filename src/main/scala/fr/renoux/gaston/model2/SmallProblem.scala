@@ -39,7 +39,7 @@ final class SmallProblem(
     schedule.personToTopics.mapToScore { (pid, topicIds) =>
       topicIds.mapSumToScore { tid =>
         val topicsScore = prefsPersonTopic(pid, tid)(personsCount)
-        val otherPersons = schedule.topicsToPersons(tid) - pid
+        val otherPersons = schedule.topicsToPersons(tid).removed(pid)
         val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
         topicsScore + otherPersonsScore
       }
@@ -59,5 +59,5 @@ final class SmallProblem(
 }
 
 object SmallProblem {
-  val RankFactor: Weight = Weight(0.5) // TODO move this to an appropriate class, maybe a Constants object ?
+  val RankFactor: Weight = 0.5 // TODO move this to an appropriate class, maybe a Constants object ?
 }
