@@ -129,16 +129,16 @@ object IdMap {
     from(ias)
 }
 
-extension [I <: Id, A](m: IdMap[I, A]) {
+extension [I >: Int <: Id, A](m: IdMap[I, A]) {
   inline def apply(id: I): A = m(id)
 
   inline def toMap: Map[I, A] =
-    m.zipWithIndex.map { (a, id) => id.asInstanceOf[I] -> a }.toMap
+    m.zipWithIndex.map { (a, id) => id -> a }.toMap
 
   inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
     val result = new Array[Score](m.length)
     m.fastForeachWithIndex { (a, i) =>
-      result(i) = f(i.asInstanceOf[I], a)
+      result(i) = f(i, a)
     }
     result
   }
@@ -156,7 +156,7 @@ extension [I <: Id](m: IdMap[I, Score]) {
   */
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
-extension [I <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
+extension [I >: Int <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
   inline def apply(i: I, j: J)(count: Count[I]): A = {
     val index = i * count + j
     matrix(index)
@@ -172,7 +172,7 @@ extension [I <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
     while (i < countI) {
       val indexMax = indexBase + countJ
       fastLoop(indexBase, indexMax) { index =>
-        result(i) = result(i) <+> f(i.asInstanceOf[I], matrix(index))
+        result(i) = result(i) <+> f(i, matrix(index))
       }
       i += 1
       indexBase += countI
