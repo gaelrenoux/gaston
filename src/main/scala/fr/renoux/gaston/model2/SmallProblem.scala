@@ -41,7 +41,7 @@ final class SmallProblem(
         val topicsScore = prefsPersonTopic(pid, tid)(personsCount)
         val otherPersons = schedule.topicsToPersons(tid).removed(pid)
         val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
-        topicsScore + otherPersonsScore
+        topicsScore <+> otherPersonsScore
       }
     }
   }
@@ -49,11 +49,11 @@ final class SmallProblem(
   def score(schedule: Schedule): Score = {
     val personalScores: IdMap[PersonId, Score] = scorePersons(schedule)
     val personalScoresTotal = personalScores.sortedValues.fastFoldRight(Score.Zero) { (score, acc) =>
-      (SmallProblem.RankFactor * acc: Score) + score
+      (SmallProblem.RankFactor <*> acc: Score) <+> score
     }
     val topicsPureTotal = schedule.topicsPresent.mapSumToScore(prefsTopicPure(_))
     // TODO missing the other non-personal scores
-    personalScoresTotal + topicsPureTotal
+    personalScoresTotal <+> topicsPureTotal
   }
 
 }
