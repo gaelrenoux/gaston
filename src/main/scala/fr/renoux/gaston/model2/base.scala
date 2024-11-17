@@ -54,50 +54,50 @@ object Count {
   */
 opaque type SmallIdSet[I <: Id] = Long
 
-extension [I >: Int <: Id](s: SmallIdSet[I]) {
-  inline def underlying: Long = s
+object SmallIdSet {
+  extension [I >: Int <: Id](s: SmallIdSet[I]) {
+    inline def underlying: Long = s
 
-  inline def apply(id: I): Boolean = contains(id)
+    inline def apply(id: I): Boolean = contains(id)
 
-  inline def contains(id: I): Boolean =
-    (s & mask(id)) != 0L
+    inline def contains(id: I): Boolean =
+      (s & mask(id)) != 0L
 
-  inline def foreach(inline f: I => Unit): Unit = {
-    fastLoop(0, 64) { i =>
-      if (apply(i)) {
-        f(i)
+    inline def foreach(inline f: I => Unit): Unit = {
+      fastLoop(0, 64) { i =>
+        if (apply(i)) {
+          f(i)
+        }
       }
     }
-  }
 
-  inline def mapSumToScore(inline f: I => Score): Score = {
-    var result: Score = 0.0
-    foreach { i =>
-      result = result + f(i)
+    inline def mapSumToScore(inline f: I => Score): Score = {
+      var result: Score = 0.0
+      foreach { i =>
+        result = result + f(i)
+      }
+      result
     }
-    result
+
+    inline def inserted(id: I): SmallIdSet[I] = {
+      s | mask(id)
+    }
+
+    inline def removed(id: I): SmallIdSet[I] = {
+      s & (~mask(id))
+    }
+
+    // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, those can go be uncommented
+    // @targetName("SmallIdSetPlusId")
+    // inline def +(id: I): SmallIdSet[I] = added(id)
+    //
+    // @targetName("SmallIdSetMinusId")
+    // inline def -(id: I): SmallIdSet[I] = removed(id)
+
+    /** Shouldn't be necessary, but type issue otherwise */
+    private inline def mask(id: I): Long = SmallIdSet(id)
   }
 
-  inline def inserted(id: I): SmallIdSet[I] = {
-    s | mask(id)
-  }
-
-  inline def removed(id: I): SmallIdSet[I] = {
-    s & (~mask(id))
-  }
-
-  // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, those can go be uncommented
-  // @targetName("SmallIdSetPlusId")
-  // inline def +(id: I): SmallIdSet[I] = added(id)
-  //
-  // @targetName("SmallIdSetMinusId")
-  // inline def -(id: I): SmallIdSet[I] = removed(id)
-
-  /** Shouldn't be necessary, but type issue otherwise */
-  private inline def mask(id: I): Long = SmallIdSet(id)
-}
-
-object SmallIdSet {
   inline def full[I <: Id]: SmallIdSet[I] = -1
 
   inline def empty[I <: Id]: SmallIdSet[I] = 0
@@ -116,8 +116,10 @@ object SmallIdSet {
 /** IdSet: a set of arbitrary Ids as an actual BitSet. */
 opaque type IdSet[I <: Id] = BitSet
 
-extension [I <: Id](s: IdSet[I]) {
-  inline def apply(id: I): Boolean = s(id)
+object IdSet {
+  extension [I <: Id](s: IdSet[I]) {
+    inline def apply(id: I): Boolean = s(id)
+  }
 }
 
 /** IdMap: a mutable map from Ids to some value as an array. Note that there
@@ -126,6 +128,25 @@ extension [I <: Id](s: IdSet[I]) {
 opaque type IdMap[I <: Id, A] = Array[A]
 
 object IdMap {
+  extension [I >: Int <: Id, A](m: IdMap[I, A]) {
+    inline def apply(id: I): A = m(id)
+
+    inline def toMap: Map[I, A] =
+      m.zipWithIndex.map { (a, id) => id -> a }.toMap
+
+    inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
+      val result = new Array[Score](m.length)
+      m.fastForeachWithIndex { (a, i) =>
+        result(i) = f(i, a)
+      }
+      result
+    }
+  }
+
+  extension [I <: Id](m: IdMap[I, Score]) {
+    inline def sortedValues: Array[Score] = m.sorted
+  }
+
   def from[I >: Int <: Id, A: ClassTag](
       size: Int
   )(it: Iterable[(I, A)]): IdMap[I, A] = {
@@ -141,55 +162,35 @@ object IdMap {
     from(ias)
 }
 
-extension [I >: Int <: Id, A](m: IdMap[I, A]) {
-  inline def apply(id: I): A = m(id)
-
-  inline def toMap: Map[I, A] =
-    m.zipWithIndex.map { (a, id) => id -> a }.toMap
-
-  inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
-    val result = new Array[Score](m.length)
-    m.fastForeachWithIndex { (a, i) =>
-      result(i) = f(i, a)
-    }
-    result
-  }
-
-  inline def sortedValues[B >: A: Ordering]: Array[A] =
-    m.sorted // CHECK the resulting bytecode
-}
-
-extension [I <: Id](m: IdMap[I, Score]) {
-  inline def sortedValues: Array[Score] = m.sorted
-}
-
 /** IdMatrix: a mutable map from a couple of ids to some value, as a flattened
   * array. Like IdMap, there always is a value for each key.
   */
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
-extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A]) {
-  inline def apply(i: I, j: J)(countJ: Count[J]): A = {
-    val index = i * countJ + j
-    matrix(index)
-  }
-
-  // CHECK that in the bytecode, it's actually the simple loop
-  inline def scoreSumLines(
-      f: (I, A) => Score
-  )(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
-    val result = new Array[Score](countI)
-    var i = 0
-    var indexBase = 0
-    while (i < countI) {
-      val indexMax = indexBase + countJ
-      fastLoop(indexBase, indexMax) { index =>
-        result(i) = result(i) + f(i, matrix(index))
-      }
-      i += 1
-      indexBase += countJ
+object IdMatrix {
+  extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A]) {
+    inline def apply(i: I, j: J)(countJ: Count[J]): A = {
+      val index = i * countJ + j
+      matrix(index)
     }
-    result
+
+    // CHECK that in the bytecode, it's actually the simple loop
+    inline def scoreSumLines(
+        f: (I, A) => Score
+    )(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
+      val result = new Array[Score](countI)
+      var i = 0
+      var indexBase = 0
+      while (i < countI) {
+        val indexMax = indexBase + countJ
+        fastLoop(indexBase, indexMax) { index =>
+          result(i) = result(i) + f(i, matrix(index))
+        }
+        i += 1
+        indexBase += countJ
+      }
+      result
+    }
   }
 }
 
@@ -197,95 +198,97 @@ extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A]) {
 opaque type IdMatrix3[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A] =
   Array[A] // using a flattened matrix
 
-extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
-  inline def apply(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A =
-    at(i, j, k)(countJ, countK)
+object IdMatrix3 {
+  extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
+    inline def apply(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A =
+      at(i, j, k)(countJ, countK)
 
-  inline def at(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A = {
-    val index = i * countJ * countK + j * countK + k
-    matrix(index)
-  }
-
-  inline def update(i: I, j: J, k: K)(
-      a: A
-  )(countJ: Count[J], countK: Count[K]) = {
-    val index = i * countJ * countK + j * countK + k
-    matrix(index) = a
-  }
-
-}
-
-/** Very specific stuff for the schedule matrix */
-extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
-
-  inline def listSmallTopicsByPerson(
-      countS: Count[SlotId],
-      countT: Count[TopicId],
-      countP: Count[PersonId]
-  ): IdMap[PersonId, SmallIdSet[TopicId]] = {
-    val result = new Array[SmallIdSet[TopicId]](countP) // initializes at zero
-
-    // TODO could reorder T then P to limit the number of multiplications
-    Count.foreach(countP) { pid =>
-      Count.foreach(countT) { tid =>
-        var sid: SlotId = 0
-        var notFound = true // we know there's only one true
-        while (sid < countS && notFound) {
-          if (matrix.at(sid, tid, pid)(countT, countP)) {
-            result(pid) = result(pid) + tid
-            notFound = false
-          }
-          sid += 1
-        }
-      }
+    inline def at(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A = {
+      val index = i * countJ * countK + j * countK + k
+      matrix(index)
     }
 
-    result
+    inline def update(i: I, j: J, k: K)(
+        a: A
+    )(countJ: Count[J], countK: Count[K]) = {
+      val index = i * countJ * countK + j * countK + k
+      matrix(index) = a
+    }
+
   }
 
-  inline def listSmallPersonsByTopic(
-      countS: Count[SlotId],
-      countT: Count[TopicId],
-      countP: Count[PersonId]
-  ): IdMap[TopicId, SmallIdSet[PersonId]] = {
-    val result = new Array[SmallIdSet[PersonId]](countT) // initializes at zero
+  /** Very specific stuff for the schedule matrix */
+  extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
 
-    // TODO limit number of multiplications
-    Count.foreach(countS) { sid =>
-      Count.foreach(countT) { tid =>
-        Count.foreach(countP) { pid =>
-          if (matrix.at(sid, tid, pid)(countT, countP)) {
-            result(tid) = result(tid) + pid
+    inline def listSmallTopicsByPerson(
+        countS: Count[SlotId],
+        countT: Count[TopicId],
+        countP: Count[PersonId]
+    ): IdMap[PersonId, SmallIdSet[TopicId]] = {
+      val result = new Array[SmallIdSet[TopicId]](countP) // initializes at zero
+
+      // TODO could reorder T then P to limit the number of multiplications
+      Count.foreach(countP) { pid =>
+        Count.foreach(countT) { tid =>
+          var sid: SlotId = 0
+          var notFound = true // we know there's only one true
+          while (sid < countS && notFound) {
+            if (matrix.at(sid, tid, pid)(countT, countP)) {
+              result(pid) = result(pid) + tid
+              notFound = false
+            }
+            sid += 1
           }
         }
       }
+
+      result
     }
 
-    result
-  }
+    inline def listSmallPersonsByTopic(
+        countS: Count[SlotId],
+        countT: Count[TopicId],
+        countP: Count[PersonId]
+    ): IdMap[TopicId, SmallIdSet[PersonId]] = {
+      val result = new Array[SmallIdSet[PersonId]](countT) // initializes at zero
 
-  inline def listSmallTopics(
-      countS: Count[SlotId],
-      countT: Count[TopicId],
-      countP: Count[PersonId]
-  ): SmallIdSet[TopicId] = {
-    var result: SmallIdSet[TopicId] = 0
-
-    // TODO limit number of multiplications
-    Count.foreach(countS) { sid =>
-      Count.foreach(countT) { tid =>
-        var pid: PersonId = 0
-        var notFound = true // we know there's only one true
-        while (pid < countP && notFound) {
-          if (matrix.at(sid, tid, pid)(countT, countP)) {
-            result = result.inserted(tid)
-            notFound = false
+      // TODO limit number of multiplications
+      Count.foreach(countS) { sid =>
+        Count.foreach(countT) { tid =>
+          Count.foreach(countP) { pid =>
+            if (matrix.at(sid, tid, pid)(countT, countP)) {
+              result(tid) = SmallIdSet.inserted(result(tid))(pid)
+            }
           }
-          pid += 1
         }
       }
+
+      result
     }
 
-    result
+    inline def listSmallTopics(
+        countS: Count[SlotId],
+        countT: Count[TopicId],
+        countP: Count[PersonId]
+    ): SmallIdSet[TopicId] = {
+      var result: SmallIdSet[TopicId] = 0
+
+      // TODO limit number of multiplications
+      Count.foreach(countS) { sid =>
+        Count.foreach(countT) { tid =>
+          var pid: PersonId = 0
+          var notFound = true // we know there's only one true
+          while (pid < countP && notFound) {
+            if (matrix.at(sid, tid, pid)(countT, countP)) {
+              result = SmallIdSet.inserted(result)(tid)
+              notFound = false
+            }
+            pid += 1
+          }
+        }
+      }
+
+      result
+    }
   }
 }
