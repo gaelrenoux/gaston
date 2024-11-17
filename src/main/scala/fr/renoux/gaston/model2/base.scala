@@ -5,18 +5,20 @@ import fr.renoux.gaston.util.{Count as _, *}
 import scala.collection.immutable.BitSet
 import scala.reflect.ClassTag
 
-// TODO inline all closures
 
+// TODO inline all closures
 
 /* ********************* All of the IDs ********************* */
 
 opaque type Id >: Int = Int
-opaque type SlotId >: Int  <: Id = Int
-opaque type TopicId >: Int  <: Id = Int
-opaque type PersonId >: Int  <: Id = Int
+opaque type SlotId >: Int <: Id = Int
+opaque type TopicId >: Int <: Id = Int
+opaque type PersonId >: Int <: Id = Int
 
-extension (id: Id) {
-  inline def value: Int = id
+object Id {
+  extension (id: Id) {
+    inline def value: Int = id
+  }
 }
 
 object SlotId {
@@ -35,13 +37,15 @@ object PersonId {
 
 opaque type Count[I <: Id] = Int
 
-extension [I >: Int <: Id] (c: Count[I]) {
-  // TODO Could be simply foreach when https://github.com/scala/scala3/issues/21959 is fixed
-  inline def foreachId(inline f: I => Unit) = fastLoop(0, c)(f)
+object Count {
+  extension [I >: Int <: Id](c: Count[I]) {
+    inline def value: Int = c
 
-  inline def flatIndex[H <: Id](inline h: H, inline i: I) = h * c + i
+    inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
+
+    inline def flatIndex[H <: Id](inline h: H, inline i: I) = h * c + i
+  }
 }
-
 
 /* ********************* Various collections ********************* */
 
@@ -79,7 +83,7 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
   }
 
   inline def removed(id: I): SmallIdSet[I] = {
-    s & (~ mask(id))
+    s & (~mask(id))
   }
 
   // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, those can go be uncommented
@@ -222,8 +226,8 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     val result = new Array[SmallIdSet[TopicId]](countP) // initializes at zero
 
     // TODO could reorder T then P to limit the number of multiplications
-    countP.foreachId { pid =>
-      countT.foreachId { tid =>
+    Count.foreach(countP) { pid =>
+      Count.foreach(countT) { tid =>
         var sid: SlotId = 0
         var notFound = true // we know there's only one true
         while (sid < countS && notFound) {
@@ -247,9 +251,9 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     val result = new Array[SmallIdSet[PersonId]](countT) // initializes at zero
 
     // TODO limit number of multiplications
-    countS.foreachId { sid =>
-      countT.foreachId { tid =>
-        countP.foreachId { pid =>
+    Count.foreach(countS) { sid =>
+      Count.foreach(countT) { tid =>
+        Count.foreach(countP) { pid =>
           if (matrix.at(sid, tid, pid)(countT, countP)) {
             result(tid) = result(tid) + pid
           }
@@ -268,8 +272,8 @@ extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
     var result: SmallIdSet[TopicId] = 0
 
     // TODO limit number of multiplications
-    countS.foreachId { sid =>
-      countT.foreachId { tid =>
+    Count.foreach(countS) { sid =>
+      Count.foreach(countT) { tid =>
         var pid: PersonId = 0
         var notFound = true // we know there's only one true
         while (pid < countP && notFound) {
