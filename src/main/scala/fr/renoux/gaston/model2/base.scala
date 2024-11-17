@@ -16,6 +16,8 @@ opaque type TopicId >: Int <: Id = Int
 opaque type PersonId >: Int <: Id = Int
 
 object Id {
+  inline def None: Id = -1
+
   extension (id: Id) {
     inline def value: Int = id
   }
@@ -43,7 +45,22 @@ object Count {
 
     inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
 
-    inline def flatIndex[H <: Id](inline h: H, inline i: I) = h * c + i
+    /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
+    inline def find(inline f: I => Boolean): I = {
+      var i: I = 0
+      var notFound = true
+      var result: I = Id.None
+      while (notFound && i < c) {
+        if (f(i)) {
+          result = i
+          notFound = false
+        }
+        i += 1
+      }
+      result
+    }
+
+    inline def flatIndex(inline h: (Id | Int), i: I) = h * c + i
   }
 }
 
@@ -170,7 +187,7 @@ opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 object IdMatrix {
   extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A]) {
     inline def apply(i: I, j: J)(countJ: Count[J]): A = {
-      val index = i * countJ + j
+      val index = Count.flatIndex(countJ)(i, j)
       matrix(index)
     }
 
@@ -204,14 +221,14 @@ object IdMatrix3 {
       at(i, j, k)(countJ, countK)
 
     inline def at(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A = {
-      val index = i * countJ * countK + j * countK + k
+      val index = Count.flatIndex(countK)(Count.flatIndex(countJ)(i, j), k)
       matrix(index)
     }
 
     inline def update(i: I, j: J, k: K)(
         a: A
     )(countJ: Count[J], countK: Count[K]) = {
-      val index = i * countJ * countK + j * countK + k
+      val index = Count.flatIndex(countK)(Count.flatIndex(countJ)(i, j), k)
       matrix(index) = a
     }
 
@@ -230,14 +247,9 @@ object IdMatrix3 {
       // TODO could reorder T then P to limit the number of multiplications
       Count.foreach(countP) { pid =>
         Count.foreach(countT) { tid =>
-          var sid: SlotId = 0
-          var notFound = true // we know there's only one true
-          while (sid < countS && notFound) {
-            if (matrix.at(sid, tid, pid)(countT, countP)) {
-              result(pid) = result(pid) + tid
-              notFound = false
-            }
-            sid += 1
+          val slotId = Count.find(countS) { sid => matrix.at(sid, tid, pid)(countT, countP) }
+          if (slotId != SlotId.None) {
+            result(pid) = SmallIdSet.inserted(result(pid))(tid)
           }
         }
       }
