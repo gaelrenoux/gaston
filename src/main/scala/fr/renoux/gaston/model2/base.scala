@@ -69,7 +69,7 @@ extension [I >: Int <: Id](s: SmallIdSet[I]) {
   inline def mapSumToScore(inline f: I => Score): Score = {
     var result: Score = 0.0
     foreach { i =>
-      result = result <+> f(i)
+      result = result + f(i)
     }
     result
   }
@@ -180,7 +180,7 @@ extension [I >: Int <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
     while (i < countI) {
       val indexMax = indexBase + countJ
       fastLoop(indexBase, indexMax) { index =>
-        result(i) = result(i) <+> f(i, matrix(index))
+        result(i) = result(i) + f(i, matrix(index))
       }
       i += 1
       indexBase += countJ
