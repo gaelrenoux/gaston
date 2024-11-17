@@ -5,6 +5,8 @@ import fr.renoux.gaston.util.{Count as _, *}
 import scala.collection.immutable.BitSet
 import scala.reflect.ClassTag
 
+// TODO inline all closures
+
 
 /* ********************* All of the IDs ********************* */
 
@@ -16,8 +18,6 @@ opaque type PersonId >: Int  <: Id = Int
 extension (id: Id) {
   inline def value: Int = id
 }
-
-// TODO inline all closures
 
 object SlotId {
   inline def None: SlotId = -1
@@ -122,7 +122,7 @@ extension [I <: Id](s: IdSet[I]) {
 opaque type IdMap[I <: Id, A] = Array[A]
 
 object IdMap {
-  def from[I <: Id, A: ClassTag](
+  def from[I >: Int <: Id, A: ClassTag](
       size: Int
   )(it: Iterable[(I, A)]): IdMap[I, A] = {
     val result = new Array[A](size)
@@ -164,7 +164,7 @@ extension [I <: Id](m: IdMap[I, Score]) {
   */
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
-extension [I >: Int <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
+extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A]) {
   inline def apply(i: I, j: J)(countJ: Count[J]): A = {
     val index = i * countJ + j
     matrix(index)
@@ -190,10 +190,10 @@ extension [I >: Int <: Id, J <: Id, A](matrix: IdMatrix[I, J, A]) {
 }
 
 /** IdMatrix3: like IdMatrix, except it's for id triplets. */
-opaque type IdMatrix3[I <: Id, J <: Id, K <: Id, A] =
+opaque type IdMatrix3[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A] =
   Array[A] // using a flattened matrix
 
-extension [I <: Id, J <: Id, K <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
+extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
   inline def apply(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A =
     at(i, j, k)(countJ, countK)
 
