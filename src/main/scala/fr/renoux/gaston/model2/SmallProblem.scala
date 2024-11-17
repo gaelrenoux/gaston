@@ -38,7 +38,7 @@ final class SmallProblem(
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
     schedule.personToTopics.mapToScore { (pid, topicIds) =>
       topicIds.mapSumToScore { tid =>
-        val topicsScore = prefsPersonTopic(pid, tid)(personsCount)
+        val topicsScore = prefsPersonTopic(pid, tid)(topicsCount)
         val otherPersons = schedule.topicsToPersons(tid).removed(pid)
         val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
         topicsScore + otherPersonsScore
