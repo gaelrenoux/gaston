@@ -37,7 +37,7 @@ object PersonId {
   inline def None: PersonId = -1
 }
 
-opaque type Count[I <: Id] = Int
+opaque type Count[I <: Id] >: Int = Int
 
 object Count {
   extension [I >: Int <: Id](c: Count[I]) {
@@ -191,24 +191,72 @@ object IdMatrix {
       matrix(index)
     }
 
+    inline def update(i: I, j: J)(a: A)(countJ: Count[J]): Unit = {
+      val index = Count.flatIndex(countJ)(i, j)
+      matrix(index) = a
+    }
+
     // CHECK that in the bytecode, it's actually the simple loop
-    inline def scoreSumLines(
-        f: (I, A) => Score
+    inline def mapSumLinesToScore(
+        f: (I, J, A) => Score
     )(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
       val result = new Array[Score](countI)
-      var i = 0
-      var indexBase = 0
-      while (i < countI) {
-        val indexMax = indexBase + countJ
-        fastLoop(indexBase, indexMax) { index =>
-          result(i) = result(i) + f(i, matrix(index))
+      var index = 0
+      Count.foreach(countI) { i =>
+        Count.foreach(countJ) { j =>
+          result(i) = result(i) + f(i, j, matrix(index))
+          index += 1
         }
-        i += 1
-        indexBase += countJ
       }
       result
     }
+
+    inline def toSeq2(countI: Count[I], countJ: Count[J])(using ClassTag[A]): Seq[Seq[A]] = {
+      val result = new Array[Array[A]](countI)
+      var index = 0
+      Count.foreach(countI) { i =>
+        result(i) = new Array[A](countJ)
+        Count.foreach(countJ) { j =>
+          result(i)(j) = matrix(index)
+          index += 1
+        }
+      }
+      result.view.map(_.toSeq).toSeq
+    }
   }
+
+  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](countI: Count[I], countJ: Count[J])(a: A): IdMatrix[I, J, A] = {
+    val result = new Array[A](countI * countJ)
+    result.fastFill(a)
+    result
+  }
+
+  inline def tabulate[I >: Int <: Id, J >: Int <: Id, A: ClassTag](countI: Count[I], countJ: Count[J])(inline f: (I, J) => A): IdMatrix[I, J, A] = {
+    val result = new Array[A](countI * countJ)
+    var index = 0
+    Count.foreach(countI) { i =>
+      Count.foreach(countJ) { j =>
+        result(index) = f(i, j)
+        index += 1
+      }
+    }
+    result
+  }
+
+  inline def from[I >: Int <: Id, J >: Int <: Id, A: ClassTag](it: Iterable[Iterable[A]]): IdMatrix[I, J, A] = {
+    val countI: Count[I] = it.size
+    val countJ: Count[J] = it.head.size
+    var index = 0
+    val result = new Array[A](countI * countJ)
+    it.fastForeach { it2 =>
+      it2.fastForeach { a =>
+        result(index) = a
+        index += 1
+      }
+    }
+    result
+  }
+
 }
 
 /** IdMatrix3: like IdMatrix, except it's for id triplets. */
