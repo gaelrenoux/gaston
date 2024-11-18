@@ -44,11 +44,23 @@ class IdMapTest extends TestBase {
   }
 
   "mapToScore" in {
-    val map = IdMap.from(64)(testMapAll)
+    val map = IdMap.from(64)(testMapOk)
     val result = map.mapToScore { (id, str) =>
-      id.value + str.size
+      if (str == null) 0
+      else id.value + str.size
     }
-    val expected = testAllIds.map[Score] { id => id.value + id.value.toHexString.size }
-    result should be(expected)
+    val expected = testOkIds.map[(TopicId, Score)] { id => id -> (id.value + id.value.toHexString.size) }
+    result should be(IdMap.from(64)(expected))
   }
+
+  "toMap" in {
+    val map = IdMap.from(64)(testMapAll)
+    map.toMap should be(testMapAll)
+  }
+
+  "sortedValues" in {
+    val map = IdMap.from(64)(testAllInts.map[(TopicId, Score)](i => (i, 10 * i)))
+    map.sortedValues should be(testAllInts.map(_ * 10).sorted)
+  }
+
 }
