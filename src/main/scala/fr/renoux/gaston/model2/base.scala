@@ -280,6 +280,61 @@ object IdMatrix3 {
       matrix(index) = a
     }
 
+    inline def toSeq3(countI: Count[I], countJ: Count[J], countK: Count[K])(using ClassTag[A]): Seq[Seq[Seq[A]]] = {
+      val result = new Array[Array[Array[A]]](countI)
+      var index = 0
+      Count.foreach(countI) { i =>
+        result(i) = new Array[Array[A]](countJ)
+        Count.foreach(countJ) { j =>
+          result(i)(j) = new Array[A](countK)
+          Count.foreach(countK) { k =>
+            result(i)(j)(k) = matrix(index)
+            index += 1
+          }
+        }
+      }
+      result.view.map(_.view.map(_.toSeq).toSeq).toSeq
+    }
+
+  }
+
+  inline def fill[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
+      (countI: Count[I], countJ: Count[J], countK: Count[K])(a: A): IdMatrix3[I, J, K, A] = {
+    val result = new Array[A](countI * countJ * countK)
+    result.fastFill(a)
+    result
+  }
+
+  inline def tabulate[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
+      (countI: Count[I], countJ: Count[J], countK: Count[K])(inline f: (I, J, K) => A): IdMatrix3[I, J, K, A] = {
+    val result = new Array[A](countI * countJ * countK)
+    var index = 0
+    Count.foreach(countI) { i =>
+      Count.foreach(countJ) { j =>
+        Count.foreach(countK) { k =>
+          result(index) = f(i, j, k)
+          index += 1
+        }
+      }
+    }
+    result
+  }
+
+  inline def from[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag](it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
+    val countI: Count[I] = it.size
+    val countJ: Count[J] = it.head.size
+    val countK: Count[K] = it.head.head.size
+    var index = 0
+    val result = new Array[A](countI * countJ * countK)
+    it.fastForeach { it2 =>
+      it2.fastForeach { it3 =>
+        it3.fastForeach { a =>
+          result(index) = a
+          index += 1
+        }
+      }
+    }
+    result
   }
 
   /** Very specific stuff for the schedule matrix */
