@@ -68,6 +68,24 @@ extension [A](inline as: Array[A]) {
     }
     result
   }
+
+  inline def fastFill(inline a: => A): Unit = {
+    val asl = as.length
+    var ix = 0
+    while (ix < asl) {
+      as(ix) = a
+      ix += 1
+    }
+  }
+
+  inline def fastTabulate(inline f: Int => A): Unit = {
+    val asl = as.length
+    var ix = 0
+    while (ix < asl) {
+      as(ix) = f(ix)
+      ix += 1
+    }
+  }
 }
 
 /** Scala iterable extension */
