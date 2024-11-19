@@ -2,7 +2,6 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
-import scala.collection.immutable.BitSet
 import scala.reflect.ClassTag
 
 
@@ -67,14 +66,7 @@ object Count {
 /* ********************* Various collections ********************* */
 
 
-/** IdSet: a set of arbitrary Ids as an actual BitSet. */
-opaque type IdSet[I <: Id] = BitSet
 
-object IdSet {
-  extension [I <: Id](s: IdSet[I]) {
-    inline def apply(id: I): Boolean = s(id)
-  }
-}
 
 
 /** IdMatrix: a mutable map from a couple of ids to some value, as a flattened
