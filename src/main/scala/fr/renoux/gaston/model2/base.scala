@@ -139,45 +139,6 @@ object IdSet {
   }
 }
 
-/** IdMap: a mutable map from Ids to some value as an array. Note that there
-  * always is a value for each key (might be a default value).
-  */
-opaque type IdMap[I <: Id, A] = Array[A]
-
-object IdMap {
-  extension [I >: Int <: Id, A](m: IdMap[I, A]) {
-    inline def apply(id: I): A = m(id)
-
-    inline def toMap: Map[I, A] =
-      m.zipWithIndex.map { (a, id) => id -> a }.toMap
-
-    inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
-      val result = new Array[Score](m.length)
-      m.fastForeachWithIndex { (a, i) =>
-        result(i) = f(i, a)
-      }
-      result
-    }
-  }
-
-  extension [I <: Id](m: IdMap[I, Score]) {
-    inline def sortedValues: Array[Score] = m.sorted
-  }
-
-  def from[I >: Int <: Id, A: ClassTag](
-      size: Int
-  )(it: Iterable[(I, A)]): IdMap[I, A] = {
-    val result = new Array[A](size)
-    it.foreach { (i, a) => result(i) = a }
-    result
-  }
-
-  def from[I <: Id, A: ClassTag](it: Iterable[(I, A)]): IdMap[I, A] =
-    from(it.view.map(_._1).max + 1)(it)
-
-  inline def apply[I <: Id, A: ClassTag](ias: (I, A)*): IdMap[I, A] =
-    from(ias)
-}
 
 /** IdMatrix: a mutable map from a couple of ids to some value, as a flattened
   * array. Like IdMap, there always is a value for each key.
@@ -200,7 +161,7 @@ object IdMatrix {
     inline def mapSumLinesToScore(
         f: (I, J, A) => Score
     )(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
-      val result = new Array[Score](countI)
+      val result = IdMap.empty[I, Score](countI)
       var index = 0
       Count.foreach(countI) { i =>
         Count.foreach(countJ) { j =>
@@ -345,7 +306,7 @@ object IdMatrix3 {
         countT: Count[TopicId],
         countP: Count[PersonId]
     ): IdMap[PersonId, SmallIdSet[TopicId]] = {
-      val result = new Array[SmallIdSet[TopicId]](countP) // initializes at zero
+      val result = IdMap.empty[PersonId, SmallIdSet[TopicId]](countP)
 
       // TODO could reorder T then P to limit the number of multiplications
       Count.foreach(countP) { pid =>
@@ -365,7 +326,7 @@ object IdMatrix3 {
         countT: Count[TopicId],
         countP: Count[PersonId]
     ): IdMap[TopicId, SmallIdSet[PersonId]] = {
-      val result = new Array[SmallIdSet[PersonId]](countT) // initializes at zero
+      val result = IdMap.empty[TopicId, SmallIdSet[PersonId]](countT)
 
       // TODO limit number of multiplications
       Count.foreach(countS) { sid =>
