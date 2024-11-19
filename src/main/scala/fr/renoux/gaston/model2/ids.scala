@@ -3,10 +3,6 @@ package fr.renoux.gaston.model2
 import fr.renoux.gaston.util.{Count as _, *}
 
 
-// TODO inline all closures
-
-/* ********************* All of the IDs ********************* */
-
 opaque type Id >: Int = Int
 opaque type SlotId >: Int <: Id = Int
 opaque type TopicId >: Int <: Id = Int
