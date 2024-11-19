@@ -49,6 +49,7 @@ object IdMap {
     from(ias)
 
   /** Generates an empty IdMap, using the default value for type A */
-  inline def empty[I >: Int <: Id, A: ClassTag](size: Int): IdMap[I, A] =
-    new Array[A](size)
+  inline def empty[I >: Int <: Id, A: ClassTag](count: Count[I]): IdMap[I, A] =
+    new Array[A](count.value)
+
 }
