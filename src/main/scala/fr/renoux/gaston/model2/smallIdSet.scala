@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
+import scala.collection.mutable
 
 
 /** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable,
@@ -50,6 +51,12 @@ object SmallIdSet {
 
     /** Shouldn't be necessary, but type issue otherwise */
     private inline def mask(id: I): Long = SmallIdSet(id)
+
+    def toSet: Set[I] = {
+      val result = mutable.Set[I]()
+      foreach { id => result += id }
+      result.toSet
+    }
   }
 
   inline def full[I <: Id]: SmallIdSet[I] = -1
