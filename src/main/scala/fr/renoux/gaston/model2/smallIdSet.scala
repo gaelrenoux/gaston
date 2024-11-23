@@ -2,10 +2,10 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 import scala.collection.mutable
+import scala.annotation.targetName
 
 
-/** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable,
-  * but very cheap to copy.
+/** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable, but very cheap to copy.
   */
 opaque type SmallIdSet[I <: Id] = Long
 
@@ -17,6 +17,8 @@ object SmallIdSet {
 
     inline def contains(id: I): Boolean =
       (s & mask(id)) != 0L
+
+    inline def nonEmpty: Boolean = s != 0L
 
     inline def foreach(inline f: I => Unit): Unit = {
       fastLoop(0, 64) { i =>
@@ -48,6 +50,16 @@ object SmallIdSet {
     //
     // @targetName("SmallIdSetMinusId")
     // inline def -(id: I): SmallIdSet[I] = removed(id)
+
+    @targetName("intersect")
+    inline infix def &&(that: SmallIdSet[I]): SmallIdSet[I] = {
+      s & that
+    }
+
+    @targetName("exclude")
+    inline infix def &&!(that: SmallIdSet[I]): SmallIdSet[I] = {
+      s & ~that
+    }
 
     /** Shouldn't be necessary, but type issue otherwise */
     private inline def mask(id: I): Long = SmallIdSet(id)
