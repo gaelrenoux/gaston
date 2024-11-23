@@ -212,4 +212,62 @@ class SmallIdSetTest extends TestBase {
       result should be(testAllInts.map(_ * 2).sum)
     }
   }
+
+  "intersect" - {
+    "nominal" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      val b = SmallIdSet[SlotId](2, 47, 50, 62)
+      a && b should be(SmallIdSet(47))
+    }
+
+    "left is empty" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      SmallIdSet.empty[SlotId] && a should be(SmallIdSet.empty[SlotId])
+    }
+
+    "right is empty" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a && SmallIdSet.empty[SlotId] should be(SmallIdSet.empty[SlotId])
+    }
+
+    "left is full" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      SmallIdSet.full[SlotId] && a should be(a)
+    }
+
+    "right is full" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a && SmallIdSet.full[SlotId] should be(a)
+    }
+  }
+
+  "exclude" - {
+    "nominal" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      val b = SmallIdSet[SlotId](3, 47, 50, 62)
+      a &&! b should be(SmallIdSet(8, 63))
+    }
+
+    "left is empty" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      SmallIdSet.empty[SlotId] &&! a should be(SmallIdSet.empty[SlotId])
+    }
+
+    "right is empty" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a &&! SmallIdSet.empty[SlotId] should be(a)
+    }
+
+    "left is full" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      val expectedSet: Set[SlotId] = (0 until 63).toSet -- a.toSet
+      val expected = SmallIdSet[SlotId](expectedSet.toSeq*)
+      SmallIdSet.full[SlotId] &&! a should be(expected)
+    }
+
+    "right is full" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a &&! SmallIdSet.full[SlotId] should be(SmallIdSet.empty[SlotId])
+    }
+  }
 }
