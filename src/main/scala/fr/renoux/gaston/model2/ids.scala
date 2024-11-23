@@ -9,11 +9,11 @@ opaque type TopicId >: Int <: Id = Int
 opaque type PersonId >: Int <: Id = Int
 
 object Id {
-  inline def None: Id = -1
-
   extension (id: Id) {
     inline def value: Int = id
   }
+
+  inline def None: Id = -1
 }
 
 object SlotId {
@@ -38,6 +38,10 @@ object Count {
 
     inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
 
+    inline def foreachTo(limit: I)(inline f: I => Unit) = fastLoop(0, limit + 1)(f)
+
+    inline def foreachUntil(limit: I)(inline f: I => Unit) = fastLoop(0, limit)(f)
+
     // TODO inline this method
     /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
     def find(f: I => Boolean): I = {
@@ -54,6 +58,7 @@ object Count {
       result
     }
 
+    /* TODO flatIndexes should be in the appropriate classes */
     inline def flatIndex(inline h: (Id | Int), i: I) = h * c + i
   }
 }
