@@ -33,16 +33,19 @@ final class SmallProblem(
     val prefsTopicsExclusive: Array[Array[TopicId]], // a person cannot be on multiple exclusive topics
     val prefsTopicsLinked: Array[Array[TopicId]] // a person must be either on all linked topics, or on none of them
 ) {
+  given CountAll[SlotId] = CountAll(slotsCount)
+  given CountAll[TopicId] = CountAll(topicsCount)
+  given CountAll[PersonId] = CountAll(personsCount)
 
   // TODO inline this maybe ?
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
     schedule.personToTopics.mapToScore { (pid, topicIds) =>
       personsBaseScore(pid) +
         topicIds.mapSumToScore { tid =>
-          val topicsScore = prefsPersonTopic(pid, tid)(topicsCount)
+          val topicsScore = prefsPersonTopic(pid, tid)
           val otherPersons = schedule.topicsToPersons(tid).removed(pid)
           /* Person antipathy should not apply on unassigned topics */
-          val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
+          val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _))
           topicsScore + otherPersonsScore
         }
     }

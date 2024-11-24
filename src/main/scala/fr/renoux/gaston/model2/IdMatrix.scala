@@ -11,25 +11,23 @@ import scala.reflect.ClassTag
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
 object IdMatrix {
-  extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A]) {
-    inline def apply(i: I, j: J)(countJ: Count[J]): A = {
-      val index = Count.flatIndex(countJ)(i, j)
+  extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A])(using countI: CountAll[I], countJ: CountAll[J]) {
+    inline def apply(i: I, j: J): A = {
+      val index = countJ.flatIndex(i, j)
       matrix(index)
     }
 
-    inline def update(i: I, j: J)(a: A)(countJ: Count[J]): Unit = {
-      val index = Count.flatIndex(countJ)(i, j)
+    inline def update(i: I, j: J, a: A): Unit = {
+      val index = countJ.flatIndex(i, j)
       matrix(index) = a
     }
 
     // CHECK that in the bytecode, it's actually the simple loop
-    inline def mapSumLinesToScore(
-        f: (I, J, A) => Score
-    )(countI: Count[I], countJ: Count[J]): IdMap[I, Score] = {
-      val result = IdMap.empty[I, Score](countI)
+    inline def mapSumLinesToScore(f: (I, J, A) => Score): IdMap[I, Score] = {
+      val result = IdMap.empty[I, Score]
       var index = 0
-      Count.foreach(countI) { i =>
-        Count.foreach(countJ) { j =>
+      countI.foreach { i =>
+        countJ.foreach { j =>
           result(i) = result(i) + f(i, j, matrix(index))
           index += 1
         }
@@ -37,12 +35,12 @@ object IdMatrix {
       result
     }
 
-    inline def toSeq2(countI: Count[I], countJ: Count[J])(using ClassTag[A]): Seq[Seq[A]] = {
+    inline def toSeq2(using ClassTag[A]): Seq[Seq[A]] = {
       val result = new Array[Array[A]](countI.value)
       var index = 0
-      Count.foreach(countI) { i =>
+      countI.foreach { i =>
         result(i.value) = new Array[A](countJ.value)
-        Count.foreach(countJ) { j =>
+        countJ.foreach { j =>
           result(i.value)(j.value) = matrix(index)
           index += 1
         }
@@ -51,17 +49,17 @@ object IdMatrix {
     }
   }
 
-  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](countI: Count[I], countJ: Count[J])(a: A): IdMatrix[I, J, A] = {
+  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](using countI: CountAll[I], countJ: CountAll[J])(a: A): IdMatrix[I, J, A] = {
     val result = new Array[A](countI.value * countJ.value)
     result.fastFill(a)
     result
   }
 
-  inline def tabulate[I >: Int <: Id, J >: Int <: Id, A: ClassTag](countI: Count[I], countJ: Count[J])(inline f: (I, J) => A): IdMatrix[I, J, A] = {
+  inline def tabulate[I >: Int <: Id, J >: Int <: Id, A: ClassTag](using countI: CountAll[I], countJ: CountAll[J])(inline f: (I, J) => A): IdMatrix[I, J, A] = {
     val result = new Array[A](countI.value * countJ.value)
     var index = 0
-    Count.foreach(countI) { i =>
-      Count.foreach(countJ) { j =>
+    countI.foreach { i =>
+      countJ.foreach { j =>
         result(index) = f(i, j)
         index += 1
       }
@@ -69,7 +67,7 @@ object IdMatrix {
     result
   }
 
-  inline def from[I >: Int <: Id, J >: Int <: Id, A: ClassTag](it: Iterable[Iterable[A]]): IdMatrix[I, J, A] = {
+  inline def unsafeFrom[I >: Int <: Id, J >: Int <: Id, A: ClassTag](it: Iterable[Iterable[A]]): IdMatrix[I, J, A] = {
     val countI: Count[I] = it.size
     val countJ: Count[J] = it.head.size
     var index = 0
