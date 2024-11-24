@@ -27,6 +27,17 @@ class IdMapTest extends TestBase {
       val map = IdMap(testMapOk.toSeq*)
       map.toMap.filter(_._2 != null) should be(testMapOk)
     }
+
+    "fill" in {
+      val map = IdMap.fill[SlotId, String](64)("hello")
+      val expected = Seq.tabulate(64)(_ -> "hello").toMap
+      map.toMap should be(expected)
+    }
+
+    "tabulate" in {
+      val map = IdMap.tabulate[SlotId, String](64)(id => testMapAll(id.value))
+      map.toMap should be(testMapAll)
+    }
   }
 
   "apply" - {
@@ -56,6 +67,11 @@ class IdMapTest extends TestBase {
   "toMap" in {
     val map = IdMap.from(64)(testMapAll)
     map.toMap should be(testMapAll)
+  }
+
+  "toReverseMap" in {
+    val map = IdMap.from(64)(testMapAll)
+    map.toReverseMap should be(testMapAll.map(_.swap))
   }
 
   "sortedValues" in {

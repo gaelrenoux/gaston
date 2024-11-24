@@ -30,7 +30,7 @@ object PersonId {
   inline def None: PersonId = -1
 }
 
-opaque type Count[I <: Id] >: Int = Int
+opaque type Count[+I <: Id] >: Int = Int
 
 object Count {
   extension [I >: Int <: Id](c: Count[I]) {
@@ -61,4 +61,9 @@ object Count {
     /* TODO flatIndexes should be in the appropriate classes */
     inline def flatIndex(inline h: (Id | Int), i: I) = h * c + i
   }
+
+  /** A maximum count that won't overflow when it's summed with others */
+  inline def maxCount[I >: Int <: Id]: Count[I] = 10_000
+
+  val Zero: Count[Nothing] = 0
 }
