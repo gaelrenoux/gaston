@@ -3,6 +3,7 @@ package fr.renoux.gaston.model2
 import fr.renoux.gaston.util.{Count as _, *}
 
 
+/** Description on a problem small enough that we can use SmallIdSets (so max 64 elements of each category). */
 final class SmallProblem(
     val slotsCount: Count[SlotId],
     val slotsNames: IdMap[SlotId, String],
@@ -11,21 +12,20 @@ final class SmallProblem(
     val slotsMaxTopics: IdMap[SlotId, Count[TopicId]],
 
     val topicsCount: Count[TopicId],
-    val topicsNames: IdMap[TopicId, String],
+    val topicsNames: IdMap[TopicId, String],  // Includes unassigned topics
     val topicsMandatories: IdMap[TopicId, SmallIdSet[PersonId]],
-    val topicsMin: IdMap[TopicId, Count[TopicId]],
-    val topicsMax: IdMap[TopicId, Count[TopicId]],
-    val topicsAllowedSlot: IdMap[TopicId, SmallIdSet[SlotId]],
+    val topicsMin: IdMap[TopicId, Count[PersonId]],
+    val topicsMax: IdMap[TopicId, Count[PersonId]],
+    val topicsAllowedSlots: IdMap[TopicId, SmallIdSet[SlotId]],
     val topicsFollowup: IdMap[TopicId, TopicId],
     val topicsForced: IdSet[TopicId],
-    val topicsUnassignedCount: Count[TopicId],
     val topicsSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]],
     val topicsNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]],
 
     val personsCount: Count[PersonId],
     val personsNames: IdMap[PersonId, String],
     val personsWeight: IdMap[PersonId, Weight],
-    val personsStartingScore: IdMap[PersonId, Score],
+    val personsBaseScore: IdMap[PersonId, Score],
 
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
     val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
@@ -37,18 +37,20 @@ final class SmallProblem(
   // TODO inline this maybe ?
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
     schedule.personToTopics.mapToScore { (pid, topicIds) =>
-      topicIds.mapSumToScore { tid =>
-        val topicsScore = prefsPersonTopic(pid, tid)(topicsCount)
-        val otherPersons = schedule.topicsToPersons(tid).removed(pid)
-        val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
-        topicsScore + otherPersonsScore
-      }
+      personsBaseScore(pid) +
+        topicIds.mapSumToScore { tid =>
+          val topicsScore = prefsPersonTopic(pid, tid)(topicsCount)
+          val otherPersons = schedule.topicsToPersons(tid).removed(pid)
+          /* Person antipathy should not apply on unassigned topics */
+          val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _)(personsCount))
+          topicsScore + otherPersonsScore
+        }
     }
   }
 
   def scoreExclusive(schedule: Schedule): Score = {
     var score = Score.Zero
-    prefsTopicsExclusive.fastForeach { exclusives => 
+    prefsTopicsExclusive.fastForeach { exclusives =>
       var i = 0
       while (i + 1 < exclusives.length) {
         val topic1 = exclusives(i)
@@ -63,7 +65,7 @@ final class SmallProblem(
           }
           j += 1
         }
-        i +=1
+        i += 1
       }
     }
     score
@@ -71,7 +73,7 @@ final class SmallProblem(
 
   def scoreLinked(schedule: Schedule): Score = {
     var score = Score.Zero
-    prefsTopicsLinked.fastForeach { linked => 
+    prefsTopicsLinked.fastForeach { linked =>
       var i = 0
       while (i + 1 < linked.length) {
         val topic1 = linked(i)
@@ -85,7 +87,7 @@ final class SmallProblem(
           }
           j += 1
         }
-        i +=1
+        i += 1
       }
     }
     score
