@@ -84,4 +84,12 @@ object SmallIdSet {
     }
     result
   }
+
+  given [I >: Int <: Id : Printable]: Printable[SmallIdSet[I]] with {
+    extension (is: SmallIdSet[I]) override def toPrettyString: String = 
+      if (is == -1) Printable.Universe
+      else if (is == 0) Printable.Empty
+      else summon[Printable[Iterable[I]]].toPrettyString(is.toSet)
+  }
+
 }
