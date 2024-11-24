@@ -5,12 +5,6 @@ import scala.annotation.targetName
 opaque type Score >: Double = Double
 
 object Score {
-  inline def Zero: Score = 0.0
-
-  /** A minimum reward that won't overflow when it's summed with others */
-  inline def MinReward: Score = -1e9
-
-  given Ordering[Score] = math.Ordering.Double.TotalOrdering
 
   extension (s: Score) {
     @targetName("scorePlusScore")
@@ -18,6 +12,17 @@ object Score {
 
     @targetName("scoreMultiplyWeight")
     infix inline def *(w: Weight): Score = w * s
+  }
+
+  inline def Zero: Score = 0.0
+
+  /** A minimum reward that won't overflow when it's summed with others */
+  inline def MinReward: Score = -1e9
+
+  given Ordering[Score] = math.Ordering.Double.TotalOrdering
+
+  given Printable[Score] with {
+    extension (a: Score) override def toPrettyString: String = a.toString
   }
 }
 
@@ -28,5 +33,9 @@ object Weight {
     // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, this can go back to just being *
     @targetName("weightMultiplyScore")
     infix inline def *(s: Score): Score = w * s
+  }
+
+  given Printable[Weight] with {
+    extension (a: Weight) override def toPrettyString: String = a.toString
   }
 }
