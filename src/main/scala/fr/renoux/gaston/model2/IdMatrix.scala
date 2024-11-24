@@ -82,5 +82,5 @@ object IdMatrix {
     }
     result
   }
-
 }
+
