@@ -3,6 +3,7 @@ package fr.renoux.gaston.model2
 import fr.renoux.gaston.util.{Count as _, *}
 
 import scala.reflect.ClassTag
+import scala.collection.immutable.SortedMap
 
 
 /** IdMap: a mutable map from Ids to some value as an array. Note that there always is a value for each key (might be a
@@ -23,6 +24,10 @@ object IdMap {
 
     inline def toReverseMap: Map[A, I] =
       m.zipWithIndex.toMap
+
+    inline def toSortedMap: SortedMap[I, A] = {
+      SortedMap.from(m.zipWithIndex.map { (a, id) => id -> a })
+    }
 
     inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
       val result = new Array[Score](m.length)
@@ -69,4 +74,9 @@ object IdMap {
   inline def empty[I >: Int <: Id, A: ClassTag](count: Count[I]): IdMap[I, A] =
     new Array[A](count.value)
 
+
+  given [I <: Id: Printable, A: Printable]: Printable[IdMap[I, A]] with {
+      extension (as: IdMap[I, A]) override def toPrettyString: String =
+        summon[Printable[Map[Int, A]]].toPrettyString(as.toSortedMap)
+  }
 }

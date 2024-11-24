@@ -14,6 +14,15 @@ object Id {
   }
 
   inline def None: Id = -1
+
+  given [I <: Id]: Printable[I] with {
+      extension (i: I) override def toPrettyString: String = i.toString
+  }
+
+  given [I <: Id]: Ordering[I] with {
+    override def compare(x: I, y: I): Int = x.compareTo(y)
+  }
+
 }
 
 object SlotId {
@@ -66,4 +75,8 @@ object Count {
   inline def maxCount[I >: Int <: Id]: Count[I] = 10_000
 
   val Zero: Count[Nothing] = 0
+
+  given [I <: Id]: Printable[Count[I]] with {
+      extension (c: Count[I]) override def toPrettyString: String = c.toString
+  }
 }
