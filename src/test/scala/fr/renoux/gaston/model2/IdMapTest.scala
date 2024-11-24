@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestBase
 
 
 class IdMapTest extends TestBase {
+  given CountAll[TopicId] = CountAll[TopicId](64)
   val testAllInts: Seq[Int] = (0 until 64).toList
   val testAllIds: Seq[TopicId] = testAllInts
   val testOkInts: Seq[Int] = List(3, 8, 47, 63)
@@ -19,7 +20,7 @@ class IdMapTest extends TestBase {
 
   "Creation" - {
     "from" in {
-      val map = IdMap.from(64)(testMapOk)
+      val map = IdMap.from(testMapOk)
       map.toMap.filter(_._2 != null) should be(testMapOk)
     }
 
@@ -29,25 +30,25 @@ class IdMapTest extends TestBase {
     }
 
     "fill" in {
-      val map = IdMap.fill[SlotId, String](64)("hello")
+      val map = IdMap.fill[TopicId, String]("hello")
       val expected = Seq.tabulate(64)(_ -> "hello").toMap
       map.toMap should be(expected)
     }
 
     "tabulate" in {
-      val map = IdMap.tabulate[SlotId, String](64)(id => testMapAll(id.value))
+      val map = IdMap.tabulate[TopicId, String](id => testMapAll(id.value))
       map.toMap should be(testMapAll)
     }
   }
 
   "apply" - {
     "read existing key" in {
-      val map = IdMap.from(64)(testMapOk)
+      val map = IdMap.from(testMapOk)
       testOkIds.foreach { id => map(id) should be(testMapOk(id)) }
     }
 
     "read non-existing key" in {
-      val map = IdMap.from(64)(testMapOk)
+      val map = IdMap.from(testMapOk)
       testKoIds.foreach { id =>
         map(id) should be(null)
       } // null is the default value for type String
@@ -55,27 +56,27 @@ class IdMapTest extends TestBase {
   }
 
   "mapToScore" in {
-    val map = IdMap.from(64)(testMapOk)
+    val map = IdMap.from(testMapOk)
     val result = map.mapToScore { (id, str) =>
       if (str == null) 0
       else id.value + str.size
     }
     val expected = testOkIds.map[(TopicId, Score)] { id => id -> (id.value + id.value.toHexString.size) }
-    result should be(IdMap.from(64)(expected))
+    result should be(IdMap.from(expected))
   }
 
   "toMap" in {
-    val map = IdMap.from(64)(testMapAll)
+    val map = IdMap.from(testMapAll)
     map.toMap should be(testMapAll)
   }
 
   "toReverseMap" in {
-    val map = IdMap.from(64)(testMapAll)
+    val map = IdMap.from(testMapAll)
     map.toReverseMap should be(testMapAll.map(_.swap))
   }
 
   "sortedValues" in {
-    val map = IdMap.from(64)(testAllInts.map[(TopicId, Score)](i => (i, 10 * i)))
+    val map = IdMap.from(testAllInts.map[(TopicId, Score)](i => (i, 10 * i)))
     map.sortedValues should be(testAllInts.map(_ * 10).sorted)
   }
 
