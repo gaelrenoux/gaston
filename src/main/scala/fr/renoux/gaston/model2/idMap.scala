@@ -21,6 +21,9 @@ object IdMap {
     inline def toMap: Map[I, A] =
       m.zipWithIndex.map { (a, id) => id -> a }.toMap
 
+    inline def toReverseMap: Map[A, I] =
+      m.zipWithIndex.toMap
+
     inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
       val result = new Array[Score](m.length)
       m.fastForeachWithIndex { (a, i) =>
@@ -34,10 +37,24 @@ object IdMap {
     inline def sortedValues: Array[Score] = m.sorted
   }
 
-  def from[I >: Int <: Id, A: ClassTag](
-      size: Int
-  )(it: Iterable[(I, A)]): IdMap[I, A] = {
-    val result = new Array[A](size)
+  inline def fill[I >: Int <: Id, A: ClassTag](countI: Count[I])(a: A): IdMap[I, A] = {
+    val result = new Array[A](countI.value)
+    result.fastFill(a)
+    result
+  }
+
+  inline def tabulate[I >: Int <: Id, A: ClassTag](countI: Count[I])(inline f: I => A): IdMap[I, A] = {
+    val result = new Array[A](countI.value)
+    countI.foreach { i =>
+      result(i.value) = f(i)
+    }
+    result
+  }
+
+  def from[I >: Int <: Id, A: ClassTag](array: Array[A]): IdMap[I, A] = array
+
+  def from[I >: Int <: Id, A: ClassTag](countI: Count[I])(it: Iterable[(I, A)]): IdMap[I, A] = {
+    val result = new Array[A](countI.value)
     it.fastForeach { (i, a) => result(i) = a }
     result
   }
