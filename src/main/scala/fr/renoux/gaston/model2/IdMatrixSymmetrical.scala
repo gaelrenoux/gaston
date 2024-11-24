@@ -16,7 +16,7 @@ import scala.reflect.ClassTag
 opaque type IdMatrixSymmetrical[I <: Id, A] = Array[A]
 
 object IdMatrixSymmetrical {
-  private inline def arraySize[I >: Int <: Id](count: Count[I]) = {
+  private inline def arraySize[I >: Int <: Id](using count: CountAll[I]) = {
     (count.value + 1) * count.value / 2
   }
 
@@ -43,7 +43,7 @@ object IdMatrixSymmetrical {
     /** Uses the provided function to compute a score for the whole matrix. Symmetrical entries ((i, j) and (j, i)) are
       * NOT counted twice.
       */
-    inline def mapSumHalfToScore(f: (I, I, A) => Score)(countI: Count[I]): Score = {
+    inline def mapSumHalfToScore(f: (I, I, A) => Score)(using countI: CountAll[I]): Score = {
       var result = Score.Zero
       var index = 0
       countI.foreach { i =>
@@ -56,7 +56,7 @@ object IdMatrixSymmetrical {
     }
 
     /** Display the matrix as a Sequence of Sequence. Contains only stored values, which means it is a half-matrix. */
-    inline def toSeq2(countI: Count[I])(using ClassTag[A]): Seq[Seq[A]] = {
+    inline def toSeq2(using tag: ClassTag[A], countI: CountAll[I]): Seq[Seq[A]] = {
       val result = new Array[Array[A]](countI.value)
       var index = 0
       countI.foreach { i =>
@@ -70,16 +70,14 @@ object IdMatrixSymmetrical {
     }
   }
 
-  inline def fill[I >: Int <: Id, A: ClassTag](countI: Count[I])(a: A): IdMatrixSymmetrical[I, A] = {
-    val result = new Array[A](arraySize(countI))
+  inline def fill[I >: Int <: Id, A: ClassTag](using countI: CountAll[I])(a: A): IdMatrixSymmetrical[I, A] = {
+    val result = new Array[A](arraySize[I])
     result.fastFill(a)
     result
   }
 
-  inline def tabulate[I >: Int <: Id, A: ClassTag](
-      countI: Count[I]
-  )(inline f: (I, I) => A): IdMatrixSymmetrical[I, A] = {
-    val result = new Array[A](arraySize(countI))
+  inline def tabulate[I >: Int <: Id, A: ClassTag](using countI: CountAll[I])(inline f: (I, I) => A): IdMatrixSymmetrical[I, A] = {
+    val result = new Array[A](arraySize[I])
     var index = 0
     countI.foreach { i =>
       countI.foreachTo(i) { j =>
@@ -90,10 +88,10 @@ object IdMatrixSymmetrical {
     result
   }
 
-  inline def from[I >: Int <: Id, A: ClassTag](it: Iterable[Iterable[A]]): IdMatrixSymmetrical[I, A] = {
-    val countI: Count[I] = it.size
+  inline def unsafeFrom[I >: Int <: Id, A: ClassTag](it: Iterable[Iterable[A]]): IdMatrixSymmetrical[I, A] = {
+    val countI = CountAll[I](it.size)
     var index = 0
-    val result = new Array[A](arraySize(countI))
+    val result = new Array[A](arraySize[I](using countI))
     it.fastForeach { it2 =>
       it2.fastForeach { a =>
         result(index) = a

@@ -2,7 +2,6 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
-
 opaque type Id >: Int = Int
 opaque type SlotId >: Int <: Id = Int
 opaque type TopicId >: Int <: Id = Int
@@ -16,7 +15,7 @@ object Id {
   inline def None: Id = -1
 
   given [I <: Id]: Printable[I] with {
-      extension (i: I) override def toPrettyString: String = i.toString
+    extension (i: I) override def toPrettyString: String = i.toString
   }
 
   given [I <: Id]: Ordering[I] with {
@@ -77,6 +76,19 @@ object Count {
   val Zero: Count[Nothing] = 0
 
   given [I <: Id]: Printable[Count[I]] with {
-      extension (c: Count[I]) override def toPrettyString: String = c.toString
+    extension (c: Count[I]) override def toPrettyString: String = c.toString
+  }
+}
+
+/** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
+  * super-type of Int to avoid weird implicit deductions. This must be given directly.
+  */
+opaque type CountAll[I <: Id] <: Count[I] = Int
+
+object CountAll {
+  def apply[I <: Id](c: Count[I]): CountAll[I] = c
+
+  given [I <: Id]: Printable[CountAll[I]] with {
+    extension (c: CountAll[I]) override def toPrettyString: String = c.toString
   }
 }
