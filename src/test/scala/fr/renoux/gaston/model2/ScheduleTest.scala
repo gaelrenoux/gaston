@@ -7,9 +7,9 @@ class ScheduleTest extends TestBase {
 
   val height = 3
   val width = 4
-  val countSlots: Count[SlotId] = 2
-  val countTopics: Count[TopicId] = 3
-  val countPersons: Count[PersonId] = 4
+  given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
+  given countTopics: CountAll[TopicId] = CountAll[TopicId](3)
+  given countPersons: CountAll[PersonId] = CountAll[PersonId](4)
 
   val scheduleSeq: Seq[Seq[Seq[Boolean]]] = Seq(
     Seq(
@@ -24,8 +24,8 @@ class ScheduleTest extends TestBase {
     )
   )
 
-  val scheduleMatrix = IdMatrix3.from[SlotId, TopicId, PersonId, Boolean](scheduleSeq)
-  val schedule = Schedule(scheduleMatrix)(countSlots, countTopics, countPersons)
+  val scheduleMatrix = IdMatrix3.unsafeFrom[SlotId, TopicId, PersonId, Boolean](scheduleSeq)
+  val schedule = Schedule(scheduleMatrix)
 
   "personToTopics" in {
     val ptt = schedule.personToTopics

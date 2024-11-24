@@ -4,7 +4,7 @@ import fr.renoux.gaston.TestBase
 
 class IdMatrixSymmetricalTest extends TestBase {
   val dimension = 3
-  val countI: Count[SlotId] = dimension
+  given countI: CountAll[SlotId] = CountAll[SlotId](dimension)
 
   val testSeq: Seq[Seq[String]] = Seq(
     Seq(""),
@@ -14,29 +14,29 @@ class IdMatrixSymmetricalTest extends TestBase {
 
   "Creation" - {
     "tabulate" in {
-      val matrix = IdMatrixSymmetrical.tabulate(countI) { (i, j) => testSeq(i.value)(j.value) }
+      val matrix = IdMatrixSymmetrical.tabulate[SlotId, String] { (i, j) => testSeq(i.value)(j.value) }
       matrix.content.toSeq should be(testSeq.flatten)
     }
 
     "fill" in {
-      val matrix = IdMatrixSymmetrical.fill(countI)("hello")
+      val matrix = IdMatrixSymmetrical.fill[SlotId, String]("hello")
       val expected = Seq.fill(6)("hello")
       matrix.content.toSeq should be(expected)
     }
 
     "from" in {
-      val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
+      val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
       matrix.content.toSeq should be(testSeq.flatten)
     }
   }
 
   "toSeq" in {
-    val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
-    matrix.toSeq2(countI) should be(testSeq)
+    val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
+    matrix.toSeq2 should be(testSeq)
   }
 
   "apply" - {
-    val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
+    val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
 
     "inside the matrix's diagonal" in {
       matrix(0, 0) should be("")
@@ -65,7 +65,7 @@ class IdMatrixSymmetricalTest extends TestBase {
   "update" - {
 
     "inside the matrix's diagonal" in {
-      val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
+      val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
       matrix(1, 1) = "hello"
       matrix(1, 1) should be("hello")
       for { i <- 0 until dimension; j <- 0 to i; if (i, j) != (1, 1) } {
@@ -76,7 +76,7 @@ class IdMatrixSymmetricalTest extends TestBase {
       }
     }
     "inside the matrix's stored side" in {
-      val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
+      val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
       matrix(1, 0) = "hello"
       matrix(1, 0) should be("hello")
       matrix(0, 1) should be("hello")
@@ -88,7 +88,7 @@ class IdMatrixSymmetricalTest extends TestBase {
       }
     }
     "inside the matrix's non-stored side" in {
-      val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
+      val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
       matrix(1, 2) = "hello"
       matrix(1, 2) should be("hello")
       matrix(2, 1) should be("hello")
@@ -102,8 +102,8 @@ class IdMatrixSymmetricalTest extends TestBase {
   }
 
   "mapSumHalfToScore" in {
-    val matrix = IdMatrixSymmetrical.from[SlotId, String](testSeq)
-    val score = matrix.mapSumHalfToScore { (i, j, a) => i.value * 100 + j.value * 10 + a.length }(countI)
+    val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
+    val score = matrix.mapSumHalfToScore { (i, j, a) => i.value * 100 + j.value * 10 + a.length }
     score should be(0 + 102 + 112 + 202 + 213 + 223)
   }
 
