@@ -10,30 +10,28 @@ opaque type IdMatrix3[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A] =
   Array[A] // using a flattened matrix
 
 object IdMatrix3 {
-  extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A]) {
-    inline def apply(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A =
-      at(i, j, k)(countJ, countK)
+  extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A])(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]) {
+    inline def apply(i: I, j: J, k: K): A =
+      at(i, j, k)
 
-    inline def at(i: I, j: J, k: K)(countJ: Count[J], countK: Count[K]): A = {
-      val index = Count.flatIndex(countK)(Count.flatIndex(countJ)(i, j), k)
+    inline def at(i: I, j: J, k: K): A = {
+      val index = countK.flatIndex(countJ.flatIndex(i, j), k)
       matrix(index)
     }
 
-    inline def update(i: I, j: J, k: K)(
-        a: A
-    )(countJ: Count[J], countK: Count[K]) = {
-      val index = Count.flatIndex(countK)(Count.flatIndex(countJ)(i, j), k)
+    inline def update(i: I, j: J, k: K, a: A) = {
+      val index = countK.flatIndex(countJ.flatIndex(i, j), k)
       matrix(index) = a
     }
 
-    inline def toSeq3(countI: Count[I], countJ: Count[J], countK: Count[K])(using ClassTag[A]): Seq[Seq[Seq[A]]] = {
+    inline def toSeq3(using ClassTag[A]): Seq[Seq[Seq[A]]] = {
       val result = new Array[Array[Array[A]]](countI.value)
       var index = 0
-      Count.foreach(countI) { i =>
+      countI.foreach { i =>
         result(i.value) = new Array[Array[A]](countJ.value)
-        Count.foreach(countJ) { j =>
+        countJ.foreach { j =>
           result(i.value)(j.value) = new Array[A](countK.value)
-          Count.foreach(countK) { k =>
+          countK.foreach { k =>
             result(i.value)(j.value)(k.value) = matrix(index)
             index += 1
           }
@@ -45,19 +43,20 @@ object IdMatrix3 {
   }
 
   inline def fill[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
-      (countI: Count[I], countJ: Count[J], countK: Count[K])(a: A): IdMatrix3[I, J, K, A] = {
+      (using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K])(a: A): IdMatrix3[I, J, K, A] = {
     val result = new Array[A](countI.value * countJ.value * countK.value)
     result.fastFill(a)
     result
   }
 
   inline def tabulate[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
-      (countI: Count[I], countJ: Count[J], countK: Count[K])(inline f: (I, J, K) => A): IdMatrix3[I, J, K, A] = {
+      (using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K])
+      (inline f: (I, J, K) => A): IdMatrix3[I, J, K, A] = {
     val result = new Array[A](countI.value * countJ.value * countK.value)
     var index = 0
-    Count.foreach(countI) { i =>
-      Count.foreach(countJ) { j =>
-        Count.foreach(countK) { k =>
+    countI.foreach { i =>
+      countJ.foreach { j =>
+        countK.foreach { k =>
           result(index) = f(i, j, k)
           index += 1
         }
@@ -66,7 +65,7 @@ object IdMatrix3 {
     result
   }
 
-  inline def from[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag](it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
+  inline def unsafeFrom[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag](it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
     val countI: Count[I] = it.size
     val countJ: Count[J] = it.head.size
     val countK: Count[K] = it.head.head.size
@@ -86,17 +85,17 @@ object IdMatrix3 {
   /** Very specific stuff for the schedule matrix */
   extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
 
-    inline def listSmallTopicsByPerson(
-        countS: Count[SlotId],
-        countT: Count[TopicId],
-        countP: Count[PersonId]
+    inline def listSmallTopicsByPerson(using
+        countS: CountAll[SlotId],
+        countT: CountAll[TopicId],
+        countP: CountAll[PersonId]
     ): IdMap[PersonId, SmallIdSet[TopicId]] = {
-      val result = IdMap.empty[PersonId, SmallIdSet[TopicId]](countP)
+      val result = IdMap.empty[PersonId, SmallIdSet[TopicId]]
 
       // TODO could reorder T then P to limit the number of multiplications
-      Count.foreach(countP) { pid =>
-        Count.foreach(countT) { tid =>
-          val slotId = Count.find(countS) { sid => matrix.at(sid, tid, pid)(countT, countP) }
+      countP.foreach { pid =>
+        countT.foreach { tid =>
+          val slotId = countS.find { sid => matrix.at(sid, tid, pid) }
           if (slotId != SlotId.None) {
             result(pid) = SmallIdSet.inserted(result(pid))(tid)
           }
@@ -106,18 +105,18 @@ object IdMatrix3 {
       result
     }
 
-    inline def listSmallPersonsByTopic(
-        countS: Count[SlotId],
-        countT: Count[TopicId],
-        countP: Count[PersonId]
+    inline def listSmallPersonsByTopic(using
+        countS: CountAll[SlotId],
+        countT: CountAll[TopicId],
+        countP: CountAll[PersonId]
     ): IdMap[TopicId, SmallIdSet[PersonId]] = {
-      val result = IdMap.empty[TopicId, SmallIdSet[PersonId]](countT)
+      val result = IdMap.empty[TopicId, SmallIdSet[PersonId]]
 
       // TODO limit number of multiplications
-      Count.foreach(countS) { sid =>
-        Count.foreach(countT) { tid =>
-          Count.foreach(countP) { pid =>
-            if (matrix.at(sid, tid, pid)(countT, countP)) {
+      countS.foreach { sid =>
+        countT.foreach { tid =>
+          countP.foreach { pid =>
+            if (matrix.at(sid, tid, pid)) {
               result(tid) = SmallIdSet.inserted(result(tid))(pid)
             }
           }
@@ -127,20 +126,20 @@ object IdMatrix3 {
       result
     }
 
-    inline def listSmallTopics(
-        countS: Count[SlotId],
-        countT: Count[TopicId],
-        countP: Count[PersonId]
+    inline def listSmallTopics(using
+        countS: CountAll[SlotId],
+        countT: CountAll[TopicId],
+        countP: CountAll[PersonId]
     ): SmallIdSet[TopicId] = {
       var result: SmallIdSet[TopicId] = SmallIdSet.empty[TopicId]
 
       // TODO limit number of multiplications
-      Count.foreach(countS) { sid =>
-        Count.foreach(countT) { tid =>
+      countS.foreach { sid =>
+        countT.foreach { tid =>
           var pid: PersonId = 0
           var notFound = true // we know there's only one true
           while (pid.value < countP.value && notFound) {
-            if (matrix.at(sid, tid, pid)(countT, countP)) {
+            if (matrix.at(sid, tid, pid)) {
               result = SmallIdSet.inserted(result)(tid)
               notFound = false
             }

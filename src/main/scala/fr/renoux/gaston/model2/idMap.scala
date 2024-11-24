@@ -42,13 +42,13 @@ object IdMap {
     inline def sortedValues: Array[Score] = m.sorted
   }
 
-  inline def fill[I >: Int <: Id, A: ClassTag](countI: Count[I])(a: A): IdMap[I, A] = {
+  inline def fill[I >: Int <: Id, A: ClassTag](a: A)(using countI: CountAll[I]): IdMap[I, A] = {
     val result = new Array[A](countI.value)
     result.fastFill(a)
     result
   }
 
-  inline def tabulate[I >: Int <: Id, A: ClassTag](countI: Count[I])(inline f: I => A): IdMap[I, A] = {
+  inline def tabulate[I >: Int <: Id, A: ClassTag](inline f: I => A)(using countI: CountAll[I]): IdMap[I, A] = {
     val result = new Array[A](countI.value)
     countI.foreach { i =>
       result(i.value) = f(i)
@@ -56,22 +56,19 @@ object IdMap {
     result
   }
 
-  def from[I >: Int <: Id, A: ClassTag](array: Array[A]): IdMap[I, A] = array
+  def unsafeFrom[I >: Int <: Id, A: ClassTag](array: Array[A]): IdMap[I, A] = array
 
-  def from[I >: Int <: Id, A: ClassTag](countI: Count[I])(it: Iterable[(I, A)]): IdMap[I, A] = {
+  def from[I >: Int <: Id, A: ClassTag](it: Iterable[(I, A)])(using countI: CountAll[I]): IdMap[I, A] = {
     val result = new Array[A](countI.value)
     it.fastForeach { (i, a) => result(i) = a }
     result
   }
 
-  def from[I <: Id, A: ClassTag](it: Iterable[(I, A)]): IdMap[I, A] =
-    from(it.view.map(_._1.value).max + 1)(it)
-
-  inline def apply[I <: Id, A: ClassTag](ias: (I, A)*): IdMap[I, A] =
+  inline def apply[I >: Int <: Id: CountAll, A: ClassTag](ias: (I, A)*): IdMap[I, A] =
     from(ias)
 
   /** Generates an empty IdMap, using the default value for type A */
-  inline def empty[I >: Int <: Id, A: ClassTag](count: Count[I]): IdMap[I, A] =
+  inline def empty[I >: Int <: Id, A: ClassTag](using count: CountAll[I]): IdMap[I, A] =
     new Array[A](count.value)
 
 
