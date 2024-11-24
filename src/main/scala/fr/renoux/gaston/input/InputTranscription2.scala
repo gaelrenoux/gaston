@@ -3,7 +3,6 @@ package fr.renoux.gaston.input
 import cats.data.NonEmptyList
 import cats.data.ValidatedNel
 import cats.implicits.*
-import com.typesafe.scalalogging.Logger
 import fr.renoux.gaston.model.{Score as _, Weight as _, *}
 import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.util.{Count as _, *}
@@ -21,8 +20,6 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription2.*
 
-  private val log = Logger[InputTranscription]
-
   // val input: InputModel = rawInput.clean // TODO Restore cleaner here
   val input: InputModel = rawInput
   val settings: InputSettings = input.settings
@@ -32,22 +29,27 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
 
 
+  /* Get all counts first */
+  lazy given slotsCount: CountAll[SlotId] = CountAll[SlotId](input.slots.flatten.size)
+  lazy given topicsCount: CountAll[TopicId] = CountAll[TopicId](slotsCount.value + input.topics.map { inT => inT.forcedOccurrences * inT.forcedDuration }.sum)
+  lazy given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
+
+  
+
   /* Persons */
-  lazy val personsCount: Count[PersonId] = input.persons.size
-  lazy val personsNames: IdMap[PersonId, String] = IdMap.from[PersonId, String](input.persons.map(_.name: String).toArray)
-  lazy val personsWeights: IdMap[PersonId, Weight] = IdMap.from[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
-  lazy val personsBaseScores: IdMap[PersonId,Score] = IdMap.from[PersonId, Score](input.persons.map(_.baseScore.value: Score).toArray)
+  lazy val personsNames: IdMap[PersonId, String] = IdMap.unsafeFrom[PersonId, String](input.persons.map(_.name: String).toArray)
+  lazy val personsWeights: IdMap[PersonId, Weight] = IdMap.unsafeFrom[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
+  lazy val personsBaseScores: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(_.baseScore.value: Score).toArray)
   lazy val personsIdByName: Map[String, PersonId] = personsNames.toReverseMap
 
 
 
   /* Slots */
   private lazy val flattenedSlots = input.slots.flatten
-  lazy val slotsCount: Count[SlotId] = flattenedSlots.size
-  lazy val slotsNames: IdMap[SlotId, String] = IdMap.from[SlotId, String](flattenedSlots.map(_.name: String).toArray)
-  lazy val slotsMaxTopics: IdMap[SlotId, Count[TopicId]] = IdMap.from[SlotId, Count[TopicId]](flattenedSlots.map(s => s.maxTopics.getOrElse(Count.maxCount[TopicId])).toArray)
+  lazy val slotsNames: IdMap[SlotId, String] = IdMap.unsafeFrom[SlotId, String](flattenedSlots.map(_.name: String).toArray)
+  lazy val slotsMaxTopics: IdMap[SlotId, Count[TopicId]] = IdMap.unsafeFrom[SlotId, Count[TopicId]](flattenedSlots.map(s => s.maxTopics.getOrElse(Count.maxCount[TopicId])).toArray)
   lazy val slotToNextSlot = {
-    val result = IdMap.tabulate[SlotId, SlotId](slotsCount)(_.value + 1)
+    val result = IdMap.tabulate[SlotId, SlotId](_.value + 1)
     var index = -1
     input.slots.map(_.size).foreach { seqLen =>
       index += seqLen
@@ -60,18 +62,15 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Topics */
-  lazy val topicsCount: Count[TopicId] = slotsCount.value + input.topics.map { inT => inT.forcedOccurrences * inT.forcedDuration }.sum
-
-  private var topicIdInt: Int = slotsCount.value
   lazy object topics {
-    val topicsNames = IdMap.empty[TopicId, String](topicsCount)
-    val topicsMandatories = IdMap.fill[TopicId, SmallIdSet[PersonId]](topicsCount)(SmallIdSet.empty[PersonId])
-    val topicsMin = IdMap.empty[TopicId, Count[PersonId]](topicsCount)
-    val topicsMax = IdMap.empty[TopicId, Count[PersonId]](topicsCount)
-    val topicsAllowedSlots = IdMap.fill[TopicId, SmallIdSet[SlotId]](topicsCount)(SmallIdSet.full[SlotId])
+    val topicsNames = IdMap.empty[TopicId, String]
+    val topicsMandatories = IdMap.fill[TopicId, SmallIdSet[PersonId]](SmallIdSet.empty[PersonId])
+    val topicsMin = IdMap.empty[TopicId, Count[PersonId]]
+    val topicsMax = IdMap.empty[TopicId, Count[PersonId]]
+    val topicsAllowedSlots = IdMap.fill[TopicId, SmallIdSet[SlotId]](SmallIdSet.full[SlotId])
     var topicsForced = SmallIdSet.empty[TopicId]
-    val topicsFollowup = IdMap.fill[TopicId, TopicId](topicsCount)(TopicId.None)
-    val prefsTopicPure = IdMap.empty[TopicId, Score](topicsCount)
+    val topicsFollowup = IdMap.fill[TopicId, TopicId](TopicId.None)
+    val prefsTopicPure = IdMap.empty[TopicId, Score]
 
     /* Insert unassigned topics */
     fastLoop(0, slotsCount.value) { id => 
@@ -83,9 +82,10 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     }
 
     /* Then handle normal topics */
+    var topicIdInt = slotsCount.value
     input.topics.foreach { (inTopic: InputTopic) =>
       val mandatories: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
-      val forbidden : SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
+      // TODO val forbidden : SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
       val min: Count[PersonId] = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
