@@ -36,6 +36,10 @@ object IdMap {
       }
       result
     }
+
+    inline def toSeq: Seq[A] = Seq(m*)
+
+    inline def unsafeContent: Array[A] = m
   }
 
   extension [I <: Id](m: IdMap[I, Score]) {
