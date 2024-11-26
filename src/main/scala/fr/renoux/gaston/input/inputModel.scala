@@ -88,7 +88,7 @@ final case class InputModel(
 
 final case class InputSettings(
     incompatibilityAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
-    defaultMaxTopicsPerSlot: Option[PosInt] = None,
+    defaultMaxTopicsPerSlot: Option[PosInt] = None, // TODO make it a default value, e.g. Count.maxValue
     defaultMinPersonsPerTopic: PosInt = Constants.DefaultTopicMin,
     defaultMaxPersonsPerTopic: PosInt = Constants.DefaultTopicMax,
     unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
