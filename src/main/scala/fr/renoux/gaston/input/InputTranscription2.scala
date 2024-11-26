@@ -80,7 +80,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       topicsMin(id) = Count.Zero // TODO handle settings of people not being alone unassigned. Probably as a preference.
       topicsMax(id) = Count.maxCount[PersonId]
       topicsAllowedSlots(id) = SmallIdSet[SlotId](id)
-      topicsForced = topicsForced.inserted(id)
+      topicsForced = topicsForced + id
     }
 
     /* Then handle normal topics */
@@ -104,7 +104,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
           topicsMax(topicIdInt) = max
           topicsAllowedSlots(topicIdInt) = allowedSlots
           if (inTopic.forced) {
-            topicsForced = topicsForced.inserted(topicIdInt)
+            topicsForced = topicsForced + topicIdInt
           }
           topicsFollowup(topicIdInt) = topicIdInt + 1
           topicIdInt += 1

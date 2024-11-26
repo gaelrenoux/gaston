@@ -5,9 +5,7 @@ import scala.collection.mutable
 import scala.annotation.targetName
 
 
-/** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable, but very cheap to copy.
-  */
-  // TODO Make covariant: requires changing the signature of inserted a bit, and empty can be a SmallIdSet[Nothing]
+/** Set of very small Ids (O to 63) as a single Long. Immutable, but very cheap to copy. */
 opaque type SmallIdSet[I <: Id] = Long
 
 object SmallIdSet {
@@ -45,12 +43,15 @@ object SmallIdSet {
       s & (~mask(id))
     }
 
-    // TODO Uncomment this and use them instead of inserted/removed
-    // @targetName("SmallIdSetPlusId")
-    // inline def +(id: I): SmallIdSet[I] = added(id)
-    //
-    // @targetName("SmallIdSetMinusId")
-    // inline def -(id: I): SmallIdSet[I] = removed(id)
+    @targetName("SmallIdSetPlusId")
+    inline def +(id: I): SmallIdSet[I] = {
+      s | mask(id)
+    }
+
+    @targetName("SmallIdSetMinusId")
+    inline def -(id: I): SmallIdSet[I] = {
+      s & (~mask(id))
+    }
 
     @targetName("intersect")
     inline infix def &&(that: SmallIdSet[I]): SmallIdSet[I] = {
@@ -86,11 +87,12 @@ object SmallIdSet {
     result
   }
 
-  given [I >: Int <: Id : Printable]: Printable[SmallIdSet[I]] with {
-    extension (is: SmallIdSet[I]) override def toPrettyString: String = 
-      if (is == -1) Printable.Universe
-      else if (is == 0) Printable.Empty
-      else summon[Printable[Iterable[I]]].toPrettyString(is.toSet)
+  given [I >: Int <: Id: Printable]: Printable[SmallIdSet[I]] with {
+    extension (is: SmallIdSet[I])
+      override def toPrettyString: String =
+        if (is == -1) Printable.Universe
+        else if (is == 0) Printable.Empty
+        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet)
   }
 
 }
