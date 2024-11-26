@@ -7,6 +7,7 @@ import scala.annotation.targetName
 
 /** SmallIdSet: a set of very small Ids (up to 63) as a single Long. Immutable, but very cheap to copy.
   */
+  // TODO Make covariant: requires changing the signature of inserted a bit, and empty can be a SmallIdSet[Nothing]
 opaque type SmallIdSet[I <: Id] = Long
 
 object SmallIdSet {
