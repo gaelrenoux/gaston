@@ -47,7 +47,9 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
   /* Slots */
   private lazy val flattenedSlots = input.slots.flatten
   lazy val slotsNames: IdMap[SlotId, String] = IdMap.unsafeFrom[SlotId, String](flattenedSlots.map(_.name: String).toArray)
-  lazy val slotsMaxTopics: IdMap[SlotId, Count[TopicId]] = IdMap.unsafeFrom[SlotId, Count[TopicId]](flattenedSlots.map(s => s.maxTopics.getOrElse(Count.maxCount[TopicId])).toArray)
+  lazy val slotsMaxTopics: IdMap[SlotId, Count[TopicId]] = IdMap.unsafeFrom[SlotId, Count[TopicId]] {
+    flattenedSlots.map(s => s.maxTopics.orElse(settings.defaultMaxTopicsPerSlot).getOrElse(Count.maxCount[TopicId])).toArray
+  }
   lazy val slotToNextSlot = {
     val result = IdMap.tabulate[SlotId, SlotId](_.value + 1)
     var index = -1
