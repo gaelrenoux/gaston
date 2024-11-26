@@ -61,11 +61,11 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
-  "added" - {
+  "plus" - {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       for (id <- testOkIds) {
-        val s2 = set.inserted(id)
+        val s2 = set + id
         s2.contains(id) should be(true)
         testAllIds.filterNot(_ == id).foreach { nid =>
           s2.contains(nid) should be(false)
@@ -76,7 +76,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > non-existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testKoIds) {
-        val s2 = set.inserted(id)
+        val s2 = set + id
         s2.contains(id) should be(true)
         testOkIds.foreach { nid =>
           s2.contains(nid) should be(true)
@@ -90,7 +90,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testOkIds) {
-        val s2 = set.inserted(id)
+        val s2 = set + id
         s2 should be(set)
         s2.contains(id) should be(true)
         testOkIds.filterNot(_ == id).foreach { nid =>
@@ -105,7 +105,7 @@ class SmallIdSetTest extends TestBase {
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
       for (id <- testAllIds) {
-        val s2 = set.inserted(id)
+        val s2 = set + id
         s2 should be(set)
         s2.contains(id) should be(true)
         testAllIds.filterNot(_ == id).foreach { nid =>
@@ -115,11 +115,11 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
-  "removed" - {
+  "minus" - {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       for (id <- testOkIds) {
-        val s2 = set.removed(id)
+        val s2 = set - id
         s2 should be(set)
         s2.contains(id) should be(false)
         testAllIds.filterNot(_ == id).foreach { nid =>
@@ -131,7 +131,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > non-existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testKoIds) {
-        val s2 = set.removed(id)
+        val s2 = set - id
         s2 should be(set)
         s2.contains(id) should be(false)
         testOkIds.foreach { nid =>
@@ -146,7 +146,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set > existing value" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       for (id <- testOkIds) {
-        val s2 = set.removed(id)
+        val s2 = set - id
         s2.contains(id) should be(false)
         testOkIds.filterNot(_ == id).foreach { nid =>
           s2.contains(nid) should be(true)
@@ -160,7 +160,7 @@ class SmallIdSetTest extends TestBase {
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
       for (id <- testAllIds) {
-        val s2 = set.removed(id)
+        val s2 = set - id
         s2.contains(id) should be(false)
         testAllIds.filterNot(_ == id).foreach { nid =>
           s2.contains(nid) should be(true)

@@ -43,7 +43,7 @@ final class SmallProblem(
       personsBaseScore(pid) +
         topicIds.mapSumToScore { tid =>
           val topicsScore = prefsPersonTopic(pid, tid)
-          val otherPersons = schedule.topicsToPersons(tid).removed(pid)
+          val otherPersons = schedule.topicsToPersons(tid) - pid
           /* Person antipathy should not apply on unassigned topics */
           val otherPersonsScore = otherPersons.mapSumToScore(prefsPersonPerson(pid, _))
           topicsScore + otherPersonsScore
