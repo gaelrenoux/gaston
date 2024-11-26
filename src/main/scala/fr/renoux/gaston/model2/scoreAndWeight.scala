@@ -30,10 +30,11 @@ opaque type Weight >: Double = Double
 
 object Weight {
   extension (w: Weight) {
-    // TODO When Scala 3 has fixed https://github.com/scala/scala3/issues/17158, this can go back to just being *
     @targetName("weightMultiplyScore")
     infix inline def *(s: Score): Score = w * s
   }
+
+  inline def Default: Weight = 1.0
 
   given Printable[Weight] with {
     extension (a: Weight) override def toPrettyString: String = a.toString
