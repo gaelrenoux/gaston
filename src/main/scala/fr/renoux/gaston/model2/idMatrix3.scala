@@ -97,7 +97,7 @@ object IdMatrix3 {
         countT.foreach { tid =>
           val slotId = countS.find { sid => matrix.at(sid, tid, pid) }
           if (slotId != SlotId.None) {
-            result(pid) = SmallIdSet.inserted(result(pid))(tid)
+            result(pid) = result(pid) + tid
           }
         }
       }
@@ -117,7 +117,7 @@ object IdMatrix3 {
         countT.foreach { tid =>
           countP.foreach { pid =>
             if (matrix.at(sid, tid, pid)) {
-              result(tid) = SmallIdSet.inserted(result(tid))(pid)
+              result(tid) = result(tid) + pid
             }
           }
         }
@@ -140,7 +140,7 @@ object IdMatrix3 {
           var notFound = true // we know there's only one true
           while (pid.value < countP.value && notFound) {
             if (matrix.at(sid, tid, pid)) {
-              result = SmallIdSet.inserted(result)(tid)
+              result = result + tid
               notFound = false
             }
             pid = pid.value + 1
