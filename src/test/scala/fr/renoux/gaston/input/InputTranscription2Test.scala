@@ -18,7 +18,7 @@ class InputTranscription2Test extends TestBase {
     val defMinPersonsPerTopic = transcription.settings.defaultMinPersonsPerTopic
     val defMaxTopicsPerSlot = transcription.settings.defaultMaxTopicsPerSlot.get
     "errors" in {
-      transcription.errors.isEmpty should be(true)
+      transcription.errors should be(Set())
     }
 
     "settings" in {
@@ -32,7 +32,6 @@ class InputTranscription2Test extends TestBase {
       transcription.slotsNames.toSeq should be(
         Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night")
       )
-      println(">>>>>" + transcription.slotsMaxTopics.toSeq)
       transcription.slotsMaxTopics.toSeq should be(
         Seq(defMaxTopicsPerSlot, 5, defMaxTopicsPerSlot, defMaxTopicsPerSlot, defMaxTopicsPerSlot, defMaxTopicsPerSlot)
       )
@@ -87,6 +86,37 @@ class InputTranscription2Test extends TestBase {
           Seq(TopicId.None, TopicId.None, 13, TopicId.None) ++
           Seq(15, TopicId.None, 17, TopicId.None, 19, TopicId.None)
       )
+    }
+
+    "constraints" in {
+      transcription.constraints.topicsSimultaneous.size should be (6 + 14)
+      transcription.constraints.topicsSimultaneous.toSeq should be(
+        Seq.fill(6)(emptyIdSet) ++
+          Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
+          Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+          Seq.fill(6)(emptyIdSet)
+      )
+      transcription.constraints.topicsNotSimultaneous.toSeq should be(
+        Seq.fill(6)(emptyIdSet) ++
+          Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+          Seq(SmallIdSet(11, 12, 13), SmallIdSet(10, 12, 13), SmallIdSet(10, 11, 13), SmallIdSet(10, 11, 12)) ++
+          Seq.fill(6)(emptyIdSet)
+      )
+    }
+
+    // TODO add some preferences for the test
+    "preferences" in {
+      import transcription.given
+      transcription.preferences.prefsPersonTopic.toSeq2 should be(Seq(
+        Seq.fill(6 + 14)(Score.Zero),
+        Seq.fill(6 + 14)(Score.Zero),
+        Seq.fill(6 + 14)(Score.Zero)
+      ))
+      transcription.preferences.prefsPersonPerson.toSeq2 should be(Seq(
+        Seq.fill(3)(Score.Zero),
+        Seq.fill(3)(Score.Zero),
+        Seq.fill(3)(Score.Zero)
+      ))
     }
   }
 
