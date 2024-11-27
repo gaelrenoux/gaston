@@ -53,6 +53,16 @@ object SmallIdSet {
       s & (~mask(id))
     }
 
+    @targetName("SmallIdSetPlusIterable")
+    inline def ++(ids: Iterable[I]): SmallIdSet[I] = {
+      ids.fastFoldLeft(s) { (set, id) => set | mask(id) }
+    }
+
+    @targetName("SmallIdSetMinusIterable")
+    inline def --(ids: Iterable[I]): SmallIdSet[I] = {
+      ids.fastFoldLeft(s) { (set, id) => set & (~mask(id)) }
+    }
+
     @targetName("intersect")
     inline infix def &&(that: SmallIdSet[I]): SmallIdSet[I] = {
       s & that
