@@ -49,13 +49,13 @@ object IdMatrix {
     }
   }
 
-  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](using countI: CountAll[I], countJ: CountAll[J])(a: A): IdMatrix[I, J, A] = {
+  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](a: A)(using countI: CountAll[I], countJ: CountAll[J]): IdMatrix[I, J, A] = {
     val result = new Array[A](countI.value * countJ.value)
     result.fastFill(a)
     result
   }
 
-  inline def tabulate[I >: Int <: Id, J >: Int <: Id, A: ClassTag](using countI: CountAll[I], countJ: CountAll[J])(inline f: (I, J) => A): IdMatrix[I, J, A] = {
+  inline def tabulate[I >: Int <: Id, J >: Int <: Id, A: ClassTag](inline f: (I, J) => A)(using countI: CountAll[I], countJ: CountAll[J]): IdMatrix[I, J, A] = {
     val result = new Array[A](countI.value * countJ.value)
     var index = 0
     countI.foreach { i =>
