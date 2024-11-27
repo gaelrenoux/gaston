@@ -40,6 +40,8 @@ object IdMap {
     inline def toSeq: Seq[A] = Seq(m*)
 
     inline def unsafeContent: Array[A] = m
+
+    inline def size: Count[I] = m.length
   }
 
   extension [I <: Id](m: IdMap[I, Score]) {

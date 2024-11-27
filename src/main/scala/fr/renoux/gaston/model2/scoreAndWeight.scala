@@ -12,6 +12,8 @@ object Score {
 
     @targetName("scoreMultiplyWeight")
     infix inline def *(w: Weight): Score = w * s
+
+    inline def value: Double = s
   }
 
   inline def Zero: Score = 0.0
@@ -32,6 +34,8 @@ object Weight {
   extension (w: Weight) {
     @targetName("weightMultiplyScore")
     infix inline def *(s: Score): Score = w * s
+
+    inline def value: Double = w
   }
 
   inline def Default: Weight = 1.0
