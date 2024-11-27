@@ -6,8 +6,10 @@ import cats.implicits.*
 import fr.renoux.gaston.model.{Score as _, Weight as _, *}
 import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.util.{Count as _, *}
+import fr.renoux.gaston.util.CanGroupToMap.given
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.{Constraint as _, *}
+import scala.collection.mutable
 
 
 /** Converts the Input object (canonical input) to the Problem object (internal representation of the problem to
@@ -30,11 +32,11 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Get all counts first */
-  lazy given slotsCount: CountAll[SlotId] = CountAll[SlotId](input.slots.flatten.size)
-  lazy given topicsCount: CountAll[TopicId] = CountAll[TopicId](slotsCount.value + input.topics.map { inT => inT.forcedOccurrences * inT.forcedDuration }.sum)
-  lazy given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
+  given slotsCount: CountAll[SlotId] = CountAll[SlotId](input.slots.flatten.size)
+  given topicsCount: CountAll[TopicId] = CountAll[TopicId](slotsCount.value + input.topics.map { inT => inT.forcedOccurrences * inT.forcedDuration }.sum)
+  given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
 
-  
+
 
   /* Persons */
   lazy val personsNames: IdMap[PersonId, String] = IdMap.unsafeFrom[PersonId, String](input.persons.map(_.name: String).toArray)
@@ -50,7 +52,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
   lazy val slotsMaxTopics: IdMap[SlotId, Count[TopicId]] = IdMap.unsafeFrom[SlotId, Count[TopicId]] {
     flattenedSlots.map(s => s.maxTopics.orElse(settings.defaultMaxTopicsPerSlot).getOrElse(Count.maxCount[TopicId])).toArray
   }
-  lazy val slotToNextSlot = {
+  lazy val slotToNextSlot: IdMap[SlotId, SlotId] = {
     val result = IdMap.tabulate[SlotId, SlotId](_.value + 1)
     var index = -1
     input.slots.map(_.size).foreach { seqLen =>
@@ -60,6 +62,9 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     result
   }
   lazy val slotsIdByName: Map[String, SlotId] = slotsNames.toReverseMap
+  private lazy val absencesBySlotId = input.persons.zipWithIndex.flatMap { (p, pid: PersonId) => p.absences.map(a => slotsIdByName(a) -> pid) }.groupToMap
+  lazy val slotsPersonsPresent: IdMap[SlotId, SmallIdSet[PersonId]] =
+    IdMap.tabulate[SlotId, SmallIdSet[PersonId]] { slotId => SmallIdSet.full[PersonId] -- absencesBySlotId(slotId) }
 
 
 
@@ -73,6 +78,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     var topicsForced = SmallIdSet.empty[TopicId]
     val topicsFollowup = IdMap.fill[TopicId, TopicId](TopicId.None)
     val prefsTopicPure = IdMap.empty[TopicId, Score]
+    val topicIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
 
     /* Insert unassigned topics */
     fastLoop(0, slotsCount.value) { id => 
@@ -81,6 +87,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       topicsMax(id) = Count.maxCount[PersonId]
       topicsAllowedSlots(id) = SmallIdSet[SlotId](id)
       topicsForced = topicsForced + id
+      topicIdsByBaseName(topicsNames(id)) = mutable.Set(id)
     }
 
     /* Then handle normal topics */
@@ -91,11 +98,12 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       val min: Count[PersonId] = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
+      topicIdsByBaseName(inTopic.name) = mutable.Set()
 
       // TODO adds exclusion for multi-occurrence
       // TODO multi-part topics: check on which slot each topic can happen (that leaves space for the followups)
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
-        /* for long topics, some stuff is only counted on the first part */
+        /* for long topics, topic presence score is only counted on the first part */
         inTopic.presence.foreach { score => prefsTopicPure(topicIdInt) = prefsTopicPure(topicIdInt) + score.value }
         inTopicOcc.partInstances.foreach { inTopicOccPart =>
           topicsNames(topicIdInt) = inTopicOccPart.name
@@ -107,12 +115,81 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
             topicsForced = topicsForced + topicIdInt
           }
           topicsFollowup(topicIdInt) = topicIdInt + 1
+          topicIdsByBaseName(inTopic.name) += topicIdInt
           topicIdInt += 1
         }
         topicsFollowup(topicIdInt - 1) = TopicId.None // last part doesn't get a followup
       }
     }
 
+    val topicsIdByName: Map[String, TopicId] = topicsNames.toReverseMap
+  }
+
+
+
+  /* Other constraints */
+  lazy object constraints {
+
+    val topicsSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+    val topicsNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+    input.constraints.simultaneous.fastForeach { inConstraint =>
+      val topicIds = inConstraint.topics.flatMap(topics.topicIdsByBaseName)
+      topicIds.fastForeach { tid =>
+        topicsSimultaneous(tid) = topicsSimultaneous(tid) ++ topicIds - tid
+      }
+    }
+    input.constraints.notSimultaneous.fastForeach { inConstraint =>
+      val topicIds = inConstraint.topics.flatMap(topics.topicIdsByBaseName)
+      topicIds.fastForeach { tid =>
+        topicsNotSimultaneous(tid) = topicsNotSimultaneous(tid) ++ topicIds - tid
+      }
+    }
+    // TODO Complete not simultaneous with the ones which have conflicting mandatories
+
+  }
+
+  /* Preferences */
+  lazy object preferences {
+
+    /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
+     * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
+     * high values that everyone else's preferences don't matter anymore. */
+    // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes. Easy handling could be to add whatever is necessary to all make them positive.
+    lazy val personsScoreFactors: Map[PersonId, Weight] = input.personsSet.view.map { inPerson =>
+      val pid = personsIdByName(inPerson.name)
+      val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
+      val totalPersonWishesScore = inPerson.personWishes.filter(_._2.value > 0).values.sum.value
+      val totalWishScore = totalTopicWishesScore + totalPersonWishesScore
+      val scoreFactor: Weight = Constants.PersonTotalScore.value / totalWishScore
+      pid -> scoreFactor
+    }.toMap
+
+    val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score] = IdMatrix.fill[PersonId, TopicId, Score](Score.Zero)
+    val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score] = IdMatrix.fill[PersonId, PersonId, Score](Score.Zero)
+    input.persons.foreach { inPerson =>
+      val pid = personsIdByName(inPerson.name)
+      val factor = personsScoreFactors(pid)
+      inPerson.wishes.foreach { (topicName, score) =>
+        // TODO Long-duration topics are counted twice as a reward. Is that correct ?
+        topics.topicIdsByBaseName(topicName).foreach { tid =>
+          prefsPersonTopic(pid, tid) = prefsPersonTopic(pid, tid) + (score.value * factor.value)
+        }
+      }
+      inPerson.personWishes.foreach { (personName, score) =>
+        val pid2 = personsIdByName(personName)
+        prefsPersonPerson(pid, pid2) = prefsPersonPerson(pid, pid2) + (score.value * factor.value)
+      }
+      inPerson.forbidden.foreach { topicName =>
+        topics.topicIdsByBaseName(topicName).foreach { tid =>
+          prefsPersonTopic(pid, tid) = Score.MinReward
+        }
+      }
+      inPerson.incompatible.foreach { personName =>
+        val pid2 = personsIdByName(personName)
+        prefsPersonPerson(pid, pid2) = Score.MinReward
+      }
+    }
+    // TODO Missing negative preferences for unassigned topics
   }
 
 
@@ -240,10 +317,18 @@ object InputTranscription2 {
         .filter(!input.personsNameSet.contains(_))
         .map(p => s"Exclusive constraint: unknown person: [$p]")
     } ++ {
+      input.constraints.exclusive
+        .filter(_.topics.size < 2)
+        .map(c => s"Exclusive constraint: should contain at least two topics: [${c.topics}]")
+    } ++ {
       input.constraints.linked
         .flatMap(_.topics)
         .filter(!input.topicsNameSet.contains(_))
         .map(t => s"Linked constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.linked
+        .filter(_.topics.size < 2)
+        .map(c => s"Linked constraint: should contain at least two topics: [${c.topics}]")
     } ++ {
       input.constraints.simultaneous
         .flatMap(_.topics)
@@ -254,14 +339,30 @@ object InputTranscription2 {
         .flatMap { inConstraint =>
           val topics = inConstraint.topics.flatMap(input.topicsByName.get)
           if (topics.map(_.forcedOccurrences).toSet.size > 1) {
-            Some(s"Simultaneous constraint: different occurrence count: [${inConstraint.topics.mkString(", ")}]")
+            Some(s"Simultaneous constraint: different occurrence count: [${inConstraint.topics.mkString(", ")}]") // TODO Not sure about that one
           } else None
         }
+    } ++ {
+      input.constraints.simultaneous
+        .flatMap { inConstraint =>
+          val topics = inConstraint.topics.flatMap(input.topicsByName.get)
+          topics.filter(_.forcedDuration > 1).map { topic =>
+            s"Simultaneous constraint: can't handle long-duration topic: [${topic.name}]"
+          }
+        }
+    } ++ {
+      input.constraints.simultaneous
+        .filter(_.topics.size < 2)
+        .map(c => s"Simultaneous constraint: should contain at least two topics: [${c.topics}]")
     } ++ {
       input.constraints.notSimultaneous
         .flatMap(_.topics)
         .filter(!input.topicsNameSet.contains(_))
-        .map(t => s"SNot-simultaneous constraint: unknown topic: [$t]")
+        .map(t => s"Not-simultaneous constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.notSimultaneous
+        .filter(_.topics.size < 2)
+        .map(c => s"SNot-simultaneous constraint: should contain at least two topics: [${c.topics}]")
     }
   }
 
