@@ -50,6 +50,8 @@ object Count {
 
     inline def foreachUntil(limit: I)(inline f: I => Unit) = fastLoop(0, limit)(f)
 
+    inline def map[A](inline f: I => A): IndexedSeq[A] = (0 until c).map(f)
+
     // TODO inline this method
     /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
     def find(f: I => Boolean): I = {
