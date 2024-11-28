@@ -91,37 +91,96 @@ class InputTranscription2Test extends TestBase {
       )
     }
 
-    "constraints" in {
-      transcription.constraints.topicsSimultaneous.size should be (6 + 14)
-      transcription.constraints.topicsSimultaneous.toSeq should be(
-        Seq.fill(6)(emptyIdSet) ++
-          Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
-          Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
-          Seq.fill(6)(emptyIdSet)
-      )
-      transcription.constraints.topicsNotSimultaneous.toSeq should be(
-        Seq.fill(6)(emptyIdSet) ++
-          Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
-          Seq(SmallIdSet(11, 12, 13), SmallIdSet(10, 12, 13), SmallIdSet(10, 11, 13), SmallIdSet(10, 11, 12)) ++
-          Seq.fill(6)(emptyIdSet)
-      )
+    "constraints" - {
+      "topicsSimultaneous" in {
+        transcription.constraints.topicsSimultaneous.size should be (6 + 14)
+        transcription.constraints.topicsSimultaneous.toSeq should be(
+          Seq.fill(6)(emptyIdSet) ++
+            Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
+            Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+            Seq.fill(6)(emptyIdSet)
+        )
+      }
+
+      "topicsNotSimultaneous" in {
+        transcription.constraints.topicsNotSimultaneous.toSeq should be(
+          Seq.fill(6)(emptyIdSet) ++
+            Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+            Seq(SmallIdSet(11, 12, 13), SmallIdSet(10, 12, 13), SmallIdSet(10, 11, 13), SmallIdSet(10, 11, 12)) ++
+            Seq.fill(6)(emptyIdSet)
+        )
+      }
     }
 
     // TODO add some preferences for the test
-    "preferences" in {
+    "preferences" - {
       import transcription.given
 
-      transcription.preferences.prefsPersonTopic.toSeq2.mapMap(_.value.round) should be(Seq(
-        Seq.fill(6)(-100) ++ Seq.fill(14)(0),
-        Seq.fill(6)(-1) ++ Seq(0, Score.MinReward, Score.MinReward, Score.MinReward) ++ Seq(Score.MinReward, Score.MinReward, 0, 0) ++ Seq.fill(6)(0),
-        Seq.fill(6)(-72) ++ Seq.fill(4)(0) ++ Seq(0, 0, Score.MinReward, Score.MinReward) ++ Seq.fill(6)(0)
-      ))
+      "prefsPersonTopic" in {
+        transcription.preferences.prefsPersonTopic.toSeq2.mapMap(_.value.round) should be(Seq(
+          Seq.fill(6)(-100) ++ Seq.fill(14)(0),
+          Seq.fill(6)(-1) ++ Seq(0, Score.MinReward, Score.MinReward, Score.MinReward) ++ Seq(Score.MinReward, Score.MinReward, 0, 0) ++ Seq.fill(6)(0),
+          Seq.fill(6)(-72) ++ Seq.fill(4)(0) ++ Seq(0, 0, Score.MinReward, Score.MinReward) ++ Seq.fill(6)(0)
+        ))
+      }
 
-      transcription.preferences.prefsPersonPerson.toSeq2.mapMap(_.value.round) should be(Seq(
-        Seq.fill(3)(Score.Zero),
-        Seq.fill(3)(Score.Zero),
-        Seq.fill(3)(Score.Zero)
-      ))
+      "prefsPersonPerson" in {
+        transcription.preferences.prefsPersonPerson.toSeq2.mapMap(_.value.round) should be(Seq(
+          Seq.fill(3)(Score.Zero),
+          Seq.fill(3)(Score.Zero),
+          Seq.fill(3)(Score.Zero)
+        ))
+      }
+
+      "prefsTopicsExclusive" in {
+        val prefsTopicsExclusive = transcription.topics.prefsTopicsExclusive.toSeq.map(_.toSeq2)
+        val expectedTop = Seq.tabulate(6) { id => Seq.tabulate(id + 1) { id2 => if (id2 == id) Score.Zero else -50 } } 
+        val expectedLeft =  Seq.fill(6)(Score.Zero)
+        prefsTopicsExclusive(0).take(6) should be(expectedTop)
+        prefsTopicsExclusive(1).take(6) should be(expectedTop)
+        prefsTopicsExclusive(2).take(6) should be(expectedTop)
+        prefsTopicsExclusive(0).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
+        prefsTopicsExclusive(1).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
+        prefsTopicsExclusive(2).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
+
+        prefsTopicsExclusive(0).drop(6).map(_.drop(6)) should be(Seq.tabulate(14) { id => Seq.fill(id + 1)(Score.Zero) })
+        prefsTopicsExclusive(1).drop(6).map(_.drop(6)) should be(
+          Seq(
+            Seq.fill[Score](1)(Score.Zero),
+            Seq.fill[Score](2)(Score.Zero),
+            Seq.fill[Score](3)(Score.Zero),
+            Seq.fill[Score](4)(Score.Zero),
+            Seq.fill[Score](5)(Score.Zero),
+            Seq.fill[Score](6)(Score.Zero),
+            Seq.fill[Score](4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero,
+            Seq.fill[Score](4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero :+ Score.Zero,
+            Seq.fill[Score](9)(Score.Zero),
+            Seq.fill[Score](10)(Score.Zero),
+            Seq.fill[Score](11)(Score.Zero),
+            Seq.fill[Score](12)(Score.Zero),
+            Seq.fill[Score](13)(Score.Zero),
+            Seq.fill[Score](14)(Score.Zero)
+          )
+        )
+        prefsTopicsExclusive(2).drop(6).map(_.drop(6)) should be(
+          Seq(
+            Seq.fill[Score](1)(Score.Zero),
+            Seq(Score.MinReward, Score.Zero),
+            Seq(Score.MinReward, Score.MinReward, Score.Zero),
+            Seq.fill[Score](4)(Score.Zero),
+            Seq.fill[Score](5)(Score.Zero),
+            Seq.fill[Score](6)(Score.Zero),
+            Seq.fill[Score](7)(Score.Zero),
+            Seq.fill[Score](8)(Score.Zero),
+            Seq.fill[Score](9)(Score.Zero),
+            Seq.fill[Score](10)(Score.Zero),
+            Seq.fill[Score](11)(Score.Zero),
+            Seq.fill[Score](12)(Score.Zero),
+            Seq.fill[Score](13)(Score.Zero),
+            Seq.fill[Score](14)(Score.Zero)
+          )
+        )
+      }
     }
   }
 
