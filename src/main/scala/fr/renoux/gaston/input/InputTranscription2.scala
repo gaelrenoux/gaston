@@ -98,6 +98,8 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     var topicsForced = SmallIdSet.empty[TopicId]
     val topicsFollowup = IdMap.fill[TopicId, TopicId](TopicId.None)
     val prefsTopicPure = IdMap.empty[TopicId, Score]
+    val prefsTopicsExclusive = IdMap.fill[PersonId, IdMatrixSymmetrical[TopicId, Score]](IdMatrixSymmetrical.empty[TopicId, Score])
+
     val topicIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
 
     /* Insert unassigned topics */
@@ -108,6 +110,18 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       topicsAllowedSlots(id) = SmallIdSet[SlotId](id)
       topicsForced = topicsForced + id
       topicIdsByBaseName(topicsNames(id)) = mutable.Set(id)
+
+      if (input.settings.unassigned.allowed) {
+        input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
+          unassignedTopicsCount.foreach { tid2 =>
+            if (tid2.value < id) {
+              personsCount.foreach { pid =>
+                prefsTopicsExclusive(pid)(id, tid2) = score.value
+              }
+            }
+          }
+        }
+      }
     }
 
     /* Then handle normal topics */
@@ -139,6 +153,25 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
           topicIdInt += 1
         }
         topicsFollowup(topicIdInt - 1) = TopicId.None // last part doesn't get a followup
+      }
+    }
+
+    input.constraints.exclusive.foreach { inConstraint =>
+      val exemptedPersonIds = inConstraint.exemptions.map(personsIdByName)
+      inConstraint.topics.cross(inConstraint.topics).foreach { (topicName1, topicName2) =>
+        if (topicName1 != topicName2) {
+          val tids1 = topicIdsByBaseName(topicName1)
+          val tids2 = topicIdsByBaseName(topicName2)
+          tids1.cross(tids2).foreach { (tid1, tid2) =>
+            if (tid1.value < tid2.value) { // avoid handling all couples twice, once from each side
+              personsCount.foreach { pid =>
+                if (!exemptedPersonIds.contains(pid)) {
+                  prefsTopicsExclusive(pid)(tid1, tid2) = Score.MinReward
+                }
+              }
+            }
+          }
+        }
       }
     }
 
@@ -212,7 +245,6 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
         prefsPersonTopic(pid, tid) = settingsUnassignedPrefByPerson(pid)
       }
     }
-    // TODO Missing exclusive prefs for unassigned topics
   }
 
 
