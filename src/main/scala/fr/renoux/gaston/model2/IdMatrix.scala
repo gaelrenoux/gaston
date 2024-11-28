@@ -49,7 +49,7 @@ object IdMatrix {
     }
   }
 
-  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](a: A)(using countI: CountAll[I], countJ: CountAll[J]): IdMatrix[I, J, A] = {
+  inline def fill[I >: Int <: Id, J >: Int <: Id, A: ClassTag](a: => A)(using countI: CountAll[I], countJ: CountAll[J]): IdMatrix[I, J, A] = {
     val result = new Array[A](countI.value * countJ.value)
     result.fastFill(a)
     result
