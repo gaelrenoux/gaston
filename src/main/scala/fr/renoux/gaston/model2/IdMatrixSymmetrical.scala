@@ -70,13 +70,16 @@ object IdMatrixSymmetrical {
     }
   }
 
-  inline def fill[I >: Int <: Id, A: ClassTag](using countI: CountAll[I])(a: A): IdMatrixSymmetrical[I, A] = {
+  inline def empty[I >: Int <: Id, A: ClassTag](using countI: CountAll[I]): IdMatrixSymmetrical[I, A] =
+    new Array[A](arraySize[I])
+
+  inline def fill[I >: Int <: Id, A: ClassTag](a: => A)(using countI: CountAll[I]): IdMatrixSymmetrical[I, A] = {
     val result = new Array[A](arraySize[I])
     result.fastFill(a)
     result
   }
 
-  inline def tabulate[I >: Int <: Id, A: ClassTag](using countI: CountAll[I])(inline f: (I, I) => A): IdMatrixSymmetrical[I, A] = {
+  inline def tabulate[I >: Int <: Id, A: ClassTag](inline f: (I, I) => A)(using countI: CountAll[I]): IdMatrixSymmetrical[I, A] = {
     val result = new Array[A](arraySize[I])
     var index = 0
     countI.foreach { i =>
