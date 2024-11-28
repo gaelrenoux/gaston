@@ -36,6 +36,25 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
   given topicsCount: CountAll[TopicId] = CountAll[TopicId](slotsCount.value + input.topics.map { inT => inT.forcedOccurrences * inT.forcedDuration }.sum)
   given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
 
+  val unassignedTopicsCount: Count[TopicId] = slotsCount.value
+
+
+  /* Settings */
+  lazy val settingsUnassignedPrefByPerson: IdMap[PersonId, Score] = {
+    if (!input.settings.unassigned.allowed) IdMap.fill[PersonId, Score](Score.MinReward)
+    else input.settings.unassigned.personAntiPreferenceScaling match {
+      case None => IdMap.fill[PersonId, Score](input.settings.unassigned.personAntiPreference.value)
+      case Some(scaling) => IdMap.tabulate[PersonId, Score] { pid =>
+        val forbiddenCount = input.persons(pid.value).forbidden.size
+        val forbiddenRatio = forbiddenCount.toDouble / input.topics.size
+        val scoreRatio = math.min(1, forbiddenRatio / scaling.forbiddenRatioForMaximum)
+        val variableScore: Score = scaling.maximumAntiPreference.value - input.settings.unassigned.personAntiPreference.value
+        input.settings.unassigned.personAntiPreference.value + (variableScore * scoreRatio)
+      }
+    }
+  }
+  // TODO No scaling for the exclusive prefs on unassigned topics, should it be the case?
+
 
 
   /* Persons */
@@ -46,6 +65,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
 
 
+  
   /* Slots */
   private lazy val flattenedSlots = input.slots.flatten
   lazy val slotsNames: IdMap[SlotId, String] = IdMap.unsafeFrom[SlotId, String](flattenedSlots.map(_.name: String).toArray)
@@ -188,8 +208,11 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
         val pid2 = personsIdByName(personName)
         prefsPersonPerson(pid, pid2) = Score.MinReward
       }
+      unassignedTopicsCount.foreach { tid =>
+        prefsPersonTopic(pid, tid) = settingsUnassignedPrefByPerson(pid)
+      }
     }
-    // TODO Missing negative preferences for unassigned topics
+    // TODO Missing exclusive prefs for unassigned topics
   }
 
 
