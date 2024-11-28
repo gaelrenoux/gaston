@@ -48,7 +48,7 @@ object IdMap {
     inline def sortedValues: Array[Score] = m.sorted
   }
 
-  inline def fill[I >: Int <: Id, A: ClassTag](a: A)(using countI: CountAll[I]): IdMap[I, A] = {
+  inline def fill[I >: Int <: Id, A: ClassTag](a: => A)(using countI: CountAll[I]): IdMap[I, A] = {
     val result = new Array[A](countI.value)
     result.fastFill(a)
     result
