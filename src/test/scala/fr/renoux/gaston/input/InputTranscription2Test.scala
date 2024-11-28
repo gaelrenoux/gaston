@@ -3,6 +3,7 @@ package fr.renoux.gaston.input
 import fr.renoux.gaston.TestBase
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.model2.*
+import fr.renoux.gaston.util.{Count as _, *}
 
 
 class InputTranscription2Test extends TestBase {
@@ -25,6 +26,8 @@ class InputTranscription2Test extends TestBase {
       defMaxPersonsPerTopic should be(6)
       defMinPersonsPerTopic should be(4)
       defMaxTopicsPerSlot should be(50)
+
+      transcription.settingsUnassignedPrefByPerson.toSeq.map(_.value.round) should be(Seq(-100, -1, -72))
     }
 
     "slots" in {
@@ -107,12 +110,14 @@ class InputTranscription2Test extends TestBase {
     // TODO add some preferences for the test
     "preferences" in {
       import transcription.given
-      transcription.preferences.prefsPersonTopic.toSeq2 should be(Seq(
-        Seq.fill(6 + 14)(Score.Zero),
-        Seq.fill(6 + 14)(Score.Zero),
-        Seq.fill(6 + 14)(Score.Zero)
+
+      transcription.preferences.prefsPersonTopic.toSeq2.mapMap(_.value.round) should be(Seq(
+        Seq.fill(6)(-100) ++ Seq.fill(14)(0),
+        Seq.fill(6)(-1) ++ Seq(0, Score.MinReward, Score.MinReward, Score.MinReward) ++ Seq(Score.MinReward, Score.MinReward, 0, 0) ++ Seq.fill(6)(0),
+        Seq.fill(6)(-72) ++ Seq.fill(4)(0) ++ Seq(0, 0, Score.MinReward, Score.MinReward) ++ Seq.fill(6)(0)
       ))
-      transcription.preferences.prefsPersonPerson.toSeq2 should be(Seq(
+
+      transcription.preferences.prefsPersonPerson.toSeq2.mapMap(_.value.round) should be(Seq(
         Seq.fill(3)(Score.Zero),
         Seq.fill(3)(Score.Zero),
         Seq.fill(3)(Score.Zero)
