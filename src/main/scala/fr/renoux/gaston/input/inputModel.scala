@@ -69,6 +69,8 @@ object Constants {
 
 }
 
+// TODO version the model to make it easier to modify ?
+
 final case class InputModel(
     settings: InputSettings = InputSettings(),
     tableSettings: InputTableSettings = InputTableSettings(),
@@ -107,6 +109,7 @@ object InputSettings {
       personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
       personMultipleAntiPreference: Option[NonPosScore] = None
   )
+  // TODO not sure why I called all these preferences, score would be just as fine
 
   /** If this is enabled, the anti-preference for unassigned will scale with the number of forbidden topics for each person.
    * @param maximumAntiPreference The maximum value of the anti-preference (i.e., closest to zero).
