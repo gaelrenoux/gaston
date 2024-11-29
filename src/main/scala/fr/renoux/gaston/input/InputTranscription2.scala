@@ -250,6 +250,29 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
         }
       }
     }
+
+    val prefsTopicsLinked = IdMatrixSymmetrical.fill[TopicId, Boolean](false)
+    input.constraints.linked.foreach { inConstraint =>
+      inConstraint.topics.cross(inConstraint.topics).foreach {(topicName1, topicName2) =>
+        if (topicName1 < topicName2) { // only handle each couple once
+          val tids1 = topics.topicsIdsByBaseName(topicName1)
+          val tids2 = topics.topicsIdsByBaseName(topicName2)
+          tids1.cross(tids2).foreach { (tid1, tid2) =>
+            prefsTopicsLinked(tid1, tid2) = true
+          }
+        }
+      }
+    }
+    input.topics.filter(_.forcedDuration > 1).foreach { (inTopic: InputTopic) =>
+      inTopic.occurrenceInstances.foreach { inTopicOcc =>
+        val partsIds = inTopicOcc.partInstances.map(t => topics.topicsIdByName(t.name))
+        partsIds.cross(partsIds).foreach { (tid1, tid2) =>
+          if (tid1.value < tid2.value) {
+            prefsTopicsLinked(tid1, tid2) = true
+          }
+        }
+      }
+    }
   }
 
 
@@ -385,6 +408,12 @@ object InputTranscription2 {
         .flatMap(_.topics)
         .filter(!input.topicsNameSet.contains(_))
         .map(t => s"Linked constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.linked
+        .flatMap(_.topics)
+        .flatMap(input.topicsByName.get)
+        .filter(_.forcedOccurrences > 1)
+        .map(t => s"Linked constraint: can't handle multi-occurrence topics: [$t]")
     } ++ {
       input.constraints.linked
         .filter(_.topics.size < 2)
