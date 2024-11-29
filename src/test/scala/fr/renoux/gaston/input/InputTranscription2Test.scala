@@ -143,7 +143,24 @@ class InputTranscription2Test extends TestBase {
         prefsTopicsExclusive(1).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
         prefsTopicsExclusive(2).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
 
-        prefsTopicsExclusive(0).drop(6).map(_.drop(6)) should be(Seq.tabulate(14) { id => Seq.fill(id + 1)(Score.Zero) })
+        prefsTopicsExclusive(0).drop(6).map(_.drop(6)) should be(
+          Seq(
+            Seq.fill(1)(Score.Zero),
+            Seq.fill(2)(Score.Zero),
+            Seq.fill(3)(Score.Zero),
+            Seq.fill(4)(Score.Zero),
+            Seq.fill(5)(Score.Zero),
+            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.Zero, // Epsilon 2
+            Seq.fill(7)(Score.Zero),
+            Seq.fill(8)(Score.Zero),
+            Seq.fill(9)(Score.Zero), //Theta 1-1
+            Seq.fill(10)(Score.Zero), //Theta 1-2
+            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.Zero , //Theta 2-1
+            Seq.fill(12)(Score.Zero), //Theta 2-2
+            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.MinReward :+ Score.Zero :+ Score.Zero, //Theta 3-1
+            Seq.fill(14)(Score.Zero) //Theta 3-2
+          )
+        )
         prefsTopicsExclusive(1).drop(6).map(_.drop(6)) should be(
           Seq(
             Seq.fill(1)(Score.Zero),
@@ -151,15 +168,15 @@ class InputTranscription2Test extends TestBase {
             Seq.fill(3)(Score.Zero),
             Seq.fill(4)(Score.Zero),
             Seq.fill(5)(Score.Zero),
-            Seq.fill(6)(Score.Zero),
+            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.Zero, // Epsilon 2
             Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero,
             Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero :+ Score.Zero,
-            Seq.fill(9)(Score.Zero),
-            Seq.fill(10)(Score.Zero),
-            Seq.fill(11)(Score.Zero),
-            Seq.fill(12)(Score.Zero),
-            Seq.fill(13)(Score.Zero),
-            Seq.fill(14)(Score.Zero)
+            Seq.fill(9)(Score.Zero), //Theta 1-1
+            Seq.fill(10)(Score.Zero), //Theta 1-2
+            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.Zero , //Theta 2-1
+            Seq.fill(12)(Score.Zero), //Theta 2-2
+            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.MinReward :+ Score.Zero :+ Score.Zero, //Theta 3-1
+            Seq.fill(14)(Score.Zero) //Theta 3-2
           )
         )
         prefsTopicsExclusive(2).drop(6).map(_.drop(6)) should be(
@@ -169,7 +186,7 @@ class InputTranscription2Test extends TestBase {
             Seq(Score.MinReward, Score.MinReward, Score.Zero),
             Seq.fill(4)(Score.Zero),
             Seq.fill(5)(Score.Zero),
-            Seq.fill(6)(Score.Zero),
+            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.Zero, // Epsilon 2
             Seq.fill(7)(Score.Zero),
             Seq.fill(8)(Score.Zero),
             Seq.fill(9)(Score.Zero),
