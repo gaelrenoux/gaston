@@ -146,40 +146,62 @@ class InputTranscription2Test extends TestBase {
         prefsTopicsExclusive(0).drop(6).map(_.drop(6)) should be(Seq.tabulate(14) { id => Seq.fill(id + 1)(Score.Zero) })
         prefsTopicsExclusive(1).drop(6).map(_.drop(6)) should be(
           Seq(
-            Seq.fill[Score](1)(Score.Zero),
-            Seq.fill[Score](2)(Score.Zero),
-            Seq.fill[Score](3)(Score.Zero),
-            Seq.fill[Score](4)(Score.Zero),
-            Seq.fill[Score](5)(Score.Zero),
-            Seq.fill[Score](6)(Score.Zero),
-            Seq.fill[Score](4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero,
-            Seq.fill[Score](4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero :+ Score.Zero,
-            Seq.fill[Score](9)(Score.Zero),
-            Seq.fill[Score](10)(Score.Zero),
-            Seq.fill[Score](11)(Score.Zero),
-            Seq.fill[Score](12)(Score.Zero),
-            Seq.fill[Score](13)(Score.Zero),
-            Seq.fill[Score](14)(Score.Zero)
+            Seq.fill(1)(Score.Zero),
+            Seq.fill(2)(Score.Zero),
+            Seq.fill(3)(Score.Zero),
+            Seq.fill(4)(Score.Zero),
+            Seq.fill(5)(Score.Zero),
+            Seq.fill(6)(Score.Zero),
+            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero,
+            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero :+ Score.Zero,
+            Seq.fill(9)(Score.Zero),
+            Seq.fill(10)(Score.Zero),
+            Seq.fill(11)(Score.Zero),
+            Seq.fill(12)(Score.Zero),
+            Seq.fill(13)(Score.Zero),
+            Seq.fill(14)(Score.Zero)
           )
         )
         prefsTopicsExclusive(2).drop(6).map(_.drop(6)) should be(
           Seq(
-            Seq.fill[Score](1)(Score.Zero),
+            Seq.fill(1)(Score.Zero),
             Seq(Score.MinReward, Score.Zero),
             Seq(Score.MinReward, Score.MinReward, Score.Zero),
-            Seq.fill[Score](4)(Score.Zero),
-            Seq.fill[Score](5)(Score.Zero),
-            Seq.fill[Score](6)(Score.Zero),
-            Seq.fill[Score](7)(Score.Zero),
-            Seq.fill[Score](8)(Score.Zero),
-            Seq.fill[Score](9)(Score.Zero),
-            Seq.fill[Score](10)(Score.Zero),
-            Seq.fill[Score](11)(Score.Zero),
-            Seq.fill[Score](12)(Score.Zero),
-            Seq.fill[Score](13)(Score.Zero),
-            Seq.fill[Score](14)(Score.Zero)
+            Seq.fill(4)(Score.Zero),
+            Seq.fill(5)(Score.Zero),
+            Seq.fill(6)(Score.Zero),
+            Seq.fill(7)(Score.Zero),
+            Seq.fill(8)(Score.Zero),
+            Seq.fill(9)(Score.Zero),
+            Seq.fill(10)(Score.Zero),
+            Seq.fill(11)(Score.Zero),
+            Seq.fill(12)(Score.Zero),
+            Seq.fill(13)(Score.Zero),
+            Seq.fill(14)(Score.Zero)
           )
         )
+      }
+
+      "prefsTopicsLinked" in {
+        val prefsTopicsLinked = transcription.preferences.prefsTopicsLinked.toSeq2
+        prefsTopicsLinked.take(6) should be(Seq.tabulate(6) { id => Seq.fill(id + 1)(false) })
+        prefsTopicsLinked.drop(6).map(_.take(6)) should be(Seq.fill(14)(Seq.fill(6)(false)))
+        prefsTopicsLinked.drop(6).map(_.drop(6)) should be(Seq(
+            Seq.fill(1)(false),
+            Seq.fill(2)(false),
+            Seq.fill(3)(false),
+            Seq.fill(4)(false),
+            Seq.fill(5)(false),
+            Seq.fill(6)(false),
+            true +: Seq.fill(6)(false),
+            true +: Seq.fill(5)(false) :+ true :+ false,
+            Seq.fill(9)(false),
+            Seq.fill(8)(false) :+ true :+ false,
+            Seq.fill(11)(false),
+            Seq.fill(10)(false) :+ true :+ false,
+            Seq.fill(13)(false),
+            Seq.fill(12)(false) :+ true :+ false
+        ))
       }
     }
   }
