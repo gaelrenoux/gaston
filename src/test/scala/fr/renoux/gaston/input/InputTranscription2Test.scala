@@ -133,7 +133,7 @@ class InputTranscription2Test extends TestBase {
       }
 
       "prefsTopicsExclusive" in {
-        val prefsTopicsExclusive = transcription.topics.prefsTopicsExclusive.toSeq.map(_.toSeq2)
+        val prefsTopicsExclusive = transcription.preferences.prefsTopicsExclusive.toSeq.map(_.toSeq2)
         val expectedTop = Seq.tabulate(6) { id => Seq.tabulate(id + 1) { id2 => if (id2 == id) Score.Zero else -50 } } 
         val expectedLeft =  Seq.fill(6)(Score.Zero)
         prefsTopicsExclusive(0).take(6) should be(expectedTop)
