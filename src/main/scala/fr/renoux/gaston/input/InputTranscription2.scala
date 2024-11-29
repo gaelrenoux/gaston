@@ -53,7 +53,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       }
     }
   }
-  // TODO No scaling for the exclusive prefs on unassigned topics, should it be the case?
+  // TODO No scaling for the exclusive prefs on unassigned topics, should it be the case? It's added to the scaling score, so maybe not.
 
 
 
@@ -97,10 +97,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     val topicsAllowedSlots = IdMap.fill[TopicId, SmallIdSet[SlotId]](SmallIdSet.full[SlotId])
     var topicsForced = SmallIdSet.empty[TopicId]
     val topicsFollowup = IdMap.fill[TopicId, TopicId](TopicId.None)
-    val prefsTopicPure = IdMap.empty[TopicId, Score]
-    val prefsTopicsExclusive = IdMap.fill[PersonId, IdMatrixSymmetrical[TopicId, Score]](IdMatrixSymmetrical.empty[TopicId, Score])
-
-    val topicIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
+    val topicsIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
 
     /* Insert unassigned topics */
     fastLoop(0, slotsCount.value) { id => 
@@ -109,19 +106,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       topicsMax(id) = Count.maxCount[PersonId]
       topicsAllowedSlots(id) = SmallIdSet[SlotId](id)
       topicsForced = topicsForced + id
-      topicIdsByBaseName(topicsNames(id)) = mutable.Set(id)
-
-      if (input.settings.unassigned.allowed) {
-        input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
-          unassignedTopicsCount.foreach { tid2 =>
-            if (tid2.value < id) {
-              personsCount.foreach { pid =>
-                prefsTopicsExclusive(pid)(id, tid2) = score.value
-              }
-            }
-          }
-        }
-      }
+      topicsIdsByBaseName(topicsNames(id)) = mutable.Set(id)
     }
 
     /* Then handle normal topics */
@@ -132,13 +117,11 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       val min: Count[PersonId] = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
-      topicIdsByBaseName(inTopic.name) = mutable.Set()
+      topicsIdsByBaseName(inTopic.name) = mutable.Set()
 
       // TODO adds exclusion for multi-occurrence
       // TODO multi-part topics: check on which slot each topic can happen (that leaves space for the followups)
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
-        /* for long topics, topic presence score is only counted on the first part */
-        inTopic.presence.foreach { score => prefsTopicPure(topicIdInt) = prefsTopicPure(topicIdInt) + score.value }
         inTopicOcc.partInstances.foreach { inTopicOccPart =>
           topicsNames(topicIdInt) = inTopicOccPart.name
           topicsMandatories(topicIdInt) = mandatories
@@ -149,29 +132,10 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
             topicsForced = topicsForced + topicIdInt
           }
           topicsFollowup(topicIdInt) = topicIdInt + 1
-          topicIdsByBaseName(inTopic.name) += topicIdInt
+          topicsIdsByBaseName(inTopic.name) += topicIdInt
           topicIdInt += 1
         }
         topicsFollowup(topicIdInt - 1) = TopicId.None // last part doesn't get a followup
-      }
-    }
-
-    input.constraints.exclusive.foreach { inConstraint =>
-      val exemptedPersonIds = inConstraint.exemptions.map(personsIdByName)
-      inConstraint.topics.cross(inConstraint.topics).foreach { (topicName1, topicName2) =>
-        if (topicName1 != topicName2) {
-          val tids1 = topicIdsByBaseName(topicName1)
-          val tids2 = topicIdsByBaseName(topicName2)
-          tids1.cross(tids2).foreach { (tid1, tid2) =>
-            if (tid1.value < tid2.value) { // avoid handling all couples twice, once from each side
-              personsCount.foreach { pid =>
-                if (!exemptedPersonIds.contains(pid)) {
-                  prefsTopicsExclusive(pid)(tid1, tid2) = Score.MinReward
-                }
-              }
-            }
-          }
-        }
       }
     }
 
@@ -186,13 +150,13 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     val topicsSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     val topicsNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     input.constraints.simultaneous.fastForeach { inConstraint =>
-      val topicIds = inConstraint.topics.flatMap(topics.topicIdsByBaseName)
+      val topicIds = inConstraint.topics.flatMap(topics.topicsIdsByBaseName)
       topicIds.fastForeach { tid =>
         topicsSimultaneous(tid) = topicsSimultaneous(tid) ++ topicIds - tid
       }
     }
     input.constraints.notSimultaneous.fastForeach { inConstraint =>
-      val topicIds = inConstraint.topics.flatMap(topics.topicIdsByBaseName)
+      val topicIds = inConstraint.topics.flatMap(topics.topicsIdsByBaseName)
       topicIds.fastForeach { tid =>
         topicsNotSimultaneous(tid) = topicsNotSimultaneous(tid) ++ topicIds - tid
       }
@@ -200,6 +164,8 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     // TODO Complete not simultaneous with the ones which have conflicting mandatories
 
   }
+
+
 
   /* Preferences */
   lazy object preferences {
@@ -224,7 +190,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       val factor = personsScoreFactors(pid)
       inPerson.wishes.foreach { (topicName, score) =>
         // TODO Long-duration topics are counted twice as a reward. Is that correct ?
-        topics.topicIdsByBaseName(topicName).foreach { tid =>
+        topics.topicsIdsByBaseName(topicName).foreach { tid =>
           prefsPersonTopic(pid, tid) = prefsPersonTopic(pid, tid) + (score.value * factor.value)
         }
       }
@@ -233,7 +199,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
         prefsPersonPerson(pid, pid2) = prefsPersonPerson(pid, pid2) + (score.value * factor.value)
       }
       inPerson.forbidden.foreach { topicName =>
-        topics.topicIdsByBaseName(topicName).foreach { tid =>
+        topics.topicsIdsByBaseName(topicName).foreach { tid =>
           prefsPersonTopic(pid, tid) = Score.MinReward
         }
       }
@@ -243,6 +209,45 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       }
       unassignedTopicsCount.foreach { tid =>
         prefsPersonTopic(pid, tid) = settingsUnassignedPrefByPerson(pid)
+      }
+    }
+
+    val prefsTopicPure = IdMap.empty[TopicId, Score]
+    input.topics.foreach { (inTopic: InputTopic) =>
+      inTopic.occurrenceInstances.foreach { inTopicOcc =>
+        /* for long topics, topic presence score is only counted on the first part */
+        val firstPart = inTopicOcc.partInstances.head
+        val topicId = topics.topicsIdByName(firstPart.name)
+        inTopic.presence.foreach { score => prefsTopicPure(topicId) = score.value }
+      }
+    }
+
+    val prefsTopicsExclusive = IdMap.fill[PersonId, IdMatrixSymmetrical[TopicId, Score]](IdMatrixSymmetrical.empty[TopicId, Score])
+    /* Exclusive preference over unassigned topics */
+    if (input.settings.unassigned.allowed) input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
+      unassignedTopicsCount.foreach { tid => 
+        unassignedTopicsCount.foreachUntil(tid) { tid2 =>
+          personsCount.foreach { pid =>
+            prefsTopicsExclusive(pid)(tid, tid2) = score.value
+          }
+        }
+      }
+    }
+    /* Exclusive preference explicitly required by global constraints */
+    input.constraints.exclusive.foreach { inConstraint =>
+      val exemptedPersonIds = inConstraint.exemptions.map(personsIdByName)
+      inConstraint.topics.cross(inConstraint.topics).foreach { (topicName1, topicName2) =>
+        if (topicName1 < topicName2) { // only handle each couple once
+          val tids1 = topics.topicsIdsByBaseName(topicName1)
+          val tids2 = topics.topicsIdsByBaseName(topicName2)
+          tids1.cross(tids2).foreach { (tid1, tid2) =>
+            personsCount.foreach { pid =>
+              if (!exemptedPersonIds.contains(pid)) {
+                prefsTopicsExclusive(pid)(tid1, tid2) = Score.MinReward
+              }
+            }
+          }
+        }
       }
     }
   }
