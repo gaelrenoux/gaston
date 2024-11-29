@@ -113,7 +113,6 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
     var topicIdInt = slotsCount.value
     input.topics.foreach { (inTopic: InputTopic) =>
       val mandatories: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
-      // TODO val forbidden : SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
       val min: Count[PersonId] = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
