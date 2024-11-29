@@ -119,7 +119,6 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
       topicsIdsByBaseName(inTopic.name) = mutable.Set()
 
-      // TODO adds exclusion for multi-occurrence
       // TODO multi-part topics: check on which slot each topic can happen (that leaves space for the followups)
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
         inTopicOcc.partInstances.foreach { inTopicOccPart =>
@@ -229,6 +228,19 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
         unassignedTopicsCount.foreachUntil(tid) { tid2 =>
           personsCount.foreach { pid =>
             prefsTopicsExclusive(pid)(tid, tid2) = score.value
+          }
+        }
+      }
+    }
+    /* Exclusive preference over multi-occurrence topics */
+    input.topics.filter(_.forcedOccurrences > 1).foreach { (inTopic: InputTopic) =>
+      val occurrenceFirstParts = inTopic.occurrenceInstances.map(_.partInstances.head)
+      val occurrenceFirstPartsIds = occurrenceFirstParts.map(t => topics.topicsIdByName(t.name))
+      val mandatoriesIds = topics.topicsMandatories(occurrenceFirstPartsIds.head)
+      occurrenceFirstPartsIds.cross(occurrenceFirstPartsIds).foreach { (tid1, tid2) =>
+        if (tid1.value < tid2.value) personsCount.foreach { pid =>
+          if (!mandatoriesIds.contains(pid)) {
+            prefsTopicsExclusive(pid)(tid1, tid2) = Score.MinReward
           }
         }
       }
