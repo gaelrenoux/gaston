@@ -28,30 +28,30 @@ class InputTranscription2Test extends TestBase {
       defMinPersonsPerTopic should be(4)
       defMaxTopicsPerSlot should be(50)
 
-      transcription.settingsUnassignedPrefByPerson.toSeq.map(_.value.round) should be(Seq(-100, -1, -72))
+      transcription.settingsUnassignedPrefByPerson.valuesSeq.map(_.value.round) should be(Seq(-100, -1, -72))
     }
 
     "slots" in {
       transcription.slotsCount should be(6)
-      transcription.slotsNames.toSeq should be(
+      transcription.slotsNames.valuesSeq should be(
         Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night")
       )
-      transcription.slotsMaxTopics.toSeq should be(
+      transcription.slotsMaxTopics.valuesSeq should be(
         Seq(defMaxTopicsPerSlot, 5, defMaxTopicsPerSlot, defMaxTopicsPerSlot, defMaxTopicsPerSlot, defMaxTopicsPerSlot)
       )
-      transcription.slotToNextSlot.toSeq should be(Seq(1, SlotId.None, SlotId.None, 4, 5, SlotId.None))
+      transcription.slotsToNextSlot.valuesSeq should be(Seq(1, SlotId.None, SlotId.None, 4, 5, SlotId.None))
     }
 
     "persons" in {
       transcription.personsCount should be(3)
-      transcription.personsNames.toSeq should be(Seq("Albert", "Bianca", "Charly"))
-      transcription.personsWeights.toSeq should be(Seq(Weight.Default, 1.0, 2.0))
-      transcription.personsBaseScores.toSeq should be(Seq(Score.Zero, 20, Score.Zero))
+      transcription.personsName.valuesSeq should be(Seq("Albert", "Bianca", "Charly"))
+      transcription.personsWeight.valuesSeq should be(Seq(Weight.Default, 1.0, 2.0))
+      transcription.personsBaseScore.valuesSeq should be(Seq(Score.Zero, 20, Score.Zero))
     }
 
     "topics" in {
       transcription.topicsCount should be(6 + 14) // unassigned + normal (with occ/long)
-      transcription.topics.topicsNames.toSeq should be(
+      transcription.topics.topicsName.valuesSeq should be(
         Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night").map(s =>
           s"@Unassigned ($s)"
         ) ++
@@ -60,31 +60,31 @@ class InputTranscription2Test extends TestBase {
           Seq("Theta #1 ~1", "Theta #1 ~2", "Theta #2 ~1", "Theta #2 ~2", "Theta #3 ~1", "Theta #3 ~2")
       )
       transcription.topics.topicsForced.toSet should be((0 to 5).toSet ++ Set(8) ++ (14 to 19).toSet)
-      transcription.topics.topicsMax.toSeq should be(
+      transcription.topics.topicsMax.valuesSeq should be(
         Seq.fill(6)(maxCount) ++
           Seq(defMaxPersonsPerTopic, 5, defMaxPersonsPerTopic, defMaxPersonsPerTopic) ++
           Seq(defMaxPersonsPerTopic, defMaxPersonsPerTopic, defMaxPersonsPerTopic, defMaxPersonsPerTopic) ++
           Seq.fill(6)(7)
       )
-      transcription.topics.topicsMin.toSeq should be(
+      transcription.topics.topicsMin.valuesSeq should be(
         Seq.fill(6)(0) ++
           Seq(defMinPersonsPerTopic, defMinPersonsPerTopic, 2, defMinPersonsPerTopic) ++
           Seq(defMinPersonsPerTopic, defMinPersonsPerTopic, defMinPersonsPerTopic, defMinPersonsPerTopic) ++
           Seq.fill(6)(5)
       )
-      transcription.topics.topicsMandatories.toSeq should be(
+      transcription.topics.topicsMandatories.valuesSeq should be(
         Seq.fill(6)(emptyIdSet) ++
           Seq(SmallIdSet(0, 1), emptyIdSet, emptyIdSet, SmallIdSet(0)) ++
           Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
           Seq.fill(6)(SmallIdSet(2))
       )
-      transcription.topics.topicsAllowedSlots.toSeq should be(
+      transcription.topics.topicsAllowedSlots.valuesSeq should be(
         (0 to 5).map(SmallIdSet(_)) ++
           Seq(fullIdSet, fullIdSet, fullIdSet, SmallIdSet(1, 4)) ++
           Seq(fullIdSet, fullIdSet, fullIdSet, fullIdSet) ++
           Seq.fill(6)(fullIdSet)
       )
-      transcription.topics.topicsFollowup.toSeq should be(
+      transcription.topics.topicsFollowup.valuesSeq should be(
         Seq.fill(6)(TopicId.None) ++
           Seq(TopicId.None, TopicId.None, TopicId.None, TopicId.None) ++
           Seq(TopicId.None, TopicId.None, 13, TopicId.None) ++
@@ -95,7 +95,7 @@ class InputTranscription2Test extends TestBase {
     "constraints" - {
       "topicsSimultaneous" in {
         transcription.constraints.topicsSimultaneous.size should be (6 + 14)
-        transcription.constraints.topicsSimultaneous.toSeq should be(
+        transcription.constraints.topicsSimultaneous.valuesSeq should be(
           Seq.fill(6)(emptyIdSet) ++
             Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
             Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
@@ -104,7 +104,7 @@ class InputTranscription2Test extends TestBase {
       }
 
       "topicsNotSimultaneous" in {
-        transcription.constraints.topicsNotSimultaneous.toSeq should be(
+        transcription.constraints.topicsNotSimultaneous.valuesSeq should be(
           Seq.fill(6)(emptyIdSet) ++
             Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
             Seq(SmallIdSet(11, 12, 13), SmallIdSet(10, 12, 13), SmallIdSet(10, 11, 13), SmallIdSet(10, 11, 12)) ++
@@ -187,7 +187,7 @@ class InputTranscription2Test extends TestBase {
       }
 
       "prefsTopicsExclusive" in {
-        val prefsTopicsExclusive = transcription.preferences.prefsTopicsExclusive.toSeq.map(_.toSeq2)
+        val prefsTopicsExclusive = transcription.preferences.prefsTopicsExclusive.valuesSeq.map(_.toSeq2)
         val expectedTop = Seq.tabulate(6) { id => Seq.tabulate(id + 1) { id2 => if (id2 == id) Score.Zero else -50 } } 
         val expectedLeft =  Seq.fill(6)(Score.Zero)
         prefsTopicsExclusive(0).take(6) should be(expectedTop)
@@ -290,17 +290,17 @@ class InputTranscription2Test extends TestBase {
       println("Count: " + transcription.slotsCount.toPrettyString)
       println("Names: " + transcription.slotsNames.toPrettyString)
       println("Max topics: " + transcription.slotsMaxTopics.toPrettyString)
-      println("Followups: " + transcription.slotToNextSlot.toPrettyString)
+      println("Followups: " + transcription.slotsToNextSlot.toPrettyString)
 
       println("\nPersons ----------------------------------")
       println("Count: " + transcription.personsCount.toPrettyString)
-      println("Names: " + transcription.personsNames.toPrettyString)
-      println("Weights: " + transcription.personsWeights.toPrettyString)
-      println("Base scores: " + transcription.personsBaseScores.toPrettyString)
+      println("Names: " + transcription.personsName.toPrettyString)
+      println("Weights: " + transcription.personsWeight.toPrettyString)
+      println("Base scores: " + transcription.personsBaseScore.toPrettyString)
 
       println("\nTopics -----------------------------------")
       println("Count: " + transcription.topicsCount.toPrettyString)
-      println("Names: " + transcription.topics.topicsNames.toPrettyString)
+      println("Names: " + transcription.topics.topicsName.toPrettyString)
       println("Max: " + transcription.topics.topicsMax.toPrettyString)
       println("Min: " + transcription.topics.topicsMin.toPrettyString)
       println("Mandatories: " + transcription.topics.topicsMandatories.toPrettyString)
