@@ -218,6 +218,7 @@ class SmallIdSetTest extends TestBase {
   }
 
   "foreach" - {
+    given Count[TopicId] = 64
 
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
@@ -242,6 +243,8 @@ class SmallIdSetTest extends TestBase {
   }
 
   "mapSumToScore" - {
+    given Count[TopicId] = 64
+
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       val result = set.mapSumToScore(tid => tid.value * 2)
@@ -307,6 +310,8 @@ class SmallIdSetTest extends TestBase {
     }
 
     "left is full" in {
+      given Count[SlotId] = 64
+
       val a = SmallIdSet[SlotId](3, 8, 47, 63)
       val expectedSet: Set[SlotId] = (0 until 63).toSet -- a.toSet
       val expected = SmallIdSet[SlotId](expectedSet.toSeq*)
