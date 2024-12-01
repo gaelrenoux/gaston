@@ -12,6 +12,8 @@ class InputTranscription2Test extends TestBase {
   val emptyIdSet = SmallIdSet.empty[Id]
   val fullIdSet = SmallIdSet.full[Id]
 
+  // TODO Add tests for bad model
+
   "Correct model" - {
     val input: InputModel = InputLoader.fromClassPath("transcription-test.conf").force
     val transcription = InputTranscription2(input)
@@ -32,6 +34,8 @@ class InputTranscription2Test extends TestBase {
     }
 
     "slots" in {
+      import transcription.given
+
       transcription.slotsCount should be(6)
       transcription.slotsNames.valuesSeq should be(
         Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night")
@@ -40,6 +44,14 @@ class InputTranscription2Test extends TestBase {
         Seq(defMaxTopicsPerSlot, 5, defMaxTopicsPerSlot, defMaxTopicsPerSlot, defMaxTopicsPerSlot, defMaxTopicsPerSlot)
       )
       transcription.slotsToNextSlot.valuesSeq should be(Seq(1, SlotId.None, SlotId.None, 4, 5, SlotId.None))
+      transcription.slotsPersonsPresent.valuesSeq.map(_.toSet) should be(Seq(
+        Set(0, 1, 2),
+        Set(0, 1, 2),
+        Set(1, 2),
+        Set(0, 1, 2),
+        Set(0, 1, 2),
+        Set(1, 2)
+      ))
     }
 
     "persons" in {
@@ -182,7 +194,7 @@ class InputTranscription2Test extends TestBase {
 
       "prefsPersonPerson" in {
         transcription.preferences.prefsPersonPerson.toSeq2.mapMap(_.value.round) should be(Seq(
-          Seq.fill(3)(Score.Zero),
+          Seq(Score.Zero, input.settings.incompatibilityAntiPreference.value, Score.Zero),
           Seq.fill(3)(Score.Zero),
           Seq(200, Score.Zero, Score.Zero)
         ))
