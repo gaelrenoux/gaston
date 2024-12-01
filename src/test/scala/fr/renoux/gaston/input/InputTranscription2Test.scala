@@ -18,6 +18,7 @@ class InputTranscription2Test extends TestBase {
     val defMaxPersonsPerTopic = transcription.settings.defaultMaxPersonsPerTopic
     val defMinPersonsPerTopic = transcription.settings.defaultMinPersonsPerTopic
     val defMaxTopicsPerSlot = transcription.settings.defaultMaxTopicsPerSlot.get
+
     "errors" in {
       transcription.errors should be(Set())
     }
@@ -117,10 +118,63 @@ class InputTranscription2Test extends TestBase {
       import transcription.given
 
       "prefsPersonTopic" in {
-        transcription.preferences.prefsPersonTopic.toSeq2.mapMap(_.value.round) should be(Seq(
-          Seq.fill(6)(-100) ++ Seq.fill(14)(0),
-          Seq.fill(6)(-1) ++ Seq(0, Score.MinReward, Score.MinReward, Score.MinReward) ++ Seq(Score.MinReward, Score.MinReward, 0, 0) ++ Seq.fill(6)(0),
-          Seq.fill(6)(-72) ++ Seq.fill(4)(0) ++ Seq(0, 0, Score.MinReward, Score.MinReward) ++ Seq.fill(6)(0)
+        val prefsPersonTopic = transcription.preferences.prefsPersonTopic.toSeq2.mapMap(_.value.round)
+
+        val prefsPersonTopicUnassigned = prefsPersonTopic.map(_.take(6))
+        prefsPersonTopicUnassigned should be(Seq(
+          Seq.fill(6)(-100),
+          Seq.fill(6)(-1),
+          Seq.fill(6)(-72)
+        ))
+
+        val prefsPersonTopicOther = prefsPersonTopic.map(_.drop(6))
+        prefsPersonTopicOther(0) should be(Seq(
+          0, // Alpha
+          200, // Beta
+          0, // Gamma
+          0, // Delta
+          800, // Epsilon #1
+          800, // Epsilon #2
+          0, // Eta ~1
+          0, // Eta ~2
+          0, // Theta #1 ~1
+          0, // Theta #1 ~2
+          0, // Theta #2 ~1
+          0, // Theta #2 ~2
+          0, // Theta #3 ~1
+          0, // Theta #3 ~2
+        ))
+        prefsPersonTopicOther(1) should be(Seq(
+          750, // Alpha
+          Score.MinReward, // Beta
+          Score.MinReward, // Gamma
+          Score.MinReward, // Delta
+          Score.MinReward, // Epsilon #1
+          Score.MinReward, // Epsilon #2
+          250, // Eta ~1
+          250, // Eta ~2
+          0, // Theta #1 ~1
+          0, // Theta #1 ~2
+          0, // Theta #2 ~1
+          0, // Theta #2 ~2
+          0, // Theta #3 ~1
+          0, // Theta #3 ~2
+        ))
+        prefsPersonTopicOther(2) should be(Seq(
+          800, // Alpha
+          0, // Beta
+          0, // Gamma
+          0, // Delta
+          0, // Epsilon #1
+          0, // Epsilon #2
+          Score.MinReward, // Eta ~1
+          Score.MinReward, // Eta ~2
+          0, // Theta #1 ~1
+          0, // Theta #1 ~2
+          0, // Theta #2 ~1
+          0, // Theta #2 ~2
+          0, // Theta #3 ~1
+          0, // Theta #3 ~2
         ))
       }
 
@@ -128,7 +182,7 @@ class InputTranscription2Test extends TestBase {
         transcription.preferences.prefsPersonPerson.toSeq2.mapMap(_.value.round) should be(Seq(
           Seq.fill(3)(Score.Zero),
           Seq.fill(3)(Score.Zero),
-          Seq.fill(3)(Score.Zero)
+          Seq(200, Score.Zero, Score.Zero)
         ))
       }
 
