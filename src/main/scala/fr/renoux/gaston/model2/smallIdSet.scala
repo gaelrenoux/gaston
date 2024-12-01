@@ -17,17 +17,30 @@ object SmallIdSet {
     inline def contains(id: I): Boolean =
       (s & mask(id)) != 0L
 
+    inline def containsAll(i: I, j: I): Boolean =
+      (s & mask(i) & mask(j)) != 0L
+
     inline def nonEmpty: Boolean = s != 0L
 
-    inline def foreach(inline f: I => Unit): Unit = {
-      fastLoop(0, 64) { i =>
+    inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = {
+      c.foreach { i =>
         if (apply(i)) {
           f(i)
         }
       }
     }
 
-    inline def mapSumToScore(inline f: I => Score): Score = {
+    inline def foreachPair(inline f: (I, I) => Unit)(using c: Count[I]): Unit = {
+      c.foreach { i =>
+        c.foreachUntil(i) { j =>
+          if (containsAll(i, j)) {
+            f(i, j)
+          }
+        }
+      }
+    }
+
+    inline def mapSumToScore(inline f: I => Score)(using c: Count[I]): Score = {
       var result: Score = 0.0
       foreach { i =>
         result = result + f(i)
@@ -76,7 +89,7 @@ object SmallIdSet {
     /** Shouldn't be necessary, but type issue otherwise */
     private inline def mask(id: I): Long = SmallIdSet(id)
 
-    def toSet: Set[I] = {
+    def toSet(using c: Count[I]): Set[I] = {
       val result = mutable.Set[I]()
       foreach { id => result += id }
       result.toSet
@@ -102,7 +115,7 @@ object SmallIdSet {
       override def toPrettyString: String =
         if (is == -1) Printable.Universe
         else if (is == 0) Printable.Empty
-        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet)
+        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet(using Count.maxCount))
   }
 
 }
