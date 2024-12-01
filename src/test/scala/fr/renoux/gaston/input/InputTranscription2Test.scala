@@ -50,6 +50,8 @@ class InputTranscription2Test extends TestBase {
     }
 
     "topics" in {
+      import transcription.given
+
       transcription.topicsCount should be(6 + 14) // unassigned + normal (with occ/long)
       transcription.topics.topicsName.valuesSeq should be(
         Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night").map(s =>

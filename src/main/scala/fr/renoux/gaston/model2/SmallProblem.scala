@@ -46,7 +46,7 @@ final class SmallProblem(
     IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_*)))
   }
 
-  /** Scores on prefsPersonTopic, prefsPersonPerson and personsBaseScore */
+  /** Scores on personsBaseScore, prefsPersonTopic, prefsPersonPerson, prefsTopicsExclusive */
   // TODO inline this maybe ?
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
     // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
@@ -62,10 +62,10 @@ final class SmallProblem(
           topicsScore + otherPersonsScore
         }
       var exclusiveScore = Score.Zero
-      // (topicIds && personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
-      //   if (topicsMandatories(tid1).contains(pid))
-      //     exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
-      // }
+      (topicIds && personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
+        if (topicsMandatories(tid1).contains(pid))
+          exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
+      }
       
       baseScore + wishesScore
     }
