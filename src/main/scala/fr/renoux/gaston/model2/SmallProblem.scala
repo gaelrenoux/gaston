@@ -32,7 +32,8 @@ final class SmallProblem(
     val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
     val prefsTopicPure: IdMap[TopicId, Score], // score added for simply having this topic on schedule
     val prefsTopicsExclusive: IdMap[PersonId, IdMatrixSymmetrical[TopicId, Score]], // reward (normally negative) for being on exclusive topics
-    val prefsTopicsLinked: IdMatrixSymmetrical[TopicId, Boolean] // a person must be either on all linked topics, or on none of them
+
+    val prefsTopicsLinked: Array[SmallIdSet[TopicId]] // a person must be either on all linked topics, or on none of them
 ) {
   given CountAll[SlotId] = CountAll(slotsCount)
   given CountAll[TopicId] = CountAll(topicsCount)
@@ -62,38 +63,21 @@ final class SmallProblem(
           topicsScore + otherPersonsScore
         }
       var exclusiveScore = Score.Zero
-      (topicIds && personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
+      (topicIds -- personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
         if (topicsMandatories(tid1).contains(pid))
           exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
       }
+      var linkedScore = Score.Zero
+      prefsTopicsLinked.fastForeach { linked =>
+        val result = linked && topicIds
+        if (result.nonEmpty && result != linked) {
+          linkedScore += Score.MinReward.value * result.size
+        }
+      }
       
-      baseScore + wishesScore
+      baseScore + wishesScore + exclusiveScore + linkedScore
     }
   }
-
-  /** Scores on prefsTopicsLinked */
-  def scoreLinked(schedule: Schedule): Score = ???
-  // {
-  //   var score = Score.Zero
-  //   prefsTopicsLinked.fastForeach { linked =>
-  //     var i = 0
-  //     while (i + 1 < linked.length) {
-  //       val topic1 = linked(i)
-  //       var j = i + 1
-  //       val persons1 = schedule.topicsToPersons(topic1)
-  //       while (j < linked.length) {
-  //         val topic2 = linked(j)
-  //         val persons2 = schedule.topicsToPersons(topic2)
-  //         if (persons1 != persons2) {
-  //           score += Score.MinReward
-  //         }
-  //         j += 1
-  //       }
-  //       i += 1
-  //     }
-  //   }
-  //   score
-  // }
 
   def score(schedule: Schedule): Score = {
     val personalScores: IdMap[PersonId, Score] = scorePersons(schedule)
@@ -101,7 +85,7 @@ final class SmallProblem(
       (SmallProblem.RankFactor * acc: Score) + score
     }
     val topicsPureTotal = schedule.topicsPresent.mapSumToScore(prefsTopicPure(_))
-    personalScoresTotal + topicsPureTotal + scoreLinked(schedule)
+    personalScoresTotal + topicsPureTotal
   }
 
 }
