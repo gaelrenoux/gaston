@@ -264,29 +264,23 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       }
     }
 
-    val prefsTopicsLinked = IdMatrixSymmetrical.fill[TopicId, Boolean](false)
-    input.constraints.linked.foreach { inConstraint =>
-      inConstraint.topics.cross(inConstraint.topics).foreach {(topicName1, topicName2) =>
-        if (topicName1 < topicName2) { // only handle each couple once
-          val tids1 = topics.topicsIdsByBaseName(topicName1)
-          val tids2 = topics.topicsIdsByBaseName(topicName2)
-          tids1.cross(tids2).foreach { (tid1, tid2) =>
-            prefsTopicsLinked(tid1, tid2) = true
-          }
+    val prefsTopicsLinked: Array[SmallIdSet[TopicId]] = {
+      val linkedFromConstraints = input.constraints.linked.map { inConstraint =>
+        /* No multi-occurrence topic in global constraints, and we only need to link the first part of each topic */
+        val topicIds = inConstraint.topics.map { baseTopicName => topics.topicsIdsByBaseName(baseTopicName).min }
+        SmallIdSet(topicIds)
+      }
+      val linkedFromDuration = input.topics.filter(_.forcedDuration > 1).flatMap { inTopic =>
+        /* Link separately the parts of each occurrence */
+        inTopic.occurrenceInstances.map { inTopicOcc =>
+          val topicIds = inTopicOcc.partInstances.map(_.name).map(topics.topicsIdByName)
+          SmallIdSet(topicIds*)
         }
       }
+      linkedFromConstraints.toArray ++ linkedFromDuration.toArray
     }
-    input.topics.filter(_.forcedDuration > 1).foreach { (inTopic: InputTopic) =>
-      inTopic.occurrenceInstances.foreach { inTopicOcc =>
-        val partsIds = inTopicOcc.partInstances.map(t => topics.topicsIdByName(t.name))
-        partsIds.cross(partsIds).foreach { (tid1, tid2) =>
-          if (tid1.value < tid2.value) {
-            prefsTopicsLinked(tid1, tid2) = true
-          }
-        }
-      }
-    }
-  }
+
+  } // end preferences
 
 
 

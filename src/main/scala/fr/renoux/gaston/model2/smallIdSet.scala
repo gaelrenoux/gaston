@@ -71,24 +71,29 @@ object SmallIdSet {
       s & (~mask(id))
     }
 
-    @targetName("SmallIdSetPlusIterable")
+    @targetName("SmallIdSetPlusPlusSmallIdSet")
+    inline def ++(that: SmallIdSet[I]): SmallIdSet[I] = {
+      s | that
+    }
+
+    @targetName("SmallIdSetMinusMinusSmallIdSet")
+    inline def --(that: SmallIdSet[I]): SmallIdSet[I] = {
+      s & ~that
+    }
+
+    @targetName("SmallIdSetPlusPlusIterable")
     inline def ++(ids: Iterable[I]): SmallIdSet[I] = {
       ids.fastFoldLeft(s) { (set, id) => set | mask(id) }
     }
 
-    @targetName("SmallIdSetMinusIterable")
+    @targetName("SmallIdSetMinusMinusIterable")
     inline def --(ids: Iterable[I]): SmallIdSet[I] = {
       ids.fastFoldLeft(s) { (set, id) => set & (~mask(id)) }
     }
 
-    @targetName("intersect")
+    @targetName("SmallIdSetIntersectIterable")
     inline infix def &&(that: SmallIdSet[I]): SmallIdSet[I] = {
       s & that
-    }
-
-    @targetName("exclude")
-    inline infix def &&!(that: SmallIdSet[I]): SmallIdSet[I] = {
-      s & ~that
     }
 
     /** Shouldn't be necessary, but type issue otherwise */
@@ -108,6 +113,14 @@ object SmallIdSet {
   inline def apply[I <: Id](id: I): SmallIdSet[I] = 1L << id.value
 
   inline def apply[I <: Id](ids: I*): SmallIdSet[I] = {
+    var result = 0L
+    ids.fastForeach { id =>
+      result = result | SmallIdSet(id)
+    }
+    result
+  }
+
+  inline def apply[I <: Id](ids: collection.Set[I]): SmallIdSet[I] = {
     var result = 0L
     ids.fastForeach { id =>
       result = result | SmallIdSet(id)
