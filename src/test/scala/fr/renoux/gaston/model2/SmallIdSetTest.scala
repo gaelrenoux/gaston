@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
 import scala.collection.mutable
+import fr.renoux.gaston.util.{Count as _, *}
 
 
 class SmallIdSetTest extends TestBase {
@@ -58,6 +59,65 @@ class SmallIdSetTest extends TestBase {
         set.contains(id) should be(true)
         set(id) should be(true)
       }
+    }
+  }
+
+  "containsAll" - {
+    "empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      testAllIds.cross(testAllIds).foreach { (i, j) =>
+        set.containsAll(i, j) should be (false)
+      }
+      set.size should be(0)
+    }
+
+    "small set" in {
+      val set = SmallIdSet[TopicId](4, 8)
+      set.containsAll(4, 8) should be (true)
+      set.containsAll(8, 4) should be (true)
+      set.containsAll(6, 8) should be (false)
+      set.containsAll(4, 9) should be (false)
+      set.containsAll(43, 9) should be (false)
+    }
+
+    "non-empty set" in {
+      val set = SmallIdSet(testOkIds*)
+      testOkIds.cross(testOkIds).foreach { (i, j) =>
+        set.containsAll(i, j) should be (true)
+      }
+      testKoIds.cross(testOkIds).foreach { (i, j) =>
+        set.containsAll(i, j) should be (false)
+      }
+      testOkIds.cross(testKoIds).foreach { (i, j) =>
+        set.containsAll(i, j) should be (false)
+      }
+      testKoIds.cross(testKoIds).foreach { (i, j) =>
+        set.containsAll(i, j) should be (false)
+      }
+    }
+
+    "full set" in {
+      val set = SmallIdSet.full[TopicId]
+      testAllIds.cross(testAllIds).foreach { (i, j) =>
+        set.containsAll(i, j) should be (true)
+      }
+    }
+  }
+
+  "size" - {
+    "empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      set.size should be(0)
+    }
+
+    "non-empty set" in {
+      val set = SmallIdSet(testOkIds*)
+      set.size should be(testOkIds.size)
+    }
+
+    "full set" in {
+      val set = SmallIdSet.full[TopicId]
+      set.size should be(64)
     }
   }
 
@@ -239,6 +299,38 @@ class SmallIdSetTest extends TestBase {
       val result = mutable.Set[TopicId]()
       set.foreach(result += _)
       result.toSet should be(Set(testAllIds*))
+    }
+  }
+
+  "foreachPair" - {
+    given Count[TopicId] = 64
+
+    "on empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      val result = mutable.Set[(TopicId, TopicId)]()
+      set.foreachPair { (i, j) => result += i -> j }
+      result.isEmpty should be(true)
+    }
+
+    "on small set" in {
+      val set: SmallIdSet[TopicId] = SmallIdSet(1, 2)
+      val result = mutable.Set[(TopicId, TopicId)]()
+      set.foreachPair { (i: TopicId, j: TopicId) => result += i -> j }
+      result.toSet should be(Set(2 -> 1))
+    }
+
+    "on non-empty set" in {
+      val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
+      val result = mutable.Set[(TopicId, TopicId)]()
+      set.foreachPair { (i: TopicId, j: TopicId) => result += i -> j }
+      result.toSet should be(testOkIds.cross(testOkIds).toSet.filter(p => p._1.value > p._2.value))
+    }
+
+    "on full set" in {
+      val set = SmallIdSet.full[TopicId]
+      val result = mutable.Set[(TopicId, TopicId)]()
+      set.foreachPair { (i, j) => result += i -> j }
+      result.toSet should be(testAllIds.cross(testAllIds).toSet.filter(p => p._1.value > p._2.value))
     }
   }
 
