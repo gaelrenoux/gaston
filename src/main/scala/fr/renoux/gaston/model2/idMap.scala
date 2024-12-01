@@ -37,7 +37,9 @@ object IdMap {
       result
     }
 
-    inline def toSeq: Seq[A] = Seq(m*)
+    inline def valuesSeq: Seq[A] = Seq(m*)
+
+    inline def toSeq: Seq[(I, A)] = m.zipWithIndex.map(_.swap).toSeq
 
     inline def unsafeContent: Array[A] = m
 
