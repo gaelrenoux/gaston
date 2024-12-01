@@ -58,10 +58,10 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Persons */
-  lazy val personsNames: IdMap[PersonId, String] = IdMap.unsafeFrom[PersonId, String](input.persons.map(_.name: String).toArray)
-  lazy val personsWeights: IdMap[PersonId, Weight] = IdMap.unsafeFrom[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
-  lazy val personsBaseScores: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(_.baseScore.value: Score).toArray)
-  lazy val personsIdByName: Map[String, PersonId] = personsNames.toReverseMap
+  lazy val personsName: IdMap[PersonId, String] = IdMap.unsafeFrom[PersonId, String](input.persons.map(_.name: String).toArray)
+  lazy val personsWeight: IdMap[PersonId, Weight] = IdMap.unsafeFrom[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
+  lazy val personsBaseScore: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(_.baseScore.value: Score).toArray)
+  lazy val personsIdByName: Map[String, PersonId] = personsName.toReverseMap
 
 
 
@@ -72,7 +72,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
   lazy val slotsMaxTopics: IdMap[SlotId, Count[TopicId]] = IdMap.unsafeFrom[SlotId, Count[TopicId]] {
     flattenedSlots.map(s => s.maxTopics.orElse(settings.defaultMaxTopicsPerSlot).getOrElse(Count.maxCount[TopicId])).toArray
   }
-  lazy val slotToNextSlot: IdMap[SlotId, SlotId] = {
+  lazy val slotsToNextSlot: IdMap[SlotId, SlotId] = {
     val result = IdMap.tabulate[SlotId, SlotId](_.value + 1)
     var index = -1
     input.slots.map(_.size).foreach { seqLen =>
@@ -90,7 +90,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
   /* Topics */
   lazy object topics {
-    val topicsNames = IdMap.empty[TopicId, String]
+    val topicsName = IdMap.empty[TopicId, String]
     val topicsMandatories = IdMap.fill[TopicId, SmallIdSet[PersonId]](SmallIdSet.empty[PersonId])
     val topicsMin = IdMap.empty[TopicId, Count[PersonId]]
     val topicsMax = IdMap.empty[TopicId, Count[PersonId]]
@@ -101,12 +101,12 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
     /* Insert unassigned topics */
     fastLoop(0, slotsCount.value) { id => 
-      topicsNames(id) = unassignedTopicName(slotsNames(id))
+      topicsName(id) = unassignedTopicName(slotsNames(id))
       topicsMin(id) = Count.Zero // TODO handle settings of people not being alone unassigned. Probably as a preference.
       topicsMax(id) = Count.maxCount[PersonId]
       topicsAllowedSlots(id) = SmallIdSet[SlotId](id)
       topicsForced = topicsForced + id
-      topicsIdsByBaseName(topicsNames(id)) = mutable.Set(id)
+      topicsIdsByBaseName(topicsName(id)) = mutable.Set(id)
     }
 
     /* Then handle normal topics */
@@ -121,7 +121,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       // TODO multi-part topics: check on which slot each topic can happen (that leaves space for the followups)
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
         inTopicOcc.partInstances.foreach { inTopicOccPart =>
-          topicsNames(topicIdInt) = inTopicOccPart.name
+          topicsName(topicIdInt) = inTopicOccPart.name
           topicsMandatories(topicIdInt) = mandatories
           topicsMin(topicIdInt) = min
           topicsMax(topicIdInt) = max
@@ -137,7 +137,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       }
     }
 
-    val topicsIdByName: Map[String, TopicId] = topicsNames.toReverseMap
+    val topicsIdByName: Map[String, TopicId] = topicsName.toReverseMap
   }
 
 
@@ -291,7 +291,32 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Construction of the Problem */
-  lazy val problem: SmallProblem = ???
+  lazy val problem: SmallProblem = SmallProblem(
+    slotsCount = slotsCount,
+    slotsNames = slotsNames,
+    slotsPersonsPresent = slotsPersonsPresent,
+    slotsToNextSlot = slotsToNextSlot,
+    slotsMaxTopics = slotsMaxTopics,
+    topicsCount = topicsCount,
+    topicsName = topics.topicsName,
+    topicsMandatories = topics.topicsMandatories,
+    topicsMin = topics.topicsMin,
+    topicsMax = topics.topicsMax,
+    topicsAllowedSlots = topics.topicsAllowedSlots,
+    topicsFollowup = topics.topicsFollowup,
+    topicsForced = topics.topicsForced,
+    topicsSimultaneous = constraints.topicsSimultaneous,
+    topicsNotSimultaneous = constraints.topicsNotSimultaneous,
+    personsCount = personsCount,
+    personsName = personsName,
+    personsWeight = personsWeight,
+    personsBaseScore = personsBaseScore,
+    prefsPersonTopic = preferences.prefsPersonTopic,
+    prefsPersonPerson = preferences.prefsPersonPerson,
+    prefsTopicPure = preferences.prefsTopicPure,
+    prefsTopicsExclusive = preferences.prefsTopicsExclusive,
+    prefsTopicsLinked = preferences.prefsTopicsLinked,
+  )
 
   lazy val result: ValidatedNel[InputError, SmallProblem] = errors.toList.sorted.map(InputError(_)) match {
     case Nil => problem.valid
