@@ -256,24 +256,12 @@ class InputTranscription2Test extends TestBase {
       }
 
       "prefsTopicsLinked" in {
-        val prefsTopicsLinked = transcription.preferences.prefsTopicsLinked.toSeq2
-        prefsTopicsLinked.take(6) should be(Seq.tabulate(6) { id => Seq.fill(id + 1)(false) })
-        prefsTopicsLinked.drop(6).map(_.take(6)) should be(Seq.fill(14)(Seq.fill(6)(false)))
-        prefsTopicsLinked.drop(6).map(_.drop(6)) should be(Seq(
-            Seq.fill(1)(false),
-            Seq.fill(2)(false),
-            Seq.fill(3)(false),
-            Seq.fill(4)(false),
-            Seq.fill(5)(false),
-            Seq.fill(6)(false),
-            true +: Seq.fill(6)(false),
-            true +: Seq.fill(5)(false) :+ true :+ false,
-            Seq.fill(9)(false),
-            Seq.fill(8)(false) :+ true :+ false,
-            Seq.fill(11)(false),
-            Seq.fill(10)(false) :+ true :+ false,
-            Seq.fill(13)(false),
-            Seq.fill(12)(false) :+ true :+ false
+        transcription.preferences.prefsTopicsLinked.view.map(_.toSet).toSet should be(Set(
+          Set(6, 12), // Alpha + Eta 1
+          Set(12, 13), // Eta parts 1 and 2
+          Set(14, 15), // Theta #1 parts 1 and 2
+          Set(16, 17), // Theta #2 parts 1 and 2
+          Set(18, 19), // Theta #3 parts 1 and 2
         ))
       }
     }
