@@ -47,38 +47,6 @@ final class SmallProblem(
     IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_*)))
   }
 
-  /** Scores on personsBaseScore, prefsPersonTopic, prefsPersonPerson, prefsTopicsExclusive */
-  // TODO inline this maybe ?
-  def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
-    // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
-    schedule.personToTopics.mapToScore { (pid, topicIds) =>
-      val baseScore = personsBaseScore(pid)
-      val wishesScore = topicIds.mapSumToScore { tid =>
-        val topicsScore = prefsPersonTopic(pid, tid)
-        /* Person antipathy doesn't apply on unassigned topics */
-        val otherPersonsScore: Score = if (tid.value < unassignedTopicsCount.value) 0 else {
-          val otherPersons = schedule.topicsToPersons(tid) - pid
-            otherPersons.mapSumToScore(prefsPersonPerson(pid, _))
-          }
-          topicsScore + otherPersonsScore
-        }
-      var exclusiveScore = Score.Zero
-      (topicIds -- personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
-        if (topicsMandatories(tid1).contains(pid))
-          exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
-      }
-      var linkedScore = Score.Zero
-      prefsTopicsLinked.fastForeach { linked =>
-        val result = linked && topicIds
-        if (result.nonEmpty && result != linked) {
-          linkedScore += Score.MinReward.value * result.size
-        }
-      }
-      
-      baseScore + wishesScore + exclusiveScore + linkedScore
-    }
-  }
-
   def score(schedule: Schedule): Score = {
     val personalScores: IdMap[PersonId, Score] = scorePersons(schedule)
     val personalScoresTotal = personalScores.sortedValues.fastFoldRight(Score.Zero) { (score, acc) =>
@@ -86,6 +54,51 @@ final class SmallProblem(
     }
     val topicsPureTotal = schedule.topicsPresent.mapSumToScore(prefsTopicPure(_))
     personalScoresTotal + topicsPureTotal
+  }
+
+  /** Scores on personsBaseScore, prefsPersonTopic, prefsPersonPerson, prefsTopicsExclusive */
+  // TODO inline this maybe ?
+  def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
+    // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
+    schedule.personToTopics.mapToScore { (pid, topicIds) =>
+      val baseScore = personsBaseScore(pid)
+      val wishesScore = scoreWishes(schedule, pid, topicIds)
+      val exclusiveScore = scoreExclusive(pid, topicIds)
+      val linkedScore = scoreLinked(topicIds)
+      baseScore + wishesScore + exclusiveScore + linkedScore
+    }
+  }
+
+  def scoreWishes(schedule: Schedule, pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
+    topicIds.mapSumToScore { tid =>
+      val topicsScore = prefsPersonTopic(pid, tid)
+      /* Person antipathy doesn't apply on unassigned topics */
+      val otherPersonsScore: Score = if (tid.value < unassignedTopicsCount.value) 0 else {
+        val otherPersons = schedule.topicsToPersons(tid) - pid
+        otherPersons.mapSumToScore(prefsPersonPerson(pid, _))
+      }
+      topicsScore + otherPersonsScore
+    }
+  }
+
+  def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
+    var exclusiveScore = Score.Zero
+    (topicIds -- personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
+      if (topicsMandatories(tid1).contains(pid))
+        exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
+    }
+    exclusiveScore
+  }
+
+  def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
+    var linkedScore = Score.Zero
+    prefsTopicsLinked.fastForeach { linked =>
+      val result = linked && topicIds
+      if (result.nonEmpty && result != linked) {
+        linkedScore += Score.MinReward.value * result.size
+      }
+    }
+    linkedScore
   }
 
 }
