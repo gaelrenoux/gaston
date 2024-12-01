@@ -53,7 +53,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       }
     }
   }
-  // TODO No scaling for the exclusive prefs on unassigned topics, should it be the case? It's added to the scaling score, so maybe not.
+  // TODO No scaling for the exclusive prefs on unassigned topics, should it be the case? It's added to the unassigned score which is already scaling, so maybe not.
 
 
 
@@ -172,6 +172,8 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
      * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
      * high values that everyone else's preferences don't matter anymore. */
     // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes. Easy handling could be to add whatever is necessary to all make them positive.
+    // TODO a wish on a multi-duration topic should count as many times as the duration, to avoid penalizing that person heavily (reward will be gained on each part)
+    // TODO person wishes should count more than once, because they can be satisfied more than once
     lazy val personsScoreFactors: Map[PersonId, Weight] = input.personsSet.view.map { inPerson =>
       val pid = personsIdByName(inPerson.name)
       val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
