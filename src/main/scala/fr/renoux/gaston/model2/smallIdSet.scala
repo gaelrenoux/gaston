@@ -17,10 +17,14 @@ object SmallIdSet {
     inline def contains(id: I): Boolean =
       (s & mask(id)) != 0L
 
-    inline def containsAll(i: I, j: I): Boolean =
-      (s & mask(i) & mask(j)) != 0L
+    inline def containsAll(i: I, j: I): Boolean = {
+      val fullMask = mask(i) | mask(j)
+      (s & fullMask) == fullMask
+    }
 
     inline def nonEmpty: Boolean = s != 0L
+
+    inline def size: Int = java.lang.Long.bitCount(s)
 
     inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = {
       c.foreach { i =>
@@ -30,6 +34,7 @@ object SmallIdSet {
       }
     }
 
+    /** Iterates over all possible pair once, considering that (A, B) and (B, A) are the same pair, and that (A, A) isn't a pair */
     inline def foreachPair(inline f: (I, I) => Unit)(using c: Count[I]): Unit = {
       c.foreach { i =>
         c.foreachUntil(i) { j =>
