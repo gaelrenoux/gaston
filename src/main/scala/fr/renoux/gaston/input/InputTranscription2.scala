@@ -84,7 +84,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
   lazy val slotsIdByName: Map[String, SlotId] = slotsNames.toReverseMap
   private lazy val absencesBySlotId = input.persons.zipWithIndex.flatMap { (p, pid: PersonId) => p.absences.map(a => slotsIdByName(a) -> pid) }.groupToMap
   lazy val slotsPersonsPresent: IdMap[SlotId, SmallIdSet[PersonId]] =
-    IdMap.tabulate[SlotId, SmallIdSet[PersonId]] { slotId => SmallIdSet.full[PersonId] -- absencesBySlotId(slotId) }
+    IdMap.tabulate[SlotId, SmallIdSet[PersonId]] { slotId => SmallIdSet.full[PersonId] -- absencesBySlotId.getOrElse(slotId, Nil) }
 
 
 
@@ -205,7 +205,7 @@ private[input] final class InputTranscription2(rawInput: InputModel) {
       }
       inPerson.incompatible.foreach { personName =>
         val pid2 = personsIdByName(personName)
-        prefsPersonPerson(pid, pid2) = Score.MinReward
+        prefsPersonPerson(pid, pid2) = input.settings.incompatibilityAntiPreference.value
       }
       unassignedTopicsCount.foreach { tid =>
         prefsPersonTopic(pid, tid) = settingsUnassignedPrefByPerson(pid)
