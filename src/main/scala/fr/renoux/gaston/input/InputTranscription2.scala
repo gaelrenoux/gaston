@@ -18,7 +18,7 @@ import scala.collection.mutable
  * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
  * result in the `result` field.
  */
-private[input] final class InputTranscription2(rawInput: InputModel) {
+final class InputTranscription2(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription2.*
 
