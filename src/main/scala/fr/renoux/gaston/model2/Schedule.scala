@@ -1,23 +1,16 @@
 package fr.renoux.gaston.model2
 
+// TODO for all of those, check if having an Array isn't better than having a SmallIdSet
 class Schedule(
-    val content: IdMatrix3[SlotId, TopicId, PersonId, Boolean]
+    val planning: IdMap[SlotId, SmallIdSet[TopicId]],
+    val assignment: IdMap[PersonId, SmallIdSet[TopicId]]
 )(using
     countSlots: CountAll[SlotId],
     countTopics: CountAll[TopicId],
     countPersons: CountAll[PersonId]
 ) {
 
-  // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
-  
-  lazy val personToTopics: IdMap[PersonId, SmallIdSet[TopicId]] = 
-    content.listSmallTopicsByPerson
+  lazy val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]] = assignment.transpose
 
-  lazy val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]] =
-    content.listSmallPersonsByTopic
-  
-  lazy val topicsPresent: SmallIdSet[TopicId] =
-    content.listSmallTopics
-
-
+  lazy val topicsPresent: SmallIdSet[TopicId] = planning.reduceValues(_ ++ _)
 }
