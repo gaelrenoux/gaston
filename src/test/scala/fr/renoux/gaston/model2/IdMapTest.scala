@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestBase
 
 
 class IdMapTest extends TestBase {
+  given CountAll[SlotId] = CountAll[SlotId](64)
   given CountAll[TopicId] = CountAll[TopicId](64)
   val testAllInts: Seq[Int] = (0 until 64).toList
   val testAllIds: Seq[TopicId] = testAllInts
@@ -78,6 +79,27 @@ class IdMapTest extends TestBase {
   "sortedValues" in {
     val map = IdMap.from(testAllInts.map[(TopicId, Score)](i => (i, 10 * i)))
     map.sortedValues should be(testAllInts.map(_ * 10).sorted)
+  }
+
+  "reduceValues" in {
+    val map = IdMap.from(testMapAll)
+    map.reduceValues(_ + _) should be(testMapAll.toSeq.sortBy(_._1.value).map(_._2).reduceLeft(_ + _))
+  }
+
+  "transpose" in {
+    val map = IdMap.from[SlotId, SmallIdSet[TopicId]](
+      Seq.tabulate(64)(id =>
+        if (id == 0) id -> SmallIdSet(63, 0)
+        else id -> SmallIdSet(id, id - 1)
+      )
+    )
+    val expected = IdMap.from[TopicId, SmallIdSet[SlotId]](
+      Seq.tabulate(64)(id =>
+        if (id == 63) id -> SmallIdSet(63, 0)
+        else id -> SmallIdSet(id, id + 1)
+      )
+    )
+    map.transpose should be(expected)
   }
 
 }
