@@ -47,6 +47,10 @@ object ScheduleMaker {
       infix def topic(pids: PersonId*)(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
         slotDef.add(TopicDef(tid, pids*))
       }
+
+      def topicEmpty(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
+        slotDef.add(TopicDef(tid))
+      }
     }
   }
 
@@ -56,22 +60,26 @@ object ScheduleMaker {
   ) {
     assert(tid.value < countTopics.value, "Topic ID to high")
     assert(pids.toSet.size == pids.size, "Person repetition in same topic")
-    assert(pids.map(_.value).max < countPersons.value, "Person ID to high")
+    assert(pids.isEmpty || pids.map(_.value).max < countPersons.value, "Person ID to high")
   }
 
   def mkSchedule(init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit)(using CountAll[SlotId], CountAll[TopicId], CountAll[PersonId]): Schedule = {
     given scheduleDef: ScheduleDef = ScheduleDef()
     init
 
-    val matrix = IdMatrix3.fill[SlotId, TopicId, PersonId, Boolean](false)
+    val planning = IdMap.fill[SlotId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+    val assignment = IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+
     scheduleDef.slotsDef.foreach { slotDef =>
       slotDef.topicDefs.foreach { topicDef =>
+        planning(slotDef.sid) = planning(slotDef.sid) + topicDef.tid
         topicDef.pids.foreach { pid =>
-          matrix(slotDef.sid, topicDef.tid, pid) = true
+          assignment(pid) = assignment(pid) + topicDef.tid
         }
       }
     }
-    Schedule(matrix)
+
+    Schedule(planning, assignment)
   }
 }
 
