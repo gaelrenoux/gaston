@@ -37,6 +37,14 @@ object IdMap {
       result
     }
 
+    inline def reduceValues(inline f: (A, A) => A): A = {
+      var a = m(0)
+      fastLoop(1, m.length) { i =>
+        a = f(a, m(i))
+      }
+      a
+    }
+
     inline def valuesSeq: Seq[A] = Seq(m*)
 
     inline def toSeq: Seq[(I, A)] = m.zipWithIndex.map(_.swap).toSeq
@@ -48,6 +56,18 @@ object IdMap {
 
   extension [I <: Id](m: IdMap[I, Score]) {
     inline def sortedValues: Array[Score] = m.sorted
+  }
+
+  extension [I >: Int <: Id, J >: Int <: Id : ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
+    inline def transpose: IdMap[J, SmallIdSet[I]] = {
+      val array = new Array[SmallIdSet[I]](cj.value) // default value is 0
+      m.fastForeachWithIndex { (js, i) =>
+        js.foreach { j =>
+          array(j) = array(j) + i
+        }
+      }
+      array
+    }
   }
 
   inline def fill[I >: Int <: Id, A: ClassTag](a: => A)(using countI: CountAll[I]): IdMap[I, A] = {
