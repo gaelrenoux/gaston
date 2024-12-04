@@ -138,7 +138,7 @@ class InputTranscription2Test extends TestBase {
         prefsPersonTopicUnassigned should be(Seq(
           Seq.fill(6)(-100),
           Seq.fill(6)(-1),
-          Seq.fill(6)(-72)
+          Seq.fill(6)(-36) // weight 2, divided by 2
         ))
 
         val prefsPersonTopicOther = prefsPersonTopic.map(_.drop(6))
@@ -174,15 +174,15 @@ class InputTranscription2Test extends TestBase {
           0, // Theta #3 ~1
           0, // Theta #3 ~2
         ))
-        prefsPersonTopicOther(2) should be(Seq(
-          800, // Alpha
+        prefsPersonTopicOther(2) should be(Seq(  // weight 2
+          800 / 2, // Alpha
           0, // Beta
           0, // Gamma
           0, // Delta
           0, // Epsilon #1
           0, // Epsilon #2
-          Score.MinReward, // Eta ~1
-          Score.MinReward, // Eta ~2
+          Score.MinReward.value, // Eta ~1
+          Score.MinReward.value, // Eta ~2
           0, // Theta #1 ~1
           0, // Theta #1 ~2
           0, // Theta #2 ~1
@@ -196,17 +196,17 @@ class InputTranscription2Test extends TestBase {
         transcription.preferences.prefsPersonPerson.toSeq2.mapMap(_.value.round) should be(Seq(
           Seq(Score.Zero, input.settings.incompatibilityAntiPreference.value, Score.Zero),
           Seq.fill(3)(Score.Zero),
-          Seq(200, Score.Zero, Score.Zero)
+          Seq(200 / 2, Score.Zero, Score.Zero)
         ))
       }
 
       "prefsTopicsExclusive" in {
         val prefsTopicsExclusive = transcription.preferences.prefsTopicsExclusive.valuesSeq.map(_.toSeq2)
-        val expectedTop = Seq.tabulate(6) { id => Seq.tabulate(id + 1) { id2 => if (id2 == id) Score.Zero else -50 } } 
-        val expectedLeft =  Seq.fill(6)(Score.Zero)
+        val expectedTop: Seq[Seq[Score]] = Seq.tabulate(6) { id => Seq.tabulate(id + 1) { id2 => if (id2 == id) Score.Zero else -50 } } 
+        val expectedLeft: Seq[Score]  =  Seq.fill(6)(Score.Zero)
         prefsTopicsExclusive(0).take(6) should be(expectedTop)
         prefsTopicsExclusive(1).take(6) should be(expectedTop)
-        prefsTopicsExclusive(2).take(6) should be(expectedTop)
+        prefsTopicsExclusive(2).take(6) should be(expectedTop.mapMap(_.value / 2)) // Weight 2
         prefsTopicsExclusive(0).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
         prefsTopicsExclusive(1).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
         prefsTopicsExclusive(2).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
