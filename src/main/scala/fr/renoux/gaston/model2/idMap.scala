@@ -12,6 +12,16 @@ import scala.collection.immutable.SortedMap
 opaque type IdMap[I <: Id, A] = Array[A]
 
 object IdMap {
+  extension [I <: Id, A: ClassTag](m: IdMap[I, A]) {
+    def copy(): IdMap[I, A] = {
+      val result = new Array[A](m.length)
+      m.fastForeachWithIndex { (a, i) =>
+        result(i) = a
+      }
+      result
+    }
+  }
+
   extension [I >: Int <: Id, A](m: IdMap[I, A]) {
     inline def apply(id: I): A = m(id.value)
 

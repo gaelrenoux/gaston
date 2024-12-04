@@ -11,6 +11,16 @@ import scala.reflect.ClassTag
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
 object IdMatrix {
+  extension[I <: Id, J <: Id, A: ClassTag](matrix: IdMatrix[I, J, A]) {
+    inline def copy(): IdMatrix[I, J, A] = {
+      val result = new Array[A](matrix.length)
+      matrix.fastForeachWithIndex { (a, i) =>
+        result(i) = a
+      }
+      result
+    }
+  }
+
   extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A])(using countI: CountAll[I], countJ: CountAll[J]) {
     inline def apply(i: I, j: J): A = {
       val index = countJ.flatIndex(i, j)
