@@ -81,4 +81,6 @@ class IdMatrixTest extends TestBase {
     scoreLines.toMap should be(Map(0 -> 5, 1 -> -6, 2 -> 0))
   }
 
+  // TODO test copy
+
 }

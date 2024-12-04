@@ -102,4 +102,6 @@ class IdMapTest extends TestBase {
     map.transpose should be(expected)
   }
 
+  // TODO test copy
+
 }

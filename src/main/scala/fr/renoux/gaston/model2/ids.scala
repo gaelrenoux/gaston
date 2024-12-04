@@ -44,7 +44,7 @@ object Count {
   extension [I >: Int <: Id](c: Count[I]) {
     inline def value: Int = c
 
-    inline def range: Range = (0 until c)
+    inline def range: Seq[I] = (0 until c)
 
     inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
 
