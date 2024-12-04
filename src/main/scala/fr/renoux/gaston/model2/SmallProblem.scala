@@ -101,6 +101,33 @@ final class SmallProblem(
     linkedScore
   }
 
+  def copy() = new SmallProblem(
+    slotsCount = slotsCount,
+    slotsNames = slotsNames.copy(),
+    slotsPersonsPresent = slotsPersonsPresent.copy(),
+    slotsToNextSlot = slotsToNextSlot.copy(),
+    slotsMaxTopics = slotsMaxTopics.copy(),
+    topicsCount = topicsCount,
+    topicsName = topicsName.copy(),
+    topicsMandatories = topicsMandatories.copy(),
+    topicsMin = topicsMin.copy(),
+    topicsMax = topicsMax.copy(),
+    topicsAllowedSlots = topicsAllowedSlots.copy(),
+    topicsFollowup = topicsFollowup.copy(),
+    topicsForced = topicsForced,
+    topicsSimultaneous = topicsSimultaneous.copy(),
+    topicsNotSimultaneous = topicsNotSimultaneous.copy(),
+    personsCount = personsCount,
+    personsName = personsName.copy(),
+    personsWeight = personsWeight.copy(),
+    personsBaseScore = personsBaseScore.copy(),
+    prefsPersonTopic = prefsPersonTopic.copy(),
+    prefsPersonPerson = prefsPersonPerson.copy(),
+    prefsTopicPure = prefsTopicPure.copy(),
+    prefsTopicsExclusive = prefsTopicsExclusive.copy(),
+    prefsTopicsLinked = prefsTopicsLinked.fastCopy()
+  )
+
 }
 
 object SmallProblem {
