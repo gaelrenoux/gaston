@@ -25,7 +25,7 @@ final class SmallProblem(
 
     val personsCount: Count[PersonId],
     val personsName: IdMap[PersonId, String],
-    val personsWeight: IdMap[PersonId, Weight],
+    val personsWeight: IdMap[PersonId, Weight], // Unused in calculation as weight has already been applied to all relevant scores. Only for display.
     val personsBaseScore: IdMap[PersonId, Score],
 
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
@@ -69,7 +69,7 @@ final class SmallProblem(
     }
   }
 
-  def scoreWishes(schedule: Schedule, pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
+  private def scoreWishes(schedule: Schedule, pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
     topicIds.mapSumToScore { tid =>
       val topicsScore = prefsPersonTopic(pid, tid)
       /* Person antipathy doesn't apply on unassigned topics */
@@ -81,7 +81,7 @@ final class SmallProblem(
     }
   }
 
-  def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
+  private def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
     var exclusiveScore = Score.Zero
     (topicIds -- personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
       if (topicsMandatories(tid1).contains(pid))
@@ -90,7 +90,7 @@ final class SmallProblem(
     exclusiveScore
   }
 
-  def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
+  private def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
     var linkedScore = Score.Zero
     prefsTopicsLinked.fastForeach { linked =>
       val result = linked && topicIds
