@@ -5,6 +5,17 @@ import scala.reflect.ClassTag
 
 /** Array extension */
 extension [A](inline as: Array[A]) {
+  inline def fastCopy()(using ClassTag[A])= {
+    val asl = as.length
+    var res = new Array[A](asl)
+    var ix = 0
+    while (ix < asl) {
+      res(ix) = as(ix)
+      ix += 1
+    }
+    res
+  }
+
   inline def fastFoldLeft[B](inline init: B)(inline f: (B, A) => B): B = {
     var res = init
     val asl = as.length
