@@ -60,7 +60,7 @@ final class InputTranscription2(rawInput: InputModel) {
   /* Persons */
   lazy val personsName: IdMap[PersonId, String] = IdMap.unsafeFrom[PersonId, String](input.persons.map(_.name: String).toArray)
   lazy val personsWeight: IdMap[PersonId, Weight] = IdMap.unsafeFrom[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
-  lazy val personsBaseScore: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(_.baseScore.value: Score).toArray)
+  lazy val personsBaseScore: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(p => p.baseScore.value / p.weight.value: Score).toArray)
   lazy val personsIdByName: Map[String, PersonId] = personsName.toReverseMap
 
 
@@ -179,8 +179,8 @@ final class InputTranscription2(rawInput: InputModel) {
       val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
       val totalPersonWishesScore = inPerson.personWishes.filter(_._2.value > 0).values.sum.value
       val totalWishScore = totalTopicWishesScore + totalPersonWishesScore
-      val scoreFactor: Weight = Constants.PersonTotalScore.value / totalWishScore
-      pid -> scoreFactor
+      val scoreFactor = Constants.PersonTotalScore.value / totalWishScore
+      pid -> (scoreFactor / inPerson.weight.value) // also add the person's weight in there
     }.toMap
 
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score] = IdMatrix.fill[PersonId, TopicId, Score](Score.Zero)
@@ -205,10 +205,12 @@ final class InputTranscription2(rawInput: InputModel) {
       }
       inPerson.incompatible.foreach { personName =>
         val pid2 = personsIdByName(personName)
-        prefsPersonPerson(pid, pid2) = input.settings.incompatibilityAntiPreference.value
+        // Needs to take the weight, because the whole score of the person (total of all preferences) needs the weight applied
+        prefsPersonPerson(pid, pid2) = input.settings.incompatibilityAntiPreference.value / inPerson.weight.value
       }
       unassignedTopicsCount.foreach { tid =>
-        prefsPersonTopic(pid, tid) = settingsUnassignedPrefByPerson(pid)
+        // Needs to take the weight, because the whole score of the person (total of all preferences) needs the weight applied
+        prefsPersonTopic(pid, tid) = settingsUnassignedPrefByPerson(pid).value / inPerson.weight.value
       }
     }
 
@@ -228,7 +230,8 @@ final class InputTranscription2(rawInput: InputModel) {
       unassignedTopicsCount.foreach { tid => 
         unassignedTopicsCount.foreachUntil(tid) { tid2 =>
           personsCount.foreach { pid =>
-            prefsTopicsExclusive(pid)(tid, tid2) = score.value
+            val inPerson = input.persons(pid.value)
+            prefsTopicsExclusive(pid)(tid, tid2) = score.value / inPerson.weight.value
           }
         }
       }
