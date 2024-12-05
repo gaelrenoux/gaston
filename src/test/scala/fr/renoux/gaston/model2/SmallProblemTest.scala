@@ -5,6 +5,7 @@ import fr.renoux.gaston.input.InputModel
 import fr.renoux.gaston.input.InputLoader
 import fr.renoux.gaston.input.InputTranscription2
 import fr.renoux.gaston.TestUtils.*
+import com.softwaremill.quicklens.*
 import ScheduleMaker.mkSchedule
 
 
@@ -55,25 +56,66 @@ class SmallProblemTest extends TestBase {
     }
 
     "satisfied person-wish" in {
-      val betterSchedule = scheduleBase().move(c, epsilon1, alpha)
+      val betterSchedule = scheduleBase().move(h, delta, beta).move(h, gamma, alpha)
       problem.scorePersons(betterSchedule).toMap should be(
         personScoresBase + (c -> 500)
       )
       problem.score(betterSchedule) should be(500.0 / 2048)
     }
 
-    "unsatisfied incompatible" in {
-      val betterSchedule = scheduleBase().move(a, epsilon2, beta).move(c, beta, epsilon2)
-      problem.scorePersons(betterSchedule).toMap should be(
-        personScoresBase + (a -> -800) // +200 for the wish, -1000 for the incompatibility
+    "person base score" in {
+      val schedule = scheduleBase()
+      val input2 =
+        input.modify(_.persons.eachWhere(_.name == "Bianca").baseScore).setTo(fr.renoux.gaston.model.Score(100))
+      val problem2 = InputTranscription2(input2).problem
+      problem2.scorePersons(schedule).toMap should be(
+        personScoresBase + (b -> 100)
       )
-      problem.score(betterSchedule) should be(-800.0)
+      problem2.score(schedule) should be(100.0 / 2048)
+    }
+
+    "topic base score" in {
+      val betterSchedule = scheduleBase().addTopic(1, theta)
+      problem.scorePersons(betterSchedule).toMap should be(personScoresBase)
+      problem.score(betterSchedule) should be(20)
+    }
+
+    "unsatisfied incompatible" in {
+      val betterSchedule = scheduleBase().move(g, gamma, alpha).move(g, delta, beta)
+      problem.scorePersons(betterSchedule).toMap should be(
+        personScoresBase + (a -> -1000)
+      )
+      problem.score(betterSchedule) should be(-1000.0)
     }
 
     "unsatisfied forbidden" in {
       val betterSchedule = scheduleBase().move(e, epsilon2, beta)
       problem.scorePersons(betterSchedule).toMap should be(
         personScoresBase + (e -> Score.MinReward)
+      )
+      problem.score(betterSchedule) should be(Score.MinReward)
+    }
+
+    "unsatisfied exclusive (on unassigned)" in {
+      val betterSchedule = scheduleBase().move(a, alpha, unassigned0).move(a, epsilon2, unassigned1)
+      problem.scorePersons(betterSchedule).toMap should be(
+        personScoresBase + (a -> (-100 - 100 - 50)) // two unassigned, plus the exclusive constraint
+      )
+      problem.score(betterSchedule) should be(-250)
+    }
+
+    "unsatisfied exclusive (on occurrences)" in {
+      val betterSchedule = scheduleBase().move(a, alpha, epsilon1)
+      problem.scorePersons(betterSchedule).toMap should be(
+        personScoresBase + (a -> Score.MinReward)
+      )
+      problem.score(betterSchedule) should be(Score.MinReward)
+    }
+
+    "unsatisfied linked" in {
+      val betterSchedule = scheduleBase().move(j, eta1, alpha)
+      problem.scorePersons(betterSchedule).toMap should be(
+        personScoresBase + (j -> Score.MinReward)
       )
       problem.score(betterSchedule) should be(Score.MinReward)
     }
@@ -86,12 +128,6 @@ class SmallProblemTest extends TestBase {
       problem.score(betterSchedule) should be(500.0 / 2048)
     }
     // TODO test weight on other scores as well
-
-    // TODO more tests to do
-
-    "person base score" ignore {
-      fail()
-    }
 
   }
 
