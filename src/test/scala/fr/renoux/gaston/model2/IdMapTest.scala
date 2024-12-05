@@ -102,6 +102,14 @@ class IdMapTest extends TestBase {
     map.transpose should be(expected)
   }
 
-  // TODO test copy
+  "copy" in {
+    val map = IdMap.from(testMapAll)
+    val map2 = map.copy()
+    map2.toMap should be(map.toMap)
+
+    map2(42) = ""
+    map2(42) should be ("")
+    map(42) should be ("2a")
+  }
 
 }
