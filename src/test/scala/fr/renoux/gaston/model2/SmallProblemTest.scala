@@ -24,18 +24,18 @@ class SmallProblemTest extends TestBase {
     val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
     def scheduleBase() = mkSchedule {
       0 slot {
-        0.topicEmpty
-        2 topic (a, d, e) // Alpha, ADE
-        6 topic (b, c, f) // Epsilon #1, BCF
-        4 topic (g, h, i) // Gamma, GHI
-        8 topic (j, k, l) // Eta ~1, JKL
+        unassigned0.topicEmpty
+        alpha topic (a, d, e) // Alpha, ADE
+        epsilon1 topic (b, c, f) // Epsilon #1, BCF
+        gamma topic (g, h, i) // Gamma, GHI
+        eta1 topic (j, k, l) // Eta ~1, JKL
       }
       1 slot {
-        1.topicEmpty
-        3 topic (b, c, f) // Beta, BCF
-        7 topic (a, d, e) // Epsilon #2, ADE,
-        5 topic (g, h, i) // Delta, GHI
-        9 topic (j, k, l) // Eta ~2, JKL
+        unassigned1.topicEmpty
+        beta topic (b, c, f) // Beta, BCF
+        epsilon2 topic (a, d, e) // Epsilon #2, ADE,
+        delta topic (g, h, i) // Delta, GHI
+        eta2 topic (j, k, l) // Eta ~2, JKL
       }
     }
     println(scheduleBase().toPrettyString)
