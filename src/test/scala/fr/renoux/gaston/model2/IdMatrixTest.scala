@@ -81,6 +81,14 @@ class IdMatrixTest extends TestBase {
     scoreLines.toMap should be(Map(0 -> 5, 1 -> -6, 2 -> 0))
   }
 
-  // TODO test copy
+  "copy" in {
+    val matrix = IdMatrix.unsafeFrom[SlotId, TopicId, String](testSeq)
+    val matrix2 = matrix.copy()
+    matrix2.toSeq2 should be(matrix.toSeq2)
+
+    matrix2(1, 1) = "maybe"
+    matrix2(1, 1) should be ("maybe")
+    matrix(1, 1) should be ("no")
+  }
 
 }
