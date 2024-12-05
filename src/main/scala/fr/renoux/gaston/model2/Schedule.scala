@@ -24,4 +24,14 @@ class Schedule(
   }
 
   def reverseMove(pid: PersonId, tid1: TopicId, tid2: TopicId): Schedule = move(pid, tid2, tid1)
+
+  inline def addTopic(sid: SlotId, tid: TopicId): Schedule = {
+    planning(sid) = planning(sid) + tid
+    this
+  }
+
+  inline def removeTopic(sid: SlotId, tid: TopicId): Schedule = {
+    planning(sid) = planning(sid) - tid
+    this
+  }
 }
