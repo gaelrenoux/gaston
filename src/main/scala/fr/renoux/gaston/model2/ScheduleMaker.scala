@@ -18,7 +18,7 @@ object ScheduleMaker {
       slotsDef += sd
     }
 
-    extension (sid: Int) {
+    extension (sid: SlotId) {
       infix def slot(
           init: (CountAll[TopicId], CountAll[PersonId], SlotDef) ?=> Unit
       )(using scheduleDef: ScheduleDef, cs: CountAll[SlotId], ct: CountAll[TopicId], cp: CountAll[PersonId]): Unit = {
@@ -43,7 +43,7 @@ object ScheduleMaker {
       topicDefs += td
     }
 
-    extension (tid: Int) {
+    extension (tid: TopicId) {
       infix def topic(pids: PersonId*)(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
         slotDef.add(TopicDef(tid, pids*))
       }
