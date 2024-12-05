@@ -84,7 +84,7 @@ final class SmallProblem(
   private def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
     var exclusiveScore = Score.Zero
     (topicIds -- personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
-      if (topicsMandatories(tid1).contains(pid))
+      if (!topicsMandatories(tid1).contains(pid))
         exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
     }
     exclusiveScore
