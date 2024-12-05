@@ -1,7 +1,5 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.model.Person
-
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
 class Schedule(
     val planning: IdMap[SlotId, SmallIdSet[TopicId]],
