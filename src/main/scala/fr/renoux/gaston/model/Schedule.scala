@@ -45,7 +45,7 @@ final case class Schedule(
   @inline def updateSlotSchedule(slot: Slot)(f: SlotSchedule => SlotSchedule): Schedule =
     updateWrapped(wrapped.updated(slot, f(on(slot))))
 
-  val scoreCalculator: ScoreCalculator = new ScoreCalculator(this)
+  private var scoreCalculator: ScoreCalculator = new ScoreCalculator(this)
 
   lazy val slotSchedules: Iterable[SlotSchedule] = wrapped.values
   lazy val slotSchedulesSet: Set[SlotSchedule] = slotSchedules.toSet
@@ -275,6 +275,14 @@ final case class Schedule(
   }
 
   override lazy val hashCode: Int = wrapped.hashCode
+
+
+  @testOnly def getScoreCalculator = scoreCalculator
+
+  /** Useful when benchmarking, to calculate how much time the scoring takes */
+  @testOnly def resetScoreCalculator() = {
+    scoreCalculator = new ScoreCalculator(this)
+  }
 
 }
 
