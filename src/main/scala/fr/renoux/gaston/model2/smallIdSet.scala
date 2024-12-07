@@ -34,7 +34,9 @@ object SmallIdSet {
       }
     }
 
-    /** Iterates over all possible pair once, considering that (A, B) and (B, A) are the same pair, and that (A, A) isn't a pair */
+    /** Iterates over all possible pair once, considering that (A, B) and (B, A) are the same pair, and that (A, A)
+      * isn't a pair
+      */
     inline def foreachPair(inline f: (I, I) => Unit)(using c: Count[I]): Unit = {
       c.foreach { i =>
         c.foreachUntil(i) { j =>
@@ -106,6 +108,8 @@ object SmallIdSet {
     }
   }
 
+  val MaxValue = 63
+
   inline def full[I <: Id]: SmallIdSet[I] = -1
 
   inline def empty[I <: Id]: SmallIdSet[I] = 0
@@ -133,7 +137,7 @@ object SmallIdSet {
       override def toPrettyString: String =
         if (is == -1) Printable.Universe
         else if (is == 0) Printable.Empty
-        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet(using Count.maxCount))
+        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet(using (MaxValue + 1: Count[I])))
   }
 
 }
