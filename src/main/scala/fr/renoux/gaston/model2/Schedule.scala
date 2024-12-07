@@ -32,4 +32,9 @@ class Schedule(
     planning(sid) = planning(sid) - tid
     this
   }
+
+  def isValidFor(pb: SmallProblem): Boolean = {
+    // TODO Will be helpful in tests
+    ???
+  }
 }
