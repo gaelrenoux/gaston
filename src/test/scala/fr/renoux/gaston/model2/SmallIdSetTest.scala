@@ -431,4 +431,9 @@ class SmallIdSetTest extends TestBase {
       a && SmallIdSet.full[SlotId] should be(a)
     }
   }
+
+  "Printable" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a.toPrettyString should be("[ 3, 8, 47, 63 ]")
+  }
 }
