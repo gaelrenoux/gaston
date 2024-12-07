@@ -47,6 +47,10 @@ class ScheduleMakerTest extends TestBase {
       }
       val newSchedule: Schedule = ScheduleMaker.fromOldSchedule(oldSchedule, problem, true)
       problem.score(newSchedule) should be(Score.Zero)
+
+      newSchedule.countSlots should be (problem.slotsCount)
+      newSchedule.countTopics should be (problem.topicsCount)
+      newSchedule.countPersons should be (problem.personsCount)
       println(newSchedule.toPrettyString)
     }
   }
