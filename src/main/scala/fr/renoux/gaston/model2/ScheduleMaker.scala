@@ -3,6 +3,7 @@ package fr.renoux.gaston.model2
 import scala.collection.mutable
 import fr.renoux.gaston.model.{Schedule as OldSchedule}
 
+
 /** Only used in tests to create a schedule in a clear way */
 object ScheduleMaker {
 
@@ -45,7 +46,9 @@ object ScheduleMaker {
     }
 
     extension (tid: TopicId) {
-      infix def topic(pids: PersonId*)(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
+      infix def topic(
+          pids: PersonId*
+      )(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
         slotDef.add(TopicDef(tid, pids*))
       }
 
@@ -64,7 +67,9 @@ object ScheduleMaker {
     assert(pids.isEmpty || pids.map(_.value).max < countPersons.value, "Person ID to high")
   }
 
-  def mkSchedule(init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit)(using CountAll[SlotId], CountAll[TopicId], CountAll[PersonId]): Schedule = {
+  def mkSchedule(
+      init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit
+  )(using CountAll[SlotId], CountAll[TopicId], CountAll[PersonId]): Schedule = {
     given scheduleDef: ScheduleDef = ScheduleDef()
     init
 
@@ -83,13 +88,19 @@ object ScheduleMaker {
     Schedule(planning, assignment)
   }
 
-  def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem): Schedule = {
+  def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem, addUnassigned: Boolean = true): Schedule = {
     given CountAll[SlotId] = CountAll(oldSchedule.problem.counts.slots)
     given CountAll[TopicId] = CountAll(oldSchedule.problem.counts.topics)
     given CountAll[PersonId] = CountAll(oldSchedule.problem.counts.persons)
 
     val planning = IdMap.fill[SlotId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     val assignment = IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+
+    if (addUnassigned) {
+      problem.slotsCount.foreach { slotId =>
+        planning(slotId) = planning(slotId) + slotId.value
+      }
+    }
 
     oldSchedule.slotSchedules.foreach { oldSlotSchedule =>
       val slotId = problem.slotsNames.unsafeContent.indexOf(oldSlotSchedule.slot.name)
@@ -106,6 +117,4 @@ object ScheduleMaker {
     Schedule(planning, assignment)
   }
 
-
 }
-
