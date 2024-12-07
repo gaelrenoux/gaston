@@ -27,7 +27,7 @@ class ScheduleTest extends TestBase {
   }
 
   "assignment" in {
-    val ass = schedule.assignment.toMap.view.mapValues(_.toSet).toMap
+    val ass = schedule.personsToTopics.toMap.view.mapValues(_.toSet).toMap
     ass should be(Map(0 -> Set(0, 3), 1 -> Set(0, 3), 2 -> Set(0, 3), 3 -> Set(1, 3)))
   }
 
