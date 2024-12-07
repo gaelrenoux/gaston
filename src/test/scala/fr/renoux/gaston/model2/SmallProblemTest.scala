@@ -19,18 +19,19 @@ class SmallProblemTest extends TestBase {
     import problem.given
     given SchedulePrinter = new SchedulePrinter(problem)
 
+    val Seq(d1, d2) = problem.slotsCount.range
     val Seq(unassigned0, unassigned1, alpha, beta, gamma, delta, epsilon1, epsilon2, eta1, eta2, theta) =
       problem.topicsCount.range
     val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
     def scheduleBase() = mkSchedule {
-      0 slot {
+      d1 slot {
         unassigned0.topicEmpty
         alpha topic (a, d, e) // Alpha, ADE
         epsilon1 topic (b, c, f) // Epsilon #1, BCF
         gamma topic (g, h, i) // Gamma, GHI
         eta1 topic (j, k, l) // Eta ~1, JKL
       }
-      1 slot {
+      d2 slot {
         unassigned1.topicEmpty
         beta topic (b, c, f) // Beta, BCF
         epsilon2 topic (a, d, e) // Epsilon #2, ADE,
