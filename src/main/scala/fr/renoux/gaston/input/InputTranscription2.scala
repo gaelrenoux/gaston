@@ -355,6 +355,9 @@ object InputTranscription2 {
     Set.empty[String] ++ {
       val duplicates = input.slots.flatten.groupBy(_.name).mapValuesStrict(_.size).filter(_._2 > 1).keySet
       duplicates.map { d => s"Duplicate slot name: $d" }
+    } ++ {
+      val empty = input.slots.zipWithIndex.filter(_._1.isEmpty)
+      empty.map { (_, i) => s"Empty slot sequence at position $i" }
     }
   }
 
