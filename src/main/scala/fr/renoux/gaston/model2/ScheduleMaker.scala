@@ -85,7 +85,7 @@ object ScheduleMaker {
       }
     }
 
-    Schedule(planning, assignment)
+    Schedule.from(planning, assignment)
   }
 
   def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem, addUnassigned: Boolean = true): Schedule = {
@@ -112,7 +112,7 @@ object ScheduleMaker {
       }
     }
 
-    Schedule(planning, assignment)
+    Schedule.from(planning, assignment)
   }
 
 }
