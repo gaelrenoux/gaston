@@ -89,9 +89,7 @@ object ScheduleMaker {
   }
 
   def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem, addUnassigned: Boolean = true): Schedule = {
-    given CountAll[SlotId] = CountAll(oldSchedule.problem.counts.slots)
-    given CountAll[TopicId] = CountAll(oldSchedule.problem.counts.topics)
-    given CountAll[PersonId] = CountAll(oldSchedule.problem.counts.persons)
+    import problem.given
 
     val planning = IdMap.fill[SlotId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     val assignment = IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
