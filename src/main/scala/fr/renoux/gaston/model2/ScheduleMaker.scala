@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model2
 
 import scala.collection.mutable
+import fr.renoux.gaston.model.{Schedule as OldSchedule}
 
 /** Only used in tests to create a schedule in a clear way */
 object ScheduleMaker {
@@ -81,5 +82,30 @@ object ScheduleMaker {
 
     Schedule(planning, assignment)
   }
+
+  def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem): Schedule = {
+    given CountAll[SlotId] = CountAll(oldSchedule.problem.counts.slots)
+    given CountAll[TopicId] = CountAll(oldSchedule.problem.counts.topics)
+    given CountAll[PersonId] = CountAll(oldSchedule.problem.counts.persons)
+
+    val planning = IdMap.fill[SlotId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+    val assignment = IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+
+    oldSchedule.slotSchedules.foreach { oldSlotSchedule =>
+      val slotId = problem.slotsNames.unsafeContent.indexOf(oldSlotSchedule.slot.name)
+      oldSlotSchedule.topics.foreach { oldTopic =>
+        val topicId = problem.topicsName.unsafeContent.indexOf(oldTopic.name)
+        planning(slotId) = planning(slotId) + topicId
+        oldSlotSchedule.on(oldTopic).persons.foreach { oldPerson =>
+          val personId = problem.personsName.unsafeContent.indexOf(oldPerson.name)
+          assignment(personId) = assignment(personId) + topicId
+        }
+      }
+    }
+
+    Schedule(planning, assignment)
+  }
+
+
 }
 
