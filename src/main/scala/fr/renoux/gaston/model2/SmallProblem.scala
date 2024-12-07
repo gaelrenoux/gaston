@@ -60,7 +60,7 @@ final class SmallProblem(
   // TODO inline this maybe ?
   def scorePersons(schedule: Schedule): IdMap[PersonId, Score] = {
     // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
-    schedule.assignment.mapToScore { (pid, topicIds) =>
+    schedule.personsToTopics.mapToScore { (pid, topicIds) =>
       val baseScore = personsBaseScore(pid)
       val wishesScore = scoreWishes(schedule, pid, topicIds)
       val exclusiveScore = scoreExclusive(pid, topicIds)
