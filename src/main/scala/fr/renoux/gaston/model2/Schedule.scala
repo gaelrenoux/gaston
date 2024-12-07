@@ -5,9 +5,9 @@ class Schedule(
     val planning: IdMap[SlotId, SmallIdSet[TopicId]],
     val assignment: IdMap[PersonId, SmallIdSet[TopicId]]
 )(using
-    countSlots: CountAll[SlotId],
-    countTopics: CountAll[TopicId],
-    countPersons: CountAll[PersonId]
+    val countSlots: CountAll[SlotId],
+    val countTopics: CountAll[TopicId],
+    val countPersons: CountAll[PersonId]
 ) {
 
   // TODO Instead of transposing, probably better to update both this and assignment every time
