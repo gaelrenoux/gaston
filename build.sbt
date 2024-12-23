@@ -73,7 +73,6 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.2.20" % Test
 )
 
-
 assembly / mainClass := Some("fr.renoux.gaston.command.Main")
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", _*) => MergeStrategy.discard
