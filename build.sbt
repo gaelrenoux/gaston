@@ -11,7 +11,7 @@ scalaVersion := "3.5.2"
 
 lazy val gaston = (project in file("."))
   .configs(SlowTest)
-  .settings(inConfig(SlowTest)(Defaults.testSettings)*)
+  .settings(inConfig(SlowTest)(Defaults.testSettings) *)
 
 /* Those tests are much slower */
 lazy val SlowTest = config("test-slow") extend (Test)
@@ -36,7 +36,7 @@ scalacOptions ++= Seq(
   "-Wunused:locals", // Warn if a local definition is unused.
   // "-Wunused:patvars", // Warn if a variable bound in a pattern is unused.
   "-Wunused:privates", // Warn if a private member is unused.
-  "-Wvalue-discard", // Warn when non-Unit expression results are unused.
+  "-Wvalue-discard" // Warn when non-Unit expression results are unused.
 
   // "-XX:MaxInlineLevel=18", // see https://github.com/scala/bug/issues/11627#issuecomment-514619316 // check if still valid for Scala 3
 )
@@ -71,7 +71,6 @@ libraryDependencies ++= Seq(
   "com.github.jatcwang" %% "difflicious-scalatest" % "0.4.3" % Test,
   "org.scalatest" %% "scalatest" % "3.2.19" % Test
 )
-
 
 assembly / mainClass := Some("fr.renoux.gaston.command.Main")
 assembly / assemblyMergeStrategy := {
