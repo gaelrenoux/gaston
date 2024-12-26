@@ -2,8 +2,9 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
-import scala.reflect.ClassTag
+import java.util as jutil
 import scala.collection.immutable.SortedMap
+import scala.reflect.ClassTag
 
 
 /** IdMap: a mutable map from Ids to some value as an array. Note that there always is a value for each key (might be a
@@ -39,6 +40,7 @@ object IdMap {
       SortedMap.from(m.zipWithIndex.map { (a, id) => id -> a })
     }
 
+    /** Returns a new IdMap from the id to the score, given a function to convert index and value into a score. */
     inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
       val result = new Array[Score](m.length)
       m.fastForeachWithIndex { (a, i) =>
@@ -66,9 +68,15 @@ object IdMap {
 
   extension [I <: Id](m: IdMap[I, Score]) {
     inline def sortedValues: Array[Score] = m.sorted
+
+    /** Returns the sorted values of the IdMap, but works in place (so the IdMap itself is broken afterwards). */
+    inline def destructiveSortedValues: Array[Score] = {
+      jutil.Arrays.sort(m.asInstanceOf[Array[Double]]) // ugly but necessary
+      m
+    }
   }
 
-  extension [I >: Int <: Id, J >: Int <: Id : ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
+  extension [I >: Int <: Id, J >: Int <: Id: ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
     inline def transpose: IdMap[J, SmallIdSet[I]] = {
       val array = new Array[SmallIdSet[I]](cj.value) // default value is 0
       m.fastForeachWithIndex { (js, i) =>
@@ -109,9 +117,10 @@ object IdMap {
   inline def empty[I >: Int <: Id, A: ClassTag](using count: CountAll[I]): IdMap[I, A] =
     new Array[A](count.value)
 
-
   given [I <: Id: Printable, A: Printable]: Printable[IdMap[I, A]] with {
-      extension (as: IdMap[I, A]) override def toPrettyString: String =
+    extension (as: IdMap[I, A]) {
+      override def toPrettyString: String =
         summon[Printable[Map[Int, A]]].toPrettyString(as.toSortedMap)
+    }
   }
 }
