@@ -48,8 +48,8 @@ final class SmallProblem(
   }
 
   def score(schedule: Schedule): Score = {
-    val personalScores: IdMap[PersonId, Score] = scorePersons(schedule)
-    val personalScoresTotal = personalScores.sortedValues.fastFoldRight(Score.Zero) { (score, acc) =>
+    val personalScores: Array[Score] = scorePersons(schedule).destructiveSortedValues
+    val personalScoresTotal = personalScores.fastFoldRight(Score.Zero) { (score, acc) =>
       (SmallProblem.RankFactor * acc: Score) + score
     }
     val topicsPureTotal = schedule.topicsPresent.mapSumToScore(prefsTopicPure(_))
