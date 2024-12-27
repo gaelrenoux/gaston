@@ -40,6 +40,8 @@ object IdMap {
       SortedMap.from(m.zipWithIndex.map { (a, id) => id -> a })
     }
 
+    inline def mapValues[B: ClassTag](inline f: A => B): IdMap[I, B] = m.fastMap(f)
+
     /** Returns a new IdMap from the id to the score, given a function to convert index and value into a score. */
     inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {
       val result = new Array[Score](m.length)

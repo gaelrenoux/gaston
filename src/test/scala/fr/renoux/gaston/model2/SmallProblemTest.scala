@@ -11,7 +11,17 @@ import ScheduleMaker.mkSchedule
 
 class SmallProblemTest extends TestBase {
 
-  // TODO test copy
+  // TODO test copy
+
+  "personsToTopicsWithPrefExclusive" in {
+    val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
+    val problem = InputTranscription2(input).result.toEither.force
+    import problem.given
+
+    problem.personsToTopicsWithPrefExclusive should be(
+      IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet[TopicId](0, 1, 6, 7))
+    )
+  }
 
   "Scoring" - {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
