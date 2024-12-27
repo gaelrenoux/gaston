@@ -115,6 +115,49 @@ final class SmallProblem(
     linkedScore
   }
 
+  @testOnly
+  def calculateBaseScores(schedule: Schedule): Array[Score] = {
+    schedule.personsToTopics.mapToScore { (pid, topicIds) =>
+      personsBaseScore(pid)
+    }.destructiveSortedValues
+  }
+
+  @testOnly
+  def calculateWishesTopicScores(schedule: Schedule): Array[Score] = {
+    schedule.personsToTopics.mapToScore { (pid, topicIds) =>
+      topicIds.mapSumToScore { tid =>
+        prefsPersonTopic(pid, tid)
+      }
+    }.destructiveSortedValues
+  }
+
+  @testOnly
+  def calculateWishesPersonScores(schedule: Schedule): Array[Score] = {
+    schedule.personsToTopics.mapToScore { (pid, topicIds) =>
+      topicIds.mapSumToScore { tid =>
+        /* Person antipathy doesn't apply on unassigned topics */
+        if (tid.value < unassignedTopicsCount.value) 0 else {
+          val otherPersons = schedule.topicsToPersons(tid) - pid
+          otherPersons.mapSumToScore(prefsPersonPerson(pid, _))
+        }
+      }
+    }.destructiveSortedValues
+  }
+
+  @testOnly
+  def calculateExclusiveScores(schedule: Schedule): Array[Score] = {
+    schedule.personsToTopics.mapToScore { (pid, topicIds) =>
+      scoreExclusive(pid, topicIds)
+    }.destructiveSortedValues
+  }
+
+  @testOnly
+  def calculateLinkedScores(schedule: Schedule): Array[Score] = {
+    schedule.personsToTopics.mapToScore { (pid, topicIds) =>
+      scoreLinked(topicIds)
+    }.destructiveSortedValues
+  }
+
   def copy() = new SmallProblem(
     slotsCount = slotsCount,
     slotsNames = slotsNames.copy(),
