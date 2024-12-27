@@ -17,7 +17,7 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "give a correct unweightedScoresByPerson" in {
-    SimpleTestModel.Solutions.BestWithUnassignedTopics.getScoreCalculator.unweightedScoresByPerson should be(Map(
+    SimpleTestModel.Solutions.BestWithUnassignedTopics.scoreCalculator.unweightedScoresByPerson should be(Map(
       SimpleTestModel.Persons.Arthur -> Score(5.0),
       SimpleTestModel.Persons.Bianca -> Score(6.0),
       SimpleTestModel.Persons.Corwin -> Score(7.0), // he has a base score of 1
@@ -31,7 +31,7 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "give a correct weightedScoresByPerson" in {
-    SimpleTestModel.Solutions.BestWithUnassignedTopics.getScoreCalculator.weightedScoresByPerson should be(Map(
+    SimpleTestModel.Solutions.BestWithUnassignedTopics.scoreCalculator.weightedScoresByPerson should be(Map(
       SimpleTestModel.Persons.Arthur -> Score(5.0),
       SimpleTestModel.Persons.Bianca -> Score(3.0), // she has a weight of 2
       SimpleTestModel.Persons.Corwin -> Score(7.0), // he has a base score of 1
@@ -45,14 +45,14 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "give a correct impersonalScore" in {
-    SimpleTestModel.Solutions.BestWithUnassignedTopics.getScoreCalculator.impersonalScore should be(5.0)
+    SimpleTestModel.Solutions.BestWithUnassignedTopics.scoreCalculator.impersonalScore should be(5.0)
   }
 
   "Weights" should "divide the personal scores" in {
     given Problem = weightedProblem()
     val schedule = Schedule.from(Morning(Chess(Heavy), Go(Light)))
-    schedule.getScoreCalculator.unweightedScoresByPerson should be(Map(Heavy -> Score(10), Light -> Score(4)))
-    schedule.getScoreCalculator.weightedScoresByPerson should be(Map(Heavy -> Score(5), Light -> Score(4)))
+    schedule.scoreCalculator.unweightedScoresByPerson should be(Map(Heavy -> Score(10), Light -> Score(4)))
+    schedule.scoreCalculator.weightedScoresByPerson should be(Map(Heavy -> Score(5), Light -> Score(4)))
   }
 
   it should "change which person is the least satisfied" in {
@@ -67,7 +67,7 @@ class ScoreCalculatorSpec extends AnyFlatSpec with Matchers {
     val lightWithBaseScore = Light.copy(baseScore = Score(3))
     given Problem = weightedProblem(light = lightWithBaseScore)
     val schedule = Schedule.from(Morning(Chess(Heavy), Go(lightWithBaseScore)))
-    schedule.getScoreCalculator.unweightedScoresByPerson should be(Map(Heavy -> Score(10), lightWithBaseScore -> Score(7)))
+    schedule.scoreCalculator.unweightedScoresByPerson should be(Map(Heavy -> Score(10), lightWithBaseScore -> Score(7)))
     /* Sorted weighted scores are 5 (Heavy) then 7 (Light): 5 + 7 / 2 */
     schedule.score should be(Score(8.5))
   }
