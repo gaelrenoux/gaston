@@ -23,7 +23,7 @@ final class Renderer(
 
   /** Formats the schedule and analysis to a pretty String. Empty lines at the beginning and the end. */
   def apply(schedule: Schedule): String = {
-    val weightedScoresByPerson: Map[Person, Score] = schedule.getScoreCalculator.weightedScoresByPerson
+    val weightedScoresByPerson: Map[Person, Score] = schedule.scoreCalculator.weightedScoresByPerson
 
     /* For each name, weighted score, base score, descending list of satisfied rewards, number of mandatory topics */
     val summaryByPerson: Seq[(String, Double, Double, Seq[Double], Int)] = topicPreferencesByPerson.toSeq.map {
