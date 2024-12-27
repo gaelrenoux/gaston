@@ -13,7 +13,7 @@ final class SmallProblem(
     val slotsMaxTopics: IdMap[SlotId, Count[TopicId]],
 
     val topicsCount: Count[TopicId],
-    val topicsName: IdMap[TopicId, String],  // Includes unassigned topics
+    val topicsName: IdMap[TopicId, String], // Includes unassigned topics
     val topicsMandatories: IdMap[TopicId, SmallIdSet[PersonId]],
     val topicsMin: IdMap[TopicId, Count[PersonId]],
     val topicsMax: IdMap[TopicId, Count[PersonId]],
@@ -38,6 +38,21 @@ final class SmallProblem(
   given CountAll[SlotId] = CountAll(slotsCount)
   given CountAll[TopicId] = CountAll(topicsCount)
   given CountAll[PersonId] = CountAll(personsCount)
+
+  /** For each person, the set of topics for which they have an exclusive preference */
+  val personsToTopicsWithPrefExclusive: IdMap[PersonId, SmallIdSet[TopicId]] =
+    prefsTopicsExclusive.mapValues { matrix =>
+      var result = SmallIdSet.empty[TopicId]
+      topicsCount.foreach { tid1 =>
+        topicsCount.foreach { tid2 =>
+          if (matrix(tid1, tid2) != Score.Zero) {
+            result += tid1
+            result += tid2
+          }
+        }
+      }
+      result
+    }
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
   val personTopicsMandatory: IdMap[PersonId, SmallIdSet[TopicId]] = {
@@ -83,9 +98,8 @@ final class SmallProblem(
 
   private def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
     var exclusiveScore = Score.Zero
-    (topicIds -- personTopicsMandatory(pid)).foreachPair { (tid1, tid2) =>
-      if (!topicsMandatories(tid1).contains(pid))
-        exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
+    (topicIds && personsToTopicsWithPrefExclusive(pid)).foreachPair { (tid1, tid2) =>
+      exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
     }
     exclusiveScore
   }
