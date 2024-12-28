@@ -27,6 +27,26 @@ extension [A, CC[_], C <: CC[A]](it: IterableOnceOps[A, CC, C]) {
   }
 }
 
+extension [A](seq: Seq[A]) {
+  inline def develop[B](f: A => Seq[B]): Seq[Seq[B]] = {
+    def recur(list: List[A], reversePrefix: List[B], f: A => Seq[B]): Seq[List[B]] = list match {
+      case Nil => List(reversePrefix.reverse)
+      case head :: tail => f(head).flatMap { b => recur(tail, b :: reversePrefix, f) }
+    }
+    recur(seq.toList, Nil, f)
+  }
+}
+
+extension [A](set: Set[A]) {
+  inline def develop[B](f: A => Set[B]): Set[Set[B]] = {
+    def recur(list: List[A], reversePrefix: List[B], f: A => Set[B]): Set[List[B]] = list match {
+      case Nil => Set(reversePrefix.reverse)
+      case head :: tail => f(head).flatMap { b => recur(tail, b :: reversePrefix, f) }
+    }
+    recur(set.toList, Nil, f).map(_.toSet)
+  }
+}
+
 
 extension [A, CC[_], C <: CC[A]](it: IterableOps[A, CC, C]) {
 
