@@ -138,6 +138,30 @@ class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
   it should "work with two empty maps" in {
     Map.empty.zipByKeys(Map.empty) should be(Map.empty)
   }
+
+  "develop" should "work in the nominal case on a Seq" in {
+    val s = Seq("abc", "d", "ef")
+    s.develop(_.toSeq) should be(Seq(
+      Seq('a', 'd', 'e'),
+      Seq('a', 'd', 'f'),
+      Seq('b', 'd', 'e'),
+      Seq('b', 'd', 'f'),
+      Seq('c', 'd', 'e'),
+      Seq('c', 'd', 'f')
+    ))
+  }
+
+  "develop" should "work in the nominal case on a Set" in {
+    val s = Set("abc", "d", "ef")
+    s.develop(_.toSet) should be(Set(
+      Set('a', 'd', 'e'),
+      Set('a', 'd', 'f'),
+      Set('b', 'd', 'e'),
+      Set('b', 'd', 'f'),
+      Set('c', 'd', 'e'),
+      Set('c', 'd', 'f')
+    ))
+  }
 }
 
 object CollectionExtensionsSpec {
