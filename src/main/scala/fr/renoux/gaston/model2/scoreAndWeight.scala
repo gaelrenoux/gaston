@@ -12,6 +12,9 @@ object Score {
 
     @targetName("scoreMultiplyWeight")
     infix inline def *(w: Weight): Score = w * s
+    
+    @targetName("scoreMultiplyInt")
+    infix inline def *(i: Int): Score = i * s
 
     inline def value: Double = s
   }
