@@ -21,6 +21,24 @@ class InputTranscription2Test extends TestBase {
     val defMinPersonsPerTopic = transcription.settings.defaultMinPersonsPerTopic
     val defMaxTopicsPerSlot = transcription.settings.defaultMaxTopicsPerSlot.get
 
+    transcription.topics.topicsName.valuesSeq should be(
+      Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night").map(s =>
+        s"@Unassigned ($s)"
+      ) ++
+        Seq("Alpha", "Beta", "Gamma", "Delta") ++
+        Seq("Epsilon #1", "Epsilon #2", "Eta ~1", "Eta ~2") ++
+        Seq("Theta #1 ~1", "Theta #1 ~2", "Theta #2 ~1", "Theta #2 ~2", "Theta #3 ~1", "Theta #3 ~2")
+    )
+
+    object ExpectedTopics {
+      val Seq(
+        unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
+        alpha, beta, gamma, delta, // 6 to 9
+        epsilon1, epsilon2, eta1, eta2, // 10 to 13
+        theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
+      ) = (0 until 20)
+    }
+
     "errors" in {
       transcription.errors should be(Set())
     }
@@ -201,70 +219,36 @@ class InputTranscription2Test extends TestBase {
       }
 
       "prefsTopicsExclusive" in {
-        val prefsTopicsExclusive = transcription.preferences.prefsTopicsExclusive.valuesSeq.map(_.toSeq2)
-        val expectedTop: Seq[Seq[Score]] = Seq.tabulate(6) { id => Seq.tabulate(id + 1) { id2 => if (id2 == id) Score.Zero else -50 } } 
-        val expectedLeft: Seq[Score]  =  Seq.fill(6)(Score.Zero)
-        prefsTopicsExclusive(0).take(6) should be(expectedTop)
-        prefsTopicsExclusive(1).take(6) should be(expectedTop)
-        prefsTopicsExclusive(2).take(6) should be(expectedTop.mapMap(_.value / 2)) // Weight 2
-        prefsTopicsExclusive(0).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
-        prefsTopicsExclusive(1).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
-        prefsTopicsExclusive(2).drop(6).map(_.take(6)) should be(Seq.fill(14)(expectedLeft))
+        import ExpectedTopics.*
+        // 6 exclusive groups: unassigned topics, epsilon occurrences, theta occurrences, first manual groups, second manual group duplicated (because it contains Epsilon)
 
-        prefsTopicsExclusive(0).drop(6).map(_.drop(6)) should be(
-          Seq(
-            Seq.fill(1)(Score.Zero),
-            Seq.fill(2)(Score.Zero),
-            Seq.fill(3)(Score.Zero),
-            Seq.fill(4)(Score.Zero),
-            Seq.fill(5)(Score.Zero),
-            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.Zero, // Epsilon 2
-            Seq.fill(7)(Score.Zero),
-            Seq.fill(8)(Score.Zero),
-            Seq.fill(9)(Score.Zero), //Theta 1-1
-            Seq.fill(10)(Score.Zero), //Theta 1-2
-            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.Zero , //Theta 2-1
-            Seq.fill(12)(Score.Zero), //Theta 2-2
-            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.MinReward :+ Score.Zero :+ Score.Zero, //Theta 3-1
-            Seq.fill(14)(Score.Zero) //Theta 3-2
-          )
-        )
-        prefsTopicsExclusive(1).drop(6).map(_.drop(6)) should be(
-          Seq(
-            Seq.fill(1)(Score.Zero),
-            Seq.fill(2)(Score.Zero),
-            Seq.fill(3)(Score.Zero),
-            Seq.fill(4)(Score.Zero),
-            Seq.fill(5)(Score.Zero),
-            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.Zero, // Epsilon 2
-            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero,
-            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.MinReward :+ Score.Zero :+ Score.Zero,
-            Seq.fill(9)(Score.Zero), //Theta 1-1
-            Seq.fill(10)(Score.Zero), //Theta 1-2
-            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.Zero , //Theta 2-1
-            Seq.fill(12)(Score.Zero), //Theta 2-2
-            Seq.fill(8)(Score.Zero) :+ Score.MinReward :+ Score.Zero :+ Score.MinReward :+ Score.Zero :+ Score.Zero, //Theta 3-1
-            Seq.fill(14)(Score.Zero) //Theta 3-2
-          )
-        )
-        prefsTopicsExclusive(2).drop(6).map(_.drop(6)) should be(
-          Seq(
-            Seq.fill(1)(Score.Zero),
-            Seq(Score.MinReward, Score.Zero),
-            Seq(Score.MinReward, Score.MinReward, Score.Zero),
-            Seq.fill(4)(Score.Zero),
-            Seq.fill(5)(Score.Zero),
-            Seq.fill(4)(Score.Zero) :+ Score.MinReward :+ Score.Zero, // Epsilon 2
-            Seq.fill(7)(Score.Zero),
-            Seq.fill(8)(Score.Zero),
-            Seq.fill(9)(Score.Zero),
-            Seq.fill(10)(Score.Zero),
-            Seq.fill(11)(Score.Zero),
-            Seq.fill(12)(Score.Zero),
-            Seq.fill(13)(Score.Zero),
-            Seq.fill(14)(Score.Zero)
-          )
-        )
+        val exclusivities0 = transcription.preferences.prefsTopicsExclusive(0)
+        exclusivities0.count should be(3) // Albert is exempted from both manual exclusives
+        exclusivities0.groups.toSeq should be(Seq(
+          SmallIdSet(0 until 6),
+          SmallIdSet(epsilon1, epsilon2), // Epsilon
+          SmallIdSet(theta11, theta21, theta31) // Theta
+        ))
+        exclusivities0.scores.toSeq should be(Seq(-50, Score.MinReward, Score.MinReward))
+
+        val exclusivities1 = transcription.preferences.prefsTopicsExclusive(1)
+        exclusivities1.count should be(5) // Bianca is exempted from the first manual exclusive
+        exclusivities1.groups.toSeq should be(Seq(
+          SmallIdSet(0 until 6),
+          SmallIdSet(epsilon1, epsilon2), // Epsilon
+          SmallIdSet(theta11, theta21, theta31), // Theta
+          SmallIdSet(epsilon1, eta1), SmallIdSet(epsilon2, eta1) // Manual constraint
+        ))
+        exclusivities1.scores.toSeq should be(Seq(-50, Score.MinReward, Score.MinReward, Score.MinReward, Score.MinReward))
+
+        val exclusivities2 = transcription.preferences.prefsTopicsExclusive(2)
+        exclusivities2.count should be(3) // Charly is exempted from the second manual exclusive and is mandatory on Theta
+        exclusivities2.groups.toSeq should be(Seq(
+          SmallIdSet(0 until 6),
+          SmallIdSet(epsilon1, epsilon2), // Epsilon
+          SmallIdSet(alpha, beta, gamma) // Manual constraint
+        ))
+        exclusivities2.scores.toSeq should be(Seq(-25, Score.MinReward, Score.MinReward)) // Half score, weight is 2
       }
 
       "prefsTopicsLinked" in {
