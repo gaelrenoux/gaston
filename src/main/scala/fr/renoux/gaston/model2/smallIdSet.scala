@@ -124,7 +124,7 @@ object SmallIdSet {
     result
   }
 
-  inline def apply[I <: Id](ids: collection.Set[I]): SmallIdSet[I] = {
+  inline def apply[I <: Id](ids: Iterable[I]): SmallIdSet[I] = {
     var result = 0L
     ids.fastForeach { id =>
       result = result | SmallIdSet(id)
