@@ -37,6 +37,7 @@ final class InputTranscription2(rawInput: InputModel) {
   given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
+  val unassignedTopicsSet: SmallIdSet[TopicId] = SmallIdSet(unassignedTopicsCount.range*)
 
 
   /* Settings */
@@ -98,6 +99,7 @@ final class InputTranscription2(rawInput: InputModel) {
     var topicsForced = SmallIdSet.empty[TopicId]
     val topicsFollowup = IdMap.fill[TopicId, TopicId](TopicId.None)
     val topicsIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
+    val topicsFirstPartIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
 
     /* Insert unassigned topics */
     fastLoop(0, slotsCount.value) { id => 
@@ -107,6 +109,7 @@ final class InputTranscription2(rawInput: InputModel) {
       topicsAllowedSlots(id) = SmallIdSet[SlotId](id)
       topicsForced = topicsForced + id
       topicsIdsByBaseName(topicsName(id)) = mutable.Set(id)
+      topicsFirstPartIdsByBaseName(topicsName(id)) = mutable.Set(id)
     }
 
     /* Then handle normal topics */
@@ -117,9 +120,11 @@ final class InputTranscription2(rawInput: InputModel) {
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
       topicsIdsByBaseName(inTopic.name) = mutable.Set()
+      topicsFirstPartIdsByBaseName(inTopic.name) = mutable.Set()
 
       // TODO multi-part topics: check on which slot each topic can happen (that leaves space for the followups)
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
+        topicsFirstPartIdsByBaseName(inTopic.name) += topicIdInt
         inTopicOcc.partInstances.foreach { inTopicOccPart =>
           topicsName(topicIdInt) = inTopicOccPart.name
           topicsMandatories(topicIdInt) = mandatories
@@ -148,13 +153,13 @@ final class InputTranscription2(rawInput: InputModel) {
     val topicsSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     val topicsNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     input.constraints.simultaneous.fastForeach { inConstraint =>
-      val topicIds = inConstraint.topics.flatMap(topics.topicsIdsByBaseName)
+      val topicIds = inConstraint.topics.flatMap(topics.topicsIdsByBaseName) // TODO Maybe just look at the first parts only
       topicIds.fastForeach { tid =>
         topicsSimultaneous(tid) = topicsSimultaneous(tid) ++ topicIds - tid
       }
     }
     input.constraints.notSimultaneous.fastForeach { inConstraint =>
-      val topicIds = inConstraint.topics.flatMap(topics.topicsIdsByBaseName)
+      val topicIds = inConstraint.topics.flatMap(topics.topicsIdsByBaseName) // TODO Maybe just look at the first parts only
       topicIds.fastForeach { tid =>
         topicsNotSimultaneous(tid) = topicsNotSimultaneous(tid) ++ topicIds - tid
       }
@@ -189,7 +194,7 @@ final class InputTranscription2(rawInput: InputModel) {
       val pid = personsIdByName(inPerson.name)
       val factor = personsScoreFactors(pid)
       inPerson.wishes.foreach { (topicName, score) =>
-        // TODO Long-duration topics are counted twice as a reward. Is that correct ?
+        // TODO Long-duration topics are counted twice as a reward. Is that correct ? Maybe put a half-score on te second part ?
         topics.topicsIdsByBaseName(topicName).foreach { tid =>
           prefsPersonTopic(pid, tid) = prefsPersonTopic(pid, tid) + (score.value * factor.value)
         }
@@ -224,16 +229,17 @@ final class InputTranscription2(rawInput: InputModel) {
       }
     }
 
-    val prefsTopicsExclusive = IdMap.fill[PersonId, IdMatrixSymmetrical[TopicId, Score]](IdMatrixSymmetrical.empty[TopicId, Score])
+    val prefsTopicsExclusiveBuffer = mutable.Map[PersonId, (mutable.Buffer[SmallIdSet[TopicId]], mutable.Buffer[Score])]()
+    personsCount.foreach { pid =>
+      prefsTopicsExclusiveBuffer(pid) = (mutable.Buffer(), mutable.Buffer())
+    }
     /* Exclusive preference over unassigned topics */
     if (input.settings.unassigned.allowed) input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
-      unassignedTopicsCount.foreach { tid => 
-        unassignedTopicsCount.foreachUntil(tid) { tid2 =>
-          personsCount.foreach { pid =>
-            val inPerson = input.persons(pid.value)
-            prefsTopicsExclusive(pid)(tid, tid2) = score.value / inPerson.weight.value
-          }
-        }
+      personsCount.foreach { pid =>
+        val inPerson = input.persons(pid.value)
+        val bufferEntry =  prefsTopicsExclusiveBuffer(pid)
+        bufferEntry._1.append(unassignedTopicsSet)
+        bufferEntry._2.append(score.value / inPerson.weight.value)
       }
     }
     /* Exclusive preference over multi-occurrence topics */
@@ -241,31 +247,33 @@ final class InputTranscription2(rawInput: InputModel) {
       val occurrenceFirstParts = inTopic.occurrenceInstances.map(_.partInstances.head)
       val occurrenceFirstPartsIds = occurrenceFirstParts.map(t => topics.topicsIdByName(t.name))
       val mandatoriesIds = topics.topicsMandatories(occurrenceFirstPartsIds.head)
-      occurrenceFirstPartsIds.cross(occurrenceFirstPartsIds).foreach { (tid1, tid2) =>
-        if (tid1.value < tid2.value) personsCount.foreach { pid =>
-          if (!mandatoriesIds.contains(pid)) {
-            prefsTopicsExclusive(pid)(tid1, tid2) = Score.MinReward
-          }
+      val topicIdSet = SmallIdSet(occurrenceFirstPartsIds*)
+      personsCount.foreach { pid =>
+        if (!mandatoriesIds.contains(pid)) {
+          val bufferEntry = prefsTopicsExclusiveBuffer(pid)
+          bufferEntry._1.append(topicIdSet)
+          bufferEntry._2.append(Score.MinReward)
         }
       }
     }
     /* Exclusive preference explicitly required by global constraints */
     input.constraints.exclusive.foreach { inConstraint =>
       val exemptedPersonIds = inConstraint.exemptions.map(personsIdByName)
-      inConstraint.topics.cross(inConstraint.topics).foreach { (topicName1, topicName2) =>
-        if (topicName1 < topicName2) { // only handle each couple once
-          val tids1 = topics.topicsIdsByBaseName(topicName1)
-          val tids2 = topics.topicsIdsByBaseName(topicName2)
-          tids1.cross(tids2).foreach { (tid1, tid2) =>
-            personsCount.foreach { pid =>
-              if (!exemptedPersonIds.contains(pid)) {
-                prefsTopicsExclusive(pid)(tid1, tid2) = Score.MinReward
-              }
-            }
+      inConstraint.topics.develop(topics.topicsFirstPartIdsByBaseName(_).toSet).foreach { topicIds =>
+        personsCount.foreach { pid =>
+          if (!exemptedPersonIds.contains(pid)) {
+            val bufferEntry = prefsTopicsExclusiveBuffer(pid)
+            bufferEntry._1.append(SmallIdSet(topicIds))
+            bufferEntry._2.append(Score.MinReward)
           }
         }
       }
     }
+    val prefsTopicsExclusive: IdMap[PersonId, Exclusivities] = IdMap.from[PersonId, Exclusivities](
+      prefsTopicsExclusiveBuffer.view.mapValues { case (topicSets, scores) =>
+        Exclusivities(topicSets.toArray, scores.toArray)
+      }
+    )
 
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] = {
       val linkedFromConstraints = input.constraints.linked.map { inConstraint =>

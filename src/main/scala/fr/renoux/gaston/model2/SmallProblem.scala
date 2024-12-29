@@ -31,28 +31,13 @@ final class SmallProblem(
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
     val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
     val prefsTopicPure: IdMap[TopicId, Score], // score added for simply having this topic on schedule
-    val prefsTopicsExclusive: IdMap[PersonId, IdMatrixSymmetrical[TopicId, Score]], // reward (normally negative) for being on exclusive topics
+    val prefsTopicsExclusive: IdMap[PersonId, Exclusivities],
 
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] // a person must be either on all linked topics, or on none of them
 ) {
   given CountAll[SlotId] = CountAll(slotsCount)
   given CountAll[TopicId] = CountAll(topicsCount)
   given CountAll[PersonId] = CountAll(personsCount)
-
-  /** For each person, the set of topics for which they have an exclusive preference */
-  val personsToTopicsWithPrefExclusive: IdMap[PersonId, SmallIdSet[TopicId]] =
-    prefsTopicsExclusive.mapValues { matrix =>
-      var result = SmallIdSet.empty[TopicId]
-      topicsCount.foreach { tid1 =>
-        topicsCount.foreach { tid2 =>
-          if (matrix(tid1, tid2) != Score.Zero) {
-            result += tid1
-            result += tid2
-          }
-        }
-      }
-      result
-    }
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
   val personTopicsMandatory: IdMap[PersonId, SmallIdSet[TopicId]] = {
@@ -96,13 +81,8 @@ final class SmallProblem(
     }
   }
 
-  private def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
-    var exclusiveScore = Score.Zero
-    (topicIds && personsToTopicsWithPrefExclusive(pid)).foreachPair { (tid1, tid2) =>
-      exclusiveScore += prefsTopicsExclusive(pid)(tid1, tid2)
-    }
-    exclusiveScore
-  }
+  private def scoreExclusive(pid: PersonId, topicIds: SmallIdSet[TopicId]) =
+    prefsTopicsExclusive(pid).evaluate(topicIds)
 
   private def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
     var linkedScore = Score.Zero
