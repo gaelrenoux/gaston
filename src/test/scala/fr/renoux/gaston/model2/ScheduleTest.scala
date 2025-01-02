@@ -11,8 +11,6 @@ import ScheduleMaker.mkSchedule
 class ScheduleTest extends TestBase {
 
   "Basics " - {
-    val height = 3
-    val width = 4
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
     given countTopics: CountAll[TopicId] = CountAll[TopicId](4)
     given countPersons: CountAll[PersonId] = CountAll[PersonId](4)
