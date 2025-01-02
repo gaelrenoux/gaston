@@ -94,7 +94,7 @@ class Schedule(
     problem.prefsTopicsLinked.fastForeach { linked =>
       val result = linked && topicIds
       if (result.nonEmpty && result != linked) {
-        linkedScore += Score.MinReward.value * result.size
+        linkedScore += Score.MinReward.value * result.size.value
       }
     }
     linkedScore
