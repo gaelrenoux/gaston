@@ -15,7 +15,7 @@ final class Exclusivities(
     fastLoop(0, count) { i =>
       val matchingTidsCount = (tids && groups(i)).size
       if (matchingTidsCount > 1) {
-        result += scores(i) * (matchingTidsCount - 1)
+        result += scores(i) * (matchingTidsCount.value - 1)
       }
     }
     result
