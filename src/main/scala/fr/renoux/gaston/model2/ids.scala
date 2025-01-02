@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
+import scala.annotation.targetName
 
 opaque type Id >: Int = Int
 opaque type SlotId >: Int <: Id = Int
@@ -44,6 +45,18 @@ object Count {
   extension [I >: Int <: Id](c: Count[I]) {
     inline def value: Int = c
 
+    @targetName("CountInferior")
+    inline def <(d: Count[I]) = c < d
+
+    @targetName("CountSuperior")
+    inline def >(d: Count[I]) = c > d
+
+    @targetName("CountInferiorOrEqual")
+    inline def <=(d: Count[I]) = c <= d
+
+    @targetName("CountSuperiorOrEqual")
+    inline def >=(d: Count[I]) = c >= d
+
     inline def range: Seq[I] = (0 until c)
 
     inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
@@ -51,6 +64,14 @@ object Count {
     inline def foreachTo(limit: I)(inline f: I => Unit) = fastLoop(0, limit + 1)(f)
 
     inline def foreachUntil(limit: I)(inline f: I => Unit) = fastLoop(0, limit)(f)
+
+    inline def foreachWhile(inline f: I => Boolean) = {
+      var i = 0
+      while (i < c && f(i)) {
+        i += 1
+      }
+
+    }
 
     inline def map[A](inline f: I => A): IndexedSeq[A] = (0 until c).map(f)
 
