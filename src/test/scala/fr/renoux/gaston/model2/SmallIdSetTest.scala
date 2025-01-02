@@ -66,40 +66,40 @@ class SmallIdSetTest extends TestBase {
     "empty set" in {
       val set = SmallIdSet.empty[TopicId]
       testAllIds.cross(testAllIds).foreach { (i, j) =>
-        set.containsAll(i, j) should be (false)
+        set.containsAll(i, j) should be(false)
       }
       set.size should be(0)
     }
 
     "small set" in {
       val set = SmallIdSet[TopicId](4, 8)
-      set.containsAll(4, 8) should be (true)
-      set.containsAll(8, 4) should be (true)
-      set.containsAll(6, 8) should be (false)
-      set.containsAll(4, 9) should be (false)
-      set.containsAll(43, 9) should be (false)
+      set.containsAll(4, 8) should be(true)
+      set.containsAll(8, 4) should be(true)
+      set.containsAll(6, 8) should be(false)
+      set.containsAll(4, 9) should be(false)
+      set.containsAll(43, 9) should be(false)
     }
 
     "non-empty set" in {
       val set = SmallIdSet(testOkIds*)
       testOkIds.cross(testOkIds).foreach { (i, j) =>
-        set.containsAll(i, j) should be (true)
+        set.containsAll(i, j) should be(true)
       }
       testKoIds.cross(testOkIds).foreach { (i, j) =>
-        set.containsAll(i, j) should be (false)
+        set.containsAll(i, j) should be(false)
       }
       testOkIds.cross(testKoIds).foreach { (i, j) =>
-        set.containsAll(i, j) should be (false)
+        set.containsAll(i, j) should be(false)
       }
       testKoIds.cross(testKoIds).foreach { (i, j) =>
-        set.containsAll(i, j) should be (false)
+        set.containsAll(i, j) should be(false)
       }
     }
 
     "full set" in {
       val set = SmallIdSet.full[TopicId]
       testAllIds.cross(testAllIds).foreach { (i, j) =>
-        set.containsAll(i, j) should be (true)
+        set.containsAll(i, j) should be(true)
       }
     }
   }
@@ -350,6 +350,58 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
+  "foreachWhile" - {
+    given Count[TopicId] = 64
+
+    "on empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      val result = mutable.Set[TopicId]()
+      set.foreachWhile { i => 
+        if (i.value < 20) {
+          result += i
+          true
+        } else false
+      }
+      result.isEmpty should be(true)
+    }
+
+    "on non-empty set" in {
+      val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
+      val result = mutable.Set[TopicId]()
+      set.foreachWhile { i => 
+        if (i.value < 20) {
+          result += i
+          true
+        } else false
+      }
+      result.toSet should be(Set(testOkIds*).filter(_.value < 20))
+    }
+
+    "on full set" in {
+      val set = SmallIdSet.full[TopicId]
+      val result = mutable.Set[TopicId]()
+      set.foreachWhile { i => 
+        if (i.value < 20) {
+          result += i
+          true
+        } else false
+      }
+      result.toSet should be(Set(testAllIds*).filter(_.value < 20))
+    }
+
+    "precise split" in {
+      val set = SmallIdSet[TopicId](1, 2, 3)
+      val result = mutable.Set[TopicId]()
+      set.foreachWhile { i => 
+        if (i.value < 2) {
+          result += i
+          true
+        } else false
+      }
+      result.toSet should be(Set(1))
+    }
+  }
+
   "foreachPair" - {
     given Count[TopicId] = 64
 
@@ -432,8 +484,36 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
-  "Printable" in {
+  "filter" - {
+    given Count[SlotId] = 64
+
+    "nominal" in {
       val a = SmallIdSet[SlotId](3, 8, 47, 63)
-      a.toPrettyString should be("[ 3, 8, 47, 63 ]")
+      a.filter(_.value % 3 == 0) should be(SmallIdSet(3, 63))
+    }
+
+    "set is empty" in {
+      val a = SmallIdSet.empty[SlotId]
+      a.filter(_.value % 3 == 0) should be(SmallIdSet.empty[SlotId])
+    }
+
+    "set is full" in {
+      SmallIdSet.full[SlotId].filter(_.value % 3 == 0) should be(SmallIdSet((0 to 21).map(_ * 3)))
+    }
+
+    "filter is always false" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a.filter(_ => false) should be(SmallIdSet.empty[SlotId])
+    }
+
+    "filter is always true" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a.filter(_ => true) should be(a)
+    }
+  }
+
+  "Printable" in {
+    val a = SmallIdSet[SlotId](3, 8, 47, 63)
+    a.toPrettyString should be("[ 3, 8, 47, 63 ]")
   }
 }
