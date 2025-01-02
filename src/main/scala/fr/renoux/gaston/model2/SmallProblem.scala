@@ -47,6 +47,12 @@ final class SmallProblem(
     IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_*)))
   }
 
+  val personsWithPersonWish: SmallIdSet[PersonId] = SmallIdSet(
+    prefsPersonPerson.toMap2.collect {
+      case (i, line) if line.exists(_._2 != Score.Zero) => i
+    }
+  )
+
   def copy() = new SmallProblem(
     slotsCount = slotsCount,
     slotsNames = slotsNames.copy(),

@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
+import scala.collection.mutable
 import scala.reflect.ClassTag
 
 
@@ -11,7 +12,7 @@ import scala.reflect.ClassTag
 opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 
 object IdMatrix {
-  extension[I <: Id, J <: Id, A: ClassTag](matrix: IdMatrix[I, J, A]) {
+  extension [I <: Id, J <: Id, A: ClassTag](matrix: IdMatrix[I, J, A]) {
     inline def copy(): IdMatrix[I, J, A] = {
       val result = new Array[A](matrix.length)
       matrix.fastForeachWithIndex { (a, i) =>
@@ -32,6 +33,15 @@ object IdMatrix {
       matrix(index) = a
     }
 
+    inline def mapLines[B: ClassTag](inline f: Array[A] => B): IdMap[I, B] = {
+      val result = new Array[B](countI.value)
+      countI.foreach { i =>
+        val slice = matrix.slice(i.value * countJ.value, (i.value + 1) * countJ.value)
+        result(i.value) = f(slice)
+      }
+      IdMap.unsafeFrom(result)
+    }
+
     // CHECK that in the bytecode, it's actually the simple loop
     inline def mapSumLinesToScore(f: (I, J, A) => Score): IdMap[I, Score] = {
       val result = IdMap.empty[I, Score]
@@ -43,6 +53,19 @@ object IdMatrix {
         }
       }
       result
+    }
+
+    inline def toMap2: Map[I, Map[J, A]] = {
+      val result = mutable.Map[I, mutable.Map[J, A]]()
+      var index = 0
+      countI.foreach { i =>
+        result(i) = mutable.Map[J, A]()
+        countJ.foreach { j =>
+          result(i)(j) = matrix(index)
+          index += 1
+        }
+      }
+      result.view.mapValues(_.toMap).toMap
     }
 
     inline def toSeq2(using ClassTag[A]): Seq[Seq[A]] = {
@@ -91,4 +114,3 @@ object IdMatrix {
     result
   }
 }
-

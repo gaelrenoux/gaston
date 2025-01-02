@@ -69,14 +69,20 @@ class Schedule(
   }
 
   private def scoreWishes(problem: SmallProblem, pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
+    val hasPersonWishes = problem.personsWithPersonWish.contains(pid)
     topicIds.mapSumToScore { tid =>
       val topicsScore = problem.prefsPersonTopic(pid, tid)
-      /* Person antipathy doesn't apply on unassigned topics */
-      val otherPersonsScore: Score = if (tid.value < problem.unassignedTopicsCount.value) 0 else {
-        val otherPersons = this.topicsToPersons(tid) - pid
-        otherPersons.mapSumToScore(problem.prefsPersonPerson(pid, _))
-      }
+      val otherPersonsScore: Score = scorePersonWishes(problem, pid, tid, hasPersonWishes)
       topicsScore + otherPersonsScore
+    }
+  }
+
+  private def scorePersonWishes(problem: SmallProblem, pid: PersonId, tid: TopicId, hasPersonWishes: Boolean): Score = {
+      /* Person sym/antipathy doesn't apply on unassigned topics */
+    if (!hasPersonWishes || tid.value < problem.unassignedTopicsCount.value) 0
+    else {
+      val otherPersons = this.topicsToPersons(tid) - pid
+      otherPersons.mapSumToScore(problem.prefsPersonPerson(pid, _))
     }
   }
 
@@ -113,12 +119,9 @@ class Schedule(
   @testOnly
   def calculateWishesPersonScores(problem: SmallProblem): Array[Score] = {
     this.personsToTopics.mapToScore { (pid, topicIds) =>
+      val hasPersonWishes = problem.personsWithPersonWish.contains(pid)
       topicIds.mapSumToScore { tid =>
-        /* Person antipathy doesn't apply on unassigned topics */
-        if (tid.value < problem.unassignedTopicsCount.value) 0 else {
-          val otherPersons = this.topicsToPersons(tid) - pid
-          otherPersons.mapSumToScore(problem.prefsPersonPerson(pid, _))
-        }
+        scorePersonWishes(problem, pid, tid, hasPersonWishes)
       }
     }.destructiveSortedValues
   }
