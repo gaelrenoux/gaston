@@ -24,13 +24,21 @@ object SmallIdSet {
 
     inline def nonEmpty: Boolean = s != 0L
 
-    inline def size: Int = java.lang.Long.bitCount(s)
+    inline def size: Count[I] = java.lang.Long.bitCount(s)
 
     inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = {
       c.foreach { i =>
         if (apply(i)) {
           f(i)
         }
+      }
+    }
+
+    inline def foreachWhile(inline f: I => Boolean)(using c: Count[I]): Unit = {
+      c.foreachWhile { i =>
+        if (apply(i)) {
+          f(i)
+        } else true
       }
     }
 
@@ -105,6 +113,16 @@ object SmallIdSet {
       val result = mutable.Set[I]()
       foreach { id => result += id }
       result.toSet
+    }
+
+    def filter(f: I => Boolean)(using c: Count[I]): SmallIdSet[I] = {
+      var result = SmallIdSet.empty[I]
+      c.foreach { i =>
+        if (s.contains(i) && f(i)) {
+          result = result.inserted(i)
+        }
+      }
+      result
     }
   }
 
