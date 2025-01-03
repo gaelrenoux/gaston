@@ -80,6 +80,8 @@ final class SmallProblem(
     prefsTopicsLinked = prefsTopicsLinked.fastCopy()
   )
 
+  inline def isPersonMandatory(pid: PersonId, tid: TopicId) = topicsMandatories(tid).contains(pid)
+
 }
 
 object SmallProblem {
