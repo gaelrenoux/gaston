@@ -80,7 +80,7 @@ object IdMap {
 
   extension [I >: Int <: Id, J >: Int <: Id: ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
     inline def transpose: IdMap[J, SmallIdSet[I]] = {
-      val array = new Array[SmallIdSet[I]](cj.value) // default value is 0
+      val array = new Array[SmallIdSet[I]](cj.value) // default value is 0 (empty SmallIdSet)
       m.fastForeachWithIndex { (js, i) =>
         js.foreach { j =>
           array(j) = array(j) + i

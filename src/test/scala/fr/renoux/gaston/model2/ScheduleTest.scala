@@ -26,14 +26,19 @@ class ScheduleTest extends TestBase {
       }
     }
 
-    "planning" in {
-      val plan = schedule.planning.toMap.view.mapValues(_.toSet).toMap
-      plan should be(Map(0 -> Set(0, 1), 1 -> Set(3)))
+    "slotsToTopics" in {
+      val stt = schedule.slotsToTopics.toMap.view.mapValues(_.toSet).toMap
+      stt should be(Map(0 -> Set(0, 1), 1 -> Set(3)))
     }
 
-    "assignment" in {
-      val ass = schedule.personsToTopics.toMap.view.mapValues(_.toSet).toMap
-      ass should be(Map(0 -> Set(0, 3), 1 -> Set(0, 3), 2 -> Set(0, 3), 3 -> Set(1, 3)))
+    "topicsToSlots" in {
+      val tts = schedule.topicsToSlot.toMap
+      tts should be(Map(0 -> 0, 1 -> 0, 2 -> -1, 3 -> 1))
+    }
+
+    "personsToTopics" in {
+      val ptp = schedule.personsToTopics.toMap.view.mapValues(_.toSet).toMap
+      ptp should be(Map(0 -> Set(0, 3), 1 -> Set(0, 3), 2 -> Set(0, 3), 3 -> Set(1, 3)))
     }
 
     "topicsToPersons" in {
