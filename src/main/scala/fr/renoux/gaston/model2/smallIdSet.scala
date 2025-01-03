@@ -3,6 +3,8 @@ package fr.renoux.gaston.model2
 import fr.renoux.gaston.util.{Count as _, *}
 import scala.collection.mutable
 import scala.annotation.targetName
+import scala.reflect.ClassTag
+import scala.util.Random
 
 
 /** Set of very small Ids (O to 63) as a single Long. Immutable, but very cheap to copy. */
@@ -141,6 +143,24 @@ object SmallIdSet {
           result = result.inserted(i)
         }
       }
+      result
+    }
+
+    def toArray(using c: Count[I], ct: ClassTag[I]): Array[I] = {
+      val result = Array.fill[I](s.size.value)(Id.None.value)
+      var resultIx = 0
+      c.foreach { i =>
+        if (apply(i)) {
+          result(resultIx) = i
+          resultIx +=1
+        }
+      }
+      result
+    }
+
+    def toShuffledArray(using Count[I], ClassTag[I], Random): Array[I] = {
+      val result = toArray
+      result.shuffle
       result
     }
   }
