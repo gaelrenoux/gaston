@@ -29,16 +29,28 @@ object Id {
 
 object SlotId {
   inline def None: SlotId = -1
+
+  extension (id: SlotId) {
+    inline def next(using c: Count[SlotId]): SlotId = (id + 1) % c
+  }
 }
 
 object TopicId {
   inline def None: TopicId = -1
 
   inline def Absent: TopicId = 0 // Topic for someone who isn't there
+
+  extension (id: TopicId) {
+    inline def next(using c: Count[TopicId]): TopicId = (id + 1) % c
+  }
 }
 
 object PersonId {
   inline def None: PersonId = -1
+
+  extension (id: PersonId) {
+    inline def next(using c: Count[PersonId]): PersonId = (id + 1) % c
+  }
 }
 
 opaque type Count[+I <: Id] >: Int = Int
@@ -75,7 +87,7 @@ object Count {
 
     }
 
-    inline def map[A](inline f: I => A): IndexedSeq[A] = (0 until c).map(f)
+    inline def map[A: ClassTag](inline f: I => A): Array[A] = Array.tabulate[A](c)(f)
 
     // TODO inline this method
     /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
