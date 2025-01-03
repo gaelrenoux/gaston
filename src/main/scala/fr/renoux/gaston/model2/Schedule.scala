@@ -4,9 +4,11 @@ import fr.renoux.gaston.util.testOnly
 import fr.renoux.gaston.util.fastForeach
 import fr.renoux.gaston.util.fastFoldRight
 
+
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
 class Schedule(
-    val planning: IdMap[SlotId, SmallIdSet[TopicId]],
+    val slotsToTopics: IdMap[SlotId, SmallIdSet[TopicId]],
+    val topicsToSlot: IdMap[TopicId, SlotId],
     var topicsPresent: SmallIdSet[TopicId],
     val personsToTopics: IdMap[PersonId, SmallIdSet[TopicId]],
     val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]]
@@ -27,13 +29,15 @@ class Schedule(
   def reverseMove(pid: PersonId, tid1: TopicId, tid2: TopicId): Schedule = move(pid, tid2, tid1)
 
   inline def addTopic(sid: SlotId, tid: TopicId): Schedule = {
-    planning(sid) = planning(sid) + tid
+    slotsToTopics(sid) = slotsToTopics(sid) + tid
+    topicsToSlot(tid) = sid
     topicsPresent = topicsPresent + tid
     this
   }
 
   inline def removeTopic(sid: SlotId, tid: TopicId): Schedule = {
-    planning(sid) = planning(sid) - tid
+    slotsToTopics(sid) = slotsToTopics(sid) - tid
+    topicsToSlot(tid) = SlotId.None
     topicsPresent = topicsPresent - tid
     this
   }
@@ -42,7 +46,6 @@ class Schedule(
     // TODO Will be helpful in tests
     ???
   }
-
 
   /* ALL SCORING METHODS */
 
@@ -78,7 +81,7 @@ class Schedule(
   }
 
   private def scorePersonWishes(problem: SmallProblem, pid: PersonId, tid: TopicId, hasPersonWishes: Boolean): Score = {
-      /* Person sym/antipathy doesn't apply on unassigned topics */
+    /* Person sym/antipathy doesn't apply on unassigned topics */
     if (!hasPersonWishes || tid.value < problem.unassignedTopicsCount.value) 0
     else {
       val otherPersons = this.topicsToPersons(tid) - pid
@@ -152,6 +155,7 @@ object Schedule {
   ) = {
     Schedule(
       planning,
+      planning.transpose.mapValues(_.headOrElse(SlotId.None)),
       planning.reduceValues(_ ++ _),
       assignment,
       assignment.transpose
