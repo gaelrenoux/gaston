@@ -21,7 +21,7 @@ class Schedule(
   def topicOf(sid: SlotId, pid: PersonId): TopicId = {
     val topicsFromSlot = slotsToTopics(sid)
     val topicsFromPerson = personsToTopics(pid)
-    (topicsFromSlot && topicsFromPerson).head // should always exist
+    (topicsFromSlot && topicsFromPerson).headOrElse(TopicId.Absent)
   }
 
    /** Returns true if that person can be added to this topic, without moving anyone else. */
