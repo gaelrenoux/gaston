@@ -28,6 +28,11 @@ object SmallIdSet {
 
     inline def size: Count[I] = java.lang.Long.bitCount(s)
 
+    inline def head: I = {
+      if (isEmpty) throw new NoSuchElementException
+      else fastFind(0, SmallIdSet.MaxValue)(apply(_))
+    }
+
     inline def headOption: Option[I] = {
       if (isEmpty) None
       else Some {
