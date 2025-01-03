@@ -99,12 +99,7 @@ object Count {
     /** Returns an array containing all values from the count, in a random order (using the Fisher-Yates shuffle) */
     inline def shuffled(using ct: ClassTag[I], rand: Random) = {
       val result: Array[I] = Array.tabulate(c)(identity)
-      fastLoop(c - 1, 1, _- 1) { i =>
-        val j = rand.nextInt(i + 1)
-        val tmp = result(i)
-        result(i) = result(j)
-        result(j) = tmp
-      }
+      result.shuffle
       result
     }
   }
