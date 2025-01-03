@@ -8,7 +8,7 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
       val sb = new StringBuilder
       problem.slotsCount.foreach { sid =>
         sb.append(problem.slotsNames(sid)).append("\n")
-        schedule.planning(sid).foreach { tid =>
+        schedule.slotsToTopics(sid).foreach { tid =>
           sb.append("    ").append(problem.topicsName(tid)).append(" ==> ")
           val persons = schedule.topicsToPersons(tid).toSet
           val personNames = persons.map(problem.personsName.apply).toSeq.sorted

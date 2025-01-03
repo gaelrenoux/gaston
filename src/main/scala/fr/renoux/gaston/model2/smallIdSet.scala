@@ -22,9 +22,23 @@ object SmallIdSet {
       (s & fullMask) == fullMask
     }
 
+    inline def isEmpty: Boolean = s == 0L
+
     inline def nonEmpty: Boolean = s != 0L
 
     inline def size: Count[I] = java.lang.Long.bitCount(s)
+
+    inline def headOption: Option[I] = {
+      if (isEmpty) None
+      else Some {
+        fastFind(0, SmallIdSet.MaxValue)(apply(_))
+      }
+    }
+
+    inline def headOrElse(j: I): I = {
+      if (isEmpty) j
+      else fastFind(0, SmallIdSet.MaxValue, default = j.value)(apply(_))
+    }
 
     inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = {
       c.foreach { i =>
