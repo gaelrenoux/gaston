@@ -18,6 +18,28 @@ class Schedule(
     val countPersons: CountAll[PersonId]
 ) {
 
+  def topicOf(sid: SlotId, pid: PersonId): TopicId = {
+    val topicsFromSlot = slotsToTopics(sid)
+    val topicsFromPerson = personsToTopics(pid)
+    (topicsFromSlot && topicsFromPerson).head // should always exist
+  }
+
+   /** Returns true if that person can be added to this topic, without moving anyone else. */
+  def isAddableTopic(problem: SmallProblem, pid: PersonId, tid: TopicId) = {
+    inline def topicMax = problem.topicsMax(tid)
+    inline def topicPersonsCount = topicsToPersons(tid).size
+    // TODO should handle forbidden here
+    topicPersonsCount < topicMax
+  }
+
+  /** Returns true if that person can be removed from that topic, without moving anyone else. */
+  def isDroppableTopic(problem: SmallProblem, pid: PersonId, tid: TopicId) = {
+      inline def topicMin = problem.topicsMin(tid)
+      inline def topicPersonsCount = topicsToPersons(tid).size
+      inline def personIsMandatory = problem.isPersonMandatory(pid, tid)
+      !personIsMandatory && topicPersonsCount > topicMin
+  }
+
   inline def move(pid: PersonId, tid1: TopicId, tid2: TopicId): Schedule = {
     // TODO Dev mode control: both topics should be on the same slot, pid should be on tid1
     personsToTopics(pid) = personsToTopics(pid) - tid1 + tid2
