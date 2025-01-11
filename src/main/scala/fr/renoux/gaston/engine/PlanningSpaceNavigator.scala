@@ -35,6 +35,7 @@ final class PlanningSpaceNavigator(using private val problem: Problem) {
     _ = log.debug(s"Checking for possible Additions on slot ${slot.name}")
 
     /* Filter out impossible topics because of incompatibility */
+    // TODO Note: this is not entirely deterministic, as the Set's initial conversion to a Seq (before shuffling) can vary based on unrelated changes.
     topic <- shuffled(schedule.unscheduledTopics -- slotSchedule.incompatibleTopics).view
 
     /* Filter out impossible topics because followup topic can't be added. Also, can't move followup topics directly. */
