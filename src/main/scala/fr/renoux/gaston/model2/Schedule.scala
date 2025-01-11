@@ -18,6 +18,16 @@ class Schedule(
     val countPersons: CountAll[PersonId]
 ) {
 
+  var personsScoreCache = IdMap.fill[PersonId, Score](Score.Missing)
+
+  def invalidateCacheFor(pid: PersonId)(using problem: SmallProblem) = {
+    personsScoreCache(pid) = Score.Missing
+    val otherPersons = problem.personsTargetedByWish(pid)
+    otherPersons.foreach {
+      personsScoreCache(_) = Score.Missing
+    }
+  }
+
   def topicOf(sid: SlotId, pid: PersonId): TopicId = {
     val topicsFromSlot = slotsToTopics(sid)
     val topicsFromPerson = personsToTopics(pid)
@@ -40,15 +50,16 @@ class Schedule(
       !personIsMandatory && topicPersonsCount > topicMin
   }
 
-  inline def move(pid: PersonId, tid1: TopicId, tid2: TopicId): Schedule = {
+  inline def move(pid: PersonId, tid1: TopicId, tid2: TopicId)(using SmallProblem): Schedule = {
     // TODO Dev mode control: both topics should be on the same slot, pid should be on tid1
     personsToTopics(pid) = personsToTopics(pid) - tid1 + tid2
     topicsToPersons(tid1) = topicsToPersons(tid1) - pid
     topicsToPersons(tid2) = topicsToPersons(tid2) + pid
+    invalidateCacheFor(pid)
     this
   }
 
-  def reverseMove(pid: PersonId, tid1: TopicId, tid2: TopicId): Schedule = move(pid, tid2, tid1)
+  def reverseMove(pid: PersonId, tid1: TopicId, tid2: TopicId)(using SmallProblem): Schedule = move(pid, tid2, tid1)
 
   inline def addTopic(sid: SlotId, tid: TopicId): Schedule = {
     slotsToTopics(sid) = slotsToTopics(sid) + tid
@@ -85,11 +96,18 @@ class Schedule(
   def scorePersons(problem: SmallProblem): IdMap[PersonId, Score] = {
     // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
     this.personsToTopics.mapToScore { (pid, topicIds) =>
-      val baseScore = problem.personsBaseScore(pid)
-      val wishesScore = scoreWishes(problem, pid, topicIds)
-      val exclusiveScore = scoreExclusive(problem, pid, topicIds)
-      val linkedScore = scoreLinked(problem, topicIds)
-      baseScore + wishesScore + exclusiveScore + linkedScore
+      val cached = personsScoreCache(pid)
+      if (cached > Double.MinValue) {
+        cached
+      } else {
+        val baseScore = problem.personsBaseScore(pid)
+        val wishesScore = scoreWishes(problem, pid, topicIds)
+        val exclusiveScore = scoreExclusive(problem, pid, topicIds)
+        val linkedScore = scoreLinked(problem, topicIds)
+        val total = baseScore + wishesScore + exclusiveScore + linkedScore
+        personsScoreCache(pid) = total
+        total
+      }
     }
   }
 
