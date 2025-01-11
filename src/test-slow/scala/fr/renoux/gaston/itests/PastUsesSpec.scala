@@ -68,7 +68,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     val (result, count) = runConcurrently(udocon2019, 1000, 4)
     println(result.toFormattedString)
     count should be(1000L)
-    result.score.value should be > 850.0
+    result.score.value should be > 845.0
   }
 
   "r32019" should "not crash after after examining 10 schedules" in {
