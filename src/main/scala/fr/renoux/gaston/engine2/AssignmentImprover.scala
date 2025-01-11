@@ -13,6 +13,7 @@ import scala.util.Random
   */
 final class AssignmentImprover(private val problem: SmallProblem)(using private val ctx: Context) {
 
+  given SmallProblem = problem
   import problem.given
 
   private val defaultMaxRoundsCount = 1000

@@ -47,7 +47,7 @@ object SmallIdSet {
       else fastFind(0, SmallIdSet.MaxValue, default = j.value)(apply(_))
     }
 
-    inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = {
+    inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = if (nonEmpty) {
       c.foreach { i =>
         if (apply(i)) {
           f(i)

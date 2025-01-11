@@ -54,7 +54,7 @@ class ScheduleTest extends TestBase {
 
   "Scoring" - {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
-    val problem = InputTranscription2(input).result.toEither.force
+    given problem: SmallProblem = InputTranscription2(input).result.toEither.force
     import problem.given
     given SchedulePrinter = new SchedulePrinter(problem)
 
