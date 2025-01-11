@@ -16,6 +16,18 @@ object Score {
     @targetName("scoreMultiplyInt")
     infix inline def *(i: Int): Score = i * s
 
+    @targetName("scoreSuperior")
+    infix inline def >(t: Score): Boolean = s > t
+
+    @targetName("scoreSuperiorOrEqual")
+    infix inline def >=(t: Score): Boolean = s >= t
+
+    @targetName("scoreInferior")
+    infix inline def <(t: Score): Boolean = s < t
+
+    @targetName("scoreInferiorOrEqual")
+    infix inline def <=(t: Score): Boolean = s <= t
+
     inline def value: Double = s
   }
 
@@ -23,6 +35,9 @@ object Score {
 
   /** A minimum reward that won't overflow when it's summed with others */
   inline def MinReward: Score = -1e9
+
+  /** Some value to represent no value (in caches and stuff) */
+  inline def Missing: Score = Double.MinValue
 
   given Ordering[Score] = math.Ordering.Double.TotalOrdering
 
