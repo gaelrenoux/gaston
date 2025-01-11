@@ -25,7 +25,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     * Ends either because the schedule can't be perfected any more or because the limit number of rounds has been
     * reached.
     */
-  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(using Random) = 
+  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(using Random): Unit =
     chrono("PersonPlacementImprover >  improve") {
       val slotsToChangeablePersons: IdMap[SlotId, Array[PersonId]] =
         IdMap.tabulate[SlotId, Array[PersonId]] { sid =>
@@ -84,7 +84,6 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
         sid = sid.next
       }
-
 
     }
 
