@@ -28,7 +28,7 @@ final case class TopicsLinked(topics: ArraySet[Topic], reward: Score = Preferenc
 
   override def hashCode(): Int = (this.topics.actualHashCode, reward).hashCode()
 
-  override lazy val toLongString: String = s"TopicsLinked($topics, $reward)"
+  override lazy val toLongString: String = s"TopicsLinked(${topics.toGoodString}, $reward)"
 
   override lazy val toAbstract: (String, Seq[Int], Double) = ("TopicsLinked", topics.toIdSet.toSeq.sorted, reward.value)
 }

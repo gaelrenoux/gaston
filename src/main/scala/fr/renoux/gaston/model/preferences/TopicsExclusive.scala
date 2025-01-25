@@ -28,7 +28,7 @@ final case class TopicsExclusive(topics: ArraySet[Topic], exemptions: ArraySet[P
 
   override def hashCode(): Int = (this.topics.actualHashCode, this.exemptions.actualHashCode, reward).hashCode()
 
-  override lazy val toLongString: String = s"TopicsExclusive($topics${if (exemptions.nonEmpty) s"$exemptions, " else ""}, $reward)"
+  override lazy val toLongString: String = s"TopicsExclusive(${topics.toGoodString}${if (exemptions.nonEmpty) s"$exemptions, " else ""}, $reward)"
 
   override lazy val toAbstract: (String, Seq[Int], Seq[Int], Double) =
     ("TopicsExclusive", topics.toIdSet.toSeq.sorted, exemptions.toIdSet.toSeq.sorted, reward.value)

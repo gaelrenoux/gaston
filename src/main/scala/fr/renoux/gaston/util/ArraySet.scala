@@ -47,7 +47,7 @@ object ArraySet {
     /** Returns a Set of the ids present in this. */
     inline def toIdSet: Set[Int] = as.view.zipWithIndex.filter(_._1).map(_._2).toSet
 
-    inline def toString: String = as.view.zipWithIndex.filter(_._1).map(_._2).mkString("[", ", ", "]")
+    inline def toGoodString: String = as.view.zipWithIndex.filter(_._1).map(_._2).mkString("[", ", ", "]")
   }
 
   def from[A <: Identified](size: Int)(it: Iterable[A]): ArraySet[A] = {
