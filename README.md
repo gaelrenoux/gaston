@@ -44,8 +44,9 @@ The input file describes the problem to solve. It follows the HOCON format, and 
             - `persons-anti-preference-scaling`: If present, this settings make the unassignment anti-preference scale with the number of forbidden entries of a person. The more topics are forbidden for them, the less impactful an unassignment will be. Default is none.
                 - `forbidden-ratio-for-maximum`: For a person, if their ratio of forbidden topics to total topics reach this value, the unassignment anti-preference will be set to its maximum value below.Default is `75%`.
                 - `maximum-anti-preference`: If a person has the maximum ratio of forbidden topics, their unassignment anti-preference. Default is `-1`.
+        - `absence-adjustment-factor`: If a person is absent, with a factor of 1, its score will be adjusted so that it will be the same as someone having the same % of their time on the same wish level. For example: if you're only present on 3 slots and have 3 wishes at 5, you'll have the same score than someone present on 5 slots and 3 wishes at 5. This factor lets you reduce that a bit. Putting a lower factor means that absence counts for less than 1, leading to slightly better schedules for people who are missing some slots. The reasoning: if they're not here as much, they should at least enjoy the slots they are here. 
     - `tableSettings`: Settings for importing a table. Optional (leave that field out if you are not importing a table). See the *Importing a table* section below for details. 
-    - `slots`: The slots on which to schedule, as an array of arrays of slots. The inner arrays contain the slots following each other directly (such as one in the morning and the other in the afternoon of the same day), so that mult-slot topics may be handled (WIP). The following lines describe the structure of one slot.
+    - `slots`: The slots on which to schedule, as an array of arrays of slots. The inner arrays contain the slots following each other directly (such as one in the morning and the other in the afternoon of the same day), so that mult-slot topics may be handled. The following lines describe the structure of one slot.
         - `name`: Name of the slot. Must be unique among slots.
         - `max-topics`: Maximum number of topics to schedule on this slot (e.g. because space as limited at that time).
     - `topics`: The topics to schedule. The following lines describe the structure of one topic.
@@ -67,6 +68,7 @@ The input file describes the problem to solve. It follows the HOCON format, and 
         - `incompatible`: An array of person names this person wish not to share a topic with. Default is empty.
         - `wishes`: A mapping of topic names to scores. The higher the score, the more that persons wishes to be on that topic. The scores will be rebalanced so that everyone has a 1000 points total (including person wishes, next line).
         - `personWishes`: A mapping of person names to scores. The higher the score, the more that persons wishes to be on a topic with the target person. The scores will be rebalanced so that everyone has a 1000 points total (including topic wishes, previous line).
+        - `min-free-slots`: How many free slots (slots where the person's not assigned to anything) they want. Implies that `unassigned` persons are allowed in the settings. Note that free slots must be on different slots sub-list (different days).
     - `constraints`: Global constraints on the schedule.
         - `simultaneous`: An array of simultaneity constraints.
             - `topics`: An array of topics. Those topics must all be scheduled on the same slot, or not at all.

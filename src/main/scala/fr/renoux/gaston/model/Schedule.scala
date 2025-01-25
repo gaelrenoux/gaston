@@ -61,7 +61,7 @@ final case class Schedule(
   // lazy val maxPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.max))
   // lazy val minPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.min))
   lazy val personsByTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsByTopic).toMap
-
+  
   /** Get the SlotSchedule for a specific Slot */
   def on(slot: Slot): SlotSchedule = wrapped.getOrElse(slot, SlotSchedule.empty(slot))
 

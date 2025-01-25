@@ -45,7 +45,7 @@ object MinimalTestModel {
     lazy val Evening: Slot = Slot(index.getAndIncrement(), "evening", Persons.All, Some(Night))
     lazy val Night: Slot = Slot(index.getAndIncrement(), "night", Persons.All, None)
 
-    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon, Evening, Night))
+    val All: Seq[Seq[Slot]] = Seq(Seq(Morning, Afternoon), Seq(Evening, Night))
     given SlotCount: Count[Slot] = util.Count[Slot](All.flatten.size)
   }
 

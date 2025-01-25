@@ -21,6 +21,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   behavior of "Occurrences"
 
   {
+    val inputSlots = List(List(InputSlot("afternoon"), InputSlot("evening")))
     val inputTopics = List(InputTopic(
       name = "alpha",
       occurrences = Some(3)
@@ -37,6 +38,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
 
     they should "all have the same mandatory, forbidden and wishes" in {
       given problem: Problem = from(InputModel(
+        slots = inputSlots,
         topics = inputTopics,
         persons = List(
           InputPerson("Arnold", mandatory = Set("alpha")),

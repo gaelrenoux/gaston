@@ -14,10 +14,7 @@ trait Preference {
 
   def toLongString: String
 
-  val isPersonal: Boolean
-
   def toAbstract: Product
-
 }
 
 object Preference {
@@ -61,14 +58,10 @@ object Preference {
   trait Personal extends RecordLevel {
     /** A personal preference always references someone */
     val person: Person
-
-    override val isPersonal: Boolean = true
   }
 
   /** Impersonal preferences are not linked to a single, specific person. Persons assignment may still matter though! */
-  trait Impersonal extends Preference {
-    override val isPersonal: Boolean = false
-  }
+  trait Impersonal extends Preference
 
   /** This is only used for pseudo-constraints: constraints represented as preferences. */
   val NecessaryPreferenceScore: Score = Score(-1000000000.0) // Cannot be negative infinity: we want breaking one constraint to be better than breaking two.
