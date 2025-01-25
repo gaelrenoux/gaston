@@ -16,6 +16,7 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 type NonEmptyString = String :| Not[Empty]
 type PosInt = Int :| Positive
 type NonNegInt = Int :| Positive0
+type PosDouble = Double :| Positive
 
 type NonPosScore = Score :| Negative0
 
@@ -91,6 +92,7 @@ final case class InputSettings(
     defaultMinPersonsPerTopic: PosInt = Constants.DefaultTopicMin,
     defaultMaxPersonsPerTopic: PosInt = Constants.DefaultTopicMax,
     unassigned: InputSettings.Unassigned = InputSettings.Unassigned(),
+    absenceAdjustmentFactor: PosDouble = 0.8,
     statusDisplayInterval: FiniteDuration = 20.seconds
 )
 
@@ -202,7 +204,8 @@ final case class InputPerson(
     forbidden: Set[NonEmptyString] = Set.empty,
     incompatible: Set[NonEmptyString] = Set.empty,
     wishes: Map[String, Score] = Map.empty, // can't use Refined as a key, see https://github.com/fthomas/refined/issues/443
-    personWishes: Map[String, Score] = Map.empty
+    personWishes: Map[String, Score] = Map.empty,
+    minFreeSlots: Option[PosInt] = None // how many free slots does this person want? None is zero..
 )
 
 final case class InputGlobalConstraints(

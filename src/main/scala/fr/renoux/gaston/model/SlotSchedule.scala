@@ -64,7 +64,13 @@ final case class SlotSchedule(
   lazy val countPersonsByTopic: Map[Topic, Int] = personsByTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
   lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)
-
+  
+  /** For each person, their topic */
+  lazy val topicByPerson: Map[Person, Topic] = wrapped.flatMap { case (topic, record) => record.persons.map(p => p -> topic) }
+  
+  /** Set of persons unassigned on this slot-schedule **/
+  lazy val unassignedPersons: Set[Person] = wrapped.find(_._1.isUnassigned).fold(Set.empty)(_._2.persons)
+  
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
 

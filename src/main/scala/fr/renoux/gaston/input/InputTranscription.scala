@@ -126,7 +126,9 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   /* Counts */
   given Count[Slot] = Count[Slot](slotsByName.size)
+
   given Count[Person] = Count[Person](personsByName.size)
+
   given Count[Topic] = Count[Topic](topicsByName.values.flatten.size)
 
 
@@ -211,7 +213,10 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
       val totalPersonWishesScore = inPerson.personWishes.filter(_._2.value > 0).values.sum.value
       val totalWishScore = totalTopicWishesScore + totalPersonWishesScore
-      val scoreFactor = Constants.PersonTotalScore.value / totalWishScore
+      val personMissedSlots = inPerson.absences.size + inPerson.minFreeSlots.getOrElse(0)
+      val absenceRatio = personMissedSlots.toDouble / slotsByName.size
+      val adjustedAbsenceRatio = absenceRatio * input.settings.absenceAdjustmentFactor
+      val scoreFactor = Constants.PersonTotalScore.value / totalWishScore / (1 - adjustedAbsenceRatio)
       inPerson.name -> scoreFactor
     }.toMap
 
@@ -257,6 +262,12 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toArraySet, ArraySet.empty, reward))
       }
 
+    lazy val personFreeSlotsPreferences: Seq[PersonFreeSlotPreference] =
+      input.persons.flatMap { inPerson =>
+        val person = personsByName(inPerson.name)
+        inPerson.minFreeSlots.map(PersonFreeSlotPreference(person, _))
+      }
+
 
     lazy val all: Set[Preference] = {
       Set.empty[Preference] ++
@@ -269,7 +280,8 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         personTopicPreferences ++
         personPersonPreferences ++
         unassignedTopicPreferences ++
-        unassignedTopicsExclusivePreferences
+        unassignedTopicsExclusivePreferences ++
+        personFreeSlotsPreferences
     }
   }
 
