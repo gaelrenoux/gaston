@@ -13,6 +13,7 @@ class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.MinimalTestModel.Topics.{*, given}
 
   given Problem = Minimal
+
   given Context = Context.Default
 
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
@@ -44,10 +45,20 @@ class TopicsExclusiveSpec extends AnyFlatSpec with Matchers {
     ) should be(Score.Zero)
   }
 
-  it should "break if a person does two out of three" in {
-    TopicsExclusive(Set(Leading, Party, Machines).toArraySet, ArraySet.empty[Person]).score(scheduled(Morning, Leading, Leonardo, Michelangelo) ++
+  it should "return the reward if a person does two out of three" in {
+    val cannotLeadAndPartyAndMachines = TopicsExclusive(Set(Leading, Party, Machines).toArraySet, ArraySet.empty[Person])
+    cannotLeadAndPartyAndMachines.score(scheduled(Morning, Leading, Leonardo, Michelangelo) ++
       scheduled(Afternoon, Party, Raphael, Michelangelo) ++ scheduled(Evening, Machines, Donatello)
-    ) should be(cannotLeadAndPartyExceptLeo.reward)
+    ) should be(cannotLeadAndPartyAndMachines.reward)
+  }
+
+  it should "return twice the reward if a person does three out of three" in {
+    val cannotLeadAndPartyAndMachines = TopicsExclusive(Set(Leading, Party, Machines).toArraySet, ArraySet.empty[Person])
+    cannotLeadAndPartyAndMachines.score(
+      scheduled(Morning, Leading, Leonardo, Michelangelo) ++
+        scheduled(Afternoon, Party, Raphael, Michelangelo) ++
+        scheduled(Evening, Machines, Donatello, Michelangelo)
+    ) should be(cannotLeadAndPartyAndMachines.reward * 2)
   }
 
 }

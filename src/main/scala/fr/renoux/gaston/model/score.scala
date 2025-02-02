@@ -30,7 +30,7 @@ object Score {
     /** Divide a score by a weight */
     inline def /(w: Weight): Score = s / w
 
-    inline def negative: Score = -s
+    inline def opposite: Score = -s
 
     inline def toFormattedString: String = Score.TwoDecimalsFormat.format(s)
 

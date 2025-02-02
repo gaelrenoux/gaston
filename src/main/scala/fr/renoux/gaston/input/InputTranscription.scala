@@ -36,7 +36,22 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
 
   /* Persons */
-  lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (p, ix) => Person(ix, p.name, p.weight, p.baseScore) }.toArray
+  lazy val unassignedScoreByPersonId: Map[Person.Id, Score] = input.persons.zipWithIndex.map { case (inPerson, index) =>
+    val score: Score = settings.unassigned.personAntiPreferenceScaling match {
+      case None => settings.unassigned.personAntiPreference
+      case Some(scalingSettings) =>
+        val ratioOfForbiddenTopics = inPerson.forbidden.size.toDouble / input.topics.size
+        val antiPreferenceVariablePart: Score = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
+        val ratioOnVariablePart = math.max(0, 1 - (ratioOfForbiddenTopics / scalingSettings.forbiddenRatioForMaximum))
+        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * ratioOnVariablePart)
+    }
+    index -> score
+  }.toMap
+  lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (inPerson, index) =>
+    // Ugly adjustment: min-free-slots will lead to negative scores for the person, this will revert it
+    val baseScoreAdjustment = (unassignedScoreByPersonId(index) * inPerson.minFreeSlots.getOrElse(0)).opposite
+    Person(index, inPerson.name, inPerson.weight, inPerson.baseScore + baseScoreAdjustment)
+  }.toArray
   lazy val personsByName: Map[NonEmptyString, Person] = personsById.map { p => (p.name.refineUnsafe[Not[Empty]]: NonEmptyString) -> p }.toMap
 
 
@@ -240,21 +255,12 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         wishedPerson = personsByName(wishedPersonName)
       } yield PersonPersonPreference(person, wishedPerson, inWish._2 * scoreFactor)
 
-    def getUnassignedAntiPreference(inPerson: InputPerson): Score = settings.unassigned.personAntiPreferenceScaling match {
-      case None => settings.unassigned.personAntiPreference
-      case Some(scalingSettings) =>
-        val ratioOfForbiddenTopics = inPerson.forbidden.size.toDouble / input.topics.size
-        val antiPreferenceVariablePart: Score = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
-        val ratioOnVariablePart = math.max(0, 1 - (ratioOfForbiddenTopics / scalingSettings.forbiddenRatioForMaximum))
-        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * ratioOnVariablePart)
-    }
-
     lazy val unassignedTopicPreferences: Set[PersonTopicPreference] = {
       for {
         unassignedTopic <- unassignedTopicsByNameAndSlot.values
         inPerson <- input.personsSet
         person = personsByName(inPerson.name)
-      } yield PersonTopicPreference(person, unassignedTopic, getUnassignedAntiPreference(inPerson))
+      } yield PersonTopicPreference(person, unassignedTopic, unassignedScoreByPersonId(person.id))
     }.toSet
 
     lazy val unassignedTopicsExclusivePreferences: Set[TopicsExclusive] =

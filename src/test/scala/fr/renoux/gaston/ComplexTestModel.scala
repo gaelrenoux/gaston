@@ -81,7 +81,7 @@ class ComplexTestModel(seed: Long) {
     val Unassigned: Set[Preference] = for {
       t: Topic <- Topics.Unassigned.values.toSet
       p <- Persons.All
-    } yield PersonTopicPreference(p, t, Constants.PersonTotalScore.negative)
+    } yield PersonTopicPreference(p, t, Constants.PersonTotalScore.opposite)
 
     val All: Set[Preference] = PersonTopics ++ Incompatibilities ++ Unassigned
   }

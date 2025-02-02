@@ -11,6 +11,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   // TODO Improve this test !
   // TODO missing test for Simultaneous
   // TODO missing test for NotSimultaneous
+  // TODO missing test for adjusted absence ratio
 
   import fr.renoux.gaston.TestUtils.*
 
