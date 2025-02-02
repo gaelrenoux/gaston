@@ -30,6 +30,8 @@ object ArrayMap {
     tmp
   }
 
+  def unsafeFrom[A <: Identified, B](array: Array[B]): ArrayMap[A, B] = array
+
   extension [A <: Identified, B](wrapped: Iterable[(A, B)]) {
 
     inline def toArrayMap(size: Int, default: B)(using tagB: ClassTag[B]): ArrayMap[A, B] =

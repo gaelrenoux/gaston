@@ -11,18 +11,13 @@ import fr.renoux.gaston.model.{Person, Preference, Schedule, Score, Topic}
 final case class PersonFreeSlotPreference(person: Person, requiredCount: Int, reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti {
 
-  assert(requiredCount >0, s"$this should have a strictly positive count")
+  assert(requiredCount > 0, s"$this should have a strictly positive count")
 
   override def scoreSchedule(schedule: Schedule): Score = {
-    var countLeft = requiredCount
-    val slotSeqIt = schedule.problem.slotSequences.iterator
-    while (countLeft > 0 && slotSeqIt.hasNext) {
-      val slotSeq = slotSeqIt.next()
-      val foundOne = slotSeq.exists { s => schedule.on(s).unassignedPersons.contains(person) }
-      if (foundOne) countLeft -= 1
-    }
-
-    reward * countLeft
+    val count = schedule.countSlotCyclesWithUnassignedByPerson(person)
+    val diff = requiredCount - count
+    if (diff <= 0) Score.Zero
+    else reward * diff
   }
 
   override lazy val toLongString: String = s"PersonFreeSlotPreference(${person.toShortString}, $requiredCount, $reward)"
