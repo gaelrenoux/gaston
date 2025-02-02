@@ -48,6 +48,8 @@ final case class Topic(
     followup.map(_.id),
     isFollowup, forced, isUnassigned
   )
+
+  override def hashCode(): Int = id
 }
 
 object Topic {

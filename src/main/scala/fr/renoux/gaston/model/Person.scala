@@ -20,6 +20,7 @@ final case class Person(
 
   lazy val toAbstract: (Person.Id, Double, Double) = (id, weight.value, baseScore.value)
 
+  override def hashCode(): Int = id
 }
 
 object Person {

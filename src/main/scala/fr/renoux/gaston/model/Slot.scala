@@ -26,6 +26,8 @@ final case class Slot(
     s"Slot($id, $name,${next.fold("")(s => s" next: ${s.name},")} ${personsPresent.map(_.name).mkString("(", ",", ")")}${if (maxTopics < Int.MaxValue) s", max: $maxTopics" else ""})"
 
   lazy val toAbstract: (Int, List[Person.Id], Option[Int], Int) = (id, personsPresent.map(_.id).toList.sorted, next.map(_.id), maxTopics)
+
+  override def hashCode(): Int = id
 }
 
 //TODO call to hashcode is a minor (9%) hot-spot ! Same for topic and person !
