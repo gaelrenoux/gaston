@@ -40,10 +40,10 @@ final class Renderer(
     val summaryTextBody = summariesFromBestToWorse.map { case (name, score, baseScore, satisfied, mandatoryCount) =>
       val nameTxt = name.padTo(8, ' ').take(8)
       val scoreTxt = ScoreDecimalFormat.format(score)
-      val baseScoreTxt = if (baseScore == 0.0) "" else ScoreDecimalFormat.format(baseScore) + " "
-      val mandatoryTxt = if (mandatoryCount == 0) "" else Seq.fill(mandatoryCount)(Record.MandatoryMarker).mkString("", " ", " ")
+      val baseScoreTxt = if (baseScore == 0.0) "" else ShortScoreDecimalFormat.format(baseScore) + " "
+      val mandatoryTxt = if (mandatoryCount == 0) "" else Seq.fill(mandatoryCount)(Record.MandatoryMarker).mkString(" ", "  ", " ")
       val satisfiedTxt = satisfied.map(ShortScoreDecimalFormat.format).mkString(" ")
-      s"$nameTxt    $scoreTxt    ($baseScoreTxt$mandatoryTxt$satisfiedTxt)"
+      s"$nameTxt    $scoreTxt    ($baseScoreTxt$mandatoryTxt$satisfiedTxt )"
     }.mkString("\n")
 
     val notableOtherPrefs = otherPreferences.filter(_.score(schedule) != Score.Zero)
@@ -54,7 +54,7 @@ final class Renderer(
     s"""${schedule.toFormattedString}
        |Schedule score is ${schedule.score.value}
        |
-       |Person       Score     (Detail)
+       |Person       Score     ( Detail )
        |$summaryTextBody
        |$notableOtherPrefsTxt
        |""".stripMargin
@@ -66,6 +66,6 @@ object Renderer {
 
   val ScoreDecimalFormat = new DecimalFormat(" 000.00;-0")
 
-  val ShortScoreDecimalFormat = new DecimalFormat("000")
+  val ShortScoreDecimalFormat = new DecimalFormat(" 000;-0")
 
 }
