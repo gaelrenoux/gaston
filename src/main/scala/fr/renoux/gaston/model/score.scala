@@ -37,6 +37,8 @@ object Score {
     inline def isNegativeInfinity: Boolean = s.isNegInfinity
 
     inline def isPositive: Boolean = s > 0
+    
+    inline def isZero: Boolean = s == 0.0
   }
 
   def apply(s: Double): Score = s
