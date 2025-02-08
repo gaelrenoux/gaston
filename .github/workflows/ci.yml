@@ -29,5 +29,11 @@ jobs:
       - name: Setup sbt
         uses: sbt/setup-sbt@v1
 
-      - name: Clean compile and run tests
-        run: sbt clean test test-slow:test
+      - name: Clean compile
+        run: sbt clean
+
+      - name: Run fast tests
+        run: sbt test
+
+      - name: Run slow tests
+        run: sbt test-slow:test
