@@ -40,8 +40,8 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     val score: Score = settings.unassigned.personAntiPreferenceScaling match {
       case None => settings.unassigned.personAntiPreference
       case Some(scalingSettings) =>
-        val countForbiddenNormalPriority = inPerson.forbidden.count { f => input.normalPriorityTopicsSet.exists(_.name == f) }
-        val ratioOfForbiddenTopics = countForbiddenNormalPriority.toDouble / input.topics.size
+        val countForbiddenNormal = inPerson.forbidden.count { f => input.normalTopicsSet.exists(_.name == f) }
+        val ratioOfForbiddenTopics = countForbiddenNormal.toDouble / input.topics.size
         val antiPreferenceVariablePart: Score = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
         val ratioOnVariablePart = math.max(0, 1 - (ratioOfForbiddenTopics / scalingSettings.forbiddenRatioForMaximum))
         scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * ratioOnVariablePart)
@@ -179,7 +179,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
   object Preferences {
 
     lazy val topicScores: Set[TopicDirectPreference] = for {
-      inTopic <- input.normalPriorityTopicsSet
+      inTopic <- input.normalTopicsSet
       topic <- topicsByName(inTopic.name)
       presenceScore <- inTopic.presence
     } yield TopicDirectPreference(topic, presenceScore)
@@ -225,10 +225,10 @@ private[input] final class InputTranscription(rawInput: InputModel) {
      *
      * We do not handle negative preferences here (they're excluded from the total). */
     // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes.
-    lazy val personScoreFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
-      // Low-priority topic are not considered for calculating the general factor
-      val normalPriorityTopicWishes = inPerson.ironedWishes.filter { case (name, _) => input.normalPriorityTopicsNameSet.contains(name) }
-      val totalTopicWishesScore = normalPriorityTopicWishes.filter(_._2.value > 0).values.sum.value
+    lazy val personScoreNormalFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
+      // Stopgap topic are not considered for calculating the general factor
+      val normalTopicWishes = inPerson.ironedWishes.filter { case (name, _) => input.normalTopicsNameSet.contains(name) }
+      val totalTopicWishesScore = normalTopicWishes.filter(_._2.value > 0).values.sum.value
       val totalPersonWishesScore = inPerson.personWishes.filter(_._2.value > 0).values.sum.value
       val totalWishScore = totalTopicWishesScore + totalPersonWishesScore
       val personMissedSlots = inPerson.absences.size + inPerson.minFreeSlots.getOrElse(0)
@@ -238,11 +238,11 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       inPerson.name -> scoreFactor
     }.toMap
 
-    lazy val personScoreLowPriorityFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
-      // Only considering low-priority topics
-      val lowPriorityTopicWishes = inPerson.ironedWishes.filter { case (name, _) => input.lowPriorityTopicsNameSet.contains(name) }
-      val totalWishScore = lowPriorityTopicWishes.filter(_._2.value > 0).values.sum.value
-      val scoreFactor = if (totalWishScore == 0) 0 else Constants.PersonLowPriorityTotalScore.value / totalWishScore
+    lazy val personScoreStopgapFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
+      // Only considering stopgap topics
+      val stopgapTopicWishes = inPerson.ironedWishes.filter { case (name, _) => input.stopgapTopicsNameSet.contains(name) }
+      val totalWishScore = stopgapTopicWishes.filter(_._2.value > 0).values.sum.value
+      val scoreFactor = if (totalWishScore == 0) 0 else Constants.PersonStopgapTotalScore.value / totalWishScore
       inPerson.name -> scoreFactor
     }.toMap
 
@@ -250,34 +250,34 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       for {
         inPerson <- input.personsSet
         person = personsByName(inPerson.name)
-        scoreFactor = personScoreFactors(inPerson.name)
+        scoreFactor = personScoreNormalFactors(inPerson.name)
         (wishName, wishValue) <- inPerson.ironedWishes
-        if !input.topicsByName(wishName).forcedLowPriority
+        if !input.topicsByName(wishName).forcedStopgap
         topic <- topicsByName(wishName)
         score = wishValue * scoreFactor
         if !score.isZero
       } yield PersonTopicPreference(person, topic, score)
 
-    lazy val personLowPriorityTopicPreferences: Set[PersonTopicPreference] =
+    lazy val personStopgapTopicPreferences: Set[PersonTopicPreference] =
       for {
         inPerson <- input.personsSet
         person = personsByName(inPerson.name)
         unassignedScore = unassignedScoreByPersonId(person.id)
-        inTopic <- input.lowPriorityTopicsSet
+        inTopic <- input.stopgapTopicsSet
         topic <- topicsByName(inTopic.name)
-        scoreFactor = personScoreLowPriorityFactors(inPerson.name)
+        scoreFactor = personScoreStopgapFactors(inPerson.name)
         wishValue = inPerson.ironedWishes.getOrElse(inTopic.name, Score.Zero)
         score = (wishValue * scoreFactor) + unassignedScore
         if !score.isZero
       } yield PersonTopicPreference(person, topic, score)
 
-    lazy val personTopicPreferences = personNormalTopicPreferences ++ personLowPriorityTopicPreferences
+    lazy val personTopicPreferences = personNormalTopicPreferences ++ personStopgapTopicPreferences
 
     lazy val personPersonPreferences: Set[PersonPersonPreference] =
       for {
         inPerson <- input.personsSet
         person = personsByName(inPerson.name)
-        scoreFactor = personScoreFactors(inPerson.name)
+        scoreFactor = personScoreNormalFactors(inPerson.name)
         (wishName, wishValue) <- inPerson.ironedPersonWishes
         wishedPerson = personsByName(wishName)
       } yield PersonPersonPreference(person, wishedPerson, wishValue * scoreFactor)

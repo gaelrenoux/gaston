@@ -67,8 +67,8 @@ object Constants {
   // TODO that's horrible, remove this. But it helps for now.
   val IntLowMaxValue: PosInt = 10000
 
-  /** What score should a person have if all its preferences on low-priority topics are satisfied ? */
-  val PersonLowPriorityTotalScore: Score = Score(1)
+  /** What additional score should a person have if all its preferences on stopgap topics are used on previously unassigned topics ? */
+  val PersonStopgapTotalScore: Score = Score(1)
 
 }
 
@@ -86,13 +86,13 @@ final case class InputModel(
   lazy val personsSet: Set[InputPerson] = persons.toSet
   lazy val personsNameSet: Set[NonEmptyString] = persons.map(_.name).toSet
 
-  lazy val normalPriorityTopics: List[InputTopic] = topics.filter(!_.forcedLowPriority)
-  lazy val lowPriorityTopics: List[InputTopic] = topics.filter(_.forcedLowPriority)
-  lazy val normalPriorityTopicsSet: Set[InputTopic] = normalPriorityTopics.toSet
-  lazy val lowPriorityTopicsSet: Set[InputTopic] = lowPriorityTopics.toSet
+  lazy val normalTopics: List[InputTopic] = topics.filter(!_.forcedStopgap)
+  lazy val stopgapTopics: List[InputTopic] = topics.filter(_.forcedStopgap)
+  lazy val normalTopicsSet: Set[InputTopic] = normalTopics.toSet
+  lazy val stopgapTopicsSet: Set[InputTopic] = stopgapTopics.toSet
   lazy val topicsNameSet: Set[NonEmptyString] = topics.map(_.name).toSet
-  lazy val normalPriorityTopicsNameSet: Set[NonEmptyString] = normalPriorityTopics.map(_.name).toSet
-  lazy val lowPriorityTopicsNameSet: Set[NonEmptyString] = lowPriorityTopics.map(_.name).toSet
+  lazy val normalTopicsNameSet: Set[NonEmptyString] = normalTopics.map(_.name).toSet
+  lazy val stopgapTopicsNameSet: Set[NonEmptyString] = stopgapTopics.map(_.name).toSet
   lazy val topicsByName: Map[NonEmptyString, InputTopic] = topics.view.zipWith(_.name).map(_.swap).toMap
 
 }
@@ -158,7 +158,7 @@ final case class InputTopic(
     occurrences: Option[PosInt] = None,
     slots: Option[Set[NonEmptyString]] = None,
     presence: Option[Score] = None,
-    lowPriority: Option[Boolean] = None,
+    stopgap: Option[Boolean] = None,
     forced: Boolean = false
 ) {
 
@@ -168,7 +168,7 @@ final case class InputTopic(
   /** Duration needs to be an Option to not appear when not needed */
   lazy val forcedDuration: PosInt = duration.getOrElse(1)
 
-  lazy val forcedLowPriority: Boolean = lowPriority.getOrElse(false)
+  lazy val forcedStopgap: Boolean = stopgap.getOrElse(false)
 
   lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
     if (forcedOccurrences == 1) Seq(InputTopic.Occurrence(this))
