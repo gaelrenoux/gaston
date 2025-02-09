@@ -60,24 +60,30 @@ object Count {
     inline def value: Int = c
 
     @targetName("CountInferior")
-    inline def <(d: Count[I]) = c < d
+    inline def <(d: Count[I]): Boolean = c < d
 
     @targetName("CountSuperior")
-    inline def >(d: Count[I]) = c > d
+    inline def >(d: Count[I]): Boolean = c > d
 
     @targetName("CountInferiorOrEqual")
-    inline def <=(d: Count[I]) = c <= d
+    inline def <=(d: Count[I]): Boolean = c <= d
 
     @targetName("CountSuperiorOrEqual")
-    inline def >=(d: Count[I]) = c >= d
+    inline def >=(d: Count[I]): Boolean = c >= d
+
+    @targetName("CountPlus")
+    inline def +(d: Count[I]): Count[I] = c + d
+
+    @targetName("CountMinus")
+    inline def -(d: Count[I]): Count[I] = c - d
 
     inline def range: Seq[I] = (0 until c)
 
     inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
 
-    inline def foreachTo(limit: I)(inline f: I => Unit) = fastLoop(0, limit + 1)(f)
+    inline def foreachTo(limit: I)(inline f: I => Unit) = fastLoop(0, limit + 1)(f) // TODO bad class for method, count isn't used
 
-    inline def foreachUntil(limit: I)(inline f: I => Unit) = fastLoop(0, limit)(f)
+    inline def foreachUntil(limit: I)(inline f: I => Unit) = fastLoop(0, limit)(f) // TODO bad class for method, count isn't used
 
     inline def foreachWhile(inline f: I => Boolean) = {
       var i = 0
@@ -127,8 +133,8 @@ object Count {
 }
 
 /** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
-  * super-type of Int to avoid weird implicit deductions. This must be given directly.
-  */
+ * super-type of Int to avoid weird implicit deductions. This must be given directly.
+ */
 opaque type CountAll[I <: Id] <: Count[I] = Int
 
 object CountAll {
