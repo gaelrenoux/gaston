@@ -171,6 +171,15 @@ object SmallIdSet {
 
   inline def empty[I <: Id]: SmallIdSet[I] = 0
 
+  /** Returns a set containing all ids in order from 0, stopping when the count is reached. */
+  inline def take[I <: Id](c: Count[I]): SmallIdSet[I] = {
+    var result = 0L
+    c.foreach { id =>
+      result = result | SmallIdSet(id)
+    }
+    result
+  }
+
   inline def apply[I <: Id](id: I): SmallIdSet[I] = 1L << id.value
 
   inline def apply[I <: Id](ids: I*): SmallIdSet[I] = {
