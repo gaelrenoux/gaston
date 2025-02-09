@@ -36,9 +36,9 @@ object SlotId {
 }
 
 object TopicId {
-  inline def None: TopicId = -1
+  inline def None: TopicId = Int.MinValue
 
-  inline def Absent: TopicId = 0 // Topic for someone who isn't there
+  inline def Absent: TopicId = -1 // Topic for someone who isn't there
 
   extension (id: TopicId) {
     inline def next(using c: Count[TopicId]): TopicId = (id + 1) % c
