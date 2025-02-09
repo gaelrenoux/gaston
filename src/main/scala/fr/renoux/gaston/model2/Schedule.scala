@@ -95,16 +95,20 @@ class Schedule(
   // TODO inline this maybe ?
   def scorePersons(problem: SmallProblem): IdMap[PersonId, Score] = {
     // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
+    
+    
+    
+    this.personsToTopics.mapToScore { (pid: PersonId, topicIds: SmallIdSet[TopicId]) =>
       val cached = personsScoreCache(pid)
       if (cached > Double.MinValue) {
         cached
       } else {
         val baseScore = problem.personsBaseScore(pid)
         val wishesScore = scoreWishes(problem, pid, topicIds)
+        val unassignedCountScore = scorePersonUnassignedCount(problem, pid, topicIds)
         val exclusiveScore = scoreExclusive(problem, pid, topicIds)
         val linkedScore = scoreLinked(problem, topicIds)
-        val total = baseScore + wishesScore + exclusiveScore + linkedScore
+        val total = baseScore + wishesScore + unassignedCountScore + exclusiveScore + linkedScore
         personsScoreCache(pid) = total
         total
       }
@@ -127,6 +131,16 @@ class Schedule(
       val otherPersons = this.topicsToPersons(tid) - pid
       otherPersons.mapSumToScore(problem.prefsPersonPerson(pid, _))
     }
+  }
+
+  private def scorePersonUnassignedCount(problem: SmallProblem, pid: PersonId, topicIds: SmallIdSet[TopicId]): Score = {
+    // TODO Actually needs to check they're on different slot cycles
+    // TODO Needs to be included in tests
+    val minCount = problem.prefsPersonMinUnassigned(pid)
+    val unassignedCount: Count[TopicId] = (topicIds && problem.unassignedTopicIds).size
+    val diff = minCount - unassignedCount
+    if (diff <= 0) Score.Zero
+    else Score.MinReward * diff
   }
 
   private def scoreExclusive(problem: SmallProblem, pid: PersonId, topicIds: SmallIdSet[TopicId]) =
