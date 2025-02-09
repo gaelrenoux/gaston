@@ -60,31 +60,41 @@ object Count {
     inline def value: Int = c
 
     @targetName("CountInferior")
-    inline def <(d: Count[I]) = c < d
+    inline def <(d: Count[I]): Boolean = c < d
 
     @targetName("CountSuperior")
-    inline def >(d: Count[I]) = c > d
+    inline def >(d: Count[I]): Boolean = c > d
 
     @targetName("CountInferiorOrEqual")
-    inline def <=(d: Count[I]) = c <= d
+    inline def <=(d: Count[I]): Boolean = c <= d
 
     @targetName("CountSuperiorOrEqual")
-    inline def >=(d: Count[I]) = c >= d
+    inline def >=(d: Count[I]): Boolean = c >= d
+
+    @targetName("CountPlus")
+    inline def +(d: Count[I]): Count[I] = c + d
+
+    @targetName("CountMinus")
+    inline def -(d: Count[I]): Count[I] = c - d
 
     inline def range: Seq[I] = (0 until c)
 
-    inline def foreach(inline f: I => Unit) = fastLoop(0, c)(f)
+    inline def foreach(inline f: I => Unit): Unit = fastLoop(0, c)(f)
 
-    inline def foreachTo(limit: I)(inline f: I => Unit) = fastLoop(0, limit + 1)(f)
+    /* Implementation note: the next two methods seem weird, as the count value isn't used, but they make sense at call-site. */
 
-    inline def foreachUntil(limit: I)(inline f: I => Unit) = fastLoop(0, limit)(f)
+    /** Iterate over all possible values up to the limit id (included) */
+    inline def foreachTo(limit: I)(inline f: I => Unit): Unit = fastLoop(0, limit + 1)(f)
 
-    inline def foreachWhile(inline f: I => Boolean) = {
+    /** Iterate over all possible values up until the limit id (excluded) */
+    inline def foreachUntil(limit: I)(inline f: I => Unit): Unit = fastLoop(0, limit)(f)
+
+    /** Iterate over all possible values */
+    inline def foreachWhile(inline f: I => Boolean): Unit = {
       var i = 0
       while (i < c && f(i)) {
         i += 1
       }
-
     }
 
     inline def map[A: ClassTag](inline f: I => A): Array[A] = Array.tabulate[A](c)(f)
@@ -127,8 +137,8 @@ object Count {
 }
 
 /** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
-  * super-type of Int to avoid weird implicit deductions. This must be given directly.
-  */
+ * super-type of Int to avoid weird implicit deductions. This must be given directly.
+ */
 opaque type CountAll[I <: Id] <: Count[I] = Int
 
 object CountAll {
