@@ -54,7 +54,7 @@ final class SmallProblem(
   )
 
   /** This is a reverse from prefsPersonPerson: it shows for each person, which one has targeted them with a wish. */
-  val personsTargetedByWish: IdMap[PersonId, SmallIdSet[PersonId]] = {
+  val personsTargetedToPersonsWithWish: IdMap[PersonId, SmallIdSet[PersonId]] = {
     val targetSourcePids = prefsPersonPerson.toMap2.toSeq.flatMap { (sourcePid, targetPidsToScore) =>
       targetPidsToScore.filter(_._2 != Score.Zero).keySet.map(_ -> sourcePid)
     }
