@@ -5,7 +5,9 @@ import fr.renoux.gaston.TestBase
 
 class IdMapTest extends TestBase {
   given CountAll[SlotId] = CountAll[SlotId](64)
+
   given CountAll[TopicId] = CountAll[TopicId](64)
+
   val testAllInts: Seq[Int] = (0 until 64).toList
   val testAllIds: Seq[TopicId] = testAllInts
   val testOkInts: Seq[Int] = List(3, 8, 47, 63)
@@ -26,7 +28,7 @@ class IdMapTest extends TestBase {
     }
 
     "apply" in {
-      val map = IdMap(testMapOk.toSeq*)
+      val map = IdMap(testMapOk.toSeq *)
       map.toMap.filter(_._2 != null) should be(testMapOk)
     }
 
@@ -86,7 +88,17 @@ class IdMapTest extends TestBase {
     map.reduceValues(_ + _) should be(testMapAll.toSeq.sortBy(_._1.value).map(_._2).reduceLeft(_ + _))
   }
 
-  "transpose" in {
+  "transpose (Id-to-Id map)" in {
+    val map = IdMap.from[SlotId, TopicId](
+      Seq.tabulate(64) { id => id -> id % 4 }
+    )
+    val expected = IdMap.from[TopicId, SmallIdSet[SlotId]](
+      Seq.tabulate(4) { id => id -> SmallIdSet((0 until 16).map(_ * 4 + id)) }
+    )
+    map.transpose should be(expected)
+  }
+
+  "transpose (Id-to-IdSet map)" in {
     val map = IdMap.from[SlotId, SmallIdSet[TopicId]](
       Seq.tabulate(64)(id =>
         if (id == 0) id -> SmallIdSet(63, 0)
@@ -108,8 +120,8 @@ class IdMapTest extends TestBase {
     map2.toMap should be(map.toMap)
 
     map2(42) = ""
-    map2(42) should be ("")
-    map(42) should be ("2a")
+    map2(42) should be("")
+    map(42) should be("2a")
   }
 
 }
