@@ -95,7 +95,9 @@ object IdMap {
     inline def transpose: IdMap[J, SmallIdSet[I]] = {
       val array = new Array[SmallIdSet[I]](cj.value) // default value is 0 (empty SmallIdSet)
       m.fastForeachWithIndex { (j, i) =>
-        array(j) = array(j) + i
+        if (j.isNatural) {
+          array(j) = array(j) + i
+        }
       }
       array
     }

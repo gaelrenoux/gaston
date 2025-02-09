@@ -13,9 +13,12 @@ opaque type PersonId >: Int <: Id = Int
 object Id {
   extension (id: Id) {
     inline def value: Int = id
+
+    /** Non-natural are exceptional values: None, or subclass specific stuff. */
+    inline def isNatural: Boolean = id >= 0
   }
 
-  inline def None: Id = -1
+  inline def None: Id = Int.MinValue
 
   given [I <: Id]: Printable[I] with {
     extension (i: I) override def toPrettyString: String = i.toString
@@ -37,8 +40,6 @@ object SlotId {
 
 object TopicId {
   inline def None: TopicId = Int.MinValue
-
-  inline def Absent: TopicId = -1 // Topic for someone who isn't there
 
   extension (id: TopicId) {
     inline def next(using c: Count[TopicId]): TopicId = (id + 1) % c
