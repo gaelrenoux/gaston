@@ -22,7 +22,7 @@ class Schedule(
 
   def invalidateCacheFor(pid: PersonId)(using problem: SmallProblem) = {
     personsScoreCache(pid) = Score.Missing
-    val otherPersons = problem.personsTargetedByWish(pid)
+    val otherPersons = problem.personsTargetedToPersonsWithWish(pid)
     otherPersons.foreach {
       personsScoreCache(_) = Score.Missing
     }
