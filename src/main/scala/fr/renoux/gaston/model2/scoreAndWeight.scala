@@ -1,5 +1,6 @@
 package fr.renoux.gaston.model2
 
+import java.util as jutil
 import scala.annotation.targetName
 
 opaque type Score >: Double = Double
@@ -32,6 +33,10 @@ object Score {
     infix inline def <=(t: Score): Boolean = s <= t
 
     inline def value: Double = s
+  }
+
+  def sort(array: Array[Score]): Unit = {
+    jutil.Arrays.sort(array)
   }
 
   inline def Zero: Score = 0.0

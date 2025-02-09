@@ -28,7 +28,7 @@ object Id {
 }
 
 object SlotId {
-  inline def None: SlotId = -1
+  inline def None: SlotId = Int.MinValue
 
   extension (id: SlotId) {
     inline def next(using c: Count[SlotId]): SlotId = (id + 1) % c
@@ -46,7 +46,7 @@ object TopicId {
 }
 
 object PersonId {
-  inline def None: PersonId = -1
+  inline def None: PersonId = Int.MinValue
 
   extension (id: PersonId) {
     inline def next(using c: Count[PersonId]): PersonId = (id + 1) % c
@@ -77,6 +77,8 @@ object Count {
     @targetName("CountMinus")
     inline def -(d: Count[I]): Count[I] = c - d
 
+    inline def random(using random: Random): I = random.nextInt(c)
+
     inline def range: Seq[I] = (0 until c)
 
     inline def foreach(inline f: I => Unit): Unit = fastLoop(0, c)(f)
@@ -89,7 +91,7 @@ object Count {
     /** Iterate over all possible values up until the limit id (excluded) */
     inline def foreachUntil(limit: I)(inline f: I => Unit): Unit = fastLoop(0, limit)(f)
 
-    /** Iterate over all possible values */
+    /** Iterate over all possible values, and stops whenever the argument function returns false */
     inline def foreachWhile(inline f: I => Boolean): Unit = {
       var i = 0
       while (i < c && f(i)) {
