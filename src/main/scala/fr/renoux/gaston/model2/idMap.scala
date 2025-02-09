@@ -8,8 +8,8 @@ import scala.reflect.ClassTag
 
 
 /** IdMap: a mutable map from Ids to some value as an array. Note that there always is a value for each key (might be a
-  * default value).
-  */
+ * default value).
+ */
 opaque type IdMap[I <: Id, A] = Array[A]
 
 object IdMap {
@@ -59,7 +59,7 @@ object IdMap {
       a
     }
 
-    inline def valuesSeq: Seq[A] = Seq(m*)
+    inline def valuesSeq: Seq[A] = Seq(m *)
 
     inline def toSeq: Seq[(I, A)] = m.zipWithIndex.map(_.swap).toSeq
 
@@ -78,7 +78,17 @@ object IdMap {
     }
   }
 
-  extension [I >: Int <: Id, J >: Int <: Id: ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
+  extension [I >: Int <: Id, J >: Int <: Id](m: IdMap[I, J])(using cj: CountAll[J]) {
+    inline def transpose: IdMap[J, SmallIdSet[I]] = {
+      val array = new Array[SmallIdSet[I]](cj.value) // default value is 0 (empty SmallIdSet)
+      m.fastForeachWithIndex { (j, i) =>
+        array(j) = array(j) + i
+      }
+      array
+    }
+  }
+
+  extension [I >: Int <: Id, J >: Int <: Id : ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
     inline def transpose: IdMap[J, SmallIdSet[I]] = {
       val array = new Array[SmallIdSet[I]](cj.value) // default value is 0 (empty SmallIdSet)
       m.fastForeachWithIndex { (js, i) =>
@@ -112,14 +122,14 @@ object IdMap {
     result
   }
 
-  inline def apply[I >: Int <: Id: CountAll, A: ClassTag](ias: (I, A)*): IdMap[I, A] =
+  inline def apply[I >: Int <: Id : CountAll, A: ClassTag](ias: (I, A)*): IdMap[I, A] =
     from(ias)
 
   /** Generates an empty IdMap, using the default value for type A */
   inline def empty[I >: Int <: Id, A: ClassTag](using count: CountAll[I]): IdMap[I, A] =
     new Array[A](count.value)
 
-  given [I <: Id: Printable, A: Printable]: Printable[IdMap[I, A]] with {
+  given [I <: Id : Printable, A: Printable]: Printable[IdMap[I, A]] with {
     extension (as: IdMap[I, A]) {
       override def toPrettyString: String =
         summon[Printable[Map[Int, A]]].toPrettyString(as.toSortedMap)
