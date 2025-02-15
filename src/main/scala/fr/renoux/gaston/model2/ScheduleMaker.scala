@@ -8,7 +8,7 @@ import fr.renoux.gaston.model.{Schedule as OldSchedule}
 object ScheduleMaker {
 
   class ScheduleDef {
-    val slotsDef = mutable.Set[SlotDef]()
+    val slotsDef: mutable.Set[SlotDef] = mutable.Set[SlotDef]()
 
     def add(sd: SlotDef): Unit = {
       if (slotsDef.exists(_.sid == sd.sid))
@@ -67,36 +67,40 @@ object ScheduleMaker {
     assert(pids.isEmpty || pids.map(_.value).max < countPersons.value, "Person ID to high")
   }
 
-  def mkSchedule(
+  def mkSchedule(problem: SmallProblem)(
       init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit
-  )(using CountAll[SlotId], CountAll[TopicId], CountAll[PersonId]): Schedule = {
+  ): Schedule = {
+    import problem.given 
     given scheduleDef: ScheduleDef = ScheduleDef()
-    init
+    val _ = init
 
-    val planning = IdMap.fill[SlotId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
-    val assignment = IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
-
-    scheduleDef.slotsDef.foreach { slotDef =>
+    val schedule = Schedule.empty(problem)
+    
+    scheduleDef.slotsDef.foreach { (slotDef: SlotDef) =>
+      val assignment = schedule.slotsToAssignment(slotDef.sid)
       slotDef.topicDefs.foreach { topicDef =>
-        planning(slotDef.sid) = planning(slotDef.sid) + topicDef.tid
+        schedule.topicsToSlot(topicDef.tid) = slotDef.sid
+        schedule.topicsPresent = schedule.topicsPresent + topicDef.tid
         topicDef.pids.foreach { pid =>
-          assignment(pid) = assignment(pid) + topicDef.tid
+          schedule.personsToTopics(pid) = schedule.personsToTopics(pid) + topicDef.tid
+          assignment.personsToTopic(pid) = topicDef.tid
+          assignment.topicsToPersons(topicDef.tid) = assignment.topicsToPersons(topicDef.tid) + pid
         }
       }
     }
 
-    Schedule.from(planning, assignment)
+    schedule
   }
 
   def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem, addUnassigned: Boolean = true): Schedule = {
     import problem.given
 
-    val planning = IdMap.fill[SlotId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
-    val assignment = IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+    val schedule = Schedule.empty(problem)
 
     if (addUnassigned) {
       problem.slotsCount.foreach { slotId =>
-        planning(slotId) = planning(slotId) + slotId.value
+        schedule.topicsToSlot(slotId.value) = slotId
+        schedule.topicsPresent = schedule.topicsPresent + slotId.value
       }
     }
 
@@ -104,15 +108,20 @@ object ScheduleMaker {
       val slotId = problem.slotsNames.unsafeContent.indexOf(oldSlotSchedule.slot.name)
       oldSlotSchedule.topics.foreach { oldTopic =>
         val topicId = problem.topicsName.unsafeContent.indexOf(oldTopic.name)
-        planning(slotId) = planning(slotId) + topicId
+        schedule.topicsToSlot(topicId) = slotId
+        schedule.topicsPresent = schedule.topicsPresent + topicId
+        
+        val assignment = schedule.slotsToAssignment(slotId)
         oldSlotSchedule.on(oldTopic).persons.foreach { oldPerson =>
           val personId = problem.personsName.unsafeContent.indexOf(oldPerson.name)
-          assignment(personId) = assignment(personId) + topicId
+          schedule.personsToTopics(personId) = schedule.personsToTopics(personId) + topicId
+          assignment.personsToTopic(personId) = topicId
+          assignment.topicsToPersons(topicId) = assignment.topicsToPersons(topicId) + personId
         }
       }
     }
 
-    Schedule.from(planning, assignment)
+    schedule
   }
 
 }

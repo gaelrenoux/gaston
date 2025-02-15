@@ -13,9 +13,12 @@ opaque type PersonId >: Int <: Id = Int
 object Id {
   extension (id: Id) {
     inline def value: Int = id
+
+    /** Non-natural are exceptional values: None, or subclass specific stuff. */
+    inline def isNatural: Boolean = id >= 0
   }
 
-  inline def None: Id = -1
+  inline def None: Id = Int.MinValue
 
   given [I <: Id]: Printable[I] with {
     extension (i: I) override def toPrettyString: String = i.toString
@@ -28,7 +31,7 @@ object Id {
 }
 
 object SlotId {
-  inline def None: SlotId = -1
+  inline def None: SlotId = Int.MinValue
 
   extension (id: SlotId) {
     inline def next(using c: Count[SlotId]): SlotId = (id + 1) % c
@@ -38,15 +41,13 @@ object SlotId {
 object TopicId {
   inline def None: TopicId = Int.MinValue
 
-  inline def Absent: TopicId = -1 // Topic for someone who isn't there
-
   extension (id: TopicId) {
     inline def next(using c: Count[TopicId]): TopicId = (id + 1) % c
   }
 }
 
 object PersonId {
-  inline def None: PersonId = -1
+  inline def None: PersonId = Int.MinValue
 
   extension (id: PersonId) {
     inline def next(using c: Count[PersonId]): PersonId = (id + 1) % c
@@ -77,6 +78,8 @@ object Count {
     @targetName("CountMinus")
     inline def -(d: Count[I]): Count[I] = c - d
 
+    inline def random(using random: Random): I = random.nextInt(c)
+
     inline def range: Seq[I] = (0 until c)
 
     inline def foreach(inline f: I => Unit): Unit = fastLoop(0, c)(f)
@@ -89,7 +92,7 @@ object Count {
     /** Iterate over all possible values up until the limit id (excluded) */
     inline def foreachUntil(limit: I)(inline f: I => Unit): Unit = fastLoop(0, limit)(f)
 
-    /** Iterate over all possible values */
+    /** Iterate over all possible values, and stops whenever the argument function returns false */
     inline def foreachWhile(inline f: I => Boolean): Unit = {
       var i = 0
       while (i < c && f(i)) {
