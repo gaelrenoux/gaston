@@ -40,6 +40,19 @@ object IdMap {
       SortedMap.from(m.zipWithIndex.map { (a, id) => id -> a })
     }
 
+    inline def foreach(inline f: (I, A) => Unit): Unit =
+      m.fastForeachWithIndex { (a, i) => f(i, a) }
+
+    inline def keysFilter(inline f: (I, A) => Boolean): SmallIdSet[I] = {
+      var r = SmallIdSet.empty[I]
+      m.fastForeachWithIndex { (a, i) =>
+        if (f(i, a)) {
+          r = r + i
+        }
+      }
+      r
+    }
+
     inline def mapValues[B: ClassTag](inline f: A => B): IdMap[I, B] = m.fastMap(f)
 
     /** Returns a new IdMap from the id to the score, given a function to convert index and value into a score. */
@@ -82,7 +95,9 @@ object IdMap {
     inline def transpose: IdMap[J, SmallIdSet[I]] = {
       val array = new Array[SmallIdSet[I]](cj.value) // default value is 0 (empty SmallIdSet)
       m.fastForeachWithIndex { (j, i) =>
-        array(j) = array(j) + i
+        if (j.isNatural) {
+          array(j) = array(j) + i
+        }
       }
       array
     }
@@ -116,6 +131,7 @@ object IdMap {
 
   def unsafeFrom[I >: Int <: Id, A: ClassTag](array: Array[A]): IdMap[I, A] = array
 
+  /** Note that for indexes that are missing in the argument, the default value is used. */
   def from[I >: Int <: Id, A: ClassTag](it: Iterable[(I, A)])(using countI: CountAll[I]): IdMap[I, A] = {
     val result = new Array[A](countI.value)
     it.fastForeach { (i, a) => result(i) = a }

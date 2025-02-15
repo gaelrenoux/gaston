@@ -4,135 +4,116 @@ import fr.renoux.gaston.util.testOnly
 import fr.renoux.gaston.util.fastForeach
 import fr.renoux.gaston.util.fastFoldRight
 
+import java.util as jutil
+
 
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
+// TODO most fields should be private, if not all
 class Schedule(
-    val slotsToTopics: IdMap[SlotId, SmallIdSet[TopicId]],
-    val topicsToSlot: IdMap[TopicId, SlotId],
-    var topicsPresent: SmallIdSet[TopicId],
+    val problem: SmallProblem,
+    val slotsToAssignment: IdMap[SlotId, SlotAssignment],
     val personsToTopics: IdMap[PersonId, SmallIdSet[TopicId]],
-    val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]]
-)(using
-    val countSlots: CountAll[SlotId],
-    val countTopics: CountAll[TopicId],
-    val countPersons: CountAll[PersonId]
+    val topicsToSlot: IdMap[TopicId, SlotId]
 ) {
 
-  var personsScoreCache = IdMap.fill[PersonId, Score](Score.Missing)
+  import problem.given
 
-  def invalidateCacheFor(pid: PersonId)(using problem: SmallProblem) = {
-    personsScoreCache(pid) = Score.Missing
-    val otherPersons = problem.personsTargetedToPersonsWithWish(pid)
-    otherPersons.foreach {
-      personsScoreCache(_) = Score.Missing
-    }
-  }
+  var topicsPresent: SmallIdSet[TopicId] = topicsToSlot.keysFilter { (_, sid) => sid != SlotId.None }
 
-  def topicOf(sid: SlotId, pid: PersonId): TopicId = {
-    val topicsFromSlot = slotsToTopics(sid)
-    val topicsFromPerson = personsToTopics(pid)
-    (topicsFromSlot && topicsFromPerson).headOrElse(TopicId.Absent)
-  }
-
-   /** Returns true if that person can be added to this topic, without moving anyone else. */
-  def isAddableTopic(problem: SmallProblem, pid: PersonId, tid: TopicId) = {
-    inline def topicMax = problem.topicsMax(tid)
-    inline def topicPersonsCount = topicsToPersons(tid).size
-    // TODO should handle forbidden here
-    topicPersonsCount < topicMax
-  }
-
-  /** Returns true if that person can be removed from that topic, without moving anyone else. */
-  def isDroppableTopic(problem: SmallProblem, pid: PersonId, tid: TopicId) = {
-      inline def topicMin = problem.topicsMin(tid)
-      inline def topicPersonsCount = topicsToPersons(tid).size
-      inline def personIsMandatory = problem.isPersonMandatory(pid, tid)
-      !personIsMandatory && topicPersonsCount > topicMin
-  }
-
-  inline def move(pid: PersonId, tid1: TopicId, tid2: TopicId)(using SmallProblem): Schedule = {
-    // TODO Dev mode control: both topics should be on the same slot, pid should be on tid1
-    personsToTopics(pid) = personsToTopics(pid) - tid1 + tid2
-    topicsToPersons(tid1) = topicsToPersons(tid1) - pid
-    topicsToPersons(tid2) = topicsToPersons(tid2) + pid
-    invalidateCacheFor(pid)
-    this
-  }
-
-  def reverseMove(pid: PersonId, tid1: TopicId, tid2: TopicId)(using SmallProblem): Schedule = move(pid, tid2, tid1)
+  def slotsToTopics: IdMap[SlotId, SmallIdSet[TopicId]] = topicsToSlot.transpose
 
   inline def addTopic(sid: SlotId, tid: TopicId): Schedule = {
-    slotsToTopics(sid) = slotsToTopics(sid) + tid
     topicsToSlot(tid) = sid
     topicsPresent = topicsPresent + tid
     this
   }
 
-  inline def removeTopic(sid: SlotId, tid: TopicId): Schedule = {
-    slotsToTopics(sid) = slotsToTopics(sid) - tid
+  inline def removeTopic(tid: TopicId): Schedule = {
     topicsToSlot(tid) = SlotId.None
     topicsPresent = topicsPresent - tid
     this
   }
 
-  def isValidFor(pb: SmallProblem): Boolean = {
-    // TODO Will be helpful in tests
-    ???
-  }
+
+
 
   /* ALL SCORING METHODS */
 
-  def score(problem: SmallProblem): Score = {
-    val personalScores: Array[Score] = scorePersons(problem).destructiveSortedValues
-    val personalScoresTotal = personalScores.fastFoldRight(Score.Zero) { (score, acc) =>
+  private var cacheTotalScore: Score = Score.Missing
+  private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private var cacheTopicsPresentScore: Score = Score.Missing
+
+  def getTotalScore(): Score = {
+    recalculateIfNeeded()
+    cacheTotalScore
+  }
+
+  @testOnly
+  def getPersonScore(pid: PersonId): Score = {
+    recalculateIfNeeded()
+    cachePersonsScore(pid)
+  }
+
+  @testOnly
+  def getPersonScores() = {
+    recalculateIfNeeded()
+    cachePersonsScore
+  }
+
+  private def invalidateCacheTotal(): Unit = {
+    cacheTotalScore = Score.Missing
+  }
+
+  def invalidateCacheForPerson(pid: PersonId): Unit = {
+    invalidateCacheTotal()
+    cachePersonsScore(pid) = Score.Missing
+    val otherPersons = problem.personsTargetedToPersonsWithWish(pid)
+    otherPersons.foreach { pid =>
+      cachePersonsScore(pid) = Score.Missing
+    }
+  }
+
+  def invalideCacheForTopics(): Unit = {
+    invalidateCacheTotal()
+    cacheTopicsPresentScore = Score.Missing
+  }
+
+  /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
+  private val personScores: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
+
+  private def recalculateIfNeeded(): Unit = if (cacheTotalScore == Score.Missing) {
+    problem.personsCount.foreach { pid =>
+      val cachedPersonScore = cachePersonsScore(pid)
+      val personScore = if (cachedPersonScore != Score.Missing) cachedPersonScore else scorePerson(pid)
+      cachePersonsScore(pid) = personScore
+      personScores(pid.value) = personScore
+    }
+    Score.sort(personScores)
+    val personsTotalScore = personScores.fastFoldRight(Score.Zero) { (score, acc) =>
       (SmallProblem.RankFactor * acc: Score) + score
     }
-    val topicsPureTotal = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
-    personalScoresTotal + topicsPureTotal
+
+    val topicsPureTotalScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
+
+    cacheTotalScore = personsTotalScore + topicsPureTotalScore
   }
 
-  /** Scores on personsBaseScore, prefsPersonTopic, prefsPersonPerson, prefsTopicsExclusive */
-  // TODO inline this maybe ?
-  def scorePersons(problem: SmallProblem): IdMap[PersonId, Score] = {
-    // TODO to ultra-optimize this, we could have all person scores as a single array: first the base score, then person/topic, then person/person, etc.
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
-      val cached = personsScoreCache(pid)
-      if (cached > Double.MinValue) {
-        cached
-      } else {
-        val baseScore = problem.personsBaseScore(pid)
-        val wishesScore = scoreWishes(problem, pid, topicIds)
-        val exclusiveScore = scoreExclusive(problem, pid, topicIds)
-        val linkedScore = scoreLinked(problem, topicIds)
-        val total = baseScore + wishesScore + exclusiveScore + linkedScore
-        personsScoreCache(pid) = total
-        total
-      }
+  /** Uses the person's base score, slot-assignments, exclusive and linked topics */
+  private def scorePerson(pid: PersonId): Score = {
+    var slotsScore = Score.Zero
+    slotsToAssignment.foreach { (_, sa) =>
+      slotsScore += sa.getPersonScore(pid)
     }
+
+    val topicIds = personsToTopics(pid)
+    val baseScore = problem.personsBaseScore(pid)
+    val exclusiveScore = problem.prefsTopicsExclusive(pid).evaluate(topicIds)
+    val linkedScore = scoreLinked(topicIds)
+    val total = baseScore + slotsScore + exclusiveScore + linkedScore
+    total
   }
 
-  private def scoreWishes(problem: SmallProblem, pid: PersonId, topicIds: SmallIdSet[TopicId]) = {
-    val hasPersonWishes = problem.personsWithPersonWish.contains(pid)
-    topicIds.mapSumToScore { tid =>
-      val topicsScore = problem.prefsPersonTopic(pid, tid)
-      val otherPersonsScore: Score = scorePersonWishes(problem, pid, tid, hasPersonWishes)
-      topicsScore + otherPersonsScore
-    }
-  }
-
-  private def scorePersonWishes(problem: SmallProblem, pid: PersonId, tid: TopicId, hasPersonWishes: Boolean): Score = {
-    /* Person sym/antipathy doesn't apply on unassigned topics */
-    if (!hasPersonWishes || tid.value < problem.unassignedTopicsCount.value) 0
-    else {
-      val otherPersons = this.topicsToPersons(tid) - pid
-      otherPersons.mapSumToScore(problem.prefsPersonPerson(pid, _))
-    }
-  }
-
-  private def scoreExclusive(problem: SmallProblem, pid: PersonId, topicIds: SmallIdSet[TopicId]) =
-    problem.prefsTopicsExclusive(pid).evaluate(topicIds)
-
-  private def scoreLinked(problem: SmallProblem, topicIds: SmallIdSet[TopicId]) = {
+  private def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
     var linkedScore = Score.Zero
     problem.prefsTopicsLinked.fastForeach { linked =>
       val result = linked && topicIds
@@ -143,62 +124,37 @@ class Schedule(
     linkedScore
   }
 
+
+  /* TEST METHODS */
   @testOnly
-  def calculateBaseScores(problem: SmallProblem): Array[Score] = {
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
-      problem.personsBaseScore(pid)
-    }.destructiveSortedValues
+  def on(slot: SlotId)(f: SlotAssignment => Any): Schedule = {
+    val _ = f(slotsToAssignment(slot))
+    this
   }
 
-  @testOnly
-  def calculateWishesTopicScores(problem: SmallProblem): Array[Score] = {
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
-      topicIds.mapSumToScore { tid =>
-        problem.prefsPersonTopic(pid, tid)
-      }
-    }.destructiveSortedValues
-  }
 
-  @testOnly
-  def calculateWishesPersonScores(problem: SmallProblem): Array[Score] = {
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
-      val hasPersonWishes = problem.personsWithPersonWish.contains(pid)
-      topicIds.mapSumToScore { tid =>
-        scorePersonWishes(problem, pid, tid, hasPersonWishes)
-      }
-    }.destructiveSortedValues
-  }
+  //  /* OLD STUFF */
+  //
+  //  def score(problem: SmallProblem): Score = ???
+  //
+  //  def scorePersons(problem: SmallProblem): IdMap[PersonId, Score] = ???
 
-  @testOnly
-  def calculateExclusiveScores(problem: SmallProblem): Array[Score] = {
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
-      scoreExclusive(problem, pid, topicIds)
-    }.destructiveSortedValues
-  }
 
-  @testOnly
-  def calculateLinkedScores(problem: SmallProblem): Array[Score] = {
-    this.personsToTopics.mapToScore { (pid, topicIds) =>
-      scoreLinked(problem, topicIds)
-    }.destructiveSortedValues
+  /* INITIALIZATION */
+
+  slotsToAssignment.foreach { (_, sa) =>
+    sa.parent = this
   }
 }
 
 object Schedule {
-  def from(
-      planning: IdMap[SlotId, SmallIdSet[TopicId]],
-      assignment: IdMap[PersonId, SmallIdSet[TopicId]]
-  )(using
-      countSlots: CountAll[SlotId],
-      countTopics: CountAll[TopicId],
-      countPersons: CountAll[PersonId]
-  ) = {
+  def empty(problem: SmallProblem): Schedule = {
+    import problem.given
     Schedule(
-      planning,
-      planning.transpose.mapValues(_.headOrElse(SlotId.None)),
-      planning.reduceValues(_ ++ _),
-      assignment,
-      assignment.transpose
+      problem,
+      IdMap.tabulate[SlotId, SlotAssignment](SlotAssignment.empty(problem, _)),
+      IdMap.fill[PersonId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId]),
+      IdMap.fill[TopicId, SlotId](SlotId.None)
     )
   }
 }
