@@ -9,11 +9,12 @@ import scala.util.Random
 
 
 /** Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them. Every person
-  * should already be assigned somewhere (this will not assign unassigned persons).
-  */
+ * should already be assigned somewhere (this will not assign unassigned persons).
+ */
 final class AssignmentImprover(private val problem: SmallProblem)(using private val ctx: Context) {
 
   given SmallProblem = problem
+
   import problem.given
 
   private val defaultMaxRoundsCount = 1000
@@ -22,42 +23,38 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
   private val defaultMaxSuccessiveRoundsCountPerSlot = defaultMaxRoundsCount / problem.slotsCount.value
 
   /** Main method. Modifies the schedule to make it better (mutates the argument).
-    *
-    * Ends either because the schedule can't be perfected any more or because the limit number of rounds has been
-    * reached.
-    */
+   *
+   * Ends either because the schedule can't be perfected any more or because the limit number of rounds has been
+   * reached.
+   */
   def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(using Random): Unit =
     chrono("PersonPlacementImprover >  improve") {
-      val slotsToChangeablePersons: IdMap[SlotId, Array[PersonId]] =
-        IdMap.tabulate[SlotId, Array[PersonId]] { sid =>
-          val personsWhoCanMove = problem.slotsPersonsPresent(sid).filter { pid =>
-            val tid = schedule.topicOf(sid, pid)
-            !problem.isPersonMandatory(pid, tid)
-          }
-          personsWhoCanMove.toShuffledArray
-        }
-      val slotsToTopics: IdMap[SlotId, Array[TopicId]] = schedule.slotsToTopics.mapValues(_.toShuffledArray)
+      val slotsToRandMobilePersons = IdMap.tabulate[SlotId, Array[PersonId]] { sid =>
+        schedule.slotsToAssignment(sid).mobilePersons.toShuffledArray
+      }
+      val slotsToRandTopics: IdMap[SlotId, Array[TopicId]] = schedule.slotsToTopics.mapValues(_.toShuffledArray)
 
       var roundsLeft = maxRounds
-      var sid: SlotId = 0
+      var sid: SlotId = problem.slotsCount.random
       var blockedSlots = 0
 
-      while(blockedSlots < problem.slotsCount && roundsLeft > 0) { // iterate over slots
-        val randPersonIds = slotsToChangeablePersons(sid)
-        val randTopicIds = slotsToTopics(sid)
+      while (blockedSlots < problem.slotsCount && roundsLeft > 0) { // iterate over slots
+        val randPersons = slotsToRandMobilePersons(sid)
+        val randTopics = slotsToRandTopics(sid)
+        val assignment = schedule.slotsToAssignment(sid)
 
         var changesMade = false
         var subRoundsLeft = math.min(roundsLeft, defaultMaxSuccessiveRoundsCountPerSlot)
         var personIx = 0
         var blockedPersons = 0
 
-        while (blockedPersons < randPersonIds.length && subRoundsLeft > 0) { // iterate over persons
-          val pid = randPersonIds(personIx)
+        while (blockedPersons < randPersons.length && subRoundsLeft > 0) { // iterate over persons
+          val pid = randPersons(personIx)
           var targetTopicIx = 0
           var foundGoodChange = false
-          while (!foundGoodChange && targetTopicIx < randTopicIds.length) {
-            val targetTid = randTopicIds(targetTopicIx)
-            foundGoodChange = goodChangeForPersonTopic(schedule, pid, targetTid)
+          while (!foundGoodChange && targetTopicIx < randTopics.length) {
+            val targetTid = randTopics(targetTopicIx)
+            foundGoodChange = goodChangeForPersonTopic(schedule, assignment, pid, targetTid)
             targetTopicIx += 1
           }
 
@@ -70,16 +67,16 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
             blockedPersons += 1
           }
 
-          personIx = (personIx + 1) % randPersonIds.length
+          personIx = (personIx + 1) % randPersons.length
           subRoundsLeft -= 1
           roundsLeft -= 1
         }
 
         if (changesMade) {
-            // We changed something on the current slots, making new changes possible (but this slot is done pending further changes)
+          // We changed something on the current slots, making new changes possible (but this slot is done pending further changes)
           blockedSlots = 1
         } else {
-            // Couldn't improve the current slot
+          // Couldn't improve the current slot
           blockedSlots += 1
         }
 
@@ -89,49 +86,44 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
 
 
-  private def goodChangeForPersonTopic(schedule: Schedule, pid: PersonId, targetTid: TopicId): Boolean = {
-    val targetTopicPersons = schedule.topicsToPersons(targetTid)
-    if (targetTopicPersons.contains(pid)) false
+  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, targetTid: TopicId): Boolean = {
+    val currentTid = assignment.personsToTopic(pid)
+    if (currentTid == targetTid) false
     else {
       var found = false
-      val sid = schedule.topicsToSlot(targetTid)
-      val currentTid = schedule.topicOf(sid, pid)
+      val currentScore = schedule.getTotalScore()
 
-      if (currentTid != TopicId.Absent && !problem.isPersonMandatory(pid, currentTid)) {
-
-        /* First, let's see if we can just move the person onto the target topic */
-        if (schedule.isDroppableTopic(problem, pid, currentTid) && schedule.isAddableTopic(problem, pid, targetTid)) {
-          /* We can just move that person on the target topic */
-          val oldScore = schedule.score(problem)
-          schedule.move(pid, currentTid, targetTid)
-          val newScore = schedule.score(problem)
-          if (newScore <= oldScore) {
-            val _ = schedule.reverseMove(pid, currentTid, targetTid)
-          } else {
-            // found a good one
-            found = true
-          }
+      /* First, let's see if we can just move the person onto the target topic */
+      if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+        /* We can just move that person on the target topic */
+        assignment.move(pid, currentTid, targetTid)
+        val newScore = schedule.getTotalScore()
+        if (newScore <= currentScore) {
+          val _ = assignment.reverseMove(pid, currentTid, targetTid)
+        } else {
+          // found a good one
+          found = true
         }
+      }
 
-        /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one */
-        if (!found) {
-          targetTopicPersons.foreachWhile { otherPid =>
-            if (!problem.isPersonMandatory(otherPid, targetTid)) {
-              val oldScore = schedule.score(problem)
-              schedule.move(pid, currentTid, targetTid)
-              schedule.move(otherPid, targetTid, currentTid)
-              val newScore = schedule.score(problem)
-              if (newScore <= oldScore) {
-                schedule.reverseMove(otherPid, targetTid, currentTid)
-                schedule.reverseMove(pid, currentTid, targetTid)
-                ()
-              } else {
-                // found a good one
-                found = true
-              }
+      /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one */
+      if (!found) {
+        val targetTopicPersons = assignment.topicsToPersons(targetTid)
+        targetTopicPersons.foreachWhile { otherPid =>
+          if (!problem.isPersonMandatory(otherPid, targetTid)) {
+            assignment.move(pid, currentTid, targetTid)
+            assignment.move(otherPid, targetTid, currentTid)
+            val newScore = schedule.getTotalScore()
+            if (newScore <= currentScore) {
+              assignment.reverseMove(otherPid, targetTid, currentTid)
+              assignment.reverseMove(pid, currentTid, targetTid)
+              ()
+            } else {
+              // found a good one
+              found = true
             }
-            !found
           }
+          !found
         }
       }
 
@@ -139,7 +131,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
   }
 
-  // TODO From previous version:
+  // TODO From previous version:
   // - We might be examining swaps twice, once from each side. Can we exclude that?
   // - I might need to bring forbidden back as a constraint, to avoid evaluating the score when it's never gonna help.
 
