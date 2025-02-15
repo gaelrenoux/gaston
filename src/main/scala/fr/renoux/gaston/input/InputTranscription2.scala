@@ -219,6 +219,8 @@ final class InputTranscription2(rawInput: InputModel) {
       }
     }
 
+    // TODO Handle inputPerson.minFreeSlots
+
     val prefsTopicPure = IdMap.empty[TopicId, Score]
     input.topics.foreach { (inTopic: InputTopic) =>
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
