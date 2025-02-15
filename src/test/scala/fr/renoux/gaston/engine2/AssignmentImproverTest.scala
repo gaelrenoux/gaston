@@ -24,7 +24,7 @@ class AssignmentImproverTest extends TestBase {
     val Seq(unassigned0, unassigned1, alpha, beta, gamma, delta, epsilon1, epsilon2, eta1, eta2, theta) =
       problem.topicsCount.range
     val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
-    def scheduleBase() = mkSchedule {
+    def scheduleBase() = mkSchedule(problem) {
       d1 slot {
         unassigned0.topicEmpty
         alpha topic (a, d, e) // Alpha, ADE
@@ -41,7 +41,7 @@ class AssignmentImproverTest extends TestBase {
       }
     }
     println(scheduleBase().toPrettyString)
-    val baseScore = scheduleBase().score(problem)
+    val baseScore = scheduleBase().getTotalScore()
     println(s"Score: $baseScore")
 
     val improver = new AssignmentImprover(problem)
@@ -50,7 +50,7 @@ class AssignmentImproverTest extends TestBase {
       given Random = new Random(0)
       val schedule = scheduleBase()
       improver.improve(schedule)
-      val newScore = schedule.score(problem)
+      val newScore = schedule.getTotalScore()
       newScore should be > baseScore
       println(schedule.toPrettyString)
       println(s"Score: $newScore")
@@ -60,12 +60,12 @@ class AssignmentImproverTest extends TestBase {
       given Random = new Random(0)
       val schedule = scheduleBase()
       improver.improve(schedule)
-      val newScore = schedule.score(problem)
+      val newScore = schedule.getTotalScore()
       newScore should be > baseScore
       //println(schedule.toPrettyString)
       //println(s"Score: $newScore")
       improver.improve(schedule)
-      val newNewScore = schedule.score(problem)
+      val newNewScore = schedule.getTotalScore()
       newNewScore should be(newScore)
       //println(schedule.toPrettyString)
       //println(s"Score: $newScore")
@@ -77,8 +77,8 @@ class AssignmentImproverTest extends TestBase {
       improver.improve(schedule1)
       val schedule2 = scheduleBase()
       improver.improve(schedule2)
-      val score1 = schedule1.score(problem)
-      val score2 = schedule2.score(problem)
+      val score1 = schedule1.getTotalScore()
+      val score2 = schedule2.getTotalScore()
       score1 should be (score2)
       //println(schedule1.toPrettyString)
       //println(schedule2.toPrettyString)
