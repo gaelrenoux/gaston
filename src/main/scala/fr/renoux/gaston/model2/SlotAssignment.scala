@@ -88,13 +88,15 @@ class SlotAssignment(
   }
 
   private def scoreWishes(problem: SmallProblem, pid: PersonId, tid: TopicId): Score = {
-    val hasPersonWishes = problem.personsWithPersonWish.contains(pid)
-    val topicsScore: Score = problem.prefsPersonTopic(pid, tid)
-    val otherPersonsScore: Score =
-      if (!problem.personsWithPersonWish.contains(pid)) Score.Zero
-      else if (tid.value < problem.unassignedTopicsCount.value) Score.Zero // Person sym/antipathy doesn't apply on unassigned topics
-      else (topicsToPersons(tid) - pid).mapSumToScore(problem.prefsPersonPerson(pid, _))
-    topicsScore + otherPersonsScore
+    /* Missing person gets a score of zero */ // TODO add a test for this
+    if (tid == TopicId.None) Score.Zero else {
+      val topicsScore: Score = problem.prefsPersonTopic(pid, tid)
+      val otherPersonsScore: Score =
+        if (!problem.personsWithPersonWish.contains(pid)) Score.Zero
+        else if (tid.value < problem.unassignedTopicsCount.value) Score.Zero // Person sym/antipathy doesn't apply on unassigned topics
+        else (topicsToPersons(tid) - pid).mapSumToScore(problem.prefsPersonPerson(pid, _))
+      topicsScore + otherPersonsScore
+    }
   }
 }
 
