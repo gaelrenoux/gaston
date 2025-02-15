@@ -2,6 +2,8 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
 
+import scala.collection.mutable
+
 
 class IdMapTest extends TestBase {
   given CountAll[SlotId] = CountAll[SlotId](64)
@@ -56,6 +58,24 @@ class IdMapTest extends TestBase {
         map(id) should be(null)
       } // null is the default value for type String
     }
+  }
+
+  "foreach" in {
+    val map = IdMap.from(testMapAll)
+    val result = mutable.Map[Int, Int]()
+    map.foreach { (tid: TopicId, str: String) =>
+      val _ = result.updateWith(str.length) {
+        case None => Some(1)
+        case Some(x) => Some(x + 1)
+      }
+    }
+    result.toMap should be(Map(1 -> 16, 2 -> 48))
+  }
+
+  "keysFilter" in {
+    val map = IdMap.from(testMapAll)
+    val result = map.keysFilter { (tid: TopicId, str: String) => tid.value % 2 == 1 && str.length == 1 }
+    result should be(SmallIdSet(1, 3, 5, 7, 9, 11, 13, 15))
   }
 
   "mapToScore" in {
