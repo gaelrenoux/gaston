@@ -223,6 +223,10 @@ final class InputTranscription2(rawInput: InputModel) {
 
     val prefsTopicPure = IdMap.empty[TopicId, Score]
     input.topics.foreach { (inTopic: InputTopic) =>
+      // TODO Handle inputTopic.stopgap
+      if (inTopic.stopgap.exists(identity)) {
+        throw new IllegalArgumentException("Not handling stopgap topics for now")
+      }
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
         /* for long topics, topic presence score is only counted on the first part */
         val firstPart = inTopicOcc.partInstances.head
