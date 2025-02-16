@@ -11,15 +11,16 @@ import ScheduleMaker.mkSchedule
 class ScheduleTest extends TestBase {
   // TODO test move/swap individually
 
-  "Basics " ignore { // TODO fix that, we need a way to create a simple problem
+  "Basics " - { // TODO fix that, we need a way to create a simple problem
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
-
     given countTopics: CountAll[TopicId] = CountAll[TopicId](4)
-
     given countPersons: CountAll[PersonId] = CountAll[PersonId](4)
+
+    val baseProblem = SmallProblemMaker.make
+
     import ScheduleMaker.mkSchedule
 
-    val schedule = mkSchedule(???) {
+    val schedule = mkSchedule(baseProblem) {
       0 slot {
         0 topic(0, 1, 2)
         1 topic (3)
@@ -36,7 +37,7 @@ class ScheduleTest extends TestBase {
 
     "topicsToSlots" in {
       val tts = schedule.topicsToSlot.toMap
-      tts should be(Map(0 -> 0, 1 -> 0, 2 -> -1, 3 -> 1))
+      tts should be(Map(0 -> 0, 1 -> 0, 2 -> SlotId.None, 3 -> 1))
     }
 
     "personsToTopics" in {
