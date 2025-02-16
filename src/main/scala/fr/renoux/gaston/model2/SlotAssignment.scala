@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model2
 
 import scala.compiletime.uninitialized
+import fr.renoux.gaston.util.*
 
 
 /** The schedule for a single slot. */
@@ -9,6 +10,7 @@ class SlotAssignment(
     val slot: SlotId,
     val personsToTopic: IdMap[PersonId, TopicId], // Default value (for persons that arent't there) is TopicId.None
 ) {
+
   import problem.given
 
   var parent: Schedule = uninitialized // Will be set up on initialization of the schedule
@@ -36,17 +38,51 @@ class SlotAssignment(
     !personIsMandatory && topicPersonsCount > topicMin
   }
 
-  inline def move(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
+  def move(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
+    // TODO Dev mode control: pid should be on tid1
+    parent.saveCache()
+    _move(pid, tid1, tid2)
+    this
+  }
+
+  def undoMove(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
+    _move(pid, tid2, tid1)
+    parent.restoreCache()
+    this
+  }
+
+  private inline def _move(pid: PersonId, tid1: TopicId, tid2: TopicId): Unit = {
     // TODO Dev mode control: pid should be on tid1
     personsToTopic(pid) = tid2
     topicsToPersons(tid1) = topicsToPersons(tid1) - pid
     topicsToPersons(tid2) = topicsToPersons(tid2) + pid
     parent.personsToTopics(pid) = parent.personsToTopics(pid) - tid1 + tid2 // TODO Not a fan of this
-    invalidateCacheForPerson(pid)
+    invalidateCacheForPersons(pid)
+  }
+
+  def swap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
+    // TODO Dev mode control: pid1 should be on tid1, pid2 should be on tid2
+    parent.saveCache()
+    _swap(pid1, tid1, pid2, tid2)
     this
   }
 
-  def reverseMove(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = move(pid, tid2, tid1)
+  def undoSwap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
+    _swap(pid1, tid2, pid2, tid1)
+    parent.restoreCache()
+    this
+  }
+
+  private inline def _swap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): Unit = {
+    // TODO Dev mode control: pid1 should be on tid1, pid2 should be on tid2
+    personsToTopic(pid1) = tid2
+    personsToTopic(pid2) = tid1
+    topicsToPersons(tid1) = topicsToPersons(tid1) - pid1 + pid2
+    topicsToPersons(tid2) = topicsToPersons(tid2) + pid1 - pid2
+    parent.personsToTopics(pid1) = parent.personsToTopics(pid1) - tid1 + tid2 // TODO Not a fan of this
+    parent.personsToTopics(pid2) = parent.personsToTopics(pid2) + tid1 - tid2 // TODO Not a fan of this
+    invalidateCacheForPersons(pid1, pid2)
+  }
 
   /** Persons that are present on this slot and can be moved around with the current topics being planned (they're not
    * mandatory on their current topic). */
@@ -62,16 +98,18 @@ class SlotAssignment(
   private var cacheNeedsRecalculation: Boolean = true
   private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
-  def invalidateCacheForPerson(pid: PersonId): Unit = {
+  def invalidateCacheForPersons(pids: PersonId*): Unit = {
     cacheNeedsRecalculation = true
-    cachePersonsScore(pid) = Score.Missing
-    parent.invalidateCacheForPerson(pid)
-    
-    /* Person that had a wish on this person have their score changed */
-    val otherPersons: SmallIdSet[PersonId] = problem.personsTargetedToPersonsWithWish(pid)
-    otherPersons.foreach { pid =>
+    pids.fastForeach { pid =>
       cachePersonsScore(pid) = Score.Missing
-      parent.invalidateSlotCacheForPerson(pid) // no need to recalculate global score for them, just slot-level is enough
+      parent.invalidateCacheForPerson(pid)
+
+      /* Person that had a wish on this person have their score changed */
+      val otherPersons: SmallIdSet[PersonId] = problem.personsTargetedToPersonsWithWish(pid)
+      otherPersons.foreach { pid =>
+        cachePersonsScore(pid) = Score.Missing
+        parent.invalidateSlotCacheForPerson(pid) // no need to recalculate global score for them, just slot-level is enough
+      }
     }
   }
 
@@ -91,7 +129,8 @@ class SlotAssignment(
   }
 
   private def scoreWishes(problem: SmallProblem, pid: PersonId, tid: TopicId): Score = {
-    /* Missing person gets a score of zero */ // TODO add a test for this
+    /* Missing person gets a score of zero */
+    // TODO add a test for this
     if (tid == TopicId.None) Score.Zero else {
       val topicsScore: Score = problem.prefsPersonTopic(pid, tid)
       val otherPersonsScore: Score =
