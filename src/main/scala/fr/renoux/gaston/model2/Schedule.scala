@@ -39,7 +39,11 @@ class Schedule(
 
   /* ALL SCORING METHODS */
 
+  // TODO Keep a previous version. That way, a revert can just get it back. Only allows for one revert, but that should be enough.
+
   private var cacheTotalScore: Score = Score.Missing
+  private val cachePersonsSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val cachePersonsGlobalScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private var cacheTopicsPresentScore: Score = Score.Missing
 
@@ -64,13 +68,17 @@ class Schedule(
     cacheTotalScore = Score.Missing
   }
 
-  def invalidateCacheForPerson(pid: PersonId): Unit = {
+  def invalidateCacheForPerson(personId: PersonId) = {
     invalidateCacheTotal()
-    cachePersonsScore(pid) = Score.Missing
-    val otherPersons = problem.personsTargetedToPersonsWithWish(pid)
-    otherPersons.foreach { pid =>
-      cachePersonsScore(pid) = Score.Missing
-    }
+    cachePersonsScore(personId) = Score.Missing
+    cachePersonsGlobalScore(personId) = Score.Missing
+    cachePersonsSlotScore(personId) = Score.Missing
+  }
+
+  def invalidateSlotCacheForPerson(personId: PersonId): Unit = {
+    invalidateCacheTotal()
+    cachePersonsScore(personId) = Score.Missing
+    cachePersonsSlotScore(personId) = Score.Missing
   }
 
   def invalideCacheForTopics(): Unit = {
@@ -83,10 +91,8 @@ class Schedule(
 
   private def recalculateIfNeeded(): Unit = if (cacheTotalScore == Score.Missing) {
     problem.personsCount.foreach { pid =>
-      val cachedPersonScore = cachePersonsScore(pid)
-      val personScore = if (cachedPersonScore != Score.Missing) cachedPersonScore else scorePerson(pid)
-      cachePersonsScore(pid) = personScore
-      personScores(pid.value) = personScore
+      val personTotalScore = scorePerson(pid)
+      personScores(pid.value) = personTotalScore
     }
     Score.sort(personScores)
     val personsTotalScore = personScores.fastFoldRight(Score.Zero) { (score, acc) =>
@@ -100,17 +106,35 @@ class Schedule(
 
   /** Uses the person's base score, slot-assignments, exclusive and linked topics */
   private def scorePerson(pid: PersonId): Score = {
-    var slotsScore = Score.Zero
-    slotsToAssignment.foreach { (_, sa) =>
-      slotsScore += sa.getPersonScore(pid)
-    }
+    val cachedPersonTotalScore = cachePersonsScore(pid)
+    val personTotalScore = if (cachedPersonTotalScore != Score.Missing) cachedPersonTotalScore else {
+      
+      val cachedSlotScore = cachePersonsSlotScore(pid)
+      val slotsScore = if (cachedSlotScore != Score.Missing) cachedSlotScore else {
+        var s = Score.Zero
+        slotsToAssignment.foreach { (_, sa) =>
+          s += sa.getPersonScore(pid)
+        }
+        s
+      }
 
-    val topicIds = personsToTopics(pid)
-    val baseScore = problem.personsBaseScore(pid)
-    val exclusiveScore = problem.prefsTopicsExclusive(pid).evaluate(topicIds)
-    val linkedScore = scoreLinked(topicIds)
-    val total = baseScore + slotsScore + exclusiveScore + linkedScore
-    total
+      val cachedGlobalScore = cachePersonsGlobalScore(pid)
+      val globalScore = if (cachedGlobalScore != Score.Missing) cachedGlobalScore else {
+        val topicIds = personsToTopics(pid)
+        val baseScore = problem.personsBaseScore(pid)
+        val exclusiveScore = problem.prefsTopicsExclusive(pid).evaluate(topicIds)
+        val linkedScore = scoreLinked(topicIds)
+        val s = baseScore + exclusiveScore + linkedScore
+        cachePersonsGlobalScore(pid) = s
+        s
+      }
+      
+      val s = globalScore + slotsScore
+      cachePersonsScore(pid) = s
+      s
+    }
+    personScores(pid.value) = personTotalScore
+    personTotalScore
   }
 
   private def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
