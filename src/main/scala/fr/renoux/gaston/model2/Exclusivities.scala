@@ -21,3 +21,7 @@ final class Exclusivities(
     result
   }
 }
+
+object Exclusivities {
+  def empty = Exclusivities(Array.empty, Array.empty)
+}
