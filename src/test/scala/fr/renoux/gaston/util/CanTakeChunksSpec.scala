@@ -14,7 +14,7 @@ class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
 
   val testList: List[String] = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")
 
-  behavior of "SeqOps.take"
+  behavior of "takeChunks"
   it should "return a list with as much elements as the argument list" in {
     testList.takeChunks(1, 2)._1.size should be(2)
     testList.takeChunks(1, 2, 3)._1.size should be(3)
@@ -39,7 +39,7 @@ class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
     ), Nil))
   }
 
-  behavior of "ListOps.takeWithRemainder"
+  behavior of "takeChunksWith"
   it should "return a filled remainder if there is one" in {
     val x: (List[List[String]], List[String]) = testList.takeChunksWith(List(3, 5, 1))
     x should be((List(

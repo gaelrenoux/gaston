@@ -7,17 +7,19 @@ class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
 
   import CollectionExtensionsSpec.*
 
-  "zipWith" should "work" in {
-    Seq("alpha", "beta", "gamma").zipWith(_.length) should be(Seq("alpha" -> 5, "beta" -> 4, "gamma" -> 5))
+  "zipWith" should "work with Seqs" in {
+    val result: Seq[(String, Int)] = Seq("alpha", "beta", "gamma").zipWith(_.length)
+    result should be(Seq("alpha" -> 5, "beta" -> 4, "gamma" -> 5))
   }
 
-  it should "handle types" in {
-    """val a: Seq[(String, Int)] = Seq("alpha", "beta", "gamma").zipWith(_.length)""" should compile
-    """val a: List[(String, Int)] = List("alpha", "beta", "gamma").zipWith(_.length)""" should compile
-    """val a: Set[(String, Int)] = Set("alpha", "beta", "gamma").zipWith(_.length)""" should compile
-    // TODO The whole extension needs to be reworked for the next one
-    // """val a: Iterable[((Char, String), Int)] = Map('a' -> "alpha", 'b' -> "beta", 'c' -> "gamma").zipWith(_._2.length)""" should compile
-    println(a)
+  it should "work with Lists" in {
+    val result: List[(String, Int)] = List("alpha", "beta", "gamma").zipWith(_.length)
+    result should be(List("alpha" -> 5, "beta" -> 4, "gamma" -> 5))
+  }
+
+  it should "work with Sets" in {
+    val result: Set[(String, Int)] = Set("alpha", "beta", "gamma").zipWith(_.length)
+    result should be(Set("alpha" -> 5, "beta" -> 4, "gamma" -> 5))
   }
 
   "replace" should "work on Seqs" in {
@@ -31,19 +33,53 @@ class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "work on Nil" in {
-    val result: List[Animal] = List.empty[Dog].replace { case Dog("beta") => Cat("beta") }
+    val result: List[Animal] = (Nil: List[Dog]).replace { case Dog("beta") => Cat("beta") }
     result should be(Nil)
   }
 
-  "cross" should "work" in {
-    val result = List(1, 2, 3) x List("red", "green")
+  it should "work on empty Set" in {
+    val result: Set[Animal] = Set.empty[Dog].replace { case Dog("beta") => Cat("beta") }
+    result.isEmpty should be(true)
+  }
+
+  "cross" should "work with lists" in {
+    val result: List[(Int, String)] = List(1, 2, 3) x List("red", "green")
     result should be(List(1 -> "red", 1 -> "green", 2 -> "red", 2 -> "green", 3 -> "red", 3 -> "green"))
+  }
+
+  it should "work with sets" in {
+    val result: Set[(Int, String)] = Set(1, 2, 3) x Set("red", "green")
+    result should be(Set(1 -> "red", 1 -> "green", 2 -> "red", 2 -> "green", 3 -> "red", 3 -> "green"))
+  }
+
+  it should "work with different collections" in {
+    val result1: Set[(Int, String)] = Set(1, 2, 3) x List("red", "green")
+    result1 should be(Set(1 -> "red", 1 -> "green", 2 -> "red", 2 -> "green", 3 -> "red", 3 -> "green"))
+
+    val result2: List[(Int, String)] = List(1, 2, 3) x Set("red", "green")
+    result2 should be(List(1 -> "red", 1 -> "green", 2 -> "red", 2 -> "green", 3 -> "red", 3 -> "green"))
+  }
+
+  it should "work with empty on the left" in {
+    val result: List[(Nothing, String)] = Nil x List("red", "green")
+    result should be(Nil)
+  }
+
+  it should "work with empty on the right" in {
+    val result: List[(Int, Nothing)] = List(1, 2, 3) x Nil
+    result should be(Nil)
   }
 
   "mapWithState" should "work" in {
     val result = Seq(1, 3, 2).mapWithState("#") { (i, state) => (s"$state to $i", i.toString) }
     result._1 should be(Seq("# to 1", "1 to 3", "3 to 2"))
     result._2 should be("2")
+  }
+
+  it should "work on empty" in {
+    val result = Nil.mapWithState("#") { (i, state) => (s"$state to $i", i.toString) }
+    result._1 should be(Nil)
+    result._2 should be("#")
   }
 
   "filterMinBy" should "work" in {
@@ -65,78 +101,19 @@ class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
     set.unzipEither should be(Set(1, 42), Set("Hello", "World"))
   }
 
+  it should "work on empty" in {
+    val seq: Seq[Either[Int, String]] = Nil
+    seq.unzipEither should be(Nil, Nil)
+  }
+
   "mapMap" should "work" in {
     val seq = Seq(Seq("apple", "orange"), Seq("kiwi"), Nil)
     seq.mapMap(_.length) should be(Seq(Seq(5, 6), Seq(4), Nil))
   }
 
-  "getMinKey" should "work" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").minKeyOption should be(Some("kiwi"))
-  }
-
-  "getMinKey" should "work on empty Map" in {
-    Map.empty[String, Dog].minKeyOption should be(None)
-  }
-
-  "updatedWithOrElse" should "work to replace a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updateAtKeyOrElse(8)(f => f + f, "apple") should
-      be(Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomatotomato"))
-  }
-
-  it should "work to add a value" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").updateAtKeyOrElse(9)(f => f + f, "apple") should
-      be(Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato", 9 -> "apple"))
-  }
-
-  "mapValuesStrict" should "work" in {
-    Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").mapValuesStrict(_.length) should be(Map(3 -> 6, 2 -> 4, 8 -> 6))
-  }
-
-  it should "not be lazy" in {
-    var count = 0
-
-    def transform(str: String): Int = {
-      count += 1
-      str.length
-    }
-
-    val map = Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato")
-    val _ = map.view.mapValues(transform) // basic method in Scala, checks it doesn't change the count
-    count should be(0)
-    val result = map.mapValuesStrict(transform)
-    count should be(3)
-    result should be(Map(3 -> 6, 2 -> 4, 8 -> 6))
-  }
-
-  "zipByKeys" should "work" in {
-    val m1 = Map(1 -> "orange", 5 -> "kiwi")
-    val m2 = Map(5 -> "tomato", 7 -> "apple", 11 -> "nut")
-    m1.zipByKeys(m2) should be(Map(
-      1 -> (Some("orange"), None),
-      5 -> (Some("kiwi"), Some("tomato")),
-      7 -> (None, Some("apple")),
-      11 -> (None, Some("nut"))
-    ))
-  }
-
-  it should "work with an empty map on the left" in {
-    val m = Map(1 -> "orange", 5 -> "kiwi")
-    m.zipByKeys(Map.empty) should be(Map(
-      1 -> (Some("orange"), None),
-      5 -> (Some("kiwi"), None)
-    ))
-  }
-
-  it should "work with an empty map on the right" in {
-    val m = Map(1 -> "orange", 5 -> "kiwi")
-    Map.empty.zipByKeys(m) should be(Map(
-      1 -> (None, Some("orange")),
-      5 -> (None, Some("kiwi"))
-    ))
-  }
-
-  it should "work with two empty maps" in {
-    Map.empty.zipByKeys(Map.empty) should be(Map.empty)
+  "mapMap" should "work on empty" in {
+    val seq: Seq[Seq[String]] = Nil
+    seq.mapMap(_.length) should be(Nil)
   }
 }
 

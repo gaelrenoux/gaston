@@ -2,7 +2,7 @@ package fr.renoux.gaston.tools
 
 import com.softwaremill.quicklens.*
 import fr.renoux.gaston.input.InputModel
-import fr.renoux.gaston.util.Resources.readNamesFile
+import fr.renoux.gaston.util.Resources.readNonEmptyLines
 
 import scala.util.Random
 
@@ -16,11 +16,11 @@ class InputAnonymizer(in: InputModel, val seed: Long = 0) {
   private val rand = new Random(seed)
 
   val personAnonymizer = new CombinerAnonymizer(
-    rand.nextLong(), readNamesFile("persons1.txt"), readNamesFile("persons2.txt")
+    rand.nextLong(), readNonEmptyLines("names/persons1.txt"), readNonEmptyLines("names/persons2.txt")
   )
 
   val topicAnonymizer = new CombinerAnonymizer(
-    rand.nextLong(), readNamesFile("topics1.txt"), readNamesFile("topics2.txt"), "The"
+    rand.nextLong(), readNonEmptyLines("names/topics1.txt"), readNonEmptyLines("names/topics2.txt"), prefix = "The"
   )
 
   val anonymized: InputModel = in

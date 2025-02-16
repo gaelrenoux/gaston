@@ -180,10 +180,10 @@ object RandomScheduleGenerator {
     if (total > 0) triggerOnFailures(this)
 
     def addNoTopics(slot: Slot): BacktrackingFailures =
-      copy(noTopics = noTopics.updateAtKeyOrElse(slot)(_ + 1, 1), total = total + 1)
+      copy(noTopics = noTopics.updatedAtKeyOrElse(slot)(_ + 1, 1), total = total + 1)
 
     def addMaxParallelizationReached(slot: Slot): BacktrackingFailures =
-      copy(maxParallelizationReached = maxParallelizationReached.updateAtKeyOrElse(slot)(_ + 1, 1), total = total + 1)
+      copy(maxParallelizationReached = maxParallelizationReached.updatedAtKeyOrElse(slot)(_ + 1, 1), total = total + 1)
   }
 
 }

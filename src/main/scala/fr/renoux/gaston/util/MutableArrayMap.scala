@@ -24,6 +24,8 @@ object MutableArrayMap {
     }
 
     inline def toArrayMap: ArrayMap[A, B] = ArrayMap.unsafeFrom(am)
+    
+    inline def unsafeContent: Array[B] = am
   }
 
   def fill[A <: Identified, B: ClassTag](size: Int, default: B): MutableArrayMap[A, B] = {

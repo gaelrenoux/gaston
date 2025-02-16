@@ -16,12 +16,12 @@ object ArraySet {
 
     inline def containsId(inline id: Int): Boolean = as(id)
 
-    inline def countIntersection(that: ArraySet[A]): Int = {
+    def countIntersection(that: ArraySet[A]): Int = {
       // while loop used for performance
       var i = 0
       var total = 0
       val thisSize = as.length
-      while (i <= thisSize) {
+      while (i < thisSize) {
         if (as(i) && that.containsId(i)) total += 1
         i += 1
       }

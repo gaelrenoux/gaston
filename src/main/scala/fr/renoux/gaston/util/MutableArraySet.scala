@@ -26,11 +26,11 @@ object MutableArraySet {
     }
 
     inline def remove(inline a: A): Unit = {
-      as(a.id) = true
+      as(a.id) = false
     }
 
     inline def removeId(inline id: Int): Unit = {
-      as(id) = true
+      as(id) = false
     }
 
     inline def addAll(it: Iterable[A]): Unit = {
