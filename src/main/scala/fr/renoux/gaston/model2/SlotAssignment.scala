@@ -63,13 +63,16 @@ class SlotAssignment(
   private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
   def invalidateCacheForPerson(pid: PersonId): Unit = {
+    cacheNeedsRecalculation = true
     cachePersonsScore(pid) = Score.Missing
+    parent.invalidateCacheForPerson(pid)
+    
+    /* Person that had a wish on this person have their score changed */
     val otherPersons: SmallIdSet[PersonId] = problem.personsTargetedToPersonsWithWish(pid)
     otherPersons.foreach { pid =>
       cachePersonsScore(pid) = Score.Missing
+      parent.invalidateSlotCacheForPerson(pid) // no need to recalculate global score for them, just slot-level is enough
     }
-    cacheNeedsRecalculation = true
-    parent.invalidateCacheForPerson(pid)
   }
 
   def getPersonScore(pid: PersonId): Score = {
