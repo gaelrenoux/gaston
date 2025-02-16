@@ -47,21 +47,31 @@ class Schedule(
   private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private var cacheTopicsPresentScore: Score = Score.Missing
 
+  private var previousCacheTotalScore: Score = Score.Missing
+
   def getTotalScore(): Score = {
-    recalculateIfNeeded()
+    recalculateIfNeeded(cacheTotalScore)
     cacheTotalScore
   }
 
   @testOnly
-  def getPersonScore(pid: PersonId): Score = {
-    recalculateIfNeeded()
+  private def getPersonScore(pid: PersonId): Score = {
+    recalculateIfNeeded(cachePersonsScore(pid))
     cachePersonsScore(pid)
   }
 
+  /** Only used in tests. Pretty slow because it goes over all persons to check their cache status. */
   @testOnly
-  def getPersonScores() = {
-    recalculateIfNeeded()
-    cachePersonsScore
+  def slowGetPersonScores() = {
+    IdMap.tabulate[PersonId, Score](getPersonScore)
+  }
+
+  def saveCache(): Unit = {
+    previousCacheTotalScore = cacheTotalScore
+  }
+  def restoreCache(): Unit = {
+    cacheTotalScore = previousCacheTotalScore
+    previousCacheTotalScore = Score.Missing
   }
 
   private def invalidateCacheTotal(): Unit = {
@@ -89,7 +99,7 @@ class Schedule(
   /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
   private val personScores: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
-  private def recalculateIfNeeded(): Unit = if (cacheTotalScore == Score.Missing) {
+  private inline def recalculateIfNeeded(checked: Score = cacheTotalScore): Unit = if (checked == Score.Missing) {
     problem.personsCount.foreach { pid =>
       val personTotalScore = scorePerson(pid)
       personScores(pid.value) = personTotalScore

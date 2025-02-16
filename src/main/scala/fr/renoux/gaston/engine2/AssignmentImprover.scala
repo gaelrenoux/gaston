@@ -99,7 +99,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         assignment.move(pid, currentTid, targetTid)
         val newScore = schedule.getTotalScore()
         if (newScore <= currentScore) {
-          val _ = assignment.reverseMove(pid, currentTid, targetTid)
+          val _ = assignment.undoMove(pid, currentTid, targetTid)
         } else {
           // found a good one
           found = true
@@ -111,12 +111,10 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         val targetTopicPersons = assignment.topicsToPersons(targetTid)
         targetTopicPersons.foreachWhile { otherPid =>
           if (!problem.isPersonMandatory(otherPid, targetTid)) {
-            assignment.move(pid, currentTid, targetTid)
-            assignment.move(otherPid, targetTid, currentTid)
+            assignment.swap(pid, currentTid, otherPid, targetTid)
             val newScore = schedule.getTotalScore()
             if (newScore <= currentScore) {
-              assignment.reverseMove(otherPid, targetTid, currentTid)
-              assignment.reverseMove(pid, currentTid, targetTid)
+              assignment.undoSwap(pid, currentTid, otherPid, targetTid)
               ()
             } else {
               // found a good one
