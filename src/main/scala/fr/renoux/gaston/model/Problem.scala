@@ -40,7 +40,7 @@ final case class Problem(
   lazy val forcedTopicsMostToLeastConstrained: Seq[Topic] =
     forcedTopics.toSeq.view.map { topic => topic -> topic.slots.fold(slotsSet.size)(_.size) }.sortBy(_._2).map(_._1).toSeq
   lazy val topicsWithFollowups: Set[(Topic, Topic)] = topicsSet.flatMap { t => t.followup.map(t -> _) }
-
+  lazy val hasUnassignedTopics: Boolean = unassignedTopics.nonEmpty
 
 
   /* PERSONS */

@@ -64,13 +64,13 @@ final case class SlotSchedule(
   lazy val countPersonsByTopic: Map[Topic, Int] = personsByTopic.mapValuesStrict(_.size)
   lazy val personGroups: Iterable[Set[Person]] = records.view.map(_.persons).toList // not a Set: we do not want to deduplicate identical groups!
   lazy val mandatory: Set[Person] = topicsSet.flatMap(_.mandatory)
-  
+
   /** For each person, their topic */
   lazy val topicByPerson: Map[Person, Topic] = wrapped.flatMap { case (topic, record) => record.persons.map(p => p -> topic) }
-  
-  /** Set of persons unassigned on this slot-schedule **/
+
+  /** Set of persons unassigned on this slot-schedule * */
   lazy val unassignedPersons: Set[Person] = wrapped.find(_._1.isUnassigned).fold(Set.empty)(_._2.persons)
-  
+
   lazy val isMinPersonsTooHigh: Boolean = minPersons.exists(_ > problem.personsCount)
   lazy val isMaxPersonsTooLow: Boolean = maxPersons.exists(_ < problem.personsCount)
 
@@ -219,7 +219,7 @@ final case class SlotSchedule(
 
   /** Unassign all persons, except mandatory persons. If unassigned topics do not exist, returns this SlotSchedule without change. Used only in tests. */
   @testOnly def unassignAll: SlotSchedule =
-    if (problem.unassignedTopics.isEmpty) this
+    if (!problem.hasUnassignedTopics) this
     else updateWrapped {
       val cleanedWrapped = wrapped.collect {
         case (topic, _) if !topic.isUnassigned => topic -> Record(slot, topic, topic.mandatory)
@@ -248,12 +248,13 @@ object SlotSchedule {
 
   def empty(slot: Slot)(using problem: Problem): SlotSchedule = SlotSchedule(slot, Map.empty)
 
-  /** Slot schedule where everyone is on an "unassigned" topic, no other topic. Doesn't work if unassignes isn't allowed. */
+  /** Slot schedule where everyone is on an "unassigned" topic, no other topic. Doesn't work if unassigned isn't allowed. */
   def everyoneUnassigned(slot: Slot)(using problem: Problem): SlotSchedule =
-    if (problem.unassignedTopics.isEmpty) throw new IllegalStateException("Cannot call everyoneUnassigned, persons cannot be unassigned")
-    else {
+    if (problem.hasUnassignedTopics) {
       val t = problem.unassignedTopics(slot)
       SlotSchedule(slot, Map(t -> Record(slot, t, slot.personsPresent)))
+    } else {
+      throw new IllegalStateException("Cannot call everyoneUnassigned, persons cannot be unassigned")
     }
 
   /** Commodity method */

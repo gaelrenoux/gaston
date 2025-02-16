@@ -253,8 +253,8 @@ final case class Schedule(
 
   /** Unassign all persons, except mandatory persons. If unassigned topics do not exist, does nothing. Used only in tests. */
   @testOnly def unassignAll: Schedule =
-    if (problem.unassignedTopics.isEmpty) this
-    else updateAllSlotSchedules(_.unassignAll)
+    if (problem.hasUnassignedTopics) updateAllSlotSchedules(_.unassignAll)
+    else this
 
   /** Merge with another schedule's content. Used only in tests. */
   @testOnly def ++(that: Schedule): Schedule = Schedule(

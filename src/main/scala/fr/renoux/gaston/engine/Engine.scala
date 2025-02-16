@@ -34,8 +34,8 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
     given Random = new Random(chainSeed)
 
     val initialSchedule: Schedule =
-      if (problem.unassignedTopics.isEmpty) startingScheduleGenerator.create(chainSeed)
-      else Schedule.startingUnassignedOrForced(chainSeed)
+      if (problem.hasUnassignedTopics) Schedule.startingUnassignedOrForced(chainSeed)
+      else startingScheduleGenerator.create(chainSeed)
     if (!initialSchedule.isSolution) {
       val message = s"A bad schedule was generated at startup !\n ${initialSchedule.toFormattedString}\n${initialSchedule.errors.mkString("\n")}"
       throw new IllegalStateException(message)

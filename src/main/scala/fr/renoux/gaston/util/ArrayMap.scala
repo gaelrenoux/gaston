@@ -15,9 +15,11 @@ object ArrayMap {
 
     inline def map[C: ClassTag](inline f: B => C): ArrayMap[A, C] = am.view.map(f).toArray
 
+    /** /!\ Performance is linear with the capacity */
     inline def isEmpty: Boolean = !nonEmpty
 
-    inline def nonEmpty: Boolean = am.exists(_ != null) // TODO Not great, see if we can do without
+    /** /!\ Performance is linear with the capacity */
+    inline def nonEmpty: Boolean = am.exists(_ != null)
   }
 
   def empty[A <: Identified, B: ClassTag]: ArrayMap[A, B] = {
