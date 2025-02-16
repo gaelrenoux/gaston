@@ -128,7 +128,11 @@ class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
     ))
   }
 
-  "develop" should "work in the nominal case on a Set" in {
+  it should "work on empty Seq" in {
+    Seq.empty[String].develop(_.toSeq) should be(Seq(Nil))
+  }
+
+  it should "work in the nominal case on a Set" in {
     val s = Set("abc", "d", "ef")
     s.develop(_.toSet) should be(Set(
       Set('a', 'd', 'e'),
@@ -138,6 +142,10 @@ class CollectionExtensionsSpec extends AnyFlatSpec with Matchers {
       Set('c', 'd', 'e'),
       Set('c', 'd', 'f')
     ))
+  }
+
+  it should "work on empty Set" in {
+    Set.empty[String].develop(_.toSet) should be(Set(Set.empty))
   }
 }
 
