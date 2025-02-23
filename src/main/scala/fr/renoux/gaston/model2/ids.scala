@@ -110,6 +110,22 @@ object Count {
 
     inline def map[A: ClassTag](inline f: I => A): Array[A] = Array.tabulate[A](c)(f)
 
+    inline def forall(inline f: I => Boolean): Boolean = {
+      var i = 0
+      while (i < c && f(i)) {
+        i += 1
+      }
+      i == c
+    }
+
+    inline def exists(inline f: I => Boolean): Boolean = {
+      var i = 0
+      while (i < c && !f(i)) {
+        i += 1
+      }
+      i != c
+    }
+
     // TODO inline this method
     /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
     def find(f: I => Boolean): I = {
