@@ -39,8 +39,6 @@ class Schedule(
 
   /* ALL SCORING METHODS */
 
-  // TODO Keep a previous version. That way, a revert can just get it back. Only allows for one revert, but that should be enough.
-
   private var cacheTotalScore: Score = Score.Missing
   private val cachePersonsSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private val cachePersonsGlobalScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
@@ -48,6 +46,8 @@ class Schedule(
   private var cacheTopicsPresentScore: Score = Score.Missing
 
   private var previousCacheTotalScore: Score = Score.Missing
+  private var previousCacheScore1: Score = Score.Missing
+  private var previousCacheScore2: Score = Score.Missing
 
   def getTotalScore(): Score = {
     recalculateIfNeeded(cacheTotalScore)
@@ -66,12 +66,32 @@ class Schedule(
     IdMap.tabulate[PersonId, Score](getPersonScore)
   }
 
-  def saveCache(): Unit = {
+  def saveCacheFor(pid: PersonId): Unit = {
     previousCacheTotalScore = cacheTotalScore
+    previousCacheScore1 = cachePersonsScore(pid)
   }
-  def restoreCache(): Unit = {
+
+  def restoreCacheFor(pid: PersonId): Unit = {
     cacheTotalScore = previousCacheTotalScore
+    cachePersonsScore(pid) = previousCacheScore1
     previousCacheTotalScore = Score.Missing
+    previousCacheScore1 = Score.Missing
+    previousCacheScore2 = Score.Missing
+  }
+
+  def saveCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
+    previousCacheTotalScore = cacheTotalScore
+    previousCacheScore1 = cachePersonsScore(pid1)
+    previousCacheScore2 = cachePersonsScore(pid2)
+  }
+
+  def restoreCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
+    cacheTotalScore = previousCacheTotalScore
+    cachePersonsScore(pid1) = previousCacheScore1
+    cachePersonsScore(pid2) = previousCacheScore2
+    previousCacheTotalScore = Score.Missing
+    previousCacheScore1 = Score.Missing
+    previousCacheScore2 = Score.Missing
   }
 
   private def invalidateCacheTotal(): Unit = {
