@@ -114,8 +114,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
             assignment.swap(pid, currentTid, otherPid, targetTid)
             val newScore = schedule.getTotalScore()
             if (newScore <= currentScore) {
-              assignment.undoSwap(pid, currentTid, otherPid, targetTid)
-              ()
+              val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
             } else {
               // found a good one
               found = true

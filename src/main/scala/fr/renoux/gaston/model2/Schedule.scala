@@ -1,14 +1,18 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.util.testOnly
-import fr.renoux.gaston.util.fastForeach
-import fr.renoux.gaston.util.fastFoldRight
+import fr.renoux.gaston.util.{fastFoldRight, fastForeach, fastLoop, testOnly}
 
 import java.util as jutil
 
 
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
 // TODO most fields should be private, if not all
+
+/**
+ *
+ * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
+ * no rescoring is done, in which case this class' user must manually trigger a rescoring.
+ */
 class Schedule(
     val problem: SmallProblem,
     val slotsToAssignment: IdMap[SlotId, SlotAssignment],
@@ -25,149 +29,182 @@ class Schedule(
   inline def addTopic(sid: SlotId, tid: TopicId): Schedule = {
     topicsToSlot(tid) = sid
     topicsPresent = topicsPresent + tid
+    recalculateTopicScore()
     this
   }
 
   inline def removeTopic(tid: TopicId): Schedule = {
     topicsToSlot(tid) = SlotId.None
     topicsPresent = topicsPresent - tid
+    recalculateTopicScore()
     this
   }
 
+  /* ALL SCORING STUFF */
 
+  private var totalScore: Score = Score.Missing
+  private val personsNonSlotScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val personsScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private var personsScore: Score = Score.Missing
+  private var topicsPureScore: Score = Score.Missing
 
+  /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
+  private val personsScoresSorted: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
-  /* ALL SCORING METHODS */
+  private var previousTotalScore: Score = Score.Missing
+  private var previousPersonScore1: Score = Score.Missing
+  private var previousPersonScore2: Score = Score.Missing
+  private var previousPersonNonSlotScore1: Score = Score.Missing
+  private var previousPersonNonSlotScore2: Score = Score.Missing
 
-  private var cacheTotalScore: Score = Score.Missing
-  private val cachePersonsSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private val cachePersonsGlobalScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private var cacheTopicsPresentScore: Score = Score.Missing
-
-  private var previousCacheTotalScore: Score = Score.Missing
-  private var previousCacheScore1: Score = Score.Missing
-  private var previousCacheScore2: Score = Score.Missing
+  private val previousPersonScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
   def getTotalScore(): Score = {
-    recalculateIfNeeded(cacheTotalScore)
-    cacheTotalScore
+    totalScore
+  }
+
+  @testOnly
+  def getPersonScores(): IdMap[PersonId, Score] = {
+    personsScores
   }
 
   @testOnly
   private def getPersonScore(pid: PersonId): Score = {
-    recalculateIfNeeded(cachePersonsScore(pid))
-    cachePersonsScore(pid)
+    personsScores(pid)
   }
 
-  /** Only used in tests. Pretty slow because it goes over all persons to check their cache status. */
-  @testOnly
-  def slowGetPersonScores() = {
-    IdMap.tabulate[PersonId, Score](getPersonScore)
+  def saveScoreFor(pid: PersonId): Unit = {
+    previousTotalScore = totalScore
+    previousPersonScore1 = personsScores(pid)
+    previousPersonNonSlotScore1 = personsNonSlotScores(pid)
   }
 
-  def saveCacheFor(pid: PersonId): Unit = {
-    previousCacheTotalScore = cacheTotalScore
-    previousCacheScore1 = cachePersonsScore(pid)
+  def restoreSavedScoreFor(pid: PersonId): Unit = {
+    totalScore = previousTotalScore
+    personsScores(pid) = previousPersonScore1
+    personsNonSlotScores(pid) = previousPersonNonSlotScore1
+    previousTotalScore = Score.Missing
+    previousPersonScore1 = Score.Missing
+    previousPersonScore2 = Score.Missing
+    previousPersonNonSlotScore1 = Score.Missing
+    previousPersonNonSlotScore2 = Score.Missing
   }
 
-  def restoreCacheFor(pid: PersonId): Unit = {
-    cacheTotalScore = previousCacheTotalScore
-    cachePersonsScore(pid) = previousCacheScore1
-    previousCacheTotalScore = Score.Missing
-    previousCacheScore1 = Score.Missing
-    previousCacheScore2 = Score.Missing
+  def saveScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
+    previousTotalScore = totalScore
+    previousPersonScore1 = personsScores(pid1)
+    previousPersonScore2 = personsScores(pid2)
+    previousPersonNonSlotScore1 = personsNonSlotScores(pid1)
+    previousPersonNonSlotScore2 = personsNonSlotScores(pid2)
   }
 
-  def saveCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
-    previousCacheTotalScore = cacheTotalScore
-    previousCacheScore1 = cachePersonsScore(pid1)
-    previousCacheScore2 = cachePersonsScore(pid2)
+  def restoreSavedScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
+    totalScore = previousTotalScore
+    personsScores(pid1) = previousPersonScore1
+    personsScores(pid2) = previousPersonScore2
+    personsNonSlotScores(pid1) = previousPersonNonSlotScore1
+    personsNonSlotScores(pid2) = previousPersonNonSlotScore2
+    previousTotalScore = Score.Missing
+    previousPersonScore1 = Score.Missing
+    previousPersonScore2 = Score.Missing
+    previousPersonNonSlotScore1 = Score.Missing
+    previousPersonNonSlotScore2 = Score.Missing
   }
 
-  def restoreCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
-    cacheTotalScore = previousCacheTotalScore
-    cachePersonsScore(pid1) = previousCacheScore1
-    cachePersonsScore(pid2) = previousCacheScore2
-    previousCacheTotalScore = Score.Missing
-    previousCacheScore1 = Score.Missing
-    previousCacheScore2 = Score.Missing
-  }
+  // TODO I'm not a fan of the reversed logic between recalculateAll and recalculateScoreFor. In the first case, the
+  //  schedule calls the slot-assignment, while in the second the slot-assignment calls the schedule. I'm thinking I
+  //  should concentrate all external methods at the schedule level.
 
-  private def invalidateCacheTotal(): Unit = {
-    cacheTotalScore = Score.Missing
-  }
-
-  def invalidateCacheForPerson(personId: PersonId) = {
-    invalidateCacheTotal()
-    cachePersonsScore(personId) = Score.Missing
-    cachePersonsGlobalScore(personId) = Score.Missing
-    cachePersonsSlotScore(personId) = Score.Missing
-  }
-
-  def invalidateSlotCacheForPerson(personId: PersonId): Unit = {
-    invalidateCacheTotal()
-    cachePersonsScore(personId) = Score.Missing
-    cachePersonsSlotScore(personId) = Score.Missing
-  }
-
-  def invalideCacheForTopics(): Unit = {
-    invalidateCacheTotal()
-    cacheTopicsPresentScore = Score.Missing
-  }
-
-  /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
-  private val personScores: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
-
-  private inline def recalculateIfNeeded(checked: Score = cacheTotalScore): Unit = if (checked == Score.Missing) {
-    problem.personsCount.foreach { pid =>
-      val personTotalScore = scorePerson(pid)
-      personScores(pid.value) = personTotalScore
+  /** Calls the recalculateAll of the slot-assignment */
+  def recalculateAll(): Unit = {
+    recalculateTopicScore()
+    slotsToAssignment.foreach { (slot, sa) =>
+      sa.recalculateAll()
     }
-    Score.sort(personScores)
-    val personsTotalScore = personScores.fastFoldRight(Score.Zero) { (score, acc) =>
+    problem.personsCount.foreach { p =>
+      _recalculatePersonScoreFor(p, includeNonSlot = true)
+      personsScoresSorted(p.value) = personsScores(p)
+    }
+    Score.sort(personsScoresSorted)
+    personsScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
+      (SmallProblem.RankFactor * acc: Score) + score
+    }
+    totalScore = personsScore + topicsPureScore
+  }
+
+  /**
+   * Assumes the recalculation has already been done on the slot-assignment level
+   * @param otherPersons No need to recalculate global score for them, just slot-level is enough
+   */
+  def recalculateScoreFor(person: PersonId, otherPersons: SmallIdSet[PersonId]): Unit =
+    recalculateScoreFor(person, PersonId.None, otherPersons)
+
+  /**
+   * Assumes the recalculation has already been done on the slot-assignment level
+   * @param otherPersons No need to recalculate global score for them, just slot-level is enough
+   */
+  def recalculateScoreFor(person1: PersonId, person2: PersonId, otherPersons: SmallIdSet[PersonId]): Unit = {
+    _recalculatePersonScoreFor(person1, includeNonSlot = true)
+    if (person2 != PersonId.None) {
+      _recalculatePersonScoreFor(person2, includeNonSlot = true)
+    }
+    otherPersons.foreach { pid =>
+      _recalculatePersonScoreFor(pid, includeNonSlot = false)
+    }
+
+    // Possibility to check if that's a good idea here, before sorting
+    // val maybeUseful = problem.personsCount.exists { pid => personsScores(pid) > previousPersonScores(pid) }
+    // if (!maybeUseful) {
+    //   problem.personsCount.foreach { pid => personsScores(pid) = previousPersonScores(pid) }
+    //   false
+    // } else {
+    //   problem.personsCount.foreach { pid => previousPersonScores(pid) = personsScores(pid) }
+    //   ...
+
+    problem.personsCount.foreach { p =>
+      personsScoresSorted(p.value) = personsScores(p)
+    }
+    Score.sort(personsScoresSorted)
+    personsScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
       (SmallProblem.RankFactor * acc: Score) + score
     }
 
-    val topicsPureTotalScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
+    totalScore = personsScore + topicsPureScore
 
-    cacheTotalScore = personsTotalScore + topicsPureTotalScore
   }
 
-  /** Uses the person's base score, slot-assignments, exclusive and linked topics */
-  private def scorePerson(pid: PersonId): Score = {
-    val cachedPersonTotalScore = cachePersonsScore(pid)
-    val personTotalScore = if (cachedPersonTotalScore != Score.Missing) cachedPersonTotalScore else {
-      
-      val cachedSlotScore = cachePersonsSlotScore(pid)
-      val slotsScore = if (cachedSlotScore != Score.Missing) cachedSlotScore else {
-        var s = Score.Zero
-        slotsToAssignment.foreach { (_, sa) =>
-          s += sa.getPersonScore(pid)
-        }
-        s
+  /** Scores a person, storing the result in personsScore and returning it. */
+  private def _recalculatePersonScoreFor(person: PersonId, includeNonSlot: Boolean): Unit = {
+    val slotsScore = {
+      var s = Score.Zero
+      slotsToAssignment.foreach { (_, sa) =>
+        s += sa.getPersonScore(person)
       }
-
-      val cachedGlobalScore = cachePersonsGlobalScore(pid)
-      val globalScore = if (cachedGlobalScore != Score.Missing) cachedGlobalScore else {
-        val topicIds = personsToTopics(pid)
-        val baseScore = problem.personsBaseScore(pid)
-        val exclusiveScore = problem.prefsTopicsExclusive(pid).evaluate(topicIds)
-        val linkedScore = scoreLinked(topicIds)
-        val s = baseScore + exclusiveScore + linkedScore
-        cachePersonsGlobalScore(pid) = s
-        s
-      }
-      
-      val s = globalScore + slotsScore
-      cachePersonsScore(pid) = s
       s
     }
-    personScores(pid.value) = personTotalScore
-    personTotalScore
+
+    val nonSlotScore =
+      if (includeNonSlot) {
+        val topicIds = personsToTopics(person)
+        val baseScore = problem.personsBaseScore(person)
+        val exclusiveScore = problem.prefsTopicsExclusive(person).evaluate(topicIds)
+        val linkedScore = getScoreLinked(topicIds)
+        val s = baseScore + exclusiveScore + linkedScore
+        personsNonSlotScores(person) = s
+        s
+      } else {
+        personsNonSlotScores(person)
+      }
+
+    personsScores(person) = nonSlotScore + slotsScore
   }
 
-  private def scoreLinked(topicIds: SmallIdSet[TopicId]) = {
+  def recalculateTopicScore(): Unit = {
+    topicsPureScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
+    totalScore = personsScore + topicsPureScore
+  }
+
+  private def getScoreLinked(topicIds: SmallIdSet[TopicId]) = {
     var linkedScore = Score.Zero
     problem.prefsTopicsLinked.fastForeach { linked =>
       val result = linked && topicIds
@@ -180,6 +217,7 @@ class Schedule(
 
 
   /* TEST METHODS */
+
   @testOnly
   def on(slot: SlotId)(f: SlotAssignment => Any): Schedule = {
     val _ = f(slotsToAssignment(slot))
