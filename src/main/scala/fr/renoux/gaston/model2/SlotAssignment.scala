@@ -4,7 +4,11 @@ import scala.compiletime.uninitialized
 import fr.renoux.gaston.util.*
 
 
-/** The schedule for a single slot. */
+/** Assignments for a single slot (who is on what topic).
+ *
+ * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
+ * no rescoring is done, in which case this class' user must manually trigger a rescoring.
+ */
 class SlotAssignment(
     val problem: SmallProblem,
     val slot: SlotId,
@@ -40,16 +44,18 @@ class SlotAssignment(
 
   def move(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
     // TODO Dev mode control: pid should be on tid1
-    saveCacheFor(pid)
-    parent.saveCacheFor(pid)
+    saveScoreFor(pid)
+    parent.saveScoreFor(pid)
     _move(pid, tid1, tid2)
+    val otherPersons = recalculateScoreFor(pid)
+    parent.recalculateScoreFor(pid, otherPersons)
     this
   }
 
   def undoMove(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
     _move(pid, tid2, tid1)
-    restoreCacheFor(pid)
-    parent.restoreCacheFor(pid)
+    restoreSavedScoreFor(pid)
+    parent.restoreSavedScoreFor(pid)
     this
   }
 
@@ -59,21 +65,22 @@ class SlotAssignment(
     topicsToPersons(tid1) = topicsToPersons(tid1) - pid
     topicsToPersons(tid2) = topicsToPersons(tid2) + pid
     parent.personsToTopics(pid) = parent.personsToTopics(pid) - tid1 + tid2 // TODO Not a fan of this
-    invalidateCacheFor(pid)
   }
 
   def swap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
     // TODO Dev mode control: pid1 should be on tid1, pid2 should be on tid2
-    saveCacheFor(pid1, pid2)
-    parent.saveCacheFor(pid1, pid2)
+    saveScoreFor(pid1, pid2)
+    parent.saveScoreFor(pid1, pid2)
     _swap(pid1, tid1, pid2, tid2)
+    val otherPersons = recalculateScoreFor(pid1, pid2)
+    parent.recalculateScoreFor(pid1, pid2, otherPersons)
     this
   }
 
   def undoSwap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
     _swap(pid1, tid2, pid2, tid1)
-    restoreCacheFor(pid1, pid2)
-    parent.restoreCacheFor(pid1, pid2)
+    restoreSavedScoreFor(pid1, pid2)
+    parent.restoreSavedScoreFor(pid1, pid2)
     this
   }
 
@@ -85,7 +92,6 @@ class SlotAssignment(
     topicsToPersons(tid2) = topicsToPersons(tid2) + pid1 - pid2
     parent.personsToTopics(pid1) = parent.personsToTopics(pid1) - tid1 + tid2 // TODO Not a fan of this
     parent.personsToTopics(pid2) = parent.personsToTopics(pid2) + tid1 - tid2 // TODO Not a fan of this
-    invalidateCacheFor(pid1, pid2)
   }
 
   /** Persons that are present on this slot and can be moved around with the current topics being planned (they're not
@@ -99,75 +105,78 @@ class SlotAssignment(
 
   /* ALL SCORING STUFF */
 
-  private var cacheNeedsRecalculation: Boolean = true
-  private val cachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val personsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
-  private var previousCacheNeedsRecalculation: Boolean = true
-  private var previousCacheScore1: Score = Score.Missing
-  private var previousCacheScore2: Score = Score.Missing
-
-  def saveCacheFor(pid: PersonId): Unit = {
-    previousCacheNeedsRecalculation = cacheNeedsRecalculation
-    previousCacheScore1 = cachePersonsScore(pid)
-  }
-
-  def restoreCacheFor(pid: PersonId): Unit = {
-    cacheNeedsRecalculation = previousCacheNeedsRecalculation
-    cachePersonsScore(pid) = previousCacheScore1
-    previousCacheNeedsRecalculation = true
-    previousCacheScore1 = Score.Missing
-    previousCacheScore2 = Score.Missing
-  }
-
-  def saveCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
-    previousCacheNeedsRecalculation = cacheNeedsRecalculation
-    previousCacheScore1 = cachePersonsScore(pid1)
-    previousCacheScore2 = cachePersonsScore(pid2)
-  }
-
-  def restoreCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
-    cacheNeedsRecalculation = previousCacheNeedsRecalculation
-    cachePersonsScore(pid1) = previousCacheScore1
-    cachePersonsScore(pid2) = previousCacheScore2
-    previousCacheNeedsRecalculation = true
-    previousCacheScore1 = Score.Missing
-    previousCacheScore2 = Score.Missing
-  }
-
-  def invalidateCacheFor(pid: PersonId): Unit = {
-    cacheNeedsRecalculation = true
-    cachePersonsScore(pid) = Score.Missing
-    parent.invalidateCacheForPerson(pid)
-
-    /* Person that had a wish on this person have their score changed */
-    val otherPersons: SmallIdSet[PersonId] = problem.personsTargetedToPersonsWithWish(pid)
-    otherPersons.foreach { pid =>
-      cachePersonsScore(pid) = Score.Missing
-      parent.invalidateSlotCacheForPerson(pid) // no need to recalculate global score for them, just slot-level is enough
-    }
-  }
-
-  def invalidateCacheFor(pid1: PersonId, pid2: PersonId): Unit = {
-    invalidateCacheFor(pid1)
-    invalidateCacheFor(pid2)
-  }
+  private var savedScore1: Score = Score.Missing
+  private var savedScore2: Score = Score.Missing
 
   def getPersonScore(pid: PersonId): Score = {
-    recalculateIfNeeded()
-    cachePersonsScore(pid)
+    personsScore(pid)
   }
 
-  private def recalculateIfNeeded(): Unit = if (cacheNeedsRecalculation) {
-    // TODO to ultra-optimize this, we could have all person scores as a single array: first person/topic, then person/person.
-    this.personsToTopic.foreach { (pid, tid) =>
-      if (cachePersonsScore(pid) == Score.Missing) {
-        cachePersonsScore(pid) = scoreWishes(problem, pid, tid)
-      }
+  private def saveScoreFor(pid: PersonId): Unit = {
+    savedScore1 = personsScore(pid)
+  }
+
+  private def restoreSavedScoreFor(pid: PersonId): Unit = {
+    personsScore(pid) = savedScore1
+    savedScore1 = Score.Missing
+    savedScore2 = Score.Missing
+  }
+
+  private def saveScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
+    savedScore1 = personsScore(pid1)
+    savedScore2 = personsScore(pid2)
+  }
+
+  private def restoreSavedScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
+    personsScore(pid1) = savedScore1
+    personsScore(pid2) = savedScore2
+    savedScore1 = Score.Missing
+    savedScore2 = Score.Missing
+  }
+
+  def recalculateAll() = {
+    problem.personsCount.foreach { person =>
+      _recalculateTargetPersonScoreFor(person)
     }
-    cacheNeedsRecalculation = false
   }
 
-  private def scoreWishes(problem: SmallProblem, pid: PersonId, tid: TopicId): Score = {
+  /** Returns the other persons impacted by this one. */
+  private def recalculateScoreFor(person: PersonId): SmallIdSet[PersonId] = {
+    _recalculateTargetPersonScoreFor(person)
+
+    /* Person that had a wish on this person have their score changed */
+    val otherPersons: SmallIdSet[PersonId] = problem.personsTargetedToPersonsWithWish(person)
+    _recalculateOtherPersonsScoreFor(otherPersons)
+    otherPersons
+  }
+
+  /** Returns the other persons impacted by these ones. */
+  private def recalculateScoreFor(person1: PersonId, person2: PersonId): SmallIdSet[PersonId] = {
+    _recalculateTargetPersonScoreFor(person1)
+    _recalculateTargetPersonScoreFor(person2)
+
+    /* Person that had a wish on these persons have their score changed */
+    val otherPersons: SmallIdSet[PersonId] =
+      (problem.personsTargetedToPersonsWithWish(person1) ++ problem.personsTargetedToPersonsWithWish(person2)) - person1 - person2
+    _recalculateOtherPersonsScoreFor(otherPersons)
+    otherPersons
+  }
+
+  private def _recalculateTargetPersonScoreFor(person: PersonId): Unit = {
+    val topic = personsToTopic(person)
+    personsScore(person) = scoreWishes(person, topic)
+  }
+
+  private def _recalculateOtherPersonsScoreFor(persons: SmallIdSet[PersonId]): Unit = {
+    persons.foreach { p =>
+      val topic = personsToTopic(p)
+      personsScore(p) = scoreWishes(p, topic)
+    }
+  }
+
+  private def scoreWishes(pid: PersonId, tid: TopicId): Score = {
     /* Missing person gets a score of zero */
     // TODO add a test for this
     if (tid == TopicId.None) Score.Zero else {

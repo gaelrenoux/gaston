@@ -64,8 +64,8 @@ object SmallIdSet {
     }
 
     /** Iterates over all possible pair once, considering that (A, B) and (B, A) are the same pair, and that (A, A)
-      * isn't a pair
-      */
+     * isn't a pair
+     */
     inline def foreachPair(inline f: (I, I) => Unit)(using c: Count[I]): Unit = {
       c.foreach { i =>
         c.foreachUntil(i) { j =>
@@ -152,7 +152,7 @@ object SmallIdSet {
       c.foreach { i =>
         if (apply(i)) {
           result(resultIx) = i
-          resultIx +=1
+          resultIx += 1
         }
       }
       result
@@ -198,7 +198,19 @@ object SmallIdSet {
     result
   }
 
-  given [I >: Int <: Id: Printable]: Printable[SmallIdSet[I]] with {
+  /** Mostly used when debugging */
+  @testOnly
+  def decode(set: Long): Set[Int] = {
+    val result = mutable.Set[Int]()
+    (0 until 64).foreach { i =>
+      if (((1L << i) & set) != 0L) {
+        val _ = result.add(i)
+      }
+    }
+    result.toSet
+  }
+
+  given [I >: Int <: Id : Printable]: Printable[SmallIdSet[I]] with {
     extension (is: SmallIdSet[I])
       override def toPrettyString: String =
         if (is == -1) Printable.Universe
