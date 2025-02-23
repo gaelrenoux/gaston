@@ -5,6 +5,8 @@ import scala.reflect.ClassTag
 import scala.util.Random
 import scala.annotation.targetName
 
+// TODO Needs tests for functions in here
+
 opaque type Id >: Int = Int
 opaque type SlotId >: Int <: Id = Int
 opaque type TopicId >: Int <: Id = Int
@@ -98,6 +100,12 @@ object Count {
       while (i < c && f(i)) {
         i += 1
       }
+    }
+
+    inline def foldLeft[A](a: A)(inline f: (A, I) => A): A = {
+      var acc = a
+      fastLoop(0, c) { i => acc = f(acc, i) }
+      acc
     }
 
     inline def map[A: ClassTag](inline f: I => A): Array[A] = Array.tabulate[A](c)(f)
