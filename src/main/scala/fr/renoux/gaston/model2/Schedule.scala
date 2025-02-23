@@ -1,8 +1,6 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.util.testOnly
-import fr.renoux.gaston.util.fastForeach
-import fr.renoux.gaston.util.fastFoldRight
+import fr.renoux.gaston.util.{fastFoldRight, fastForeach, fastLoop, testOnly}
 
 import java.util as jutil
 
@@ -49,8 +47,10 @@ class Schedule(
   private var previousCacheScore1: Score = Score.Missing
   private var previousCacheScore2: Score = Score.Missing
 
+  private val tempPreviousCachePersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+
   def getTotalScore(): Score = {
-    recalculateIfNeeded(cacheTotalScore)
+    recalculateIfNeeded()
     cacheTotalScore
   }
 
@@ -119,6 +119,35 @@ class Schedule(
   /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
   private val personScores: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
+  def recalculateIfMaybeBetter(checked: Score = cacheTotalScore): Boolean = {
+    if (checked != Score.Missing) {
+      false
+    } else {
+      problem.personsCount.foreach { pid =>
+        val personTotalScore = scorePerson(pid)
+        personScores(pid.value) = personTotalScore
+      }
+
+      val maybeUseful = problem.personsCount.exists { pid => cachePersonsScore(pid) > tempPreviousCachePersonsScore(pid) }
+      if (!maybeUseful) {
+        problem.personsCount.foreach { pid => cachePersonsScore(pid) = tempPreviousCachePersonsScore(pid) }
+        false
+      } else {
+        problem.personsCount.foreach { pid => tempPreviousCachePersonsScore(pid) = cachePersonsScore(pid) }
+
+        Score.sort(personScores)
+        val personsTotalScore = personScores.fastFoldRight(Score.Zero) { (score, acc) =>
+          (SmallProblem.RankFactor * acc: Score) + score
+        }
+
+        val topicsPureTotalScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
+
+        cacheTotalScore = personsTotalScore + topicsPureTotalScore
+        true
+      }
+    }
+  }
+
   private inline def recalculateIfNeeded(checked: Score = cacheTotalScore): Unit = if (checked == Score.Missing) {
     problem.personsCount.foreach { pid =>
       val personTotalScore = scorePerson(pid)
@@ -138,7 +167,7 @@ class Schedule(
   private def scorePerson(pid: PersonId): Score = {
     val cachedPersonTotalScore = cachePersonsScore(pid)
     val personTotalScore = if (cachedPersonTotalScore != Score.Missing) cachedPersonTotalScore else {
-      
+
       val cachedSlotScore = cachePersonsSlotScore(pid)
       val slotsScore = if (cachedSlotScore != Score.Missing) cachedSlotScore else {
         var s = Score.Zero
@@ -158,7 +187,7 @@ class Schedule(
         cachePersonsGlobalScore(pid) = s
         s
       }
-      
+
       val s = globalScore + slotsScore
       cachePersonsScore(pid) = s
       s

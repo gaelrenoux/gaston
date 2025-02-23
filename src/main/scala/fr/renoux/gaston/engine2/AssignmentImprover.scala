@@ -97,12 +97,17 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
       if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
         /* We can just move that person on the target topic */
         assignment.move(pid, currentTid, targetTid)
-        val newScore = schedule.getTotalScore()
-        if (newScore <= currentScore) {
-          val _ = assignment.undoMove(pid, currentTid, targetTid)
+        val chanceForImprovement = schedule.recalculateIfMaybeBetter()
+        if (chanceForImprovement) {
+          val newScore = schedule.getTotalScore()
+          if (newScore <= currentScore) {
+            val _ = assignment.undoMove(pid, currentTid, targetTid)
+          } else {
+            // found a good one
+            found = true
+          }
         } else {
-          // found a good one
-          found = true
+          val _ = assignment.undoMove(pid, currentTid, targetTid)
         }
       }
 
@@ -112,13 +117,17 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         targetTopicPersons.foreachWhile { otherPid =>
           if (!problem.isPersonMandatory(otherPid, targetTid)) {
             assignment.swap(pid, currentTid, otherPid, targetTid)
-            val newScore = schedule.getTotalScore()
-            if (newScore <= currentScore) {
-              assignment.undoSwap(pid, currentTid, otherPid, targetTid)
-              ()
+            val chanceForImprovement = schedule.recalculateIfMaybeBetter()
+            if (chanceForImprovement) {
+              val newScore = schedule.getTotalScore()
+              if (newScore <= currentScore) {
+                val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
+              } else {
+                // found a good one
+                found = true
+              }
             } else {
-              // found a good one
-              found = true
+              val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
             }
           }
           !found
