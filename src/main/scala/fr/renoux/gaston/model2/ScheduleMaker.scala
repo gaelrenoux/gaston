@@ -88,7 +88,7 @@ object ScheduleMaker {
         }
       }
     }
-
+    schedule.recalculateAll()
     schedule
   }
 
@@ -121,6 +121,7 @@ object ScheduleMaker {
       }
     }
 
+    schedule.recalculateAll()
     schedule
   }
 
