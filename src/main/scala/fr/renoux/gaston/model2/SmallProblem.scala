@@ -91,6 +91,16 @@ final class SmallProblem(
 
   inline def isPersonMandatory(pid: PersonId, tid: TopicId) = topicsMandatories(tid).contains(pid)
 
+  extension (pid: PersonId) {
+    def personName: String = personsName(pid)
+  }
+  extension (tid: TopicId) {
+    def topicName: String = topicsName(tid)
+  }
+  extension (sid: SlotId) {
+    def slotName: String = slotsNames(sid)
+  }
+
 }
 
 object SmallProblem {
