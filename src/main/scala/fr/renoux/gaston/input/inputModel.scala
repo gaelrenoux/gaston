@@ -69,7 +69,7 @@ object Constants {
 
 }
 
-// TODO version the model to make it easier to modify ?
+// TODO version the model to make it easier to modify ?
 
 final case class InputModel(
     settings: InputSettings = InputSettings(),
