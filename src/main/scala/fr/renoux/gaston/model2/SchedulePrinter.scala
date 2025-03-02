@@ -18,6 +18,7 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
           if (persons.nonEmpty) {
             val personNames = persons.map(problem.personsName.apply).toSeq.sorted
             sb.append(" ").append(personNames.mkString(", "))
+            ()
           }
           sb.append("\n")
           ()
