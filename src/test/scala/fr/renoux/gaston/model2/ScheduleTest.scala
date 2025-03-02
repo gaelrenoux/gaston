@@ -14,6 +14,7 @@ class ScheduleTest extends TestBase {
   "Basics " - { // TODO fix that, we need a way to create a simple problem
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
     given countTopics: CountAll[TopicId] = CountAll[TopicId](4)
+
     given countPersons: CountAll[PersonId] = CountAll[PersonId](4)
 
     val baseProblem = SmallProblemMaker.make
@@ -194,16 +195,47 @@ class ScheduleTest extends TestBase {
 
       "undoing restores the score correctly (more complex)" in {
         val schedule = scheduleBase()
+
+        // Some basic changes
         schedule.getTotalScore() should be(Score.Zero)
         schedule.on(d1)(_.move(h, gamma, alpha))
         schedule.on(d2)(_.move(h, delta, beta))
         schedule.getTotalScore() should be(500.0 / 2048)
+
+        // Move and undo, on a simple case
         schedule.on(d1)(_.move(f, epsilon1, alpha))
         schedule.getTotalScore() should be(750.0 / 2048 + 500.0 / 1024)
-
         schedule.on(d1)(_.undoMove(f, epsilon1, alpha))
         schedule.getTotalScore() should be(500.0 / 2048)
+
+        // Free I out of linked topics
+        schedule.on(d1)(_.move(i, gamma, epsilon1))
+        schedule.on(d2)(_.move(i, delta, beta))
+        schedule.getTotalScore() should be(500.0 / 2048)
+
+        // Move and undo, with temporary incompatibility
+        schedule.on(d1)(_.move(i, epsilon1, alpha))
+        schedule.getTotalScore() should be(500.0 / 2048 - 1000) // incompatible with A
+        schedule.on(d1)(_.undoMove(i, epsilon1, alpha))
+        schedule.getTotalScore() should be(500.0 / 2048)
+
+        // Simple change to force recalculation on A
+        schedule.on(d2)(_.move(a, epsilon2, beta))
+        schedule.getTotalScore() should be(500.0 / 2048 - 800) // A got a wish and an incompatibility
+        schedule.on(d2)(_.undoMove(a, epsilon2, beta))
+        schedule.getTotalScore() should be(500.0 / 2048)
+
+        // Swap and undo, changing the global score (not just the slot score)
+        schedule.on(d2)(_.swap(d, epsilon2, g, delta))
+        schedule.getTotalScore().value should be < (-1E9) // because Gamma and Delta are linked
+        schedule.on(d2)(_.undoSwap(d, epsilon2, g, delta))
+        schedule.getTotalScore() should be(500.0 / 2048)
+
+        // One last change to force recalculation on D
+        schedule.on(d2)(_.move(d, epsilon2, beta))
+        schedule.getTotalScore() should be(500.0 / 2048 + 500.0 / 1024)
       }
+
     }
   }
 

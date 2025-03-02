@@ -44,8 +44,8 @@ class SlotAssignment(
 
   def move(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
     // TODO Dev mode control: pid should be on tid1
-    saveScoreFor(pid)
-    parent.saveScoreFor(pid)
+    saveScores()
+    parent.saveScores()
     _move(pid, tid1, tid2)
     val otherPersons = recalculateScoreFor(pid)
     parent.recalculateScoreFor(pid, otherPersons)
@@ -54,8 +54,8 @@ class SlotAssignment(
 
   def undoMove(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
     _move(pid, tid2, tid1)
-    restoreSavedScoreFor(pid)
-    parent.restoreSavedScoreFor(pid)
+    restoreSavedScores()
+    parent.restoreSavedScores()
     this
   }
 
@@ -69,8 +69,8 @@ class SlotAssignment(
 
   def swap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
     // TODO Dev mode control: pid1 should be on tid1, pid2 should be on tid2
-    saveScoreFor(pid1, pid2)
-    parent.saveScoreFor(pid1, pid2)
+    saveScores()
+    parent.saveScores()
     _swap(pid1, tid1, pid2, tid2)
     val otherPersons = recalculateScoreFor(pid1, pid2)
     parent.recalculateScoreFor(pid1, pid2, otherPersons)
@@ -79,8 +79,8 @@ class SlotAssignment(
 
   def undoSwap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
     _swap(pid1, tid2, pid2, tid1)
-    restoreSavedScoreFor(pid1, pid2)
-    parent.restoreSavedScoreFor(pid1, pid2)
+    restoreSavedScores()
+    parent.restoreSavedScores()
     this
   }
 
@@ -106,34 +106,18 @@ class SlotAssignment(
   /* ALL SCORING STUFF */
 
   private val personsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-
-  private var savedScore1: Score = Score.Missing
-  private var savedScore2: Score = Score.Missing
+  private val savedPersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
   def getPersonScore(pid: PersonId): Score = {
     personsScore(pid)
   }
 
-  private def saveScoreFor(pid: PersonId): Unit = {
-    savedScore1 = personsScore(pid)
+  private def saveScores(): Unit = {
+    savedPersonsScore.fillFrom(personsScore)
   }
 
-  private def restoreSavedScoreFor(pid: PersonId): Unit = {
-    personsScore(pid) = savedScore1
-    savedScore1 = Score.Missing
-    savedScore2 = Score.Missing
-  }
-
-  private def saveScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
-    savedScore1 = personsScore(pid1)
-    savedScore2 = personsScore(pid2)
-  }
-
-  private def restoreSavedScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
-    personsScore(pid1) = savedScore1
-    personsScore(pid2) = savedScore2
-    savedScore1 = Score.Missing
-    savedScore2 = Score.Missing
+  private def restoreSavedScores(): Unit = {
+    personsScore.fillFrom(savedPersonsScore)
   }
 
   def recalculateAll() = {
