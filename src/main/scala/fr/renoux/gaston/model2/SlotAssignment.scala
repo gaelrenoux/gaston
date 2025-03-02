@@ -172,6 +172,56 @@ class SlotAssignment(
       topicsScore + otherPersonsScore
     }
   }
+
+
+  /* CHECKUPS */
+
+  /** Verifies if the schedule is consistent. Very useful in tests. Poor performance.
+   * @return A list of errors.
+   */
+  def slowCheckup: List[String] = {
+    slowCheckupUnassignedTopics ++ slowCheckupTopicToPersons
+    // Other checks to come
+  }
+
+  def slowCheckupUnassignedTopics: List[String] = {
+    val topicsHere: Set[TopicId] = topicsToPersons.toMap.filter(_._2.nonEmpty).keySet
+    val unassignedTopicsHere = topicsHere.filter(problem.isTopicUnassigned)
+    if (unassignedTopicsHere.isEmpty || unassignedTopicsHere == Set(slot.value)) Nil else {
+      val topicsStr = unassignedTopicsHere.toSeq.sorted.map { tid =>
+        s"$tid (${problem.topicsName(tid)})"
+      }.mkString(" ; ")
+      List(s"Unexpected unassigned topics: $topicsStr")
+    }
+  }
+
+  def slowCheckupTopicToPersons: List[String] = {
+    val ttp: Map[TopicId, Seq[PersonId]] = topicsToPersons.toMap.filter(_._2.nonEmpty).view.mapValues(_.toSet.toSeq.sorted).toMap
+    val tps: Seq[(TopicId, PersonId)] = ttp.toSeq.flatMap { case (tid, pids) => pids.map(tid -> _) }.sorted
+    val ptt: Map[PersonId, TopicId] = personsToTopic.toMap.filterNot(_._2 == TopicId.None)
+    val referenceTps: Seq[(TopicId, PersonId)] = ptt.toSeq.map(_.swap).sorted
+
+    if (tps == referenceTps) Nil else {
+      val ttpString = ttp.toSeq.sortBy(_._1).map {
+        case (tid, pids) => s"${problem.topicsName(tid)} -> (${pids.map(problem.personsName.apply).mkString(", ")})"
+      }.mkString(" | ")
+      val convertedPttString = referenceTps.groupBy(_._1).view.mapValues(_.map(_._2)).toSeq.sortBy(_._1).map {
+        case (tid, pids) => s"${problem.topicsName(tid)} -> (${pids.map(problem.personsName.apply).mkString(", ")})"
+      }.mkString(" | ")
+      List(
+        s"""[slot $slot] topicsToPersons and personsToTopic incoherence.
+           |Tuples compare:
+           |\t$tps
+           |\t$referenceTps
+           |As a map from topics to persons:
+           |\t$ttpString
+           |\t$convertedPttString
+           |--------------------------------------------------------------------------------
+           |""".stripMargin.trim)
+    }
+  }
+
+
 }
 
 object SlotAssignment {
