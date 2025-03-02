@@ -4,7 +4,7 @@ object SmallProblemMaker {
 
 
   def make(using countSlots: CountAll[SlotId], countTopics: CountAll[TopicId], countPersons: CountAll[PersonId]): SmallProblem = {
-    new SmallProblem(
+    SmallProblem(
       slotsCount = countSlots,
       slotsNames = IdMap.tabulate[SlotId, String] { sid => s"Slot #$sid" },
       slotsPersonsPresent = IdMap.fill[SlotId, SmallIdSet[PersonId]](SmallIdSet.full[PersonId]),
@@ -14,6 +14,7 @@ object SmallProblemMaker {
       topicsCount = countTopics,
       topicsName = IdMap.tabulate[TopicId, String] { tid => s"Topic #$tid" },
       topicsMandatories = IdMap.fill(SmallIdSet.empty[PersonId]),
+      topicsForbiddens = IdMap.fill(SmallIdSet.empty[PersonId]),
       topicsMin = IdMap.fill[TopicId, Count[PersonId]](0),
       topicsMax = IdMap.fill[TopicId, Count[PersonId]](countPersons),
       topicsAllowedSlots = IdMap.fill(SmallIdSet.empty[SlotId]),
