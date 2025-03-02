@@ -93,6 +93,7 @@ final class InputTranscription2(rawInput: InputModel) {
   lazy object topics {
     val topicsName = IdMap.empty[TopicId, String]
     val topicsMandatories = IdMap.fill[TopicId, SmallIdSet[PersonId]](SmallIdSet.empty[PersonId])
+    val topicsForbiddens = IdMap.fill[TopicId, SmallIdSet[PersonId]](SmallIdSet.empty[PersonId])
     val topicsMin = IdMap.empty[TopicId, Count[PersonId]]
     val topicsMax = IdMap.empty[TopicId, Count[PersonId]]
     val topicsAllowedSlots = IdMap.fill[TopicId, SmallIdSet[SlotId]](SmallIdSet.full[SlotId])
@@ -116,6 +117,7 @@ final class InputTranscription2(rawInput: InputModel) {
     var topicIdInt = slotsCount.value
     input.topics.foreach { (inTopic: InputTopic) =>
       val mandatories: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
+      val forbiddens: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
       val min: Count[PersonId] = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
       val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
@@ -128,6 +130,7 @@ final class InputTranscription2(rawInput: InputModel) {
         inTopicOcc.partInstances.foreach { inTopicOccPart =>
           topicsName(topicIdInt) = inTopicOccPart.name
           topicsMandatories(topicIdInt) = mandatories
+          topicsForbiddens(topicIdInt) = forbiddens
           topicsMin(topicIdInt) = min
           topicsMax(topicIdInt) = max
           topicsAllowedSlots(topicIdInt) = allowedSlots
@@ -311,6 +314,7 @@ final class InputTranscription2(rawInput: InputModel) {
     topicsCount = topicsCount,
     topicsName = topics.topicsName,
     topicsMandatories = topics.topicsMandatories,
+    topicsForbiddens = topics.topicsForbiddens,
     topicsMin = topics.topicsMin,
     topicsMax = topics.topicsMax,
     topicsAllowedSlots = topics.topicsAllowedSlots,
