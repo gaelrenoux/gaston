@@ -47,6 +47,9 @@ class ScheduleMakerTest extends TestBase {
       }
       val newSchedule: Schedule = ScheduleMaker.fromOldSchedule(oldSchedule, problem, true)
       newSchedule.getTotalScore() should be(Score.Zero)
+      val checkupResult = newSchedule.slowCheckup
+      println(checkupResult.mkString("Errors:\n", "\n", "\n"))
+      checkupResult.size should be(0)
       println(newSchedule.toPrettyString)
     }
   }
