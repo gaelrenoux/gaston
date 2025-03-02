@@ -38,7 +38,8 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
       var sid: SlotId = problem.slotsCount.random
       var blockedSlots = 0
 
-      while (blockedSlots < problem.slotsCount && roundsLeft > 0) { // iterate over slots
+      /* Iterate over slots */
+      while (blockedSlots < problem.slotsCount && roundsLeft > 0) {
         val randPersons = slotsToRandMobilePersons(sid)
         val randTopics = slotsToRandTopics(sid)
         val assignment = schedule.slotsToAssignment(sid)
@@ -48,10 +49,13 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         var personIx = 0
         var blockedPersons = 0
 
-        while (blockedPersons < randPersons.length && subRoundsLeft > 0) { // iterate over persons
+        /* Iterate over persons to change */
+        while (blockedPersons < randPersons.length && subRoundsLeft > 0) {
           val pid = randPersons(personIx)
           var targetTopicIx = 0
           var foundGoodChange = false
+
+          /* Iterate over target topics for a move */
           while (!foundGoodChange && targetTopicIx < randTopics.length) {
             val targetTid = randTopics(targetTopicIx)
             foundGoodChange = goodChangeForPersonTopic(schedule, assignment, pid, targetTid)
@@ -86,47 +90,49 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
 
 
-  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, targetTid: TopicId): Boolean = {
-    val currentTid = assignment.personsToTopic(pid)
-    if (currentTid == targetTid) false
+  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, targetTid: TopicId): Boolean =
+    if (problem.isPersonForbidden(pid, targetTid)) false // Person is forbidden on the target topic, don't bother
     else {
-      var found = false
-      val currentScore = schedule.getTotalScore()
+      val currentTid = assignment.personsToTopic(pid)
+      if (currentTid == targetTid) false
+      else {
+        var found = false
+        val currentScore = schedule.getTotalScore()
 
-      /* First, let's see if we can just move the person onto the target topic */
-      if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
-        /* We can just move that person on the target topic */
-        assignment.move(pid, currentTid, targetTid)
-        val newScore = schedule.getTotalScore()
-        if (newScore <= currentScore) {
-          val _ = assignment.undoMove(pid, currentTid, targetTid)
-        } else {
-          // found a good one
-          found = true
-        }
-      }
-
-      /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one */
-      if (!found) {
-        val targetTopicPersons = assignment.topicsToPersons(targetTid)
-        targetTopicPersons.foreachWhile { otherPid =>
-          if (!problem.isPersonMandatory(otherPid, targetTid)) {
-            assignment.swap(pid, currentTid, otherPid, targetTid)
-            val newScore = schedule.getTotalScore()
-            if (newScore <= currentScore) {
-              val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
-            } else {
-              // found a good one
-              found = true
-            }
+        /* First, let's see if we can just move the person onto the target topic */
+        if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+          /* We can just move that person on the target topic */
+          assignment.move(pid, currentTid, targetTid)
+          val newScore = schedule.getTotalScore()
+          if (newScore <= currentScore) {
+            val _ = assignment.undoMove(pid, currentTid, targetTid)
+          } else {
+            // found a good one
+            found = true
           }
-          !found
         }
-      }
 
-      found
+        /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one */
+        if (!found) {
+          val targetTopicPersons = assignment.topicsToPersons(targetTid)
+          targetTopicPersons.foreachWhile { otherPid =>
+            if (!problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+              assignment.swap(pid, currentTid, otherPid, targetTid)
+              val newScore = schedule.getTotalScore()
+              if (newScore <= currentScore) {
+                val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
+              } else {
+                // found a good one
+                found = true
+              }
+            }
+            !found
+          }
+        }
+
+        found
+      }
     }
-  }
 
   // TODO From previous version:
   // - We might be examining swaps twice, once from each side. Can we exclude that?
