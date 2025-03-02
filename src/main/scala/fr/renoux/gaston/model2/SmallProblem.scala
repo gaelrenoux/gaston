@@ -15,6 +15,8 @@ final class SmallProblem(
     val topicsCount: Count[TopicId],
     val topicsName: IdMap[TopicId, String], // Includes unassigned topics
     val topicsMandatories: IdMap[TopicId, SmallIdSet[PersonId]],
+    val topicsForbiddens: IdMap[TopicId, SmallIdSet[PersonId]],
+
     val topicsMin: IdMap[TopicId, Count[PersonId]],
     val topicsMax: IdMap[TopicId, Count[PersonId]],
     val topicsAllowedSlots: IdMap[TopicId, SmallIdSet[SlotId]],
@@ -71,6 +73,7 @@ final class SmallProblem(
     topicsCount = topicsCount,
     topicsName = topicsName.copy(),
     topicsMandatories = topicsMandatories.copy(),
+    topicsForbiddens = topicsForbiddens.copy(),
     topicsMin = topicsMin.copy(),
     topicsMax = topicsMax.copy(),
     topicsAllowedSlots = topicsAllowedSlots.copy(),
@@ -90,6 +93,8 @@ final class SmallProblem(
   )
 
   inline def isPersonMandatory(pid: PersonId, tid: TopicId) = topicsMandatories(tid).contains(pid)
+
+  inline def isPersonForbidden(pid: PersonId, tid: TopicId) = topicsForbiddens(tid).contains(pid)
 
   extension (pid: PersonId) {
     def personName: String = personsName(pid)
