@@ -77,17 +77,16 @@ class AssignmentImproverTest extends TestBase {
       //println(s"Score: $newScore")
     }
 
-    "Multiple runs should produce about the same result (usually)" in {
+    "Multiple runs should produce the same result" in {
       given Random = new Random(0)
-      val schedule1 = scheduleBase()
-      improver.improve(schedule1)
-      val schedule2 = scheduleBase()
-      improver.improve(schedule2)
-      val score1 = schedule1.getTotalScore()
-      val score2 = schedule2.getTotalScore()
-      score1 should be(score2)
-      //println(schedule1.toPrettyString)
-      //println(schedule2.toPrettyString)
+
+      val allResults = (0 until 10000).map { _ =>
+        val schedule = scheduleBase()
+        improver.improve(schedule)
+        schedule.getTotalScore()
+      }.toSet
+
+      allResults should be(Set(2.978515625))
     }
 
   }
