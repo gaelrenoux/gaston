@@ -134,6 +134,17 @@ class IdMapTest extends TestBase {
     map.transpose should be(expected)
   }
 
+  "fillFrom" in {
+    val map = IdMap.from[SlotId, TopicId](
+      Seq.tabulate(64) { id => id -> id % 4 }
+    )
+    val map2 = IdMap.from[SlotId, TopicId](
+      Seq.tabulate(64) { id => id -> id % 2 }
+    )
+    map.fillFrom(map2)
+    map.valuesSeq should be(map2.valuesSeq)
+  }
+
   "copy" in {
     val map = IdMap.from(testMapAll)
     val map2 = map.copy()
