@@ -127,7 +127,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
               }
             }
             !found
-          }
+          } // end foreachWhile
         }
 
         found
