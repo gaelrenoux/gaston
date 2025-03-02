@@ -51,13 +51,13 @@ class Schedule(
   /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
   private val personsScoresSorted: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
-  private var previousTotalScore: Score = Score.Missing
-  private var previousPersonScore1: Score = Score.Missing
-  private var previousPersonScore2: Score = Score.Missing
-  private var previousPersonNonSlotScore1: Score = Score.Missing
-  private var previousPersonNonSlotScore2: Score = Score.Missing
+  /* Allow to save score to restore them during an undo */
+  private var savedTotalScore: Score = Score.Missing
+  private val savedPersonsNonSlotScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val savedPersonsScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private var savedPersonsScore: Score = Score.Missing
+  private var savedTopicsPureScore: Score = Score.Missing
 
-  private val previousPersonScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
   def getTotalScore(): Score = {
     totalScore
@@ -73,42 +73,20 @@ class Schedule(
     personsScores(pid)
   }
 
-  def saveScoreFor(pid: PersonId): Unit = {
-    previousTotalScore = totalScore
-    previousPersonScore1 = personsScores(pid)
-    previousPersonNonSlotScore1 = personsNonSlotScores(pid)
+  def saveScores(): Unit = {
+    savedTotalScore = totalScore
+    savedPersonsNonSlotScores.fillFrom(personsNonSlotScores)
+    savedPersonsScores.fillFrom(personsScores)
+    savedPersonsScore = personsScore
+    savedTopicsPureScore = topicsPureScore
   }
 
-  def restoreSavedScoreFor(pid: PersonId): Unit = {
-    totalScore = previousTotalScore
-    personsScores(pid) = previousPersonScore1
-    personsNonSlotScores(pid) = previousPersonNonSlotScore1
-    previousTotalScore = Score.Missing
-    previousPersonScore1 = Score.Missing
-    previousPersonScore2 = Score.Missing
-    previousPersonNonSlotScore1 = Score.Missing
-    previousPersonNonSlotScore2 = Score.Missing
-  }
-
-  def saveScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
-    previousTotalScore = totalScore
-    previousPersonScore1 = personsScores(pid1)
-    previousPersonScore2 = personsScores(pid2)
-    previousPersonNonSlotScore1 = personsNonSlotScores(pid1)
-    previousPersonNonSlotScore2 = personsNonSlotScores(pid2)
-  }
-
-  def restoreSavedScoreFor(pid1: PersonId, pid2: PersonId): Unit = {
-    totalScore = previousTotalScore
-    personsScores(pid1) = previousPersonScore1
-    personsScores(pid2) = previousPersonScore2
-    personsNonSlotScores(pid1) = previousPersonNonSlotScore1
-    personsNonSlotScores(pid2) = previousPersonNonSlotScore2
-    previousTotalScore = Score.Missing
-    previousPersonScore1 = Score.Missing
-    previousPersonScore2 = Score.Missing
-    previousPersonNonSlotScore1 = Score.Missing
-    previousPersonNonSlotScore2 = Score.Missing
+  def restoreSavedScores(): Unit = {
+    totalScore = savedTotalScore
+    personsNonSlotScores.fillFrom(savedPersonsNonSlotScores)
+    personsScores.fillFrom(savedPersonsScores)
+    personsScore = savedPersonsScore
+    topicsPureScore = savedTopicsPureScore
   }
 
   // TODO I'm not a fan of the reversed logic between recalculateAll and recalculateScoreFor. In the first case, the

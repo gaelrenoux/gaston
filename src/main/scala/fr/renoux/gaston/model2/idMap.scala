@@ -72,6 +72,13 @@ object IdMap {
       a
     }
 
+    /** Replaces the content of this map with the content of the argument map, which is expected to be at least as big. */
+    inline def fillFrom(m2: IdMap[I, A]) = {
+      m2.fastForeachWithIndex { (a, i) =>
+        m(i) = a
+      }
+    }
+
     inline def valuesSeq: Seq[A] = Seq(m *)
 
     inline def toSeq: Seq[(I, A)] = m.zipWithIndex.map(_.swap).toSeq
