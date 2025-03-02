@@ -73,6 +73,16 @@ class Schedule(
     personsScores(pid)
   }
 
+  @testOnly
+  def getTopicPersonNames(topic: TopicId): Set[String] = {
+    val slot = topicsToSlot(topic)
+    if (slot == SlotId.None) Set.empty
+    else {
+      val sa = slotsToAssignment(slot)
+      sa.topicsToPersons(topic).toSet.map(problem.personsName.apply).toSet
+    }
+  }
+
   def saveScores(): Unit = {
     savedTotalScore = totalScore
     savedPersonsNonSlotScores.fillFrom(personsNonSlotScores)
@@ -191,6 +201,11 @@ class Schedule(
       }
     }
     linkedScore
+  }
+
+  /** Verifies if the schedule is consistent. Very useful in tests. Poor performance. */
+  def slowCheckup: List[String] = {
+    slotsToAssignment.valuesSeq.view.flatMap { sa => sa.slowCheckup.map(s"Slot ${sa.slot} (${problem.slotsNames(sa.slot)}): " + _) }.toList
   }
 
 
