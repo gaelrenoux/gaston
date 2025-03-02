@@ -197,6 +197,8 @@ object SmallIdSet {
     }
     result
   }
+  
+  def unsafeFrom[I <: Id](set: Long): SmallIdSet[I] = set
 
   /** Mostly used when debugging */
   @testOnly

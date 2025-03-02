@@ -39,6 +39,7 @@ final class SmallProblem(
 ) {
   given CountAll[SlotId] = CountAll(slotsCount)
   given CountAll[TopicId] = CountAll(topicsCount)
+
   given CountAll[PersonId] = CountAll(personsCount)
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
@@ -46,7 +47,7 @@ final class SmallProblem(
     val personsToTopicMap = topicsMandatories.toSeq.flatMap { (tid, pids) =>
       pids.toSet.toSeq.map(_ -> tid)
     }.groupToMap
-    IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_*)))
+    IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_ *)))
   }
 
   val personsWithPersonWish: SmallIdSet[PersonId] = SmallIdSet(
@@ -92,9 +93,15 @@ final class SmallProblem(
     prefsTopicsLinked = prefsTopicsLinked.fastCopy()
   )
 
-  inline def isPersonMandatory(pid: PersonId, tid: TopicId) = topicsMandatories(tid).contains(pid)
+  /** Returns true if this is an "unassigned" topic. */
+  inline def isTopicUnassigned(tid: TopicId): Boolean = tid.value < unassignedTopicsCount.value
 
-  inline def isPersonForbidden(pid: PersonId, tid: TopicId) = topicsForbiddens(tid).contains(pid)
+  inline def isPersonMandatory(pid: PersonId, tid: TopicId): Boolean = topicsMandatories(tid).contains(pid)
+
+  inline def isPersonForbidden(pid: PersonId, tid: TopicId): Boolean = topicsForbiddens(tid).contains(pid)
+
+  @testOnly
+  def getTopicIdByName(name: String): TopicId = topicsName.valuesSeq.indexOf(name)
 
   extension (pid: PersonId) {
     def personName: String = personsName(pid)
