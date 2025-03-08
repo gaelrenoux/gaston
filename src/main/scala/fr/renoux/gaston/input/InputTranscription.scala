@@ -79,7 +79,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
   lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] =
     if (!input.settings.unassigned.allowed) Map.empty[(NonEmptyString, Slot), Topic] else {
       log.info("Unassigned persons are allowed")
-      input.slotsSet.map { inSlot =>
+      input.slots.flatten.map { inSlot =>
         val slot = slotsByName(inSlot.name)
         val name = Topic.unassignedName(inSlot.name).refineUnsafe[Not[Empty]]
         val topic = Topic.unassigned(topicIx.getAndIncrement(), slot, min = settings.unassigned.minPersons, max = settings.unassigned.maxPersons)
