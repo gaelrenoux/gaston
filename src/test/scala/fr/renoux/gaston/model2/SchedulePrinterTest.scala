@@ -10,6 +10,7 @@ class SchedulePrinterTest extends TestBase {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
 
     given problem: SmallProblem = InputTranscription2(input).result.toEither.force
+
     given SchedulePrinter = new SchedulePrinter(problem)
 
     val Seq(d1, d2) = problem.slotsCount.range
@@ -18,19 +19,19 @@ class SchedulePrinterTest extends TestBase {
     val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
 
     val schedule = mkSchedule(problem) {
-      d1 slot {
+      d1.slot {
         unassigned1.topicEmpty
-        alpha topic(a, d, e) // Alpha, ADE
-        epsilon1 topic(b, c, f) // Epsilon #1, BCF
-        gamma topic(g, h, i) // Gamma, GHI
-        eta1 topic(j, k, l) // Eta ~1, JKL
+        alpha.topic(a, d, e) // Alpha, ADE
+        epsilon1.topic(b, c, f) // Epsilon #1, BCF
+        gamma.topic(g, h, i) // Gamma, GHI
+        eta1.topic(j, k, l) // Eta ~1, JKL
       }
-      d2 slot {
+      d2.slot {
         unassigned2.topicEmpty
-        beta topic(b, c, f) // Beta, BCF
-        epsilon2 topic(a, d, e) // Epsilon #2, ADE,
-        delta topic(g, h, i) // Delta, GHI
-        eta2 topic(j, k, l) // Eta ~2, JKL
+        beta.topic(b, c, f) // Beta, BCF
+        epsilon2.topic(a, d, e) // Epsilon #2, ADE,
+        delta.topic(g, h, i) // Delta, GHI
+        eta2.topic(j, k, l) // Eta ~2, JKL
       }
     }
 
