@@ -86,6 +86,17 @@ object IdMap {
     inline def unsafeContent: Array[A] = m
 
     inline def size: Count[I] = m.length
+
+    /** Given the two ID types are the same, the size of both maps are presumed to be equal. */
+    inline def actualEquals(that: IdMap[I, A]) = {
+      var i = 0
+      var result = true
+      while (i < m.length && result) {
+        result = m(i) == that(i)
+        i += 1
+      }
+      result
+    }
   }
 
   extension [I <: Id](m: IdMap[I, Score]) {

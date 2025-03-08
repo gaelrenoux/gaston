@@ -124,7 +124,12 @@ object ScheduleMaker {
       }
     }
 
-    //TODO: Add verifications that the schedule is sane
+
+    val checkupResult = schedule.slowCheckup
+    if (checkupResult.nonEmpty) {
+      throw new IllegalArgumentException(checkupResult.mkString("Errors:\n", "\n", "\n"))
+    }
+    
     schedule.recalculateAll()
     schedule
   }

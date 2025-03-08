@@ -50,6 +50,33 @@ class ScheduleTest extends TestBase {
       val tp = schedule.topicsPresent.toSet
       tp should be(Set(0, 1, 3))
     }
+
+    "equals" in {
+      (schedule == schedule) should be(true)
+      val expected = mkSchedule(baseProblem) {
+        0 slot {
+          0 topic(0, 1, 2)
+          1 topic (3)
+        }
+        1 slot {
+          3 topic(0, 1, 2, 3)
+        }
+      }
+      (schedule == expected) should be(true)
+      (expected == schedule) should be(true)
+
+      val notExpected = mkSchedule(baseProblem) {
+        0 slot {
+          0 topic(0, 1, 3)
+          1 topic (2)
+        }
+        1 slot {
+          3 topic(0, 1, 2, 3)
+        }
+      }
+      (schedule == notExpected) should be(false)
+      (notExpected == schedule) should be(false)
+    }
   }
 
   "Scoring" - {
