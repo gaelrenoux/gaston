@@ -1,5 +1,9 @@
 package fr.renoux.gaston.model2
 
+import fr.renoux.gaston.util.testOnly
+
+/** Creates an extremely simple problem, with dummy names, given a count of the various required entities. Used in tests. */
+@testOnly
 object SmallProblemMaker {
 
 
