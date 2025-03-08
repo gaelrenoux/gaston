@@ -154,5 +154,26 @@ class IdMapTest extends TestBase {
     map2(42) should be("")
     map(42) should be("2a")
   }
+  
+  "actualEquals" in {
+    val map = IdMap.from(testMapAll)
+    map.actualEquals(map) should be (true)
+    
+    val mapBis = IdMap.from(testMapAll)
+    (map == mapBis) should be(false) // default Array equality
+    map.actualEquals(mapBis) should be (true)
+    mapBis.actualEquals(map) should be (true)
+
+    val map2 = IdMap.from(testMapOk)
+    map2.actualEquals(map2) should be (true)
+
+    val map2Bis = IdMap.from(testMapOk)
+    (map2 == map2Bis) should be(false) // default Array equality
+    map2.actualEquals(map2Bis) should be (true)
+    map2Bis.actualEquals(map2) should be (true)
+
+    map.actualEquals(map2) should be (false)
+    map2.actualEquals(map) should be (false)
+  }
 
 }
