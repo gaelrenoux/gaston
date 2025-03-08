@@ -1,13 +1,12 @@
 package fr.renoux.gaston.engine2
 
-import fr.renoux.gaston.input.InputModel
-import fr.renoux.gaston.input.InputLoader
-import fr.renoux.gaston.input.InputTranscription2
 import fr.renoux.gaston.TestBase
 import fr.renoux.gaston.TestUtils.force
-import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
+import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2}
 import fr.renoux.gaston.model2.*
+import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
 import fr.renoux.gaston.util.Context
+
 import scala.util.Random
 
 
@@ -26,19 +25,19 @@ class AssignmentImproverTest extends TestBase {
     val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
 
     def scheduleBase() = mkSchedule(problem) {
-      d1 slot {
+      d1.slot {
         unassigned0.topicEmpty
-        alpha topic (a, d, e) // Alpha, ADE
-        epsilon1 topic (b, c, f) // Epsilon #1, BCF
-        gamma topic (g, h, i) // Gamma, GHI
-        eta1 topic (j, k, l) // Eta ~1, JKL
+        alpha.topic(a, d, e) // Alpha, ADE
+        epsilon1.topic(b, c, f) // Epsilon #1, BCF
+        gamma.topic(g, h, i) // Gamma, GHI
+        eta1.topic(j, k, l) // Eta ~1, JKL
       }
-      d2 slot {
+      d2.slot {
         unassigned1.topicEmpty
-        beta topic (b, c, f) // Beta, BCF
-        epsilon2 topic (a, d, e) // Epsilon #2, ADE,
-        delta topic (g, h, i) // Delta, GHI
-        eta2 topic (j, k, l) // Eta ~2, JKL
+        beta.topic(b, c, f) // Beta, BCF
+        epsilon2.topic(a, d, e) // Epsilon #2, ADE,
+        delta.topic(g, h, i) // Delta, GHI
+        eta2.topic(j, k, l) // Eta ~2, JKL
       }
     }
 
