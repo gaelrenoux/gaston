@@ -11,7 +11,7 @@ import ScheduleMaker.mkSchedule
 class ScheduleTest extends TestBase {
   // TODO test move/swap individually
 
-  "Basics " - { // TODO fix that, we need a way to create a simple problem
+  "Basics " - {
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
     given countTopics: CountAll[TopicId] = CountAll[TopicId](4)
 
