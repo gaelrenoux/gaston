@@ -13,6 +13,7 @@ class SlotAssignmentTest extends TestBase {
 
   "Basics " - {
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
+
     given countTopics: CountAll[TopicId] = CountAll[TopicId](4)
 
     given countPersons: CountAll[PersonId] = CountAll[PersonId](4)
@@ -22,36 +23,36 @@ class SlotAssignmentTest extends TestBase {
     import ScheduleMaker.mkSchedule
 
     val schedule = mkSchedule(baseProblem) {
-      0 slot {
-        0 topic(0, 1, 2)
-        1 topic (3)
+      0.slot {
+        0.topic(0, 1, 2)
+        1.topic(3)
       }
-      1 slot {
-        3 topic(0, 1, 2, 3)
+      1.slot {
+        3.topic(0, 1, 2, 3)
       }
     }
 
     "equals" in {
       (schedule.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(true)
       val expected = mkSchedule(baseProblem) {
-        0 slot {
-          0 topic(0, 1, 2)
-          1 topic (3)
+        0.slot {
+          0.topic(0, 1, 2)
+          1.topic(3)
         }
-        1 slot {
-          3 topic(0, 1, 2, 3)
+        1.slot {
+          3.topic(0, 1, 2, 3)
         }
       }
       (schedule.slotsToAssignment(0) == expected.slotsToAssignment(0)) should be(true)
       (expected.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(true)
 
       val notExpected = mkSchedule(baseProblem) {
-        0 slot {
-          0 topic(0, 1, 3)
-          1 topic (2)
+        0.slot {
+          0.topic(0, 1, 3)
+          1.topic (2)
         }
-        1 slot {
-          3 topic(0, 1, 2, 3)
+        1.slot {
+          3.topic(0, 1, 2, 3)
         }
       }
       (schedule.slotsToAssignment(0) == notExpected.slotsToAssignment(0)) should be(false)

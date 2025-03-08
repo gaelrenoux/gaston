@@ -30,18 +30,18 @@ class ScheduleMakerTest extends TestBase {
       import problem.given
       val schedule = ScheduleMaker.mkSchedule(problem) {
         day1 slot {
-          unassigned1 topic (eric)
-          alpha topic(albert, daniela)
-          epsilon1 topic(bianca, charly, fiona)
-          gamma topic(galahad, hypatia, ignace)
-          eta1 topic(joan, kevin, laura)
+          unassigned1.topic (eric)
+          alpha.topic(albert, daniela)
+          epsilon1.topic(bianca, charly, fiona)
+          gamma.topic(galahad, hypatia, ignace)
+          eta1.topic(joan, kevin, laura)
         }
         day2 slot {
-          unassigned2 topic (fiona)
-          beta topic(bianca, charly)
-          epsilon2 topic(albert, daniela, eric)
-          delta topic(galahad, hypatia, ignace)
-          eta2 topic(joan, kevin, laura)
+          unassigned2.topic (fiona)
+          beta.topic(bianca, charly)
+          epsilon2.topic(albert, daniela, eric)
+          delta.topic(galahad, hypatia, ignace)
+          eta2.topic(joan, kevin, laura)
         }
       }
 
@@ -139,19 +139,19 @@ class ScheduleMakerTest extends TestBase {
 
       val expectedSchedule = {
         ScheduleMaker.mkSchedule(problem) {
-          day1 slot {
+          day1.slot {
             unassigned1.topicEmpty
-            alpha topic(albert, daniela, eric)
-            epsilon1 topic(bianca, charly, fiona)
-            gamma topic(galahad, hypatia, ignace)
-            eta1 topic(joan, kevin, laura)
+            alpha.topic(albert, daniela, eric)
+            epsilon1.topic(bianca, charly, fiona)
+            gamma.topic(galahad, hypatia, ignace)
+            eta1.topic(joan, kevin, laura)
           }
           day2 slot {
             unassigned2.topicEmpty
-            beta topic(bianca, charly, fiona)
-            epsilon2 topic(albert, daniela, eric)
-            delta topic(galahad, hypatia, ignace)
-            eta2 topic(joan, kevin, laura)
+            beta.topic(bianca, charly, fiona)
+            epsilon2.topic(albert, daniela, eric)
+            delta.topic(galahad, hypatia, ignace)
+            eta2.topic(joan, kevin, laura)
           }
         }
       }

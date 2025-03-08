@@ -1,12 +1,10 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.TestBase
-import fr.renoux.gaston.input.InputModel
-import fr.renoux.gaston.input.InputLoader
-import fr.renoux.gaston.input.InputTranscription2
-import fr.renoux.gaston.TestUtils.*
 import com.softwaremill.quicklens.*
-import ScheduleMaker.mkSchedule
+import fr.renoux.gaston.TestBase
+import fr.renoux.gaston.TestUtils.*
+import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2}
+import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
 
 class ScheduleTest extends TestBase {
   // TODO test move/swap individually
@@ -22,12 +20,12 @@ class ScheduleTest extends TestBase {
     import ScheduleMaker.mkSchedule
 
     val schedule = mkSchedule(baseProblem) {
-      0 slot {
-        0 topic(0, 1, 2)
-        1 topic (3)
+      0.slot {
+        0.topic(0, 1, 2)
+        1.topic(3)
       }
-      1 slot {
-        3 topic(0, 1, 2, 3)
+      1.slot {
+        3.topic(0, 1, 2, 3)
       }
     }
 
@@ -54,24 +52,24 @@ class ScheduleTest extends TestBase {
     "equals" in {
       (schedule == schedule) should be(true)
       val expected = mkSchedule(baseProblem) {
-        0 slot {
-          0 topic(0, 1, 2)
-          1 topic (3)
+        0.slot {
+          0.topic(0, 1, 2)
+          1.topic(3)
         }
-        1 slot {
-          3 topic(0, 1, 2, 3)
+        1.slot {
+          3.topic(0, 1, 2, 3)
         }
       }
       (schedule == expected) should be(true)
       (expected == schedule) should be(true)
 
       val notExpected = mkSchedule(baseProblem) {
-        0 slot {
-          0 topic(0, 1, 3)
-          1 topic (2)
+        0.slot {
+          0.topic(0, 1, 3)
+          1.topic(2)
         }
-        1 slot {
-          3 topic(0, 1, 2, 3)
+        1. slot {
+          3.topic(0, 1, 2, 3)
         }
       }
       (schedule == notExpected) should be(false)
@@ -83,7 +81,7 @@ class ScheduleTest extends TestBase {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
 
     given problem: SmallProblem = InputTranscription2(input).result.toEither.force
-    import problem.given
+
     given SchedulePrinter = new SchedulePrinter(problem)
 
     val Seq(d1, d2) = problem.slotsCount.range
@@ -92,19 +90,19 @@ class ScheduleTest extends TestBase {
     val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
 
     def scheduleBase(myProblem: SmallProblem = problem) = mkSchedule(myProblem) {
-      d1 slot {
+      d1.slot {
         unassigned0.topicEmpty
-        alpha topic(a, d, e) // Alpha, ADE
-        epsilon1 topic(b, c, f) // Epsilon #1, BCF
-        gamma topic(g, h, i) // Gamma, GHI
-        eta1 topic(j, k, l) // Eta ~1, JKL
+        alpha.topic(a, d, e) // Alpha, ADE
+        epsilon1.topic(b, c, f) // Epsilon #1, BCF
+        gamma.topic(g, h, i) // Gamma, GHI
+        eta1.topic(j, k, l) // Eta ~1, JKL
       }
-      d2 slot {
+      d2.slot {
         unassigned1.topicEmpty
-        beta topic(b, c, f) // Beta, BCF
-        epsilon2 topic(a, d, e) // Epsilon #2, ADE,
-        delta topic(g, h, i) // Delta, GHI
-        eta2 topic(j, k, l) // Eta ~2, JKL
+        beta.topic(b, c, f) // Beta, BCF
+        epsilon2.topic(a, d, e) // Epsilon #2, ADE,
+        delta.topic(g, h, i) // Delta, GHI
+        eta2.topic(j, k, l) // Eta ~2, JKL
       }
     }
 
