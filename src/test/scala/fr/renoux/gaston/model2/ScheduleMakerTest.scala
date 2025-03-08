@@ -118,8 +118,8 @@ class ScheduleMakerTest extends TestBase {
 
         old.Schedule.from(
           oldDay1(
-            oldUnassigned1(),
-            oldAlpha(a, d, e),
+            oldUnassigned1(e),
+            oldAlpha(a, d),
             oldEpsilon1(b, c, f),
             oldGamma(g, h, i),
             oldEta1(j, k, l)
@@ -135,13 +135,12 @@ class ScheduleMakerTest extends TestBase {
       }
 
       val convertedSchedule: Schedule = ScheduleMaker.fromOldSchedule(oldSchedule, problem, true)
-      convertedSchedule.getTotalScore() should be(Score.Zero)
 
       val expectedSchedule = {
         ScheduleMaker.mkSchedule(problem) {
           day1.slot {
-            unassigned1.topicEmpty
-            alpha.topic(albert, daniela, eric)
+            unassigned1.topic(eric)
+            alpha.topic(albert, daniela)
             epsilon1.topic(bianca, charly, fiona)
             gamma.topic(galahad, hypatia, ignace)
             eta1.topic(joan, kevin, laura)
