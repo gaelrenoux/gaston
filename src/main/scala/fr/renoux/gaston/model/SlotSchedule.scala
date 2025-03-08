@@ -199,13 +199,35 @@ final case class SlotSchedule(
       problem.slotLevelConstraints.forall { c => c.isApplicableToUnfilledSchedule || c.isRespectedSlot(this) }
   }
 
-  lazy val errors: Seq[String] = if (isSolution) Nil else {
-    val recordsErrors = records.flatMap(_.errors).toSeq
+  /** Returns the errors on this slot-schedule. Slow, so avoid using it. */
+  lazy val slowErrors: Seq[String] =  {
+    val recordsErrors = records.flatMap(_.slowErrors).toSeq
+
     val maxTopicsError = if (slot.maxTopics < topics.size) Some(s"Too many topics in slot ${slot.name}") else None
+
     val constraintsError = problem.slotLevelConstraints.flatMap { c =>
       if (!c.isRespectedSlot(this)) Some(s"Constraint $c not respected in slot ${slot.name}") else None
     }.toSeq
-    recordsErrors ++ maxTopicsError ++ constraintsError
+
+    val personPresentsErrors = {
+      val personsActuallyPresent = records.flatMap(_.persons).toSet
+      if (personsActuallyPresent == slot.personsPresent) Nil else {
+        val missingPersons = slot.personsPresent -- personsActuallyPresent
+        val missingPersonsError = if (missingPersons.isEmpty) Nil else Seq(s"Missing persons in slot ${slot.name}: ${missingPersons.map(_.name).mkString(", ")}")
+        val unexpectedPersons = personsActuallyPresent -- slot.personsPresent
+        val unexpectedPersonsError = if (unexpectedPersons.isEmpty) Nil else Seq(s"Unexpected persons in slot ${slot.name}: ${unexpectedPersons.map(_.name).mkString(", ")}")
+        missingPersonsError ++ unexpectedPersonsError
+      }
+    }
+
+    val duplicatePersonsError = {
+      val duplicatePersons: Map[Person.Id, Iterable[Person]] = records.flatMap(_.persons.toSeq).groupBy(_.id).filter(_._2.size > 1)
+      if (duplicatePersons.isEmpty) None else Some {
+        s"Duplicate persons in slot ${slot.name}: ${duplicatePersons.map(_._2.head.name).mkString(", ")}"
+      }
+    }
+
+    recordsErrors ++ maxTopicsError ++ constraintsError ++ personPresentsErrors ++ duplicatePersonsError
   }
 
   /** Produces a clear, multiline version of this schedule slot, with a 2-space indentation. */

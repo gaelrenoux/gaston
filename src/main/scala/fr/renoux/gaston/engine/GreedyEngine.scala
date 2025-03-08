@@ -48,7 +48,7 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
         improved = assignmentImprover.improve(unimproved)
         if improved.score > state.schedule.score
         _ = if (!improved.isSolution) {
-          val message = s"A bad schedule was generated !\n${improved.toFormattedString}\n${improved.errors.mkString("\n")}\n\nLast move: $move"
+          val message = s"A bad schedule was generated !\n${improved.toFormattedString}\n${improved.slowErrors.mkString("\n")}\n\nLast move: $move"
           throw new IllegalStateException(message)
         }
       } yield GreedyEngine.State(improved, move, state.attemptsCount + index + 1)

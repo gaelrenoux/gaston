@@ -37,7 +37,7 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
       if (problem.hasUnassignedTopics) Schedule.startingUnassignedOrForced(chainSeed)
       else startingScheduleGenerator.create(chainSeed)
     if (!initialSchedule.isSolution) {
-      val message = s"A bad schedule was generated at startup !\n ${initialSchedule.toFormattedString}\n${initialSchedule.errors.mkString("\n")}"
+      val message = s"A bad schedule was generated at startup !\n ${initialSchedule.toFormattedString}\n${initialSchedule.slowErrors.mkString("\n")}"
       throw new IllegalStateException(message)
     } else if (initialSchedule.score.isNegativeInfinity) {
       val message = s"A bad schedule was generated at startup !\n ${initialSchedule.toFormattedString}\n(Score ${initialSchedule.score})"
@@ -55,7 +55,7 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
 
     (init.result #:: unfolding).map { case (schedule, attempts) =>
       if (schedule.isSolution) (schedule, attempts) else {
-        val message = s"A bad schedule was generated !\n ${schedule.toFormattedString}\n${schedule.errors.mkString("\n")}"
+        val message = s"A bad schedule was generated !\n ${schedule.toFormattedString}\n${schedule.slowErrors.mkString("\n")}"
         throw new IllegalStateException(message)
       }
     }

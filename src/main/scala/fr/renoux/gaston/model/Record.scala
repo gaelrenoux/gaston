@@ -78,13 +78,14 @@ final case class Record(slot: Slot, topic: Topic, persons: Set[Person])(using va
   lazy val isSolution: Boolean =
     isUnfilledSolution && topic.min <= countPersons
 
-  lazy val errors: Seq[String] = if (isSolution) Nil else {
-    val maxError = if (topic.max < countPersons) Some(s"Too many persons in ${slot.name}/${topic.name}") else None
-    val minError = if (topic.min > countPersons) Some(s"Not enough persons in ${slot.name}/${topic.name}") else None
-    val forbiddenError = if (topic.forbidden.exists(persons.contains)) Some(s"Forbidden person in ${slot.name}/${topic.name}") else None
-    val mandatoryError = if (!topic.mandatory.forall(persons.contains)) Some(s"Missing mandatory person in ${slot.name}/${topic.name}") else None
-    val slotError = if (!topic.slots.forall(_.contains(slot))) Some(s"Wrong slot in ${slot.name}/${topic.name}") else None
-    val personPresentError = if (!persons.forall(slot.personsPresent.contains)) Some(s"Absent person in ${slot.name}/${topic.name}") else None
+  /** Returns the errors on this record. Slow, so avoid using it. */
+  lazy val slowErrors: Seq[String] = if (isSolution) Nil else {
+    val maxError = if (topic.max < countPersons) Some(s"Too many persons in ${slot.name}/${topic.name}: $countPersons > ${topic.max}") else None
+    val minError = if (topic.min > countPersons) Some(s"Not enough persons in ${slot.name}/${topic.name}: $countPersons < ${topic.min}") else None
+    val forbiddenError = if (topic.forbidden.exists(persons.contains)) Some(s"Forbidden persons in ${slot.name}/${topic.name}: ${topic.forbidden.intersect(persons).map(_.name).mkString(", ")}") else None
+    val mandatoryError = if (!topic.mandatory.forall(persons.contains)) Some(s"Missing mandatory persons in ${slot.name}/${topic.name}: ${(topic.mandatory -- persons).mkString(", ")}") else None
+    val slotError = if (!topic.slots.forall(_.contains(slot))) Some(s"Wrong slot in ${slot.name}/${topic.name}: should be one of ${topic.slots.getOrElse(Set.empty).map(_.name).mkString(", ")}") else None
+    val personPresentError = if (!persons.forall(slot.personsPresent.contains)) Some(s"Absent persons in ${slot.name}/${topic.name}: ${(persons -- slot.personsPresent).map(_.name).mkString(", ")}") else None
     Nil ++ maxError ++ minError ++ forbiddenError ++ mandatoryError ++ slotError ++ personPresentError
   }
 

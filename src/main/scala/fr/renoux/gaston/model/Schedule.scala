@@ -223,8 +223,9 @@ final case class Schedule(
       problem.globalLevelConstraints.forall { c => c.isApplicableToUnfilledSchedule || c.isRespected(this) }
   }
 
-  lazy val errors: Seq[String] = if (isSolution) Nil else {
-    val slotErrors = slotSchedules.flatMap(_.errors).toSeq
+  /** Returns the errors on this schedule. Slow, so avoid using it. */
+  lazy val slowErrors: Seq[String] = {
+    val slotErrors = slotSchedules.flatMap(_.slowErrors).toSeq
     val missingForcedTopics = problem.forcedTopics.diff(scheduledTopics)
     val forcedTopicsError = if (missingForcedTopics.nonEmpty) Some(s"Missing forced topics ${missingForcedTopics.map(_.toLongString)}") else None
     val constraintsError = problem.globalLevelConstraints.flatMap { c =>
@@ -333,8 +334,13 @@ object Schedule {
   }
 
   /** Commodity method for tests */
-  @testOnly def from(entries: Seq[Record]*)(using problem: Problem, ctx: Context): Schedule =
-    new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
+  @testOnly def from(entries: Seq[Record]*)(using problem: Problem, ctx: Context): Schedule = {
+    val s = new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
       case (s, rs) => s -> SlotSchedule.from(s, rs *)
     })
+    if (s.slowErrors.nonEmpty) {
+      throw new IllegalArgumentException(s"Bad entries to generate schedule from:\n${s.slowErrors.mkString("\n")}")
+    }
+    s
+  }
 }
