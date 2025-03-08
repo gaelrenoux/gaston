@@ -334,13 +334,8 @@ object Schedule {
   }
 
   /** Commodity method for tests */
-  @testOnly def from(entries: Seq[Record]*)(using problem: Problem, ctx: Context): Schedule = {
-    val s = new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
+  @testOnly def from(entries: Seq[Record]*)(using problem: Problem, ctx: Context): Schedule =
+    new Schedule(0, entries.flatten.groupBy(_.slot).map[Slot, SlotSchedule] {
       case (s, rs) => s -> SlotSchedule.from(s, rs *)
     })
-    if (s.slowErrors.nonEmpty) {
-      throw new IllegalArgumentException(s"Bad entries to generate schedule from:\n${s.slowErrors.mkString("\n")}")
-    }
-    s
-  }
 }
