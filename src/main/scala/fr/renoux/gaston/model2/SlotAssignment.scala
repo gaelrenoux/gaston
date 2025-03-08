@@ -9,7 +9,7 @@ import fr.renoux.gaston.util.*
  * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
  * no rescoring is done, in which case this class' user must manually trigger a rescoring.
  */
-class SlotAssignment(
+final class SlotAssignment(
     val problem: SmallProblem,
     val slot: SlotId,
     val personsToTopic: IdMap[PersonId, TopicId], // Default value (for persons that arent't there) is TopicId.None
@@ -221,7 +221,13 @@ class SlotAssignment(
     }
   }
 
-
+  override def equals(obj: Any): Boolean = obj match {
+    case that: SlotAssignment =>
+      problem == that.problem &&
+        slot == that.slot &&
+        personsToTopic.actualEquals(that.personsToTopic)
+    case _ => false
+  }
 }
 
 object SlotAssignment {
