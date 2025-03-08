@@ -113,6 +113,8 @@ final class SmallProblem(
     def slotName: String = slotsNames(sid)
   }
 
+  override def toString: String = s"SmallProblem($slotsCount/$topicsCount/$personsCount)"
+
 }
 
 object SmallProblem {
