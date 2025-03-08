@@ -13,7 +13,7 @@ import java.util as jutil
  * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
  * no rescoring is done, in which case this class' user must manually trigger a rescoring.
  */
-class Schedule(
+final class Schedule(
     val problem: SmallProblem,
     val slotsToAssignment: IdMap[SlotId, SlotAssignment],
     val personsToTopics: IdMap[PersonId, SmallIdSet[TopicId]],
@@ -205,7 +205,17 @@ class Schedule(
 
   /** Verifies if the schedule is consistent. Very useful in tests. Poor performance. */
   def slowCheckup: List[String] = {
+    // TODO Add more controls
     slotsToAssignment.valuesSeq.view.flatMap { sa => sa.slowCheckup.map(s"Slot ${sa.slot} (${problem.slotsNames(sa.slot)}): " + _) }.toList
+  }
+
+  override def equals(obj: Any): Boolean = obj match {
+    case that: Schedule =>
+      problem == that.problem &&
+        slotsToAssignment.actualEquals(that.slotsToAssignment) &&
+        personsToTopics.actualEquals(that.personsToTopics) &&
+        topicsToSlot.actualEquals(that.topicsToSlot)
+    case _ => false
   }
 
 
