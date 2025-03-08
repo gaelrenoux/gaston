@@ -21,7 +21,7 @@ object ScheduleMaker {
     }
 
     extension (sid: SlotId) {
-      infix def slot(
+      def slot(
           init: (CountAll[TopicId], CountAll[PersonId], SlotDef) ?=> Unit
       )(using scheduleDef: ScheduleDef, cs: CountAll[SlotId], ct: CountAll[TopicId], cp: CountAll[PersonId]): Unit = {
         given slotDef: SlotDef = SlotDef(sid)
@@ -46,7 +46,7 @@ object ScheduleMaker {
     }
 
     extension (tid: TopicId) {
-      infix def topic(
+      def topic(
           pids: PersonId*
       )(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
         slotDef.add(TopicDef(tid, pids*))
@@ -129,7 +129,7 @@ object ScheduleMaker {
     if (checkupResult.nonEmpty) {
       throw new IllegalArgumentException(checkupResult.mkString("Errors:\n", "\n", "\n"))
     }
-    
+
     schedule.recalculateAll()
     schedule
   }
