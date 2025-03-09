@@ -1,7 +1,8 @@
 package fr.renoux.gaston.model2
 
-import scala.compiletime.uninitialized
 import fr.renoux.gaston.util.*
+
+import scala.compiletime.uninitialized
 
 
 /** Assignments for a single slot (who is on what topic).

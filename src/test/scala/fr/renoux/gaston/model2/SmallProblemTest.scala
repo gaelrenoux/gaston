@@ -1,10 +1,8 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
-import fr.renoux.gaston.input.InputModel
-import fr.renoux.gaston.input.InputLoader
-import fr.renoux.gaston.input.InputTranscription2
 import fr.renoux.gaston.TestUtils.force
+import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2}
 
 
 class SmallProblemTest extends TestBase {
