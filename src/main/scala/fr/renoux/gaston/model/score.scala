@@ -41,7 +41,7 @@ object Score {
     inline def isZero: Boolean = s == 0.0
   }
 
-  def apply(s: Double): Score = s
+  inline def apply(inline s: Double): Score = s
 
   private val TwoDecimalsFormat = new java.text.DecimalFormat("####.00")
 
