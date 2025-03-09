@@ -2,7 +2,6 @@ package fr.renoux.gaston.engine
 
 import cats.implicits.*
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.RandomScheduleGenerator.BacktrackingFailures
 import fr.renoux.gaston.engine.assignment.{AssignmentImprover, RandomAssigner}
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.*
@@ -14,7 +13,7 @@ import scala.util.Random
  * Uses backtracking to produce a valid schedule, making random choices to provide a planning. Given the planning,
  * assignment of persons is optimized.
  */
-final class RandomScheduleGenerator(triggerOnFailures: BacktrackingFailures => Unit)(using problem: Problem, ctx: Context) {
+final class RandomScheduleGenerator(triggerOnFailures: RandomScheduleGenerator.BacktrackingFailures => Unit)(using problem: Problem, ctx: Context) {
 
   private val log = Logger[RandomScheduleGenerator]
 

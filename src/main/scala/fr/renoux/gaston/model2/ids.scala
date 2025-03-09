@@ -1,9 +1,10 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
+
+import scala.annotation.targetName
 import scala.reflect.ClassTag
 import scala.util.Random
-import scala.annotation.targetName
 
 // TODO Needs tests for functions in here
 

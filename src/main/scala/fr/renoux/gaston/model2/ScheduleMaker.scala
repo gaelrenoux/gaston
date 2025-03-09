@@ -1,7 +1,8 @@
 package fr.renoux.gaston.model2
 
+import fr.renoux.gaston.model.Schedule as OldSchedule
+
 import scala.collection.mutable
-import fr.renoux.gaston.model.{Schedule as OldSchedule}
 
 
 /** Only used in tests to create a schedule in a clear way */
@@ -95,7 +96,6 @@ object ScheduleMaker {
   }
 
   def fromOldSchedule(oldSchedule: OldSchedule, problem: SmallProblem, addUnassigned: Boolean = true): Schedule = {
-    import problem.given
 
     val schedule = Schedule.empty(problem)
 

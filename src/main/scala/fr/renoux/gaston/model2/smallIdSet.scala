@@ -1,8 +1,9 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
-import scala.collection.mutable
+
 import scala.annotation.targetName
+import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.util.Random
 
