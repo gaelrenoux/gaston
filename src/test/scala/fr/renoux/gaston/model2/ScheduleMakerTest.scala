@@ -13,7 +13,6 @@ import fr.renoux.gaston.util.Context
 class ScheduleMakerTest extends TestBase {
   given Context = Context.Debug
 
-
   "on basic problem" - {
 
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
@@ -162,6 +161,4 @@ class ScheduleMakerTest extends TestBase {
       convertedSchedule should be(expectedSchedule)
     }
   }
-
-  // TODO More tests required
 }
