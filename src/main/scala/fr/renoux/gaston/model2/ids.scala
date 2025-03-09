@@ -135,11 +135,11 @@ object Count {
 
     // TODO inline this method
     /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
-    def find(f: I => Boolean): I = {
-      var i: I = 0
+    inline def find(inline f: I => Boolean): I = {
+      var i = 0
       var notFound = true
-      var result: I = Id.None
-      while (notFound && i < c) {
+      var result: I = Id.None.value
+      while (notFound && i < c.value) {
         if (f(i)) {
           result = i
           notFound = false
