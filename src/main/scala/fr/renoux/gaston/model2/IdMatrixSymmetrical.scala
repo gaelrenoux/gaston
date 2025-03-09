@@ -20,7 +20,7 @@ object IdMatrixSymmetrical {
     (count.value + 1) * count.value / 2
   }
 
-  private inline def flatIndex[I >: Int <: Id](inline i: (I | Int), j: I): Int = {
+  private inline def flatIndex[I <: Id](inline i: I, j: I): Int = {
     if (i.value >= j.value) i.value * (i.value + 1) / 2 + j.value
     else j.value * (j.value + 1) / 2 + i.value
   }
