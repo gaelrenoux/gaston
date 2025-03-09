@@ -3,11 +3,9 @@ package fr.renoux.gaston.itests
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.engine2.AssignmentImprover
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2, problemFromClassPath}
-import fr.renoux.gaston.{TestBase, model as oldModel}
 import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.util.Context
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
+import fr.renoux.gaston.{TestBase, model as oldModel}
 
 import scala.util.Random
 
