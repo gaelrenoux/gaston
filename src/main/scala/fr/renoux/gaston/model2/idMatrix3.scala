@@ -10,17 +10,21 @@ opaque type IdMatrix3[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A] =
   Array[A] // using a flattened matrix
 
 object IdMatrix3 {
+
+  private inline def flatIndex[J <: Id, K <: Id](inline i: Id, inline j: J, inline k: K)(using inline countJ: Count[J], inline countK: Count[K]) =
+    (countJ.value * i.value + j.value) * countK.value + k.value
+
   extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A])(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]) {
     inline def apply(i: I, j: J, k: K): A =
       at(i, j, k)
 
     inline def at(i: I, j: J, k: K): A = {
-      val index = countK.flatIndex(countJ.flatIndex(i, j), k)
+      val index = flatIndex(i, j, k)
       matrix(index)
     }
 
     inline def update(i: I, j: J, k: K, a: A) = {
-      val index = countK.flatIndex(countJ.flatIndex(i, j), k)
+      val index = flatIndex(i, j, k)
       matrix(index) = a
     }
 
