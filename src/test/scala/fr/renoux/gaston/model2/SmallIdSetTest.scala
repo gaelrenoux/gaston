@@ -1,8 +1,9 @@
 package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
-import scala.collection.mutable
 import fr.renoux.gaston.util.{Count as _, *}
+
+import scala.collection.mutable
 
 
 class SmallIdSetTest extends TestBase {

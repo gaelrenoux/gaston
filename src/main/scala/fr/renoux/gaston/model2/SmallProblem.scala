@@ -1,7 +1,7 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.util.{Count as _, *}
 import fr.renoux.gaston.util.CanGroupToMap.given
+import fr.renoux.gaston.util.{Count as _, *}
 
 
 /** Description on a problem small enough that we can use SmallIdSets (so max 64 elements of each category). */
