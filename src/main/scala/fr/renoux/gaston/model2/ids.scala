@@ -143,9 +143,6 @@ object Count {
       result
     }
 
-    /* TODO flatIndexes should be in the appropriate classes */
-    inline def flatIndex(inline h: (Id | Int), i: I) = h * c + i
-
     /** Returns an array containing all values from the count, in a random order (using the Fisher-Yates shuffle) */
     inline def shuffled(using ct: ClassTag[I], rand: Random) = {
       val result: Array[I] = Array.tabulate(c)(identity)
