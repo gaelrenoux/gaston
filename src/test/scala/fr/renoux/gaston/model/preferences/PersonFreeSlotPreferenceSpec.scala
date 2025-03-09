@@ -7,10 +7,10 @@ import org.scalatest.matchers.should.Matchers
 
 class PersonFreeSlotPreferenceSpec extends AnyFlatSpec with Matchers {
 
-  import fr.renoux.gaston.MinimalTestModel.Persons.{*, given}
-  import fr.renoux.gaston.MinimalTestModel.Problems.{*, given}
+  import fr.renoux.gaston.MinimalTestModel.Persons.*
+  import fr.renoux.gaston.MinimalTestModel.Problems.*
   import fr.renoux.gaston.MinimalTestModel.Slots.*
-  import fr.renoux.gaston.MinimalTestModel.Topics.{*, given}
+  import fr.renoux.gaston.MinimalTestModel.Topics.*
 
   given Problem = Minimal //.copy(slotSequences = Seq(Seq(Morning, Afternoon), Seq(Evening, Night)))
 
