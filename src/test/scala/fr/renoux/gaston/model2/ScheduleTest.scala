@@ -8,6 +8,7 @@ import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
 
 class ScheduleTest extends TestBase {
   // TODO test move/swap individually
+  // TODO missing tests on SlotAssignment stuff
 
   "Basics " - {
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
@@ -75,6 +76,34 @@ class ScheduleTest extends TestBase {
       (schedule == notExpected) should be(false)
       (notExpected == schedule) should be(false)
     }
+    
+    "SlotAssignment.equals" in {
+      (schedule.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(true)
+      val expected = mkSchedule(baseProblem) {
+        0.slot {
+          0.topic(0, 1, 2)
+          1.topic(3)
+        }
+        1.slot {
+          3.topic(0, 1, 2, 3)
+        }
+      }
+      (schedule.slotsToAssignment(0) == expected.slotsToAssignment(0)) should be(true)
+      (expected.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(true)
+
+      val notExpected = mkSchedule(baseProblem) {
+        0.slot {
+          0.topic(0, 1, 3)
+          1.topic (2)
+        }
+        1.slot {
+          3.topic(0, 1, 2, 3)
+        }
+      }
+      (schedule.slotsToAssignment(0) == notExpected.slotsToAssignment(0)) should be(false)
+      (notExpected.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(false)
+    }
+    
   }
 
   "Scoring" - {
