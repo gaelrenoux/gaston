@@ -1,14 +1,14 @@
 package fr.renoux.gaston.input
 
-import cats.data.NonEmptyList
-import cats.data.ValidatedNel
+import cats.data.{NonEmptyList, ValidatedNel}
 import cats.implicits.*
 import fr.renoux.gaston.model.{Score as _, Weight as _, *}
 import fr.renoux.gaston.model2.*
-import fr.renoux.gaston.util.{Count as _, *}
 import fr.renoux.gaston.util.CanGroupToMap.given
+import fr.renoux.gaston.util.{Count as _, *}
 import io.github.iltotore.iron.constraint.all.*
 import io.github.iltotore.iron.{Constraint as _, *}
+
 import scala.collection.mutable
 
 
@@ -63,7 +63,7 @@ final class InputTranscription2(rawInput: InputModel) {
   lazy val personsIdByName: Map[String, PersonId] = personsName.toReverseMap
 
 
-  
+
   /* Slots */
   private lazy val flattenedSlots = input.slots.flatten
   lazy val slotsNames: IdMap[SlotId, String] = IdMap.unsafeFrom[SlotId, String](flattenedSlots.map(_.name: String).toArray)

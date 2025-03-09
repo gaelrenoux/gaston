@@ -2,8 +2,6 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{fastFoldRight, fastForeach, fastLoop, testOnly}
 
-import java.util as jutil
-
 
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
 // TODO most fields should be private, if not all
@@ -66,11 +64,6 @@ final class Schedule(
   @testOnly
   def getPersonScores(): IdMap[PersonId, Score] = {
     personsScores
-  }
-
-  @testOnly
-  private def getPersonScore(pid: PersonId): Score = {
-    personsScores(pid)
   }
 
   @testOnly
