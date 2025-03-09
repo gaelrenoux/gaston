@@ -22,7 +22,6 @@ final class InputTranscription2(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription2.*
 
-  // val input: InputModel = rawInput.clean // TODO Restore cleaner here
   val input: InputModel = rawInput
   val settings: InputSettings = input.settings
 
@@ -54,7 +53,6 @@ final class InputTranscription2(rawInput: InputModel) {
       }
     }
   }
-  // TODO No scaling for the exclusive prefs on unassigned topics, should it be the case? It's added to the unassigned score which is already scaling, so maybe not.
 
 
 
@@ -63,7 +61,6 @@ final class InputTranscription2(rawInput: InputModel) {
   lazy val personsWeight: IdMap[PersonId, Weight] = IdMap.unsafeFrom[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
   lazy val personsBaseScore: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(p => p.baseScore.value / p.weight.value: Score).toArray)
   lazy val personsIdByName: Map[String, PersonId] = personsName.toReverseMap
-
 
 
   
