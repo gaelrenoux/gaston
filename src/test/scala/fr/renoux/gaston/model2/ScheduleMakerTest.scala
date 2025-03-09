@@ -1,13 +1,9 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.TestBase
-import fr.renoux.gaston.input.InputModel
-import fr.renoux.gaston.input.problemFromClassPath
-import fr.renoux.gaston.input.InputTranscription2
-import fr.renoux.gaston.{model as old}
-import fr.renoux.gaston.input.InputLoader
 import fr.renoux.gaston.TestUtils.*
+import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2, problemFromClassPath}
 import fr.renoux.gaston.util.Context
+import fr.renoux.gaston.{TestBase, model as old}
 
 
 class ScheduleMakerTest extends TestBase {

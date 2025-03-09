@@ -16,7 +16,6 @@ class AssignmentImproverTest extends TestBase {
   "Nominal case" - {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
     val problem = InputTranscription2(input).result.toEither.force
-    import problem.given
     given SchedulePrinter = new SchedulePrinter(problem)
 
     val Seq(d1, d2) = problem.slotsCount.range
