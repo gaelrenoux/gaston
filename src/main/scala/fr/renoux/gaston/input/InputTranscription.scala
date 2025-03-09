@@ -27,7 +27,6 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   private val log = Logger[InputTranscription]
 
-  // val input: InputModel = rawInput.clean // TODO Restore cleaner here
   val input: InputModel = rawInput
   val settings: InputSettings = input.settings
 
