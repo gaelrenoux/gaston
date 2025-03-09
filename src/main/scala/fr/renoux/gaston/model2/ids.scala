@@ -90,10 +90,16 @@ object Count {
     /* Implementation note: the next two methods seem weird, as the count value isn't used, but they make sense at call-site. */
 
     /** Iterate over all possible values up to the limit id (included) */
-    inline def foreachTo(limit: I)(inline f: I => Unit): Unit = fastLoop(0, limit + 1)(f)
+    inline def foreachTo(limit: I)(inline f: I => Unit): Unit = {
+      val actualLimit = if (c <= limit) c else limit + 1
+      fastLoop(0, actualLimit)(f)
+    }
 
     /** Iterate over all possible values up until the limit id (excluded) */
-    inline def foreachUntil(limit: I)(inline f: I => Unit): Unit = fastLoop(0, limit)(f)
+    inline def foreachUntil(limit: I)(inline f: I => Unit): Unit = {
+      val actualLimit = if (c < limit) c else limit
+      fastLoop(0, actualLimit)(f)
+    }
 
     /** Iterate over all possible values, and stops whenever the argument function returns false */
     inline def foreachWhile(inline f: I => Boolean): Unit = {
@@ -144,7 +150,7 @@ object Count {
     }
 
     /** Returns an array containing all values from the count, in a random order (using the Fisher-Yates shuffle) */
-    inline def shuffled(using ct: ClassTag[I], rand: Random) = {
+    inline def shuffled(using ct: ClassTag[I], rand: Random): Array[I] = {
       val result: Array[I] = Array.tabulate(c)(identity)
       result.shuffle
       result
@@ -161,7 +167,7 @@ object Count {
   }
 }
 
-/** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
+/** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
  * super-type of Int to avoid weird implicit deductions. This must be given directly.
  */
 opaque type CountAll[I <: Id] <: Count[I] = Int
