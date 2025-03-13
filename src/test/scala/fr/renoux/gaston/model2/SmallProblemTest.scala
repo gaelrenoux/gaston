@@ -27,7 +27,7 @@ class SmallProblemTest extends TestBase {
       bianca -> SmallIdSet(alpha),
       charly -> SmallIdSet(theta11, theta12, theta21, theta22, theta31, theta32),
     )
-    problem.personTopicsMandatory should be(expected)
+    problem.personsToMandatoryTopics should be(expected)
   }
 
   "personsWithPersonWish" in {

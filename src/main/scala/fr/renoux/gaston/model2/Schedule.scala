@@ -41,20 +41,20 @@ final class Schedule(
   /* ALL SCORING STUFF */
 
   private var totalScore: Score = Score.Missing
-  private val personsNonSlotScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private val personsScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private var personsScore: Score = Score.Missing
-  private var topicsPureScore: Score = Score.Missing
+  private val personsToNonSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val personsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private var personsTotalScore: Score = Score.Missing
+  private var topicsTotalScore: Score = Score.Missing
 
   /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
   private val personsScoresSorted: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
   /* Allow to save score to restore them during an undo */
   private var savedTotalScore: Score = Score.Missing
-  private val savedPersonsNonSlotScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private val savedPersonsScores: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private var savedPersonsScore: Score = Score.Missing
-  private var savedTopicsPureScore: Score = Score.Missing
+  private val savedPersonsToNonSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val savedPersonsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private var savedPersonsTotalScore: Score = Score.Missing
+  private var savedTopicsTotalScore: Score = Score.Missing
 
 
   def getTotalScore(): Score = {
@@ -62,8 +62,8 @@ final class Schedule(
   }
 
   @testOnly
-  def getPersonScores(): IdMap[PersonId, Score] = {
-    personsScores
+  def getPersonsToScore(): IdMap[PersonId, Score] = {
+    personsToScore
   }
 
   @testOnly
@@ -72,24 +72,24 @@ final class Schedule(
     if (slot == SlotId.None) Set.empty
     else {
       val sa = slotsToAssignment(slot)
-      sa.topicsToPersons(topic).toSet.map(problem.personsName.apply).toSet
+      sa.topicsToPersons(topic).toSet.map(problem.personsToName.apply).toSet
     }
   }
 
   def saveScores(): Unit = {
     savedTotalScore = totalScore
-    savedPersonsNonSlotScores.fillFrom(personsNonSlotScores)
-    savedPersonsScores.fillFrom(personsScores)
-    savedPersonsScore = personsScore
-    savedTopicsPureScore = topicsPureScore
+    savedPersonsToNonSlotScore.fillFrom(personsToNonSlotScore)
+    savedPersonsToScore.fillFrom(personsToScore)
+    savedPersonsTotalScore = personsTotalScore
+    savedTopicsTotalScore = topicsTotalScore
   }
 
   def restoreSavedScores(): Unit = {
     totalScore = savedTotalScore
-    personsNonSlotScores.fillFrom(savedPersonsNonSlotScores)
-    personsScores.fillFrom(savedPersonsScores)
-    personsScore = savedPersonsScore
-    topicsPureScore = savedTopicsPureScore
+    personsToNonSlotScore.fillFrom(savedPersonsToNonSlotScore)
+    personsToScore.fillFrom(savedPersonsToScore)
+    personsTotalScore = savedPersonsTotalScore
+    topicsTotalScore = savedTopicsTotalScore
   }
 
   // TODO I'm not a fan of the reversed logic between recalculateAll and recalculateScoreFor. In the first case, the
@@ -104,13 +104,13 @@ final class Schedule(
     }
     problem.personsCount.foreach { p =>
       _recalculatePersonScoreFor(p, includeNonSlot = true)
-      personsScoresSorted(p.value) = personsScores(p)
+      personsScoresSorted(p.value) = personsToScore(p)
     }
     Score.sort(personsScoresSorted)
-    personsScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
+    personsTotalScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
       (SmallProblem.RankFactor * acc: Score) + score
     }
-    totalScore = personsScore + topicsPureScore
+    totalScore = personsTotalScore + topicsTotalScore
   }
 
   /**
@@ -143,14 +143,14 @@ final class Schedule(
     //   ...
 
     problem.personsCount.foreach { p =>
-      personsScoresSorted(p.value) = personsScores(p)
+      personsScoresSorted(p.value) = personsToScore(p)
     }
     Score.sort(personsScoresSorted)
-    personsScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
+    personsTotalScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
       (SmallProblem.RankFactor * acc: Score) + score
     }
 
-    totalScore = personsScore + topicsPureScore
+    totalScore = personsTotalScore + topicsTotalScore
 
   }
 
@@ -167,22 +167,22 @@ final class Schedule(
     val nonSlotScore =
       if (includeNonSlot) {
         val topicIds = personsToTopics(person)
-        val baseScore = problem.personsBaseScore(person)
+        val baseScore = problem.personsToBaseScore(person)
         val exclusiveScore = problem.prefsTopicsExclusive(person).evaluate(topicIds)
         val linkedScore = getScoreLinked(topicIds)
         val s = baseScore + exclusiveScore + linkedScore
-        personsNonSlotScores(person) = s
+        personsToNonSlotScore(person) = s
         s
       } else {
-        personsNonSlotScores(person)
+        personsToNonSlotScore(person)
       }
 
-    personsScores(person) = nonSlotScore + slotsScore
+    personsToScore(person) = nonSlotScore + slotsScore
   }
 
   def recalculateTopicScore(): Unit = {
-    topicsPureScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
-    totalScore = personsScore + topicsPureScore
+    topicsTotalScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
+    totalScore = personsTotalScore + topicsTotalScore
   }
 
   private def getScoreLinked(topicIds: SmallIdSet[TopicId]) = {
@@ -199,7 +199,7 @@ final class Schedule(
   /** Verifies if the schedule is consistent. Very useful in tests. Poor performance. */
   def slowCheckup: List[String] = {
     // TODO Add more controls
-    slotsToAssignment.valuesSeq.view.flatMap { sa => sa.slowCheckup.map(s"Slot ${sa.slot} (${problem.slotsNames(sa.slot)}): " + _) }.toList
+    slotsToAssignment.valuesSeq.view.flatMap { sa => sa.slowCheckup.map(s"Slot ${sa.slot} (${problem.slotsToName(sa.slot)}): " + _) }.toList
   }
 
   override def equals(obj: Any): Boolean = obj match {
