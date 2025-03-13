@@ -37,7 +37,7 @@ object SlotId {
   inline def None: SlotId = Int.MinValue
 
   extension (id: SlotId) {
-    inline def next(using c: Count[SlotId]): SlotId = (id + 1) % c
+    inline def next(using c: CountAll[SlotId]): SlotId = (id + 1) % c
   }
 }
 
@@ -45,7 +45,7 @@ object TopicId {
   inline def None: TopicId = Int.MinValue
 
   extension (id: TopicId) {
-    inline def next(using c: Count[TopicId]): TopicId = (id + 1) % c
+    inline def next(using c: CountAll[TopicId]): TopicId = (id + 1) % c
   }
 }
 
@@ -53,7 +53,7 @@ object PersonId {
   inline def None: PersonId = Int.MinValue
 
   extension (id: PersonId) {
-    inline def next(using c: Count[PersonId]): PersonId = (id + 1) % c
+    inline def next(using c: CountAll[PersonId]): PersonId = (id + 1) % c
   }
 }
 
