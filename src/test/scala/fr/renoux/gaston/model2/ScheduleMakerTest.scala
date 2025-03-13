@@ -15,8 +15,6 @@ class ScheduleMakerTest extends TestBase {
 
     val problem = InputTranscription2(input).result.toEither.force
 
-    given Printable[Schedule] = SchedulePrinter(problem)
-
     val Seq(day1, day2) = problem.slotsCount.range
     val Seq(unassigned1, unassigned2, alpha, beta, gamma, delta, epsilon1, epsilon2, eta1, eta2, theta) = problem.topicsCount.range
     val Seq(albert, bianca, charly, daniela, eric, fiona, galahad, hypatia, ignace, joan, kevin, laura) = problem.personsCount.range
