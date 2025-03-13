@@ -11,7 +11,7 @@ opaque type IdMatrix3[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A] =
 
 object IdMatrix3 {
 
-  private inline def flatIndex[J <: Id, K <: Id](inline i: Id, inline j: J, inline k: K)(using inline countJ: Count[J], inline countK: Count[K]) =
+  private inline def flatIndex[J <: Id, K <: Id](inline i: Id, inline j: J, inline k: K)(using inline countJ: CountAll[J], inline countK: CountAll[K]) =
     (countJ.value * i.value + j.value) * countK.value + k.value
 
   extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A])(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]) {
