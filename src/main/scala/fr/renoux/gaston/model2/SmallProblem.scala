@@ -7,28 +7,28 @@ import fr.renoux.gaston.util.{Count as _, *}
 /** Description on a problem small enough that we can use SmallIdSets (so max 64 elements of each category). */
 final class SmallProblem(
     val slotsCount: Count[SlotId],
-    val slotsNames: IdMap[SlotId, String],
-    val slotsPersonsPresent: IdMap[SlotId, SmallIdSet[PersonId]],
+    val slotsToName: IdMap[SlotId, String],
+    val slotsToPersonsPresent: IdMap[SlotId, SmallIdSet[PersonId]],
     val slotsToNextSlot: IdMap[SlotId, SlotId],
-    val slotsMaxTopics: IdMap[SlotId, Count[TopicId]],
+    val slotsToMaxTopics: IdMap[SlotId, Count[TopicId]],
 
     val topicsCount: Count[TopicId],
-    val topicsName: IdMap[TopicId, String], // Includes unassigned topics
-    val topicsMandatories: IdMap[TopicId, SmallIdSet[PersonId]],
-    val topicsForbiddens: IdMap[TopicId, SmallIdSet[PersonId]],
+    val topicsToName: IdMap[TopicId, String], // Includes unassigned topics
+    val topicsToMandatories: IdMap[TopicId, SmallIdSet[PersonId]],
+    val topicsToForbiddens: IdMap[TopicId, SmallIdSet[PersonId]],
 
-    val topicsMin: IdMap[TopicId, Count[PersonId]],
-    val topicsMax: IdMap[TopicId, Count[PersonId]],
-    val topicsAllowedSlots: IdMap[TopicId, SmallIdSet[SlotId]],
-    val topicsFollowup: IdMap[TopicId, TopicId],
+    val topicsToMinPersons: IdMap[TopicId, Count[PersonId]],
+    val topicsToMaxPersons: IdMap[TopicId, Count[PersonId]],
+    val topicsToAllowedSlots: IdMap[TopicId, SmallIdSet[SlotId]],
+    val topicsToFollowup: IdMap[TopicId, TopicId],
     val topicsForced: SmallIdSet[TopicId],
-    val topicsSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]],
-    val topicsNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]],
+    val topicsToSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]],
+    val topicsToNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]],
 
     val personsCount: Count[PersonId],
-    val personsName: IdMap[PersonId, String],
-    val personsWeight: IdMap[PersonId, Weight], // Unused in calculation as weight has already been applied to all relevant scores. Only for display.
-    val personsBaseScore: IdMap[PersonId, Score],
+    val personsToName: IdMap[PersonId, String],
+    val personsToWeight: IdMap[PersonId, Weight], // Unused in calculation as weight has already been applied to all relevant scores. Only for display.
+    val personsToBaseScore: IdMap[PersonId, Score],
 
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
     val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
@@ -43,8 +43,8 @@ final class SmallProblem(
   given CountAll[PersonId] = CountAll(personsCount)
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
-  val personTopicsMandatory: IdMap[PersonId, SmallIdSet[TopicId]] = {
-    val personsToTopicMap = topicsMandatories.toSeq.flatMap { (tid, pids) =>
+  val personsToMandatoryTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
+    val personsToTopicMap = topicsToMandatories.toSeq.flatMap { (tid, pids) =>
       pids.toSet.toSeq.map(_ -> tid)
     }.groupToMap
     IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_ *)))
@@ -67,25 +67,25 @@ final class SmallProblem(
 
   def copy() = new SmallProblem(
     slotsCount = slotsCount,
-    slotsNames = slotsNames.copy(),
-    slotsPersonsPresent = slotsPersonsPresent.copy(),
+    slotsToName = slotsToName.copy(),
+    slotsToPersonsPresent = slotsToPersonsPresent.copy(),
     slotsToNextSlot = slotsToNextSlot.copy(),
-    slotsMaxTopics = slotsMaxTopics.copy(),
+    slotsToMaxTopics = slotsToMaxTopics.copy(),
     topicsCount = topicsCount,
-    topicsName = topicsName.copy(),
-    topicsMandatories = topicsMandatories.copy(),
-    topicsForbiddens = topicsForbiddens.copy(),
-    topicsMin = topicsMin.copy(),
-    topicsMax = topicsMax.copy(),
-    topicsAllowedSlots = topicsAllowedSlots.copy(),
-    topicsFollowup = topicsFollowup.copy(),
+    topicsToName = topicsToName.copy(),
+    topicsToMandatories = topicsToMandatories.copy(),
+    topicsToForbiddens = topicsToForbiddens.copy(),
+    topicsToMinPersons = topicsToMinPersons.copy(),
+    topicsToMaxPersons = topicsToMaxPersons.copy(),
+    topicsToAllowedSlots = topicsToAllowedSlots.copy(),
+    topicsToFollowup = topicsToFollowup.copy(),
     topicsForced = topicsForced,
-    topicsSimultaneous = topicsSimultaneous.copy(),
-    topicsNotSimultaneous = topicsNotSimultaneous.copy(),
+    topicsToSimultaneous = topicsToSimultaneous.copy(),
+    topicsToNotSimultaneous = topicsToNotSimultaneous.copy(),
     personsCount = personsCount,
-    personsName = personsName.copy(),
-    personsWeight = personsWeight.copy(),
-    personsBaseScore = personsBaseScore.copy(),
+    personsToName = personsToName.copy(),
+    personsToWeight = personsToWeight.copy(),
+    personsToBaseScore = personsToBaseScore.copy(),
     prefsPersonTopic = prefsPersonTopic.copy(),
     prefsPersonPerson = prefsPersonPerson.copy(),
     prefsTopicPure = prefsTopicPure.copy(),
@@ -96,21 +96,21 @@ final class SmallProblem(
   /** Returns true if this is an "unassigned" topic. */
   inline def isTopicUnassigned(tid: TopicId): Boolean = tid.value < unassignedTopicsCount.value
 
-  inline def isPersonMandatory(pid: PersonId, tid: TopicId): Boolean = topicsMandatories(tid).contains(pid)
+  inline def isPersonMandatory(pid: PersonId, tid: TopicId): Boolean = topicsToMandatories(tid).contains(pid)
 
-  inline def isPersonForbidden(pid: PersonId, tid: TopicId): Boolean = topicsForbiddens(tid).contains(pid)
+  inline def isPersonForbidden(pid: PersonId, tid: TopicId): Boolean = topicsToForbiddens(tid).contains(pid)
 
   @testOnly
-  def getTopicIdByName(name: String): TopicId = topicsName.valuesSeq.indexOf(name)
+  def getTopicIdByName(name: String): TopicId = topicsToName.valuesSeq.indexOf(name)
 
   extension (pid: PersonId) {
-    def personName: String = personsName(pid)
+    def personName: String = personsToName(pid)
   }
   extension (tid: TopicId) {
-    def topicName: String = topicsName(tid)
+    def topicName: String = topicsToName(tid)
   }
   extension (sid: SlotId) {
-    def slotName: String = slotsNames(sid)
+    def slotName: String = slotsToName(sid)
   }
 
   override def toString: String = s"SmallProblem($slotsCount/$topicsCount/$personsCount)"
