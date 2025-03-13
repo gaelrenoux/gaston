@@ -29,6 +29,7 @@ object SmallIdSet {
 
     inline def nonEmpty: Boolean = s != 0L
 
+    /** How many elements are in the set */
     inline def size: Count[I] = java.lang.Long.bitCount(s)
 
     inline def head: I = {
@@ -48,7 +49,7 @@ object SmallIdSet {
       else fastFind(0, SmallIdSet.MaxValue, default = j.value)(apply(_))
     }
 
-    inline def foreach(inline f: I => Unit)(using c: Count[I]): Unit = if (nonEmpty) {
+    inline def foreach(inline f: I => Unit)(using c: CountAll[I]): Unit = if (nonEmpty) {
       c.foreach { i =>
         if (apply(i)) {
           f(i)
@@ -56,7 +57,7 @@ object SmallIdSet {
       }
     }
 
-    inline def foreachWhile(inline f: I => Boolean)(using c: Count[I]): Unit = {
+    inline def foreachWhile(inline f: I => Boolean)(using c: CountAll[I]): Unit = {
       c.foreachWhile { i =>
         if (apply(i)) {
           f(i)
@@ -67,7 +68,7 @@ object SmallIdSet {
     /** Iterates over all possible pair once, considering that (A, B) and (B, A) are the same pair, and that (A, A)
      * isn't a pair
      */
-    inline def foreachPair(inline f: (I, I) => Unit)(using c: Count[I]): Unit = {
+    inline def foreachPair(inline f: (I, I) => Unit)(using c: CountAll[I]): Unit = {
       c.foreach { i =>
         c.foreachUntil(i) { j =>
           if (containsAll(i, j)) {
@@ -77,7 +78,7 @@ object SmallIdSet {
       }
     }
 
-    inline def mapSumToScore(inline f: I => Score)(using c: Count[I]): Score = {
+    inline def mapSumToScore(inline f: I => Score)(using c: CountAll[I]): Score = {
       var result: Score = 0.0
       foreach { i =>
         result = result + f(i)
@@ -131,13 +132,13 @@ object SmallIdSet {
     /** Shouldn't be necessary, but type issue otherwise */
     private inline def mask(id: I): Long = SmallIdSet(id)
 
-    def toSet(using c: Count[I]): Set[I] = {
+    def toSet(using c: CountAll[I]): Set[I] = {
       val result = mutable.Set[I]()
       foreach { id => result += id }
       result.toSet
     }
 
-    def filter(f: I => Boolean)(using c: Count[I]): SmallIdSet[I] = {
+    def filter(f: I => Boolean)(using c: CountAll[I]): SmallIdSet[I] = {
       var result = SmallIdSet.empty[I]
       c.foreach { i =>
         if (s.contains(i) && f(i)) {
@@ -147,7 +148,7 @@ object SmallIdSet {
       result
     }
 
-    def toArray(using c: Count[I], ct: ClassTag[I]): Array[I] = {
+    def toArray(using c: CountAll[I], ct: ClassTag[I]): Array[I] = {
       val result = Array.fill[I](s.size.value)(Id.None.value)
       var resultIx = 0
       c.foreach { i =>
@@ -159,7 +160,7 @@ object SmallIdSet {
       result
     }
 
-    def toShuffledArray(using Count[I], ClassTag[I], Random): Array[I] = {
+    def toShuffledArray(using CountAll[I], ClassTag[I], Random): Array[I] = {
       val result = toArray
       result.shuffle
       result
@@ -198,7 +199,7 @@ object SmallIdSet {
     }
     result
   }
-  
+
   def unsafeFrom[I <: Id](set: Long): SmallIdSet[I] = set
 
   /** Mostly used when debugging */
@@ -218,7 +219,7 @@ object SmallIdSet {
       override def toPrettyString: String =
         if (is == -1) Printable.Universe
         else if (is == 0) Printable.Empty
-        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet(using (MaxValue + 1: Count[I])))
+        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet(using CountAll[I](MaxValue + 1)))
   }
 
 }
