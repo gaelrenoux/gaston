@@ -25,7 +25,7 @@ final class SlotAssignment(
 
   /** Returns true if that person can be added to this topic, without moving anyone else. */
   def isAddableToTopic(pid: PersonId, tid: TopicId): Boolean = {
-    inline def topicMax = problem.topicsMax(tid)
+    inline def topicMax = problem.topicsToMaxPersons(tid)
 
     inline def topicPersonsCount = topicsToPersons(tid).size
     // TODO should handle forbidden here
@@ -34,7 +34,7 @@ final class SlotAssignment(
 
   /** Returns true if that person can be removed from that topic, without moving anyone else. */
   def isDroppableFromTopic(pid: PersonId, tid: TopicId): Boolean = {
-    inline def topicMin = problem.topicsMin(tid)
+    inline def topicMin = problem.topicsToMinPersons(tid)
 
     inline def topicPersonsCount = topicsToPersons(tid).size
 
@@ -98,7 +98,7 @@ final class SlotAssignment(
   /** Persons that are present on this slot and can be moved around with the current topics being planned (they're not
    * mandatory on their current topic). */
   def mobilePersons: SmallIdSet[PersonId] = {
-    problem.slotsPersonsPresent(slot).filter { pid =>
+    problem.slotsToPersonsPresent(slot).filter { pid =>
       val tid = personsToTopic(pid)
       !problem.isPersonMandatory(pid, tid)
     }
@@ -106,19 +106,19 @@ final class SlotAssignment(
 
   /* ALL SCORING STUFF */
 
-  private val personsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
-  private val savedPersonsScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val personsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  private val savedPersonsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
 
   def getPersonScore(pid: PersonId): Score = {
-    personsScore(pid)
+    personsToScore(pid)
   }
 
   private def saveScores(): Unit = {
-    savedPersonsScore.fillFrom(personsScore)
+    savedPersonsToScore.fillFrom(personsToScore)
   }
 
   private def restoreSavedScores(): Unit = {
-    personsScore.fillFrom(savedPersonsScore)
+    personsToScore.fillFrom(savedPersonsToScore)
   }
 
   def recalculateAll() = {
@@ -151,13 +151,13 @@ final class SlotAssignment(
 
   private def _recalculateTargetPersonScoreFor(person: PersonId): Unit = {
     val topic = personsToTopic(person)
-    personsScore(person) = scoreWishes(person, topic)
+    personsToScore(person) = scoreWishes(person, topic)
   }
 
   private def _recalculateOtherPersonsScoreFor(persons: SmallIdSet[PersonId]): Unit = {
     persons.foreach { p =>
       val topic = personsToTopic(p)
-      personsScore(p) = scoreWishes(p, topic)
+      personsToScore(p) = scoreWishes(p, topic)
     }
   }
 
@@ -190,7 +190,7 @@ final class SlotAssignment(
     val unassignedTopicsHere = topicsHere.filter(problem.isTopicUnassigned)
     if (unassignedTopicsHere.isEmpty || unassignedTopicsHere == Set(slot.value)) Nil else {
       val topicsStr = unassignedTopicsHere.toSeq.sorted.map { tid =>
-        s"$tid (${problem.topicsName(tid)})"
+        s"$tid (${problem.topicsToName(tid)})"
       }.mkString(" ; ")
       List(s"Unexpected unassigned topics: $topicsStr")
     }
@@ -204,10 +204,10 @@ final class SlotAssignment(
 
     if (tps == referenceTps) Nil else {
       val ttpString = ttp.toSeq.sortBy(_._1).map {
-        case (tid, pids) => s"${problem.topicsName(tid)} -> (${pids.map(problem.personsName.apply).mkString(", ")})"
+        case (tid, pids) => s"${problem.topicsToName(tid)} -> (${pids.map(problem.personsToName.apply).mkString(", ")})"
       }.mkString(" | ")
       val convertedPttString = referenceTps.groupBy(_._1).view.mapValues(_.map(_._2)).toSeq.sortBy(_._1).map {
-        case (tid, pids) => s"${problem.topicsName(tid)} -> (${pids.map(problem.personsName.apply).mkString(", ")})"
+        case (tid, pids) => s"${problem.topicsToName(tid)} -> (${pids.map(problem.personsToName.apply).mkString(", ")})"
       }.mkString(" | ")
       List(
         s"""[slot $slot] topicsToPersons and personsToTopic incoherence.

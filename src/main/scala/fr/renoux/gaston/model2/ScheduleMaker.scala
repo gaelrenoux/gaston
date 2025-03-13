@@ -107,16 +107,16 @@ object ScheduleMaker {
     }
 
     oldSchedule.slotSchedules.foreach { oldSlotSchedule =>
-      val slotId = problem.slotsNames.unsafeContent.indexOf(oldSlotSchedule.slot.name)
+      val slotId = problem.slotsToName.unsafeContent.indexOf(oldSlotSchedule.slot.name)
       val assignment = schedule.slotsToAssignment(slotId)
 
       oldSlotSchedule.topics.foreach { oldTopic =>
-        val topicId = problem.topicsName.unsafeContent.indexOf(oldTopic.name)
+        val topicId = problem.topicsToName.unsafeContent.indexOf(oldTopic.name)
         schedule.topicsToSlot(topicId) = slotId
         schedule.topicsPresent = schedule.topicsPresent + topicId
 
         oldSlotSchedule.on(oldTopic).persons.foreach { oldPerson =>
-          val personId = problem.personsName.unsafeContent.indexOf(oldPerson.name)
+          val personId = problem.personsToName.unsafeContent.indexOf(oldPerson.name)
           schedule.personsToTopics(personId) = schedule.personsToTopics(personId) + topicId
           assignment.personsToTopic(personId) = topicId
           assignment.topicsToPersons(topicId) = assignment.topicsToPersons(topicId) + personId

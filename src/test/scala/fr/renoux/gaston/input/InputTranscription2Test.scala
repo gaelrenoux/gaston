@@ -224,7 +224,7 @@ class InputTranscription2Test extends TestBase {
 
         val exclusivities0 = transcription.preferences.prefsTopicsExclusive(0)
         exclusivities0.count should be(3) // Albert is exempted from both manual exclusives
-        exclusivities0.groups.toSeq should be(Seq(
+        exclusivities0.topicsGroups.toSeq should be(Seq(
           SmallIdSet(0 until 6),
           SmallIdSet(epsilon1, epsilon2), // Epsilon
           SmallIdSet(theta11, theta21, theta31) // Theta
@@ -233,7 +233,7 @@ class InputTranscription2Test extends TestBase {
 
         val exclusivities1 = transcription.preferences.prefsTopicsExclusive(1)
         exclusivities1.count should be(5) // Bianca is exempted from the first manual exclusive
-        exclusivities1.groups.toSeq should be(Seq(
+        exclusivities1.topicsGroups.toSeq should be(Seq(
           SmallIdSet(0 until 6),
           SmallIdSet(epsilon1, epsilon2), // Epsilon
           SmallIdSet(theta11, theta21, theta31), // Theta
@@ -243,7 +243,7 @@ class InputTranscription2Test extends TestBase {
 
         val exclusivities2 = transcription.preferences.prefsTopicsExclusive(2)
         exclusivities2.count should be(3) // Charly is exempted from the second manual exclusive and is mandatory on Theta
-        exclusivities2.groups.toSeq should be(Seq(
+        exclusivities2.topicsGroups.toSeq should be(Seq(
           SmallIdSet(0 until 6),
           SmallIdSet(epsilon1, epsilon2), // Epsilon
           SmallIdSet(alpha, beta, gamma) // Manual constraint

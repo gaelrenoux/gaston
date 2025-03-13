@@ -140,13 +140,13 @@ class ScheduleTest extends TestBase {
 
     "basic schedule" in {
       val schedule = scheduleBase()
-      schedule.getPersonScores().valuesSeq should be(Seq.fill(problem.personsCount.value)(Score.Zero))
+      schedule.getPersonsToScore().valuesSeq should be(Seq.fill(problem.personsCount.value)(Score.Zero))
       schedule.getTotalScore() should be(Score.Zero)
     }
 
     "satisfied wish" in {
       val betterSchedule = scheduleBase().on(d1)(_.move(f, epsilon1, alpha))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (f -> 750)
       )
       betterSchedule.getTotalScore() should be(750.0 / 2048)
@@ -154,7 +154,7 @@ class ScheduleTest extends TestBase {
 
     "satisfied person-wish" in {
       val betterSchedule = scheduleBase().on(d2)(_.move(h, delta, beta)).on(d1)(_.move(h, gamma, alpha))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (c -> 500)
       )
       betterSchedule.getTotalScore() should be(500.0 / 2048)
@@ -165,7 +165,7 @@ class ScheduleTest extends TestBase {
         input.modify(_.persons.eachWhere(_.name == "Bianca").baseScore).setTo(fr.renoux.gaston.model.Score(100))
       val problem2 = InputTranscription2(input2).problem
       val schedule = scheduleBase(problem2)
-      schedule.getPersonScores().toMap should be(
+      schedule.getPersonsToScore().toMap should be(
         personScoresBase + (b -> 100)
       )
       schedule.getTotalScore() should be(100.0 / 2048)
@@ -173,13 +173,13 @@ class ScheduleTest extends TestBase {
 
     "topic base score" in {
       val betterSchedule = scheduleBase().addTopic(1, theta)
-      betterSchedule.getPersonScores().toMap should be(personScoresBase)
+      betterSchedule.getPersonsToScore().toMap should be(personScoresBase)
       betterSchedule.getTotalScore() should be(20)
     }
 
     "unsatisfied incompatible" in {
       val betterSchedule = scheduleBase().on(d1)(_.move(g, gamma, alpha)).on(d2)(_.move(g, delta, beta))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (a -> -1000)
       )
       betterSchedule.getTotalScore() should be(-1000.0)
@@ -187,7 +187,7 @@ class ScheduleTest extends TestBase {
 
     "unsatisfied forbidden" in {
       val betterSchedule = scheduleBase().on(d2)(_.move(e, epsilon2, beta))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (e -> Score.MinReward)
       )
       betterSchedule.getTotalScore() should be(Score.MinReward)
@@ -195,7 +195,7 @@ class ScheduleTest extends TestBase {
 
     "unsatisfied exclusive (on unassigned)" in {
       val betterSchedule = scheduleBase().on(d1)(_.move(a, alpha, unassigned0)).on(d2)(_.move(a, epsilon2, unassigned1))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (a -> (-100 - 100 - 50)) // two unassigned, plus the exclusive constraint
       )
       betterSchedule.getTotalScore() should be(-250)
@@ -203,7 +203,7 @@ class ScheduleTest extends TestBase {
 
     "unsatisfied exclusive (on occurrences)" in {
       val betterSchedule = scheduleBase().on(d1)(_.move(a, alpha, epsilon1))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (a -> Score.MinReward)
       )
       betterSchedule.getTotalScore() should be(Score.MinReward)
@@ -211,7 +211,7 @@ class ScheduleTest extends TestBase {
 
     "unsatisfied linked" in {
       val betterSchedule = scheduleBase().on(d1)(_.move(j, eta1, alpha))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (j -> Score.MinReward)
       )
       betterSchedule.getTotalScore() should be(Score.MinReward)
@@ -219,7 +219,7 @@ class ScheduleTest extends TestBase {
 
     "weight is considered" in {
       val betterSchedule = scheduleBase().on(d2)(_.move(d, epsilon2, beta))
-      betterSchedule.getPersonScores().toMap should be(
+      betterSchedule.getPersonsToScore().toMap should be(
         personScoresBase + (d -> 500)
       )
       betterSchedule.getTotalScore() should be(500.0 / 2048)
