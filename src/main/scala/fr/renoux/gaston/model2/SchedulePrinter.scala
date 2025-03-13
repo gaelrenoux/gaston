@@ -9,14 +9,14 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
     override def toPrettyString: String = {
       val sb = new StringBuilder
       problem.slotsCount.foreach { sid =>
-        sb.append(problem.slotsNames(sid)).append("\n")
+        sb.append(problem.slotsToName(sid)).append("\n")
         val assignment = schedule.slotsToAssignment(sid)
         val topics = schedule.slotsToTopics(sid)
         topics.foreach { tid =>
-          sb.append("    ").append(problem.topicsName(tid)).append(" ==>")
+          sb.append("    ").append(problem.topicsToName(tid)).append(" ==>")
           val persons = assignment.topicsToPersons(tid).toSet
           if (persons.nonEmpty) {
-            val personNames = persons.map(problem.personsName.apply).toSeq.sorted
+            val personNames = persons.map(problem.personsToName.apply).toSeq.sorted
             sb.append(" ").append(personNames.mkString(", "))
             ()
           }
@@ -25,7 +25,7 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
         }
       }
       val unscheduled = problem.topicsCount.range.toSet -- schedule.topicsPresent.toSet
-      sb.append("Unscheduled topics: ").append(unscheduled.map(problem.topicsName.apply).toSeq.sorted.mkString(", "))
+      sb.append("Unscheduled topics: ").append(unscheduled.map(problem.topicsToName.apply).toSeq.sorted.mkString(", "))
       sb.toString
     }
 }
