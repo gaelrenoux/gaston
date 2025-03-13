@@ -327,7 +327,7 @@ class SmallIdSetTest extends TestBase {
   }
 
   "foreach" - {
-    given Count[TopicId] = 64
+    given CountAll[TopicId] = CountAll[TopicId](64)
 
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
@@ -352,7 +352,7 @@ class SmallIdSetTest extends TestBase {
   }
 
   "foreachWhile" - {
-    given Count[TopicId] = 64
+    given CountAll[TopicId] = CountAll[TopicId](64)
 
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
@@ -404,7 +404,7 @@ class SmallIdSetTest extends TestBase {
   }
 
   "foreachPair" - {
-    given Count[TopicId] = 64
+    given CountAll[TopicId] = CountAll[TopicId](64)
 
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
@@ -436,7 +436,7 @@ class SmallIdSetTest extends TestBase {
   }
 
   "mapSumToScore" - {
-    given Count[TopicId] = 64
+    given CountAll[TopicId] = CountAll[TopicId](64)
 
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
@@ -486,7 +486,7 @@ class SmallIdSetTest extends TestBase {
   }
 
   "filter" - {
-    given Count[SlotId] = 64
+    given CountAll[SlotId] = CountAll[SlotId](64)
 
     "nominal" in {
       val a = SmallIdSet[SlotId](3, 8, 47, 63)
