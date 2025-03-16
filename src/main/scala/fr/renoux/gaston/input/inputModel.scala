@@ -219,7 +219,8 @@ final case class InputPerson(
     incompatible: Set[NonEmptyString] = Set.empty,
     wishes: Map[String, Score] = Map.empty, // can't use Ironed value as a key (check out why)
     personWishes: Map[String, Score] = Map.empty,
-    minFreeSlots: Option[PosInt] = None // how many free slots does this person want? None is zero..
+    minFreeSlots: Option[PosInt] = None, // how many free slots does this person want? None is zero
+
 ) {
   lazy val ironedWishes: Map[NonEmptyString, Score] = wishes.map { case (key, value) => key.refineUnsafe[Not[Empty]] -> value }
   lazy val ironedPersonWishes: Map[NonEmptyString, Score] = personWishes.map { case (key, value) => key.refineUnsafe[Not[Empty]] -> value }
@@ -238,8 +239,17 @@ final case class InputSimultaneousConstraint(
 
 final case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
-    exemptions: Set[NonEmptyString] = Set.empty
-)
+    inclusions: Option[Set[NonEmptyString]] = None,
+    exemptions: Option[Set[NonEmptyString]] = None
+) {
+
+  lazy val forcedInclusions: Set[NonEmptyString] = inclusions.getOrElse(Set.empty)
+  lazy val forcedExemptions: Set[NonEmptyString] = exemptions.getOrElse(Set.empty)
+  
+  if (inclusions.nonEmpty && exemptions.nonEmpty) {
+    throw new IllegalArgumentException("Cannot have both inclusions and exemptions in exclusive constraint")
+  }
+}
 
 final case class InputLinkedConstraint(
     topics: Set[NonEmptyString]

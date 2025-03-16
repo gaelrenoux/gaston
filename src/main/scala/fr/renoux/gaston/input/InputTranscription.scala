@@ -184,10 +184,14 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       presenceScore <- inTopic.presence
     } yield TopicDirectPreference(topic, presenceScore)
 
-    lazy val exclusiveTopics: Set[TopicsExclusive] =
+    lazy val exclusiveTopics: Set[Preference.GlobalLevel] =
       input.constraints.exclusive.map { inConstraint =>
         // topic-parts are always linked, so we only need to mark the exclusivity on the first part
-        TopicsExclusive(inConstraint.topics.flatMap(topicsFirstPartByName).toArraySet, inConstraint.exemptions.map(personsByName).toArraySet)
+        if (inConstraint.inclusions.isEmpty) {
+          TopicsExclusive(inConstraint.topics.flatMap(topicsFirstPartByName).toArraySet, inConstraint.forcedExemptions.map(personsByName).toArraySet)
+        } else {
+          TopicsExclusiveFor(inConstraint.topics.flatMap(topicsFirstPartByName).toArraySet, inConstraint.forcedInclusions.map(personsByName).toArraySet)
+        }
       }
 
     lazy val exclusiveOccurrences: Set[TopicsExclusive] = input.topics.view
@@ -443,7 +447,7 @@ object InputTranscription {
         .map(t => s"Exclusive constraint: unknown topic: [$t]")
     } ++ {
       input.constraints.exclusive
-        .flatMap(_.exemptions)
+        .flatMap { c => c.forcedExemptions ++ c.forcedInclusions }
         .filter(!input.personsNameSet.contains(_))
         .map(p => s"Exclusive constraint: unknown person: [$p]")
     } ++ {

@@ -32,7 +32,8 @@ class InputAnonymizer(in: InputModel, val seed: Long = 0) {
     .modify(_.persons.each.wishes).using(_.map { case (key, value) => topicAnonymizer.anonymized(key) -> value })
     .modify(_.constraints.linked.each.topics.each).using(topicAnonymizer.anonymizedNonEmpty)
     .modify(_.constraints.exclusive.each.topics.each).using(topicAnonymizer.anonymizedNonEmpty)
-    .modify(_.constraints.exclusive.each.exemptions.each).using(personAnonymizer.anonymizedNonEmpty)
+    .modify(_.constraints.exclusive.each.exemptions.each.each).using(personAnonymizer.anonymizedNonEmpty)
+    .modify(_.constraints.exclusive.each.inclusions.each.each).using(personAnonymizer.anonymizedNonEmpty)
     .modify(_.constraints.simultaneous.each.topics.each).using(topicAnonymizer.anonymizedNonEmpty)
     .modify(_.constraints.notSimultaneous.each.topics.each).using(topicAnonymizer.anonymizedNonEmpty)
 

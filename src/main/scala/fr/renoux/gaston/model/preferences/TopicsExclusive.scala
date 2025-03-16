@@ -3,7 +3,7 @@ package fr.renoux.gaston.model.preferences
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.util.ArraySet
 
-/** No person (outside of the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot).
+/** No person (outside the persons explicitly exempted from this rule) can be on more than one of the topics inside that list (regardless of slot).
  *
  * This is often used as a soft-constraint (very high negative score, in order to make sure it's always respected).
  */
@@ -28,7 +28,7 @@ final case class TopicsExclusive(topics: ArraySet[Topic], exemptions: ArraySet[P
 
   override def hashCode(): Int = (this.topics.actualHashCode, this.exemptions.actualHashCode, reward).hashCode()
 
-  override lazy val toLongString: String = s"TopicsExclusive(${topics.toGoodString}${if (exemptions.nonEmpty) s"$exemptions, " else ""}, $reward)"
+  override lazy val toLongString: String = s"TopicsExclusive(${topics.toGoodString}, ${if (exemptions.nonEmpty) s"$exemptions, " else ""}$reward)"
 
   override lazy val toAbstract: (String, Seq[Int], Seq[Int], Double) =
     ("TopicsExclusive", topics.toIdSet.toSeq.sorted, exemptions.toIdSet.toSeq.sorted, reward.value)

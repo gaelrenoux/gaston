@@ -4,7 +4,7 @@ import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.model.constraints.*
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive, TopicsLinked}
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive, TopicsExclusiveFor, TopicsLinked}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -76,6 +76,7 @@ class InputSpec extends AnyFlatSpec with Matchers {
       PersonTopicPreference(expected.persons.bernard, expected.topics.gamma1, Score(scalingFactor * 1.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.gamma2, Score(scalingFactor * 1.0)),
       TopicsExclusive(Set(expected.topics.beta, expected.topics.gamma1).toArraySet, Set(expected.persons.laverne).toArraySet),
+      TopicsExclusiveFor(Set(expected.topics.alpha, expected.topics.gamma1).toArraySet, Set(expected.persons.hoagie).toArraySet),
       TopicsLinked(Set(expected.topics.gamma1, expected.topics.gamma2).toArraySet)
     )
     val expectedPreferences = initialTopicsPreferences ++ additionalPreferences
