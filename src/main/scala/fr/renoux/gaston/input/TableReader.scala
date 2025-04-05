@@ -61,12 +61,11 @@ final class TableReader(input: InputModel) {
     val topicNames = topicsSeq.map(_.name)
 
     /* For each person's names, a list of mandatory topic's names */
-    val mandatoryPersonsToTopics: Map[NonEmptyString, Set[NonEmptyString]] = cellsWithContent.map { row =>
+    val mandatoryPersonsToTopics: Map[NonEmptyString, Set[NonEmptyString]] = cellsWithContent.flatMap { row =>
       val topicName = row(tableSettings.topicCol).refineOption[Not[Empty]]
         .getOrElse(throw new IllegalArgumentException("Topic column is empty"))
       val mandatoryName = row(tableSettings.mandatoryPersonCol).refineOption[Not[Empty]]
-        .getOrElse(throw new IllegalArgumentException("Mandatory person column is empty"))
-      mandatoryName -> topicName
+      mandatoryName.map(_ -> topicName)
     }.groupToMap.mapValuesStrict(_.toSet)
 
     /* The persons, */
