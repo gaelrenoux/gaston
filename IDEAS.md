@@ -6,3 +6,9 @@
 - Keep and display schedules that are close to the current one, to give some alternatives (or fix a target score and give all that are above the score)
 - Simulated cooling
 - Generate a better base configuration, depending on what the user asks for
+
+
+
+- When reading the table format: check that a mandatory person isn't also put as forbidden on the same topic.
+- Multi-slots topics break down when there can be more than two slots that follow each other.
+
