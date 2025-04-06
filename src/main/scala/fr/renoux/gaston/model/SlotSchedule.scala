@@ -173,8 +173,7 @@ final case class SlotSchedule(
     persons.size == persons.toSet.size
   }
 
-  /**
-   * Partial Schedules are schedule where topics are matched, but not all persons are assigned yet.
+  /** Partial schedules don't even have all of their topics planned yet (and they're obviously unfilled as well).
    * @return true if this respects all constraints applicable to partial schedules
    */
   lazy val isPartialSolution: Boolean = {
@@ -200,7 +199,7 @@ final case class SlotSchedule(
   }
 
   /** Returns the errors on this slot-schedule. Slow, so avoid using it. */
-  lazy val slowErrors: Seq[String] =  {
+  lazy val slowErrors: Seq[String] = {
     val recordsErrors = records.flatMap(_.slowErrors).toSeq
 
     val maxTopicsError = if (slot.maxTopics < topics.size) Some(s"Too many topics in slot ${slot.name}") else None
