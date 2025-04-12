@@ -6,7 +6,8 @@ import fr.renoux.gaston.engine.Termination
 import fr.renoux.gaston.input.{InputModel, InputRenderer}
 import fr.renoux.gaston.model.{Problem, Schedule, Score}
 
-import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneOffset}
 import scala.math.Ordering.Implicits.infixOrderingOps
 
 /** Destination of all information in Gaston. It writes stuff both to the log file and the standard output. It has some
@@ -24,7 +25,15 @@ final class Output private(silent: Boolean)(using val problem: Problem) {
   private val log = Logger[Output]
   private val notSilent = !silent
 
+  private val startMs = System.currentTimeMillis()
+
   private var bestScore: Score = Score.MinValue
+
+  private val timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneOffset.UTC)
+
+  private def time = {
+    timeFormat.format(Instant.ofEpochMilli(System.currentTimeMillis() - startMs))
+  }
 
   private def shortString(l: Long) = {
     if (l < 10000) l.toString
@@ -37,8 +46,8 @@ final class Output private(silent: Boolean)(using val problem: Problem) {
     log.info(txt)
     if (notSilent) {
       synchronized {
-        if (separator) println(s"\n$separatorLine\n$txt\n$separatorLine\n")
-        else println(txt)
+        if (separator) println(s"\n$separatorLine\n$time: $txt\n$separatorLine\n")
+        else println(s"$time: $txt")
       }
     }
   }
