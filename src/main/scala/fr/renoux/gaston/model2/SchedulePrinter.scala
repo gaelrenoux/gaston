@@ -6,7 +6,7 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
 
   // TODO Missing mandatory markers, plus the mandatory person should always come first
 
-  extension (schedule: Schedule)
+  extension (schedule: Schedule) {
     override def toPrettyString: String = {
       val sb = new StringBuilder
       problem.slotsCount.foreach { sid =>
@@ -28,5 +28,6 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
       val unscheduled = problem.topicsCount.range.toSet -- schedule.topicsPresent.toSet
       sb.append("Unscheduled topics: ").append(unscheduled.map(problem.topicsToName.apply).toSeq.sorted.mkString(", "))
       sb.toString
+    }
     }
 }
