@@ -17,6 +17,8 @@ lazy val gaston = (project in file("."))
 lazy val SlowTest = config("test-slow") extend (Test)
 
 scalacOptions ++= Seq(
+  "-no-indent", // Remove the significant-indentation syntax
+
   "-language:implicitConversions",
   "-language:higherKinds",
   "-language:existentials",
