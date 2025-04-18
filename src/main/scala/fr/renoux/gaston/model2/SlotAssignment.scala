@@ -6,10 +6,10 @@ import scala.compiletime.uninitialized
 
 
 /** Assignments for a single slot (who is on what topic).
- *
- * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
- * no rescoring is done, in which case this class' user must manually trigger a rescoring.
- */
+  *
+  * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
+  * no rescoring is done, in which case this class' user must manually trigger a rescoring.
+  */
 final class SlotAssignment(
     val problem: SmallProblem,
     val slot: SlotId,
@@ -96,7 +96,7 @@ final class SlotAssignment(
   }
 
   /** Persons that are present on this slot and can be moved around with the current topics being planned (they're not
-   * mandatory on their current topic). */
+    * mandatory on their current topic). */
   def mobilePersons: SmallIdSet[PersonId] = {
     problem.slotsToPersonsPresent(slot).filter { pid =>
       val tid = personsToTopic(pid)
@@ -178,8 +178,9 @@ final class SlotAssignment(
   /* CHECKUPS */
 
   /** Verifies if the schedule is consistent. Very useful in tests. Poor performance.
-   * @return A list of errors.
-   */
+    *
+    * @return A list of errors.
+    */
   def slowCheckup: List[String] = {
     slowCheckupUnassignedTopics ++ slowCheckupTopicToPersons
     // Other checks to come
@@ -225,8 +226,8 @@ final class SlotAssignment(
   override def equals(obj: Any): Boolean = obj match {
     case that: SlotAssignment =>
       problem == that.problem &&
-        slot == that.slot &&
-        personsToTopic.actualEquals(that.personsToTopic)
+          slot == that.slot &&
+          personsToTopic.actualEquals(that.personsToTopic)
     case _ => false
   }
 }

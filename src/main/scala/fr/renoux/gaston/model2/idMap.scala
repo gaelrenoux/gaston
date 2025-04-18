@@ -8,8 +8,8 @@ import scala.reflect.ClassTag
 
 
 /** IdMap: a mutable map from Ids to some value as an array. Note that there always is a value for each key (might be a
- * default value).
- */
+  * default value).
+  */
 opaque type IdMap[I <: Id, A] = Array[A]
 
 object IdMap {
