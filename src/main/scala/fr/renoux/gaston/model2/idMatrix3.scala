@@ -53,9 +53,12 @@ object IdMatrix3 {
     result
   }
 
-  inline def tabulate[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
-      (using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K])
-      (inline f: (I, J, K) => A): IdMatrix3[I, J, K, A] = {
+  inline def tabulate[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag](
+      using
+      countI: CountAll[I],
+      countJ: CountAll[J],
+      countK: CountAll[K]
+  )(inline f: (I, J, K) => A): IdMatrix3[I, J, K, A] = {
     val result = new Array[A](countI.value * countJ.value * countK.value)
     var index = 0
     countI.foreach { i =>
@@ -69,7 +72,8 @@ object IdMatrix3 {
     result
   }
 
-  inline def unsafeFrom[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag](it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
+  inline def unsafeFrom[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
+      (it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
     val countI: Count[I] = it.size
     val countJ: Count[J] = it.head.size
     val countK: Count[K] = it.head.head.size
@@ -89,7 +93,8 @@ object IdMatrix3 {
   /** Very specific stuff for the schedule matrix */
   extension (matrix: IdMatrix3[SlotId, TopicId, PersonId, Boolean]) {
 
-    inline def listSmallTopicsByPerson(using
+    inline def listSmallTopicsByPerson(
+        using
         countS: CountAll[SlotId],
         countT: CountAll[TopicId],
         countP: CountAll[PersonId]
@@ -109,7 +114,8 @@ object IdMatrix3 {
       result
     }
 
-    inline def listSmallPersonsByTopic(using
+    inline def listSmallPersonsByTopic(
+        using
         countS: CountAll[SlotId],
         countT: CountAll[TopicId],
         countP: CountAll[PersonId]
@@ -130,7 +136,8 @@ object IdMatrix3 {
       result
     }
 
-    inline def listSmallTopics(using
+    inline def listSmallTopics(
+        using
         countS: CountAll[SlotId],
         countT: CountAll[TopicId],
         countP: CountAll[PersonId]

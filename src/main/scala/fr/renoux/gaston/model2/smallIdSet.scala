@@ -66,8 +66,8 @@ object SmallIdSet {
     }
 
     /** Iterates over all possible pair once, considering that (A, B) and (B, A) are the same pair, and that (A, A)
-     * isn't a pair
-     */
+      * isn't a pair
+      */
     inline def foreachPair(inline f: (I, I) => Unit)(using c: CountAll[I]): Unit = {
       c.foreach { i =>
         c.foreachUntil(i) { j =>
