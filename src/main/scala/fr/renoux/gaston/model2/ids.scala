@@ -168,8 +168,8 @@ object Count {
 }
 
 /** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
- * super-type of Int to avoid weird implicit deductions. This must be given directly.
- */
+  * super-type of Int to avoid weird implicit deductions. This must be given directly.
+  */
 opaque type CountAll[I <: Id] <: Count[I] = Int
 
 object CountAll {
