@@ -1,6 +1,7 @@
 package fr.renoux.gaston.model2
 
 class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
+
   import problem.given
 
   // TODO Missing mandatory markers, plus the mandatory person should always come first
