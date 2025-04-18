@@ -6,11 +6,9 @@ import fr.renoux.gaston.util.{fastFoldRight, fastForeach, fastLoop, testOnly}
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
 // TODO most fields should be private, if not all
 
-/**
- *
- * Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
- * no rescoring is done, in which case this class' user must manually trigger a rescoring.
- */
+/** Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
+  * no rescoring is done, in which case this class' user must manually trigger a rescoring.
+  */
 final class Schedule(
     val problem: SmallProblem,
     val slotsToAssignment: IdMap[SlotId, SlotAssignment],
@@ -113,17 +111,17 @@ final class Schedule(
     totalScore = personsTotalScore + topicsTotalScore
   }
 
-  /**
-   * Assumes the recalculation has already been done on the slot-assignment level
-   * @param otherPersons No need to recalculate global score for them, just slot-level is enough
-   */
+  /** Assumes the recalculation has already been done on the slot-assignment level
+    *
+    * @param otherPersons No need to recalculate global score for them, just slot-level is enough
+    */
   def recalculateScoreFor(person: PersonId, otherPersons: SmallIdSet[PersonId]): Unit =
     recalculateScoreFor(person, PersonId.None, otherPersons)
 
-  /**
-   * Assumes the recalculation has already been done on the slot-assignment level
-   * @param otherPersons No need to recalculate global score for them, just slot-level is enough
-   */
+  /** Assumes the recalculation has already been done on the slot-assignment level
+    *
+    * @param otherPersons No need to recalculate global score for them, just slot-level is enough
+    */
   def recalculateScoreFor(person1: PersonId, person2: PersonId, otherPersons: SmallIdSet[PersonId]): Unit = {
     _recalculatePersonScoreFor(person1, includeNonSlot = true)
     if (person2 != PersonId.None) {
@@ -205,9 +203,9 @@ final class Schedule(
   override def equals(obj: Any): Boolean = obj match {
     case that: Schedule =>
       problem == that.problem &&
-        slotsToAssignment.actualEquals(that.slotsToAssignment) &&
-        personsToTopics.actualEquals(that.personsToTopics) &&
-        topicsToSlot.actualEquals(that.topicsToSlot)
+          slotsToAssignment.actualEquals(that.slotsToAssignment) &&
+          personsToTopics.actualEquals(that.personsToTopics) &&
+          topicsToSlot.actualEquals(that.topicsToSlot)
     case _ => false
   }
 
