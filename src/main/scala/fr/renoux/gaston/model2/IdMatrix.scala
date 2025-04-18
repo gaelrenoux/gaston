@@ -14,7 +14,7 @@ opaque type IdMatrix[I <: Id, J <: Id, A] = Array[A] // using a flattened matrix
 object IdMatrix {
   private inline def flatIndex[J <: Id](inline i: Id, inline j: J)(using inline count: CountAll[J]): Int =
     count.value * i.value + j.value
-  
+
   extension [I <: Id, J <: Id, A: ClassTag](matrix: IdMatrix[I, J, A]) {
     inline def copy(): IdMatrix[I, J, A] = {
       val result = new Array[A](matrix.length)

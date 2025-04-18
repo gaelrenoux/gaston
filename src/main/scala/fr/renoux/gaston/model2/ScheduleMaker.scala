@@ -22,10 +22,15 @@ object ScheduleMaker {
     }
 
     extension (sid: SlotId) {
-      def slot(
-          init: (CountAll[TopicId], CountAll[PersonId], SlotDef) ?=> Unit
-      )(using scheduleDef: ScheduleDef, cs: CountAll[SlotId], ct: CountAll[TopicId], cp: CountAll[PersonId]): Unit = {
+      def slot(init: (CountAll[TopicId], CountAll[PersonId], SlotDef) ?=> Unit)(
+          using
+          scheduleDef: ScheduleDef,
+          cs: CountAll[SlotId],
+          ct: CountAll[TopicId],
+          cp: CountAll[PersonId]
+      ): Unit = {
         given slotDef: SlotDef = SlotDef(sid)
+
         init
         scheduleDef.add(slotDef)
       }
@@ -47,10 +52,13 @@ object ScheduleMaker {
     }
 
     extension (tid: TopicId) {
-      def topic(
-          pids: PersonId*
-      )(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
-        slotDef.add(TopicDef(tid, pids*))
+      def topic(pids: PersonId*)(
+          using
+          countTopics: CountAll[TopicId],
+          countPersons: CountAll[PersonId],
+          slotDef: SlotDef
+      ): Unit = {
+        slotDef.add(TopicDef(tid, pids *))
       }
 
       def topicEmpty(using countTopics: CountAll[TopicId], countPersons: CountAll[PersonId], slotDef: SlotDef): Unit = {
@@ -59,7 +67,8 @@ object ScheduleMaker {
     }
   }
 
-  case class TopicDef(tid: TopicId, pids: PersonId*)(using
+  case class TopicDef(tid: TopicId, pids: PersonId*)(
+      using
       countTopics: CountAll[TopicId],
       countPersons: CountAll[PersonId]
   ) {
@@ -68,15 +77,15 @@ object ScheduleMaker {
     assert(pids.isEmpty || pids.map(_.value).max < countPersons.value, "Person ID to high")
   }
 
-  def mkSchedule(problem: SmallProblem)(
-      init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit
-  ): Schedule = {
-    import problem.given 
+  def mkSchedule(problem: SmallProblem)
+      (init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit): Schedule = {
+    import problem.given
     given scheduleDef: ScheduleDef = ScheduleDef()
+
     val _ = init
 
     val schedule = Schedule.empty(problem)
-    
+
     scheduleDef.slotsDef.foreach { (slotDef: SlotDef) =>
       val assignment = schedule.slotsToAssignment(slotDef.sid)
       slotDef.topicDefs.foreach { topicDef =>

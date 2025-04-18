@@ -38,6 +38,7 @@ final class SmallProblem(
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] // a person must be either on all linked topics, or on none of them
 ) {
   given CountAll[SlotId] = CountAll(slotsCount)
+
   given CountAll[TopicId] = CountAll(topicsCount)
 
   given CountAll[PersonId] = CountAll(personsCount)
