@@ -231,6 +231,7 @@ final case class InputGlobalConstraints(
     notSimultaneous: Set[InputSimultaneousConstraint] = Set.empty,
     exclusive: Set[InputExclusiveConstraint] = Set.empty,
     linked: Set[InputLinkedConstraint] = Set.empty,
+    limitedCount: Set[InputLimitedTopicsCountConstraint] = Set.empty
 )
 
 final case class InputSimultaneousConstraint(
@@ -255,6 +256,11 @@ final case class InputLinkedConstraint(
     topics: Set[NonEmptyString]
 )
 
+final case class InputLimitedTopicsCountConstraint(
+    topics: Set[NonEmptyString],
+    count: PosInt
+)
+
 /* All necessary config-readers and config-writers */
 given [A, C](using ConfigWriter[A]): ConfigWriter[IronType[A, C]] = ConfigWriter[A].contramap(identity)
 
@@ -263,6 +269,7 @@ given ConfigReader[NonPosScore] = ConfigReader[Double :| Negative0].map(i => Non
 given ConfigReader[Weight] = ConfigReader[Double :| Positive].map(Weight.apply)
 given ConfigWriter[Weight] = ConfigWriter[Double].contramap(_.value)
 
+given ConfigConvert[InputLimitedTopicsCountConstraint] = deriveConvert[InputLimitedTopicsCountConstraint]
 given ConfigConvert[InputLinkedConstraint] = deriveConvert[InputLinkedConstraint]
 given ConfigConvert[InputExclusiveConstraint] = deriveConvert[InputExclusiveConstraint]
 given ConfigConvert[InputSimultaneousConstraint] = deriveConvert[InputSimultaneousConstraint]

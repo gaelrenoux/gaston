@@ -59,6 +59,8 @@ final class PlanningSpaceNavigator(using private val problem: Problem) {
     /* Create a new unfilled schedule with the added topics */
     unfilled = unfilledNextSlotModified.clearSlots(slot).addTopics(slot, topicsToAdd)
 
+    if problem.softcodedConstraints.forall(_.isRespected(unfilled))
+
   } yield (unfilled, Move.Add(slot, topicsToAdd))
 
   private def isAddPossible(slotSchedule: SlotSchedule, topicsToAdd: Set[Topic]): Boolean = {
@@ -106,6 +108,8 @@ final class PlanningSpaceNavigator(using private val problem: Problem) {
 
     /* Generate the swap */
     unfilled = unfilledNextSlotModified.clearSlots(slot1, slot2).swapTopics(slot1 -> topics1, slot2 -> topics2)
+
+    if problem.softcodedConstraints.forall(_.isRespected(unfilled))
 
   } yield (unfilled, Move.Swap(topics1, topics2, isExt = false))
 
@@ -166,6 +170,8 @@ final class PlanningSpaceNavigator(using private val problem: Problem) {
     /* Generate the swap */
     unfilled = unfilledNextSlotModified.clearSlots(slot).replaceTopics(slot, oldTopics, newTopics)
 
+    if problem.softcodedConstraints.forall(_.isRespected(unfilled))
+
   } yield (unfilled, Move.Swap(oldTopics, newTopics, isExt = true))
 
   private def isExtSwapPossible(slotSchedule: SlotSchedule, topicsToRemove: Set[Topic], topicsToAdd: Set[Topic]): Boolean = {
@@ -204,6 +210,8 @@ final class PlanningSpaceNavigator(using private val problem: Problem) {
 
     /* Generate the swap */
     unfilled = unfilledNextSlotModified.removeTopics(slot, topicsToRemove)
+
+    if problem.softcodedConstraints.forall(_.isRespected(unfilled))
 
   } yield (unfilled, Move.Remove(slot, topicsToRemove))
 

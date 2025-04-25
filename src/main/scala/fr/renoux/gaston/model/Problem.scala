@@ -96,6 +96,8 @@ final case class Problem(
       case s: Constraint => Right(s)
     }.unzipEither
 
+  lazy val softcodedConstraints: Array[Constraint] = constraints.filterNot(_.isHardCoded).toArray
+
   lazy val mandatoryTopicsByPerson: ArrayMap[Person, Set[Topic]] =
     topicsSet.flatMap(t => t.mandatory.map(_ -> t)).groupToMap.toArrayMap(Set.empty)
 
