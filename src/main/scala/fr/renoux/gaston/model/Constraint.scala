@@ -25,6 +25,10 @@ trait Constraint {
   def toLongString: String
 
   def toAbstract: Product
+
+  /** If true, we don't need to check it when building a schedule because it's integrated into the code to build a schedule. */
+  // TODO the way it's coded right now, a not-hard-coded constraint MUST be applicable to a partial schedule
+  def isHardCoded: Boolean
 }
 
 object Constraint {

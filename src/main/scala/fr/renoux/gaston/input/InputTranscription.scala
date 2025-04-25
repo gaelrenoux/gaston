@@ -167,10 +167,16 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
     // TODO Merge simultaneous constraint (ex: Sim(1, 2) and Sim(2, 3) can be merged into Sim(1, 2, 3))
 
+    lazy val topicsLimitedCounts: Set[TopicsLimitedCount] =
+      input.constraints.limitedCount.map { inConstraint =>
+        TopicsLimitedCount(inConstraint.topics.flatMap(topicsByName).toArraySet, inConstraint.count)
+      }
+
     lazy val all: Set[Constraint] = {
       Set.empty[Constraint] ++ // force the correct type
         simultaneousTopics ++
-        notSimultaneousTopics
+        notSimultaneousTopics ++
+        topicsLimitedCounts
     }
   }
 

@@ -6,8 +6,9 @@ import fr.renoux.gaston.util.ArraySet
 import scala.annotation.tailrec
 
 /** None of those topics may be on the same slot. I.e., a slot may contain one (or none), but not several of them. */
-@hardCoded
 final case class TopicsNotSimultaneous(topics: ArraySet[Topic]) extends Constraint.SlotLevel {
+
+  override def isHardCoded: Boolean = true
 
   override def isRespectedSlot(schedule: SlotSchedule): Boolean = check(schedule.topicsList)
 
