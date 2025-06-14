@@ -32,10 +32,10 @@ class InputTranscription2Test extends TestBase {
 
     object ExpectedTopics {
       val Seq(
-        unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
-        alpha, beta, gamma, delta, // 6 to 9
-        epsilon1, epsilon2, eta1, eta2, // 10 to 13
-        theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
+      unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
+      alpha, beta, gamma, delta, // 6 to 9
+      epsilon1, epsilon2, eta1, eta2, // 10 to 13
+      theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
       ) = (0 until 20)
     }
 
@@ -126,7 +126,7 @@ class InputTranscription2Test extends TestBase {
 
     "constraints" - {
       "topicsSimultaneous" in {
-        transcription.constraints.topicsSimultaneous.size should be (6 + 14)
+        transcription.constraints.topicsSimultaneous.size should be(6 + 14)
         transcription.constraints.topicsSimultaneous.valuesSeq should be(
           Seq.fill(6)(emptyIdSet) ++
             Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
@@ -192,7 +192,7 @@ class InputTranscription2Test extends TestBase {
           0, // Theta #3 ~1
           0, // Theta #3 ~2
         ))
-        prefsPersonTopicOther(2) should be(Seq(  // weight 2
+        prefsPersonTopicOther(2) should be(Seq( // weight 2
           800 / 2, // Alpha
           0, // Beta
           0, // Gamma
@@ -261,6 +261,51 @@ class InputTranscription2Test extends TestBase {
         ))
       }
     }
+  }
+
+  "Bad model" in {
+    val input: InputModel = InputLoader.fromClassPath("transcription-test-bad.conf").force
+    val transcription = InputTranscription2(input)
+
+    transcription.errors.nonEmpty should be(true)
+
+    transcription.errors should contain("Settings: default min persons per topic (5) is higher than default max persons per topic (3)")
+    transcription.errors should contain("Settings: Min persons on unassigned (6) is higher than max persons on unassigned (2)")
+    transcription.errors should contain("Duplicate slot name: D2-afternoon")
+    transcription.errors should contain("Empty slot sequence at position 2")
+    transcription.errors should contain("Duplicate topic name: Gamma")
+    transcription.errors should contain("Topic [@Goto]: prefix @ is reserved by the software")
+    transcription.errors should contain("Topic [Spaw~nish]: Name cannot contain characters '~' or '#'")
+    transcription.errors should contain("Topic [Hash#Tag]: Name cannot contain characters '~' or '#'")
+    transcription.errors should contain("Topic [Beta]: Min (6) is higher than max (5)")
+    transcription.errors should contain("Topic [Eta]: undefined slots: [D14-morning], [D14-night]")
+    transcription.errors should contain("Duplicate person name: Donald")
+    transcription.errors should contain("Person [Enzo]: undefined absence slots: [D42], [D43]")
+    transcription.errors should contain("Person [Enzo]: undefined mandatory topics: [Dos], [Uno]")
+    transcription.errors should contain("Person [Enzo]: undefined forbidden topics: [Aleph], [Osef]")
+    transcription.errors should contain("Person [Enzo]: undefined incompatible persons: [Jack], [John]")
+    transcription.errors should contain("Person [Enzo]: undefined wished topics: [Biomega], [Megabio]")
+    transcription.errors should contain("Person [Enzo]: undefined wished persons: [Daisy], [Diana]")
+    transcription.errors should contain("Person [Albert]: topic is both mandatory and forbidden: [Delta]")
+    transcription.errors should contain("Exclusive constraint: undefined topics: [Hello], [World]")
+    transcription.errors should contain("Exclusive constraint: undefined exempted persons: [Gaston], [Martin]")
+    transcription.errors should contain("Exclusive constraint: should contain at least two topics: [Delta]")
+    transcription.errors should contain("Exclusive constraint: should contain at least two topics: None")
+    transcription.errors should contain("Linked constraint: undefined topics: [Earth], [Goodbye]")
+    transcription.errors should contain("Linked constraint: should contain at least two topics: [Delta]")
+    transcription.errors should contain("Linked constraint: should contain at least two topics: None")
+    transcription.errors should contain("Linked constraint: can't handle multi-occurrence topics: [Epsilon], [Theta]")
+    transcription.errors should contain("Simultaneous constraint: undefined topics: [Dragons], [Dungeons]")
+    transcription.errors should contain("Simultaneous constraint: should contain at least two topics: [Delta]")
+    transcription.errors should contain("Simultaneous constraint: should contain at least two topics: None")
+    transcription.errors should contain("Simultaneous constraint: can't handle long-duration topic: [Eta]")
+    transcription.errors should contain("Simultaneous constraint: different occurrence counts: [Epsilon], [Gamma]")
+    transcription.errors should contain("Not-simultaneous constraint: undefined topics: [Perils], [Princesses]")
+    transcription.errors should contain("Not-simultaneous constraint: should contain at least two topics: [Delta]")
+    transcription.errors should contain("Not-simultaneous constraint: should contain at least two topics: None")
+
+    transcription.errors.size should be(34)
+
   }
 
   "Real-world" - {
