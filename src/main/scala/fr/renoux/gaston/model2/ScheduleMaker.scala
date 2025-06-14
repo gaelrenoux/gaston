@@ -78,7 +78,7 @@ object ScheduleMaker {
   }
 
   def mkSchedule(problem: SmallProblem)
-      (init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit): Schedule = {
+    (init: (CountAll[SlotId], CountAll[TopicId], CountAll[PersonId], ScheduleDef) ?=> Unit): Schedule = {
     import problem.given
     given scheduleDef: ScheduleDef = ScheduleDef()
 
