@@ -32,7 +32,9 @@ final class InputTranscription2(rawInput: InputModel) {
 
   /* Get all counts first */
   given slotsCount: CountAll[SlotId] = CountAll[SlotId](input.slots.flatten.size)
+
   given topicsCount: CountAll[TopicId] = CountAll[TopicId](slotsCount.value + input.topics.map { inT => inT.forcedOccurrences * inT.forcedDuration }.sum)
+
   given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
@@ -358,7 +360,7 @@ object InputTranscription2 {
     Set.empty[String] ++ {
       if (input.settings.defaultMinPersonsPerTopic <= input.settings.defaultMaxPersonsPerTopic) None
       else Some(s"Settings: default min persons per topic (${input.settings.defaultMinPersonsPerTopic}) " +
-        s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic}) ")
+        s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic})")
     } ++ {
       if (input.settings.unassigned.minPersons <= input.settings.unassigned.maxPersons) None
       else Some(s"Settings: Min persons on unassigned (${input.settings.unassigned.minPersons}) " +
@@ -391,12 +393,12 @@ object InputTranscription2 {
     } ++ {
       input.topics
         .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
-        .map { t => s"Topic [${t.name}]: Min (${t.min}) is higher than max (${t.max})" }
+        .map { t => s"Topic [${t.name}]: Min (${t.min.getOrElse(0)}) is higher than max (${t.max.getOrElse(0)})" }
     } ++ {
       input.topics.flatMap { t =>
         val badSlots = t.slots.getOrElse(Set.empty).filter(s => !input.slotsSet.exists(_.name == s)).map(s => s"[$s]")
         if (badSlots.isEmpty) None
-        else Some(s"Topic [${t.name}]: undefined slots: ${badSlots.mkString(", ")}")
+        else Some(s"Topic [${t.name}]: undefined slots: ${badSlots.toList.sorted.mkString(", ")}")
       }
     }
   }
@@ -409,19 +411,25 @@ object InputTranscription2 {
       input.persons.flatMap { p =>
         val badSlots = p.absences.filter(!input.slotsNameSet.contains(_)).map(s => s"[$s]")
         if (badSlots.isEmpty) None
-        else Some(s"Person [${p.name}]: undefined absence slots: ${badSlots.mkString(", ")}")
+        else Some(s"Person [${p.name}]: undefined absence slots: ${badSlots.toList.sorted.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
         val badTopics = p.mandatory.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
         if (badTopics.isEmpty) None
-        else Some(s"Person [${p.name}]: undefined mandatory topics: ${badTopics.mkString(", ")}")
+        else Some(s"Person [${p.name}]: undefined mandatory topics: ${badTopics.toList.sorted.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
         val badTopics = p.forbidden.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
         if (badTopics.isEmpty) None
-        else Some(s"Person [${p.name}]: undefined forbidden topics: ${badTopics.mkString(", ")}")
+        else Some(s"Person [${p.name}]: undefined forbidden topics: ${badTopics.toList.sorted.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badPersons = p.incompatible.filter(!input.personsNameSet.contains(_)).map(p => s"[$p]")
+        if (badPersons.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined incompatible persons: ${badPersons.toList.sorted.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
@@ -430,81 +438,96 @@ object InputTranscription2 {
           case Right(t) if !input.topicsNameSet.contains(t) => s"[$t]"
         }
         if (badTopics.isEmpty) None
-        else Some(s"Person [${p.name}]: undefined wished topics: ${badTopics.mkString(", ")}")
+        else Some(s"Person [${p.name}]: undefined wished topics: ${badTopics.toList.sorted.mkString(", ")}")
       }
     } ++ {
       input.persons.flatMap { p =>
-        val badPersons = p.incompatible.filter(!input.personsNameSet.contains(_)).map(p => s"[$p]")
+        val badPersons = p.personWishes.keys.map(_.refineEither[Not[Empty]]).collect {
+          case Left(_) => "[]" // empty name
+          case Right(p) if !input.personsNameSet.contains(p) => s"[$p]"
+        }
         if (badPersons.isEmpty) None
-        else Some(s"Person [${p.name}]: undefined incompatible persons: ${badPersons.mkString(", ")}")
+        else Some(s"Person [${p.name}]: undefined wished persons: ${badPersons.toList.sorted.mkString(", ")}")
+      }
+    } ++ {
+      input.persons.flatMap { person =>
+        val bothMandatoryAndForbidden = person.mandatory.intersect(person.forbidden)
+        bothMandatoryAndForbidden.map { topicName =>
+          s"Person [${person.name}]: topic is both mandatory and forbidden: [$topicName]"
+        }
       }
     }
   }
 
   private def checkConstraintErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++ {
-      input.constraints.exclusive
-        .flatMap(_.topics)
-        .filter(!input.topicsNameSet.contains(_))
-        .map(t => s"Exclusive constraint: unknown topic: [$t]")
+      input.constraints.exclusive.flatMap { inConstraint =>
+        val badTopics = inConstraint.topics.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Exclusive constraint: undefined topics: ${badTopics.toList.sorted.mkString(", ")}")
+      }
     } ++ {
-      input.constraints.exclusive
-        .flatMap(_.forcedExemptions)
-        .filter(!input.personsNameSet.contains(_))
-        .map(p => s"Exclusive constraint: unknown person: [$p]")
+      input.constraints.exclusive.flatMap { inConstraint =>
+        val badPersons = inConstraint.forcedExemptions.filter(!input.personsNameSet.contains(_)).map(p => s"[$p]")
+        if (badPersons.isEmpty) None
+        else Some(s"Exclusive constraint: undefined exempted persons: ${badPersons.toList.sorted.mkString(", ")}")
+      }
     } ++ {
       input.constraints.exclusive
         .filter(_.topics.size < 2)
-        .map(c => s"Exclusive constraint: should contain at least two topics: [${c.topics}]")
+        .map(c => s"Exclusive constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
     } ++ {
-      input.constraints.linked
-        .flatMap(_.topics)
-        .filter(!input.topicsNameSet.contains(_))
-        .map(t => s"Linked constraint: unknown topic: [$t]")
-    } ++ {
-      input.constraints.linked
-        .flatMap(_.topics)
-        .flatMap(input.topicsByName.get)
-        .filter(_.forcedOccurrences > 1)
-        .map(t => s"Linked constraint: can't handle multi-occurrence topics: [$t]")
+      input.constraints.linked.flatMap { inConstraint =>
+        val badTopics = inConstraint.topics.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Linked constraint: undefined topics: ${badTopics.toList.sorted.mkString(", ")}")
+      }
     } ++ {
       input.constraints.linked
         .filter(_.topics.size < 2)
-        .map(c => s"Linked constraint: should contain at least two topics: [${c.topics}]")
+        .map(c => s"Linked constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
+    } ++ {
+      input.constraints.linked.flatMap { inConstraint =>
+        val badTopics = inConstraint.topics.flatMap(input.topicsByName.get).filter(_.forcedOccurrences > 1).map(t => s"[${t.name}]")
+        if (badTopics.isEmpty) None
+        else Some(s"Linked constraint: can't handle multi-occurrence topics: ${badTopics.toList.sorted.mkString(", ")}")
+      }
+    } ++ {
+      input.constraints.simultaneous.flatMap { inConstraint =>
+        val badTopics = inConstraint.topics.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Simultaneous constraint: undefined topics: ${badTopics.toList.sorted.mkString(", ")}")
+      }
     } ++ {
       input.constraints.simultaneous
-        .flatMap(_.topics)
-        .filter(!input.topicsNameSet.contains(_))
-        .map(t => s"Simultaneous constraint: unknown topic: [$t]")
+        .filter(_.topics.size < 2)
+        .map(c => s"Simultaneous constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
+    } ++ {
+      input.constraints.simultaneous
+        .flatMap { inConstraint =>
+          val badTopics = inConstraint.topics.flatMap(input.topicsByName.get).filter(_.forcedDuration > 1).map(t => s"[${t.name}]")
+          if (badTopics.isEmpty) None
+          else Some(s"Simultaneous constraint: can't handle long-duration topic: ${badTopics.toList.sorted.mkString(", ")}")
+        }
     } ++ {
       input.constraints.simultaneous
         .flatMap { inConstraint =>
           val topics = inConstraint.topics.flatMap(input.topicsByName.get)
           if (topics.map(_.forcedOccurrences).toSet.size > 1) {
-            Some(s"Simultaneous constraint: different occurrence count: [${inConstraint.topics.mkString(", ")}]") // TODO Not sure about that one
+            val badTopics = topics.map(t => s"[${t.name}]")
+            Some(s"Simultaneous constraint: different occurrence counts: ${badTopics.toList.sorted.mkString(", ")}") // TODO Not sure about that one
           } else None
         }
     } ++ {
-      input.constraints.simultaneous
-        .flatMap { inConstraint =>
-          val topics = inConstraint.topics.flatMap(input.topicsByName.get)
-          topics.filter(_.forcedDuration > 1).map { topic =>
-            s"Simultaneous constraint: can't handle long-duration topic: [${topic.name}]"
-          }
-        }
-    } ++ {
-      input.constraints.simultaneous
-        .filter(_.topics.size < 2)
-        .map(c => s"Simultaneous constraint: should contain at least two topics: [${c.topics}]")
-    } ++ {
-      input.constraints.notSimultaneous
-        .flatMap(_.topics)
-        .filter(!input.topicsNameSet.contains(_))
-        .map(t => s"Not-simultaneous constraint: unknown topic: [$t]")
+      input.constraints.notSimultaneous.flatMap { inConstraint =>
+        val badTopics = inConstraint.topics.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
+        if (badTopics.isEmpty) None
+        else Some(s"Not-simultaneous constraint: undefined topics: ${badTopics.toList.sorted.mkString(", ")}")
+      }
     } ++ {
       input.constraints.notSimultaneous
         .filter(_.topics.size < 2)
-        .map(c => s"SNot-simultaneous constraint: should contain at least two topics: [${c.topics}]")
+        .map(c => s"Not-simultaneous constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
     }
   }
 
