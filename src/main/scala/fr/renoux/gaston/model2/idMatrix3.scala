@@ -47,7 +47,7 @@ object IdMatrix3 {
   }
 
   inline def fill[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
-      (a: => A)(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]): IdMatrix3[I, J, K, A] = {
+  (a: => A)(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]): IdMatrix3[I, J, K, A] = {
     val result = new Array[A](countI.value * countJ.value * countK.value)
     result.fastFill(a)
     result
@@ -73,7 +73,7 @@ object IdMatrix3 {
   }
 
   inline def unsafeFrom[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A: ClassTag]
-      (it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
+  (it: Iterable[Iterable[Iterable[A]]]): IdMatrix3[I, J, K, A] = {
     val countI: Count[I] = it.size
     val countJ: Count[J] = it.head.size
     val countK: Count[K] = it.head.head.size
