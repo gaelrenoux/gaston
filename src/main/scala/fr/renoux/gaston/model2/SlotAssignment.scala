@@ -178,7 +178,6 @@ final class SlotAssignment(
   /* CHECKUPS */
 
   /** Verifies if the schedule is consistent. Very useful in tests. Poor performance.
-    *
     * @return A list of errors.
     */
   def slowCheckup: List[String] = {
@@ -226,8 +225,8 @@ final class SlotAssignment(
   override def equals(obj: Any): Boolean = obj match {
     case that: SlotAssignment =>
       problem == that.problem &&
-          slot == that.slot &&
-          personsToTopic.actualEquals(that.personsToTopic)
+        slot == that.slot &&
+        personsToTopic.actualEquals(that.personsToTopic)
     case _ => false
   }
 }
