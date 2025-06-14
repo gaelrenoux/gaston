@@ -9,8 +9,8 @@ import scala.util.Random
 
 
 /** Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them. Every person
- * should already be assigned somewhere (this will not assign unassigned persons).
- */
+  * should already be assigned somewhere (this will not assign unassigned persons).
+  */
 final class AssignmentImprover(private val problem: SmallProblem)(using private val ctx: Context) {
 
   given SmallProblem = problem
@@ -23,10 +23,10 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
   private val defaultMaxSuccessiveRoundsCountPerSlot = defaultMaxRoundsCount / problem.slotsCount.value
 
   /** Main method. Modifies the schedule to make it better (mutates the argument).
-   *
-   * Ends either because the schedule can't be perfected any more or because the limit number of rounds has been
-   * reached.
-   */
+    *
+    * Ends either because the schedule can't be perfected any more or because the limit number of rounds has been
+    * reached.
+    */
   def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(using Random): Unit =
     chrono("PersonPlacementImprover >  improve") {
       val slotsToRandMobilePersons = IdMap.tabulate[SlotId, Array[PersonId]] { sid =>

@@ -13,11 +13,11 @@ import scala.collection.mutable
 
 
 /** Converts the Input object (canonical input) to the Problem object (internal representation of the problem to
- * optimize).
- *
- * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
- * result in the `result` field.
- */
+  * optimize).
+  *
+  * It is split in various fields for clarity and ease of development. To use it, simply instantiate it and get the end
+  * result in the `result` field.
+  */
 final class InputTranscription2(rawInput: InputModel) {
 
   import fr.renoux.gaston.input.InputTranscription2.*
@@ -36,7 +36,7 @@ final class InputTranscription2(rawInput: InputModel) {
   given personsCount: CountAll[PersonId] = CountAll[PersonId](input.persons.size)
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
-  val unassignedTopicsSet: SmallIdSet[TopicId] = SmallIdSet(unassignedTopicsCount.range*)
+  val unassignedTopicsSet: SmallIdSet[TopicId] = SmallIdSet(unassignedTopicsCount.range *)
 
 
   /* Settings */
@@ -59,7 +59,7 @@ final class InputTranscription2(rawInput: InputModel) {
   /* Persons */
   lazy val personsName: IdMap[PersonId, String] = IdMap.unsafeFrom[PersonId, String](input.persons.map(_.name: String).toArray)
   lazy val personsWeight: IdMap[PersonId, Weight] = IdMap.unsafeFrom[PersonId, Weight](input.persons.map(_.weight.value: Weight).toArray)
-  lazy val personsBaseScore: IdMap[PersonId,Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(p => p.baseScore.value / p.weight.value: Score).toArray)
+  lazy val personsBaseScore: IdMap[PersonId, Score] = IdMap.unsafeFrom[PersonId, Score](input.persons.map(p => p.baseScore.value / p.weight.value: Score).toArray)
   lazy val personsIdByName: Map[String, PersonId] = personsName.toReverseMap
 
 
@@ -100,7 +100,7 @@ final class InputTranscription2(rawInput: InputModel) {
     val topicsFirstPartIdsByBaseName = mutable.Map[String, mutable.Set[TopicId]]()
 
     /* Insert unassigned topics */
-    fastLoop(0, slotsCount.value) { id => 
+    fastLoop(0, slotsCount.value) { id =>
       topicsName(id) = unassignedTopicName(slotsNames(id))
       topicsMin(id) = Count.Zero // TODO handle settings of people not being alone unassigned. Probably as a preference.
       topicsMax(id) = Count.maxCount[PersonId]
@@ -113,11 +113,11 @@ final class InputTranscription2(rawInput: InputModel) {
     /* Then handle normal topics */
     var topicIdInt = slotsCount.value
     input.topics.foreach { (inTopic: InputTopic) =>
-      val mandatories: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
-      val forbiddens: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsIdByName)*)
+      val mandatories: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.mandatory.contains(inTopic.name)).map(_.name).map(personsIdByName) *)
+      val forbiddens: SmallIdSet[PersonId] = SmallIdSet(input.persons.filter(_.forbidden.contains(inTopic.name)).map(_.name).map(personsIdByName) *)
       val min: Count[PersonId] = inTopic.min.getOrElse(settings.defaultMinPersonsPerTopic)
       val max: Count[PersonId] = inTopic.max.getOrElse(settings.defaultMaxPersonsPerTopic)
-      val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq*) }
+      val allowedSlots: SmallIdSet[SlotId] = inTopic.slots.fold(SmallIdSet.full[SlotId]) { slots => SmallIdSet(slots.map(slotsIdByName).toSeq *) }
       topicsIdsByBaseName(inTopic.name) = mutable.Set()
       topicsFirstPartIdsByBaseName(inTopic.name) = mutable.Set()
 
@@ -169,13 +169,12 @@ final class InputTranscription2(rawInput: InputModel) {
   }
 
 
-
   /* Preferences */
   lazy object preferences {
 
     /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
-     * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
-     * high values that everyone else's preferences don't matter anymore. */
+      * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
+      * high values that everyone else's preferences don't matter anymore. */
     // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes. Easy handling could be to add whatever is necessary to all make them positive.
     // TODO a wish on a multi-duration topic should count as many times as the duration, to avoid penalizing that person heavily (reward will be gained on each part)
     // TODO person wishes should count more than once, because they can be satisfied more than once
@@ -243,7 +242,7 @@ final class InputTranscription2(rawInput: InputModel) {
     if (input.settings.unassigned.allowed) input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
       personsCount.foreach { pid =>
         val inPerson = input.persons(pid.value)
-        val bufferEntry =  prefsTopicsExclusiveBuffer(pid)
+        val bufferEntry = prefsTopicsExclusiveBuffer(pid)
         bufferEntry._1.append(unassignedTopicsSet)
         bufferEntry._2.append(score.value / inPerson.weight.value)
       }
@@ -253,7 +252,7 @@ final class InputTranscription2(rawInput: InputModel) {
       val occurrenceFirstParts = inTopic.occurrenceInstances.map(_.partInstances.head)
       val occurrenceFirstPartsIds = occurrenceFirstParts.map(t => topics.topicsIdByName(t.name))
       val mandatoriesIds = topics.topicsMandatories(occurrenceFirstPartsIds.head)
-      val topicIdSet = SmallIdSet(occurrenceFirstPartsIds*)
+      val topicIdSet = SmallIdSet(occurrenceFirstPartsIds *)
       personsCount.foreach { pid =>
         if (!mandatoriesIds.contains(pid)) {
           val bufferEntry = prefsTopicsExclusiveBuffer(pid)
@@ -291,7 +290,7 @@ final class InputTranscription2(rawInput: InputModel) {
         /* Link separately the parts of each occurrence */
         inTopic.occurrenceInstances.map { inTopicOcc =>
           val topicIds = inTopicOcc.partInstances.map(_.name).map(topics.topicsIdByName)
-          SmallIdSet(topicIds*)
+          SmallIdSet(topicIds *)
         }
       }
       linkedFromConstraints.toArray ++ linkedFromDuration.toArray
@@ -339,10 +338,10 @@ final class InputTranscription2(rawInput: InputModel) {
 
 object InputTranscription2 {
   /** A prefix on the topic-name for synthetic topics (topics created by Gaston, not present in the input). Currently
-   * only unassigned topics, but reserving it just in case. */
+    * only unassigned topics, but reserving it just in case. */
   val TopicSyntheticPrefix = "@"
 
-  private def unassignedTopicName(slotName: String): String = 
+  private def unassignedTopicName(slotName: String): String =
     s"${TopicSyntheticPrefix}Unassigned ($slotName)"
 
   private def checkErrors(input: InputModel): Set[String] = {
