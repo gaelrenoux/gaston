@@ -64,6 +64,7 @@ final class InputTranscription2(rawInput: InputModel) {
 
 
 
+
   /* Slots */
   private lazy val flattenedSlots = input.slots.flatten
   lazy val slotsNames: IdMap[SlotId, String] = IdMap.unsafeFrom[SlotId, String](flattenedSlots.map(_.name: String).toArray)
@@ -263,7 +264,7 @@ final class InputTranscription2(rawInput: InputModel) {
     }
     /* Exclusive preference explicitly required by global constraints */
     input.constraints.exclusive.foreach { inConstraint =>
-      val exemptedPersonIds = inConstraint.exemptions.map(personsIdByName)
+      val exemptedPersonIds = inConstraint.forcedExemptions.map(personsIdByName)
       inConstraint.topics.develop(topics.topicsFirstPartIdsByBaseName(_).toSet).foreach { topicIds =>
         personsCount.foreach { pid =>
           if (!exemptedPersonIds.contains(pid)) {
@@ -448,7 +449,7 @@ object InputTranscription2 {
         .map(t => s"Exclusive constraint: unknown topic: [$t]")
     } ++ {
       input.constraints.exclusive
-        .flatMap(_.exemptions)
+        .flatMap(_.forcedExemptions)
         .filter(!input.personsNameSet.contains(_))
         .map(p => s"Exclusive constraint: unknown person: [$p]")
     } ++ {
