@@ -29,5 +29,5 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
       sb.append("Unscheduled topics: ").append(unscheduled.map(problem.topicsToName.apply).toSeq.sorted.mkString(", "))
       sb.toString
     }
-    }
+  }
 }
