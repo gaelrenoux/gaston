@@ -21,6 +21,22 @@ class SmallProblemTest extends TestBase {
   theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
   ) = problem.topicsCount.range
 
+  "topicsToLinkedTopics" in {
+    val expected = IdMap(
+      alpha -> SmallIdSet(eta1, eta2),
+      eta1 -> SmallIdSet(alpha, eta2),
+      eta2 -> SmallIdSet(alpha, eta1),
+      theta11 -> SmallIdSet(theta12),
+      theta12 -> SmallIdSet(theta11),
+      theta21 -> SmallIdSet(theta22),
+      theta22 -> SmallIdSet(theta21),
+      theta31 -> SmallIdSet(theta32),
+      theta32 -> SmallIdSet(theta31)
+    )
+    problem.topicsToLinkedTopics(alpha).toSet should be(Set(eta1, eta2))
+    problem.topicsToLinkedTopics should be(expected)
+  }
+
   "personTopicsMandatory" in {
     val expected = IdMap(
       albert -> SmallIdSet(alpha, delta),
