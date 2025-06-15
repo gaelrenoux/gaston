@@ -59,7 +59,15 @@ final class Schedule(
     totalScore
   }
 
-  @testOnly
+  def getPersonsTotalScore(): Score = {
+    personsTotalScore
+  }
+
+  def getTopicsTotalScore(): Score = {
+    topicsTotalScore
+  }
+
+  /** Do NOT modify the return value */
   def getPersonsToScore(): IdMap[PersonId, Score] = {
     personsToScore
   }
