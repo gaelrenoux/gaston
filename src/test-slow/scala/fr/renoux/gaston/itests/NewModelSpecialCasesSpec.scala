@@ -89,7 +89,7 @@ class NewModelSpecialCasesSpec extends TestBase {
         throw new IllegalStateException(checkupResult.mkString("Errors:\n", "\n", "\n"))
       }
 
-      improver.improve(schedule)(using new Random(0))
+      improver.improve(schedule)//(using new Random(0))
       val score = schedule.getTotalScore()
 
       given SchedulePrinter = new SchedulePrinter(problem)
