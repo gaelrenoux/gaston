@@ -1,8 +1,8 @@
 package fr.renoux.gaston.engine2
 
 import fr.renoux.gaston.model2.*
-import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
+import fr.renoux.gaston.util.{Context, fastForeach, fastLoop}
 
 import scala.math.Ordering.Implicits.infixOrderingOps
 
@@ -47,16 +47,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         /* Iterate over persons to change */
         while (blockedPersons < persons.length && subRoundsLeft > 0) {
           val pid = persons(personIx)
-          var targetTopicIx = 0
-          var foundGoodChange = false
-
-          /* Iterate over target topics for a move */
-          while (!foundGoodChange && targetTopicIx < topics.length) {
-            val targetTid = topics(targetTopicIx)
-            foundGoodChange = goodChangeForPersonTopic(schedule, assignment, pid, targetTid)
-            targetTopicIx += 1
-          }
-
+          val foundGoodChange = goodChangeForPerson(schedule, assignment, topics, pid)
           if (foundGoodChange) {
             // We changed something on the current slot, making new changes possible
             blockedPersons = 0
@@ -84,53 +75,58 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
 
 
-  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
-  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, targetTid: TopicId): Boolean = {
-    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
+  /** Iterate over all possible topics for a move on that slot, for that person */
+  private def goodChangeForPerson(schedule: Schedule, assignment: SlotAssignment, topics: Array[TopicId], pid: PersonId): Boolean = {
 
-    if (problem.isPersonForbidden(pid, targetTid)) false // Person is forbidden on the target topic, don't bother
-    else {
-      val currentTid = assignment.personsToTopic(pid)
-      if (currentTid == targetTid) false
-      else {
-        var found = false
-        val currentScore = schedule.getTotalScore()
+    val currentTid: TopicId = assignment.personsToTopic(pid)
+    val currentTidLinks = schedule.problem.prefsTopicsLinked
 
-        /* First, let's see if we can just move the person onto the target topic */
-        if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
-          /* We can just move that person on the target topic */
-          assignment.move(pid, currentTid, targetTid)
-          val newScore = schedule.getTotalScore()
-          if (newScore <= currentScore) {
-            val _ = assignment.undoMove(pid, currentTid, targetTid)
-          } else {
-            // found a good one
-            found = true
-          }
+    topics.fastForeach { targetTid =>
+      if (currentTid != targetTid) {
+        if (goodChangeForPersonTopic(schedule, assignment, pid, currentTid, targetTid)) {
+          return true
         }
-
-        /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
-        if (!found) {
-          val targetTopicPersons = assignment.topicsToPersons(targetTid)
-          targetTopicPersons.foreachWhile { otherPid =>
-            // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
-            if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
-              assignment.swap(pid, currentTid, otherPid, targetTid)
-              val newScore = schedule.getTotalScore()
-              if (newScore <= currentScore) {
-                val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
-              } else {
-                // found a good one
-                found = true
-              }
-            }
-            !found
-          } // end foreachWhile
-        }
-
-        found
       }
     }
+    false
+  }
+
+
+  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
+  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, currentTid: TopicId, targetTid: TopicId): Boolean = {
+    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
+
+    if (problem.isPersonForbidden(pid, targetTid)) {
+      return false // Person is forbidden on the target topic, don't bother
+    }
+
+    val currentScore = schedule.getTotalScore()
+    /* First, let's see if we can just move the person onto the target topic */
+    if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+      /* We can just move that person on the target topic */
+      assignment.move(pid, currentTid, targetTid)
+      val newScore = schedule.getTotalScore()
+      if (newScore > currentScore) {
+        return true // accept this change, it looks good
+      }
+      val _ = assignment.undoMove(pid, currentTid, targetTid) // wasn't good, rollback the change
+    }
+
+    /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
+    val targetTopicPersons = assignment.topicsToPersons(targetTid)
+    targetTopicPersons.foreach { otherPid =>
+      // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+      if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+        assignment.swap(pid, currentTid, otherPid, targetTid)
+        val newScore = schedule.getTotalScore()
+        if (newScore > currentScore) {
+          return true // accept this change, it looks good
+        }
+        val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+      }
+    } // end foreachWhile
+
+    false
   }
 
   // TODO From previous version:
