@@ -281,6 +281,7 @@ final class InputTranscription2(rawInput: InputModel) {
       prefsTopicsExclusiveBuffer.view.mapValues { case (topicSets, scores) =>
         Exclusivities(topicSets.toArray, scores.toArray)
       }
+      // TODO Merge if possible
     )
 
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] = {
@@ -296,7 +297,8 @@ final class InputTranscription2(rawInput: InputModel) {
           SmallIdSet(topicIds *)
         }
       }
-      linkedFromConstraints.toArray ++ linkedFromDuration.toArray
+
+      SmallIdSet.mergeIfIntersect(linkedFromConstraints.toList ++ linkedFromDuration.toList).toArray
     }
 
   } // end preferences
