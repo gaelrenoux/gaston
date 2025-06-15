@@ -513,6 +513,27 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
+  "mergeIfIntersect" - {
+
+    given CountAll[TopicId] = CountAll[TopicId](64)
+
+    "Empty case" in {
+      SmallIdSet.mergeIfIntersect(List[SmallIdSet[TopicId]]()) should be(Nil)
+    }
+
+    "Just one entry" in {
+      SmallIdSet.mergeIfIntersect(List(SmallIdSet[TopicId](1, 2))) should be(List(SmallIdSet[TopicId](1, 2)))
+    }
+
+    "Nominal case" in {
+      SmallIdSet.mergeIfIntersect(
+        SmallIdSet[TopicId](1, 2) :: SmallIdSet[TopicId](3, 4) :: SmallIdSet[TopicId](2, 9) :: SmallIdSet[TopicId](3, 9) :: Nil
+      ) should be(List(SmallIdSet[TopicId](1, 2, 3, 4, 9)))
+    }
+
+
+  }
+
   "Printable" in {
     val a = SmallIdSet[SlotId](3, 8, 47, 63)
     a.toPrettyString should be("[ 3, 8, 47, 63 ]")
