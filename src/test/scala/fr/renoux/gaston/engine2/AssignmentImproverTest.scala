@@ -89,4 +89,80 @@ class AssignmentImproverTest extends TestBase {
 
   }
 
+  "Starting from an unassigned schedule" - {
+    val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
+    val problem = InputTranscription2(input).result.toEither.force
+    given SchedulePrinter = new SchedulePrinter(problem)
+
+    val Seq(d1, d2) = problem.slotsCount.range
+    val Seq(unassigned0, unassigned1, alpha, beta, gamma, delta, epsilon1, epsilon2, eta1, eta2, theta) =
+      problem.topicsCount.range
+    val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
+
+    def scheduleBase() = mkSchedule(problem) {
+      d1.slot {
+        unassigned0.topic(a, b, c, d, e, f, g, h, i, j, k, l)
+        alpha.topicEmpty
+        epsilon1.topicEmpty
+        gamma.topicEmpty
+        eta1.topicEmpty
+      }
+      d2.slot {
+        unassigned1.topic(a, b, c, d, e, f, g, h, i, j, k, l)
+        beta.topicEmpty
+        epsilon2.topicEmpty
+        delta.topicEmpty
+        eta2.topicEmpty
+      }
+    }
+
+    val baseScore: Score = {
+      val sb = scheduleBase()
+      println(sb)
+      val s = sb.getTotalScore()
+      println(s"Score: $s")
+      s
+    }
+
+    val improver = new AssignmentImprover(problem)
+
+    "Improved schedule should be better than the base one" in {
+      given Random = new Random(0)
+      val schedule = scheduleBase()
+      improver.improve(schedule)
+      val newScore = schedule.getTotalScore()
+      newScore should be > baseScore
+      println(schedule.toPrettyString)
+      println(s"Score: $newScore")
+    }
+
+    "Repeated improvements should do nothing (usually)" in {
+      given Random = new Random(0)
+      val schedule = scheduleBase()
+      improver.improve(schedule)
+      val newScore = schedule.getTotalScore()
+      newScore should be > baseScore
+      //println(schedule.toPrettyString)
+      //println(s"Score: $newScore")
+      improver.improve(schedule)
+      val newNewScore = schedule.getTotalScore()
+      newNewScore should be(newScore)
+      //println(schedule.toPrettyString)
+      //println(s"Score: $newScore")
+    }
+
+    "Multiple runs should produce the same result" in {
+      given Random = new Random(0)
+
+      val allResults = (0 until 10000).map { _ =>
+        val schedule = scheduleBase()
+        improver.improve(schedule)
+        schedule.getTotalScore()
+      }.toSet
+
+      allResults should be(Set(-143.5546875)) // TODO score is so bad due to the linked constraint
+    }
+
+  }
+
 }
