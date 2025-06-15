@@ -48,7 +48,24 @@ class SchedulePrinterTest extends TestBase {
         |    Delta ==> Galahad, Hypatia, Ignace
         |    Epsilon #2 ==> Albert, Daniela, Eric
         |    Eta ~2 ==> Joan, Kevin, Laura
-        |Unscheduled topics: Theta""".stripMargin)
+        |Unscheduled topics: Theta
+        |
+        |Total score: 0.0
+        |  Pure topics: 0.0
+        |  Persons: 0.0
+        |    Albert: 0.0
+        |    Bianca: 0.0
+        |    Charly: 0.0
+        |    Daniela: 0.0
+        |    Eric: 0.0
+        |    Fiona: 0.0
+        |    Galahad: 0.0
+        |    Hypatia: 0.0
+        |    Ignace: 0.0
+        |    Joan: 0.0
+        |    Kevin: 0.0
+        |    Laura: 0.0
+        |""".stripMargin)
 
   }
 }
