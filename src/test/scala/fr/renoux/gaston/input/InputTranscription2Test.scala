@@ -253,8 +253,7 @@ class InputTranscription2Test extends TestBase {
 
       "prefsTopicsLinked" in {
         transcription.preferences.prefsTopicsLinked.view.map(_.toSet).toSet should be(Set(
-          Set(6, 12), // Alpha + Eta 1
-          Set(12, 13), // Eta parts 1 and 2
+          Set(6, 12, 13), // Alpha + Eta 1 + Eta 2
           Set(14, 15), // Theta #1 parts 1 and 2
           Set(16, 17), // Theta #2 parts 1 and 2
           Set(18, 19), // Theta #3 parts 1 and 2

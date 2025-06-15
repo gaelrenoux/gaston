@@ -44,6 +44,18 @@ final class SmallProblem(
   given CountAll[PersonId] = CountAll(personsCount)
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
+
+  val topicsToLinkedTopics: IdMap[TopicId, SmallIdSet[TopicId]] = {
+    val init = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
+    prefsTopicsLinked.fastForeach { linkedTopics =>
+      linkedTopics.foreach { tid =>
+        init(tid) = init(tid) ++ linkedTopics - tid
+      }
+    }
+    init
+  }
+
+
   val personsToMandatoryTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
     val personsToTopicMap = topicsToMandatories.toSeq.flatMap { (tid, pids) =>
       pids.toSet.toSeq.map(_ -> tid)
