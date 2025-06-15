@@ -5,7 +5,6 @@ import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.util.Context.chrono
 
 import scala.math.Ordering.Implicits.infixOrderingOps
-import scala.util.Random
 
 
 /** Improves an existing Schedule by moving persons around. Does not reschedule topics, or remove them. Every person
@@ -27,21 +26,17 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     * Ends either because the schedule can't be perfected any more or because the limit number of rounds has been
     * reached.
     */
-  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount)(using Random): Unit =
+  def improve(schedule: Schedule, maxRounds: Int = defaultMaxRoundsCount): Unit =
     chrono("PersonPlacementImprover >  improve") {
-      val slotsToRandMobilePersons = IdMap.tabulate[SlotId, Array[PersonId]] { sid =>
-        schedule.slotsToAssignment(sid).mobilePersons.toShuffledArray
-      }
-      val slotsToRandTopics: IdMap[SlotId, Array[TopicId]] = schedule.slotsToTopics.mapValues(_.toShuffledArray)
 
       var roundsLeft = maxRounds
-      var sid: SlotId = problem.slotsCount.random
+      var sid: SlotId = 0 // start on the first slot
       var blockedSlots = 0
 
       /* Iterate over slots */
       while (blockedSlots < problem.slotsCount && roundsLeft > 0) {
-        val randPersons = slotsToRandMobilePersons(sid)
-        val randTopics = slotsToRandTopics(sid)
+        val persons = schedule.slotsToAssignment(sid).mobilePersons.toArray
+        val topics = schedule.slotsToTopics(sid).toArray
         val assignment = schedule.slotsToAssignment(sid)
 
         var changesMade = false
@@ -50,14 +45,14 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         var blockedPersons = 0
 
         /* Iterate over persons to change */
-        while (blockedPersons < randPersons.length && subRoundsLeft > 0) {
-          val pid = randPersons(personIx)
+        while (blockedPersons < persons.length && subRoundsLeft > 0) {
+          val pid = persons(personIx)
           var targetTopicIx = 0
           var foundGoodChange = false
 
           /* Iterate over target topics for a move */
-          while (!foundGoodChange && targetTopicIx < randTopics.length) {
-            val targetTid = randTopics(targetTopicIx)
+          while (!foundGoodChange && targetTopicIx < topics.length) {
+            val targetTid = topics(targetTopicIx)
             foundGoodChange = goodChangeForPersonTopic(schedule, assignment, pid, targetTid)
             targetTopicIx += 1
           }
@@ -71,7 +66,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
             blockedPersons += 1
           }
 
-          personIx = (personIx + 1) % randPersons.length
+          personIx = (personIx + 1) % persons.length
           subRoundsLeft -= 1
           roundsLeft -= 1
         }
@@ -86,11 +81,13 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
         sid = sid.next
       }
-
     }
 
 
-  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, targetTid: TopicId): Boolean =
+  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
+  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, targetTid: TopicId): Boolean = {
+    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
+
     if (problem.isPersonForbidden(pid, targetTid)) false // Person is forbidden on the target topic, don't bother
     else {
       val currentTid = assignment.personsToTopic(pid)
@@ -112,11 +109,12 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
           }
         }
 
-        /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one */
+        /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
         if (!found) {
           val targetTopicPersons = assignment.topicsToPersons(targetTid)
           targetTopicPersons.foreachWhile { otherPid =>
-            if (!problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+            // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+            if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
               assignment.swap(pid, currentTid, otherPid, targetTid)
               val newScore = schedule.getTotalScore()
               if (newScore <= currentScore) {
@@ -133,9 +131,9 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         found
       }
     }
+  }
 
   // TODO From previous version:
-  // - We might be examining swaps twice, once from each side. Can we exclude that?
-  // - I might need to bring forbidden back as a constraint, to avoid evaluating the score when it's never gonna help.
+  // - Need to handle linked topic. Right now we just can't move people on/off them.
 
 }
