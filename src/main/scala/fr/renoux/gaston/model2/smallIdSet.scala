@@ -2,7 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
-import scala.annotation.targetName
+import scala.annotation.{tailrec, targetName}
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.util.Random
@@ -212,6 +212,30 @@ object SmallIdSet {
       }
     }
     result.toSet
+  }
+
+  /** Merges together all sets that shares at least one common element.
+    * TODO performance is atrocious, but this will do for now
+    */
+  @tailrec
+  def mergeIfIntersect[I <: Id : CountAll](sets: List[SmallIdSet[I]]): List[SmallIdSet[I]] = {
+    sets match {
+      case Nil => Nil
+      case set :: otherSets =>
+        val result = mergeFirstIfIntersect(set, otherSets)
+        if (result.length < sets.length) mergeIfIntersect(result)
+        else result
+    }
+  }
+
+  /** Utility function for mergeIfIntersect. Atrocious performance. */
+  private def mergeFirstIfIntersect[I <: Id : CountAll](set: SmallIdSet[I], sets: List[SmallIdSet[I]]): List[SmallIdSet[I]] = {
+    sets match {
+      case Nil => List(set)
+      case (h: SmallIdSet[I]) :: t =>
+        if ((h && set).nonEmpty) (h ++ set) :: t
+        else h :: mergeFirstIfIntersect(set, t)
+    }
   }
 
   given [I >: Int <: Id : Printable]: Printable[SmallIdSet[I]] with {
