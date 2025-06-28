@@ -235,7 +235,10 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       val personMissedSlots = inPerson.absences.size + inPerson.minFreeSlots.getOrElse(0)
       val absenceRatio = personMissedSlots.toDouble / slotsByName.size
       val adjustedAbsenceRatio = absenceRatio * input.settings.absenceAdjustmentFactor
-      val scoreFactor = Constants.PersonTotalScore.value / totalWishScore / (1 - adjustedAbsenceRatio)
+      val scoreFactor = {
+        if (totalWishScore == 0) 1.0 // shouldn't happen, but just in case...
+        else Constants.PersonTotalScore.value / totalWishScore / (1 - adjustedAbsenceRatio)
+      }
       inPerson.name -> scoreFactor
     }.toMap
 
