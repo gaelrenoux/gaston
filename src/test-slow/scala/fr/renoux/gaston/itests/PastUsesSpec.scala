@@ -90,7 +90,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     count should be(10L)
   }
 
-  it should "return a great result after 1000 schedules" in {
+  it should "return a great result after 100 schedules" in {
     val (result, count) = runConcurrently(r32023, 100, 4)
     println(result.toFormattedString)
     count should be(100L)

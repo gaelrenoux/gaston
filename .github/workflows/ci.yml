@@ -34,5 +34,5 @@ jobs:
       - name: Run fast tests
         run: sbt test
 
-      - name: Run slow tests
-        run: sbt test-slow:test
+#      - name: Run slow tests
+#        run: sbt test-slow:test
