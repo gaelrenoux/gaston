@@ -1,2 +1,5 @@
-tone_instructions: "Adopt a concise, matter-of-fact style that gets straight to the point without unnecessary pleasantries."
-poem: false
+tone_instructions: "Adopt a concise, matter-of-fact style that gets straight to the point without unnecessary pleasantries. Provide suggestions, but do not make them committable."
+reviews:
+  poem: false
+  high_level_summary: false
+  high_level_summary_in_walkthrough: true
