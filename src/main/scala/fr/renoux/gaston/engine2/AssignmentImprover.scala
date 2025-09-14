@@ -76,10 +76,13 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
 
   /** Iterate over all possible topics for a move on that slot, for that person */
-  private def goodChangeForPerson(schedule: Schedule, assignment: SlotAssignment, topics: Array[TopicId], pid: PersonId): Boolean = {
-
+  private def goodChangeForPerson(
+      schedule: Schedule,
+      assignment: SlotAssignment,
+      topics: Array[TopicId],
+      pid: PersonId
+  ): Boolean = {
     val currentTid: TopicId = assignment.personsToTopic(pid)
-    val currentTidLinks = schedule.problem.prefsTopicsLinked
 
     topics.fastForeach { targetTid =>
       if (currentTid != targetTid) {
@@ -93,7 +96,11 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
 
   /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
-  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, currentTid: TopicId, targetTid: TopicId): Boolean = {
+  private def goodChangeForPersonTopic(
+      schedule: Schedule,
+      assignment: SlotAssignment,
+      pid: PersonId, currentTid: TopicId, targetTid: TopicId
+  ): Boolean = {
     /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
 
     if (problem.isPersonForbidden(pid, targetTid)) {
@@ -101,6 +108,28 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
 
     val currentScore = schedule.getTotalScore()
+
+    /* Unassigned the person on all topics linked to the current topic */
+    val currentLinkedTids = problem.topicsToLinkedTopics(currentTid)
+    currentLinkedTids.foreach { linkedTid =>
+      val linkedSlotId = schedule.topicsToSlot(linkedTid)
+      val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+      if (assignment.isDroppableFromTopic(pid, currentTid)) {
+        val _ = linkedAssignment.move(pid, currentTid, problem.unassignedTopic(linkedSlotId))
+      }
+    }
+
+    val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
+    targetLinkedTids.foreach { linkedTid =>
+      val linkedSlotId = schedule.topicsToSlot(linkedTid)
+      val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+      val currentTidHere = linkedAssignment.personsToTopic(pid)
+      if (assignment.isDroppableFromTopic(pid, currentTidHere) && assignment.isAddableToTopic(pid, linkedTid)) {
+        val _ = linkedAssignment.move(pid, currentTid, problem.unassignedTopic(linkedSlotId))
+      }
+    }
+    /* TODO Doesn't work yet because of the undos */
+
     /* First, let's see if we can just move the person onto the target topic */
     if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
       /* We can just move that person on the target topic */
@@ -129,7 +158,55 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     false
   }
 
-  // TODO From previous version:
-  // - Need to handle linked topic. Right now we just can't move people on/off them.
+
+  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
+  private def goodChangeForPersonTopicWithLinked(
+      schedule: Schedule,
+      assignment: SlotAssignment,
+      pid: PersonId, currentTid: TopicId, targetTid: TopicId,
+      handleLinked: Boolean
+  ): Boolean = {
+    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
+
+    if (problem.isPersonForbidden(pid, targetTid)) {
+      return false // Person is forbidden on the target topic, don't bother
+    }
+
+    val currentScore = schedule.getTotalScore()
+
+    val currentLinkedTids = problem.topicsToLinkedTopics(currentTid)
+    val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
+
+    /* First, let's see if we can just move the person onto the target topic */
+    if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+      /* We can just move that person on the target topic */
+      assignment.move(pid, currentTid, targetTid)
+      val newScore = schedule.getTotalScore()
+      if (newScore > currentScore) {
+        return true // accept this change, it looks good
+      }
+      val _ = assignment.undoMove(pid, currentTid, targetTid) // wasn't good, rollback the change
+    }
+
+    /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
+    val targetTopicPersons = assignment.topicsToPersons(targetTid)
+    targetTopicPersons.foreach { otherPid =>
+      // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+      if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+        assignment.swap(pid, currentTid, otherPid, targetTid)
+        val newScore = schedule.getTotalScore()
+        if (newScore > currentScore) {
+          return true // accept this change, it looks good
+        }
+        val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+      }
+    } // end foreachWhile
+
+    false
+  }
+
+
+
+  // TODO Need to handle linked topic. Right now we just can't move people on/off them.
 
 }

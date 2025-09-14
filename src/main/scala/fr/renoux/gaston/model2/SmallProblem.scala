@@ -42,6 +42,8 @@ final class SmallProblem(
   given CountAll[TopicId] = CountAll(topicsCount)
 
   given CountAll[PersonId] = CountAll(personsCount)
+  
+  inline def unassignedTopic(slotId: SlotId): TopicId = slotId.value
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
 
