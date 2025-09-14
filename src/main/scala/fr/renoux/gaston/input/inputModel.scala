@@ -67,9 +67,6 @@ object Constants {
   // TODO that's horrible, remove this. But it helps for now.
   val IntLowMaxValue: PosInt = 10000
 
-  /** What additional score should a person have if all its preferences on stopgap topics are used on previously unassigned topics ? */
-  val PersonStopgapTotalScore: Score = Score(1)
-
 }
 
 final case class InputModel(
@@ -81,20 +78,12 @@ final case class InputModel(
     constraints: InputGlobalConstraints = InputGlobalConstraints()
 ) {
   lazy val slotsSet: Set[InputSlot] = slots.flatten.toSet
-  lazy val slotsNameSet: Set[NonEmptyString] = slots.flatten.map(_.name).toSet
-
+  lazy val topicsSet: Set[InputTopic] = topics.toSet
   lazy val personsSet: Set[InputPerson] = persons.toSet
-  lazy val personsNameSet: Set[NonEmptyString] = persons.map(_.name).toSet
-
-  lazy val normalTopics: List[InputTopic] = topics.filter(!_.forcedStopgap)
-  lazy val stopgapTopics: List[InputTopic] = topics.filter(_.forcedStopgap)
-  lazy val normalTopicsSet: Set[InputTopic] = normalTopics.toSet
-  lazy val stopgapTopicsSet: Set[InputTopic] = stopgapTopics.toSet
+  lazy val slotsNameSet: Set[NonEmptyString] = slots.flatten.map(_.name).toSet
   lazy val topicsNameSet: Set[NonEmptyString] = topics.map(_.name).toSet
-  lazy val normalTopicsNameSet: Set[NonEmptyString] = normalTopics.map(_.name).toSet
-  lazy val stopgapTopicsNameSet: Set[NonEmptyString] = stopgapTopics.map(_.name).toSet
+  lazy val personsNameSet: Set[NonEmptyString] = persons.map(_.name).toSet
   lazy val topicsByName: Map[NonEmptyString, InputTopic] = topics.view.zipWith(_.name).map(_.swap).toMap
-
 }
 
 final case class InputSettings(
@@ -158,7 +147,6 @@ final case class InputTopic(
     occurrences: Option[PosInt] = None,
     slots: Option[Set[NonEmptyString]] = None,
     presence: Option[Score] = None,
-    stopgap: Option[Boolean] = None,
     forced: Boolean = false
 ) {
 
@@ -167,8 +155,6 @@ final case class InputTopic(
 
   /** Duration needs to be an Option to not appear when not needed */
   lazy val forcedDuration: PosInt = duration.getOrElse(1)
-
-  lazy val forcedStopgap: Boolean = stopgap.getOrElse(false)
 
   lazy val occurrenceInstances: Seq[InputTopic.Occurrence] =
     if (forcedOccurrences == 1) Seq(InputTopic.Occurrence(this))
@@ -219,12 +205,8 @@ final case class InputPerson(
     incompatible: Set[NonEmptyString] = Set.empty,
     wishes: Map[String, Score] = Map.empty, // can't use Ironed value as a key (check out why)
     personWishes: Map[String, Score] = Map.empty,
-    minFreeSlots: Option[PosInt] = None, // how many free slots does this person want? None is zero
-
-) {
-  lazy val ironedWishes: Map[NonEmptyString, Score] = wishes.map { case (key, value) => key.refineUnsafe[Not[Empty]] -> value }
-  lazy val ironedPersonWishes: Map[NonEmptyString, Score] = personWishes.map { case (key, value) => key.refineUnsafe[Not[Empty]] -> value }
-}
+    minFreeSlots: Option[PosInt] = None // how many free slots does this person want? None is zero
+)
 
 final case class InputGlobalConstraints(
     simultaneous: Set[InputSimultaneousConstraint] = Set.empty,
@@ -245,7 +227,7 @@ final case class InputExclusiveConstraint(
 
   lazy val forcedInclusions: Set[NonEmptyString] = inclusions.getOrElse(Set.empty)
   lazy val forcedExemptions: Set[NonEmptyString] = exemptions.getOrElse(Set.empty)
-  
+
   if (inclusions.nonEmpty && exemptions.nonEmpty) {
     throw new IllegalArgumentException("Cannot have both inclusions and exemptions in exclusive constraint")
   }
