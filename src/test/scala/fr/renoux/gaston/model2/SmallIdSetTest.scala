@@ -513,6 +513,29 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
+  "exists" - {
+    given CountAll[SlotId] = CountAll[SlotId](64)
+
+    "nominal" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a.exists(_.value % 3 == 0) should be(true)
+      a.exists(_.value % 3 == 14) should be(false)
+      a.exists(_ => true) should be(true)
+      a.exists(_ => false) should be(false)
+    }
+
+    "set is empty" in {
+      val a = SmallIdSet.empty[SlotId]
+      a.exists(_.value % 3 == 0) should be(false)
+      a.exists(_ => true) should be(false)
+    }
+
+    "set is full" in {
+      SmallIdSet.full[SlotId].exists(_.value % 3 == 0) should be(true)
+      SmallIdSet.full[SlotId].exists(_ => false) should be(false)
+    }
+  }
+
   "mergeIfIntersect" - {
 
     given CountAll[TopicId] = CountAll[TopicId](64)
