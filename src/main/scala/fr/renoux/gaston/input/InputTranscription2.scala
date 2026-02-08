@@ -90,7 +90,7 @@ final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Topics */
-  lazy object topics {
+  object topics {
     val topicsName = IdMap.empty[TopicId, String]
     val topicsMandatories = IdMap.fill[TopicId, SmallIdSet[PersonId]](SmallIdSet.empty[PersonId])
     val topicsForbiddens = IdMap.fill[TopicId, SmallIdSet[PersonId]](SmallIdSet.empty[PersonId])
@@ -151,7 +151,7 @@ final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Other constraints */
-  lazy object constraints {
+  object constraints {
 
     val topicsSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
     val topicsNotSimultaneous: IdMap[TopicId, SmallIdSet[TopicId]] = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
@@ -173,7 +173,7 @@ final class InputTranscription2(rawInput: InputModel) {
 
 
   /* Preferences */
-  lazy object preferences {
+  object preferences {
 
     /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
       * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
@@ -225,10 +225,6 @@ final class InputTranscription2(rawInput: InputModel) {
 
     val prefsTopicPure = IdMap.empty[TopicId, Score]
     input.topics.foreach { (inTopic: InputTopic) =>
-      // TODO Handle inputTopic.stopgap
-      if (inTopic.stopgap.exists(identity)) {
-        throw new IllegalArgumentException("Not handling stopgap topics for now")
-      }
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
         /* for long topics, topic presence score is only counted on the first part */
         val firstPart = inTopicOcc.partInstances.head
