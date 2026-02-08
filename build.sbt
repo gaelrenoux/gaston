@@ -45,7 +45,7 @@ scalacOptions ++= Seq(
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 val catsVersion = "2.13.0"
-val ironVersion = "2.6.0-12-a077d1-SNAPSHOT" // TODO Move to 2.7 as soon as it's released
+val ironVersion = "3.2.2"
 
 libraryDependencies ++= Seq(
 
