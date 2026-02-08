@@ -148,6 +148,10 @@ object SmallIdSet {
       result
     }
 
+    def exists(f: I => Boolean)(using c: CountAll[I]): Boolean = {
+      c.exists { i => s.contains(i) && f(i) }
+    }
+
     def toArray(using c: CountAll[I], ct: ClassTag[I]): Array[I] = {
       val result = Array.fill[I](s.size.value)(Id.None.value)
       var resultIx = 0

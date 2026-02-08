@@ -81,6 +81,31 @@ class FastIterationsTest extends TestBase {
     }
   }
 
+  "fastExists (range)" - {
+    "Nominal" in {
+      println("Start")
+      val r = fastExists(1, 10, _ + 2)(_ % 7 == 0)
+      r should be(true)
+    }
+
+    "Default advance" in {
+      val r = fastExists(1, 10)(_ % 7 == 0)
+      r should be(true)
+    }
+
+    "No result" in {
+      val r1 = fastExists(1, 10, _ + 2)(_ % 8 == 0)
+      r1 should be(false)
+    }
+
+    "Empty loop" in {
+      val r1 = fastExists(3, 3)(_ => true)
+      r1 should be(false)
+      val r2 = fastExists(3, 2)(_ => true)
+      r2 should be(false)
+    }
+  }
+
   "Array extension" - {
 
     "fastCopy" - {

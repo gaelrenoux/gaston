@@ -35,6 +35,17 @@ inline def fastFind(inline start: Int, inline until: Int, inline advance: Int =>
   if (i >= until) default else i
 }
 
+/** Loop that stops when it found a match. */
+inline def fastExists(inline start: Int, inline until: Int, inline advance: Int => Int = _ + 1)(
+    inline loopBody: Int => Boolean
+): Boolean = {
+  var i = start
+  while (!loopBody(i) && i < until) {
+    i = advance(i)
+  }
+  i < until
+}
+
 /** Array extension */
 extension [A](inline as: Array[A]) {
   inline def fastCopy()(using ClassTag[A])= {
