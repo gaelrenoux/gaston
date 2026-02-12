@@ -76,10 +76,13 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
 
   /** Iterate over all possible topics for a move on that slot, for that person */
-  private def goodChangeForPerson(schedule: Schedule, assignment: SlotAssignment, topics: Array[TopicId], pid: PersonId): Boolean = {
-
+  private def goodChangeForPerson(
+      schedule: Schedule,
+      assignment: SlotAssignment,
+      topics: Array[TopicId],
+      pid: PersonId
+  ): Boolean = {
     val currentTid: TopicId = assignment.personsToTopic(pid)
-    val currentTidLinks = schedule.problem.prefsTopicsLinked
 
     topics.fastForeach { targetTid =>
       if (currentTid != targetTid) {
@@ -92,20 +95,24 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
   }
 
 
-  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
-  private def goodChangeForPersonTopic(schedule: Schedule, assignment: SlotAssignment, pid: PersonId, currentTid: TopicId, targetTid: TopicId): Boolean = {
+  /** Find a good way to move that person, from that topic, to that topic. Returns true if it was done, false if there was no good way to do it. */
+  private def goodChangeForPersonTopic(
+      schedule: Schedule,
+      assignment: SlotAssignment,
+      pid: PersonId, currentTid: TopicId, targetTid: TopicId
+  ): Boolean = {
     /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
 
     if (problem.isPersonForbidden(pid, targetTid)) {
       return false // Person is forbidden on the target topic, don't bother
     }
 
-    val currentScore = schedule.getTotalScore()
+    val currentScore = schedule.getTotalScore
     /* First, let's see if we can just move the person onto the target topic */
     if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
       /* We can just move that person on the target topic */
       assignment.move(pid, currentTid, targetTid)
-      val newScore = schedule.getTotalScore()
+      val newScore = schedule.getTotalScore
       if (newScore > currentScore) {
         return true // accept this change, it looks good
       }
@@ -118,7 +125,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
       // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
       if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
         assignment.swap(pid, currentTid, otherPid, targetTid)
-        val newScore = schedule.getTotalScore()
+        val newScore = schedule.getTotalScore
         if (newScore > currentScore) {
           return true // accept this change, it looks good
         }
