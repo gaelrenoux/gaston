@@ -35,10 +35,10 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
     }
 
     def scoreReport: String = {
-      val totalScore = schedule.getTotalScore()
-      val topicScore = schedule.getTopicsTotalScore()
-      val personsScore = schedule.getPersonsTotalScore()
-      val personsScores: Iterable[String] = schedule.getPersonsToScore()
+      val totalScore = schedule.getTotalScore
+      val topicScore = schedule.getTopicsTotalScore
+      val personsScore = schedule.getPersonsTotalScore
+      val personsScores: Iterable[String] = schedule.getPersonsToScore
         .toMap.toSeq.sortBy(idScore => (-idScore._2.value, idScore._1))
         .map { (pid, score) =>
           val person = problem.personsToName(pid)

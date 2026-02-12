@@ -23,7 +23,7 @@ final class SlotAssignment(
   // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
   val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]] = personsToTopic.transpose
 
-  /** Returns true if that person can be added to this topic, without moving anyone else. */
+  /** Returns true if that person can be added to this topic, without moving anyone else. Checks if the maximum number of persons is respected. */
   def isAddableToTopic(pid: PersonId, tid: TopicId): Boolean = {
     inline def topicMax = problem.topicsToMaxPersons(tid)
 
@@ -32,7 +32,7 @@ final class SlotAssignment(
     topicPersonsCount < topicMax
   }
 
-  /** Returns true if that person can be removed from that topic, without moving anyone else. */
+  /** Returns true if that person can be removed from that topic, without moving anyone else. Checks if that person is mandatory, and if the minimum number of persons is respected. */
   def isDroppableFromTopic(pid: PersonId, tid: TopicId): Boolean = {
     inline def topicMin = problem.topicsToMinPersons(tid)
 
