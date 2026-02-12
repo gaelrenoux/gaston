@@ -7,8 +7,6 @@ import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
 import fr.renoux.gaston.util.Context
 
-import scala.util.Random
-
 
 class AssignmentImproverTest extends TestBase {
   given Context = Context.Default
@@ -43,7 +41,7 @@ class AssignmentImproverTest extends TestBase {
     val baseScore: Score = {
       val sb = scheduleBase()
       println(sb)
-      val s = sb.getTotalScore()
+      val s = sb.getTotalScore
       println(s"Score: $s")
       s
     }
@@ -51,37 +49,33 @@ class AssignmentImproverTest extends TestBase {
     val improver = new AssignmentImprover(problem)
 
     "Improved schedule should be better than the base one" in {
-      given Random = new Random(0)
       val schedule = scheduleBase()
       improver.improve(schedule)
-      val newScore = schedule.getTotalScore()
+      val newScore = schedule.getTotalScore
       newScore should be > baseScore
       println(schedule.toPrettyString)
       println(s"Score: $newScore")
     }
 
     "Repeated improvements should do nothing (usually)" in {
-      given Random = new Random(0)
       val schedule = scheduleBase()
       improver.improve(schedule)
-      val newScore = schedule.getTotalScore()
+      val newScore = schedule.getTotalScore
       newScore should be > baseScore
       //println(schedule.toPrettyString)
       //println(s"Score: $newScore")
       improver.improve(schedule)
-      val newNewScore = schedule.getTotalScore()
+      val newNewScore = schedule.getTotalScore
       newNewScore should be(newScore)
       //println(schedule.toPrettyString)
       //println(s"Score: $newScore")
     }
 
     "Multiple runs should produce the same result" in {
-      given Random = new Random(0)
-
       val allResults = (0 until 10000).map { _ =>
         val schedule = scheduleBase()
         improver.improve(schedule)
-        schedule.getTotalScore()
+        schedule.getTotalScore
       }.toSet
 
       allResults should be(Set(2.978515625))
@@ -119,7 +113,7 @@ class AssignmentImproverTest extends TestBase {
     val baseScore: Score = {
       val sb = scheduleBase()
       println(sb)
-      val s = sb.getTotalScore()
+      val s = sb.getTotalScore
       println(s"Score: $s")
       s
     }
@@ -127,37 +121,34 @@ class AssignmentImproverTest extends TestBase {
     val improver = new AssignmentImprover(problem)
 
     "Improved schedule should be better than the base one" in {
-      given Random = new Random(0)
       val schedule = scheduleBase()
       improver.improve(schedule)
-      val newScore = schedule.getTotalScore()
+      val newScore = schedule.getTotalScore
       newScore should be > baseScore
       println(schedule.toPrettyString)
       println(s"Score: $newScore")
     }
 
     "Repeated improvements should do nothing (usually)" in {
-      given Random = new Random(0)
       val schedule = scheduleBase()
       improver.improve(schedule)
-      val newScore = schedule.getTotalScore()
+      val newScore = schedule.getTotalScore
       newScore should be > baseScore
       //println(schedule.toPrettyString)
       //println(s"Score: $newScore")
       improver.improve(schedule)
-      val newNewScore = schedule.getTotalScore()
+      val newNewScore = schedule.getTotalScore
       newNewScore should be(newScore)
       //println(schedule.toPrettyString)
       //println(s"Score: $newScore")
     }
 
     "Multiple runs should produce the same result" in {
-      given Random = new Random(0)
 
       val allResults = (0 until 10000).map { _ =>
         val schedule = scheduleBase()
         improver.improve(schedule)
-        schedule.getTotalScore()
+        schedule.getTotalScore
       }.toSet
 
       allResults should be(Set(-143.5546875)) // TODO score is so bad due to the linked constraint
