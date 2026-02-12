@@ -43,6 +43,8 @@ final class SmallProblem(
 
   given CountAll[PersonId] = CountAll(personsCount)
 
+  inline def unassignedTopic(slotId: SlotId): TopicId = slotId.value
+
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
 
   val topicsToLinkedTopics: IdMap[TopicId, SmallIdSet[TopicId]] = {
