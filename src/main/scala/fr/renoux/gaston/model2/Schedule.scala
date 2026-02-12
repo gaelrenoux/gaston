@@ -8,6 +8,8 @@ import fr.renoux.gaston.util.{fastFoldRight, fastForeach, fastLoop, testOnly}
 
 /** Rescoring (recalculating scores) is normally handled eagerly, on any change made. If explicitly required on a change,
   * no rescoring is done, in which case this class' user must manually trigger a rescoring.
+  *
+  * Mutable.
   */
 final class Schedule(
     val problem: SmallProblem,
@@ -38,16 +40,21 @@ final class Schedule(
 
   /* ALL SCORING STUFF */
 
+  /** This contains the ENTIRE score. It is the sum of the personsTotalScore and the topicsTotalScore */
   private var totalScore: Score = Score.Missing
+  /** This contains, for each person, their score that cannot be tied a slot (for example: unrespected linked topics). */
   private val personsToNonSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  /** This contains, for each person, their score (including both the non-slot score from the previous field, and slot score) */
   private val personsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
+  /** This contains the total score coming from persons (so is calculated from personsToScore by applying the RankFactor) */
   private var personsTotalScore: Score = Score.Missing
+  /** This contains the total score coming from topics regardless of persons (topics with a base value). */
   private var topicsTotalScore: Score = Score.Missing
 
-  /** Has to be remade on every recalculation, because the last step of the recalculation is a destructive sort */
+  /** This must be refilled on every recalculation, because the last step of the recalculation is a destructive sort */
   private val personsScoresSorted: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
-  /* Allow to save score to restore them during an undo */
+  /* The following fields are used to save scores, in order to restore them after an undo */
   private var savedTotalScore: Score = Score.Missing
   private val savedPersonsToNonSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private val savedPersonsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
@@ -55,20 +62,20 @@ final class Schedule(
   private var savedTopicsTotalScore: Score = Score.Missing
 
 
-  def getTotalScore(): Score = {
+  def getTotalScore: Score = {
     totalScore
   }
 
-  def getPersonsTotalScore(): Score = {
+  def getPersonsTotalScore: Score = {
     personsTotalScore
   }
 
-  def getTopicsTotalScore(): Score = {
+  def getTopicsTotalScore: Score = {
     topicsTotalScore
   }
 
-  /** Do NOT modify the return value */
-  def getPersonsToScore(): IdMap[PersonId, Score] = {
+  /** This returns directly the inner value. Do NOT modify it. */
+  def getPersonsToScore: IdMap[PersonId, Score] = {
     personsToScore
   }
 
@@ -209,9 +216,9 @@ final class Schedule(
   override def equals(obj: Any): Boolean = obj match {
     case that: Schedule =>
       problem == that.problem &&
-        slotsToAssignment.actualEquals(that.slotsToAssignment) &&
-        personsToTopics.actualEquals(that.personsToTopics) &&
-        topicsToSlot.actualEquals(that.topicsToSlot)
+          slotsToAssignment.actualEquals(that.slotsToAssignment) &&
+          personsToTopics.actualEquals(that.personsToTopics) &&
+          topicsToSlot.actualEquals(that.topicsToSlot)
     case _ => false
   }
 

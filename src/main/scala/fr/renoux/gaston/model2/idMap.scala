@@ -72,7 +72,7 @@ object IdMap {
       a
     }
 
-    /** Replaces the content of this map with the content of the argument map, which is expected to be at least as big. */
+    /** Replaces the content of this map with the content of the argument map, which is expected to be of the same size. */
     inline def fillFrom(m2: IdMap[I, A]) = {
       m2.fastForeachWithIndex { (a, i) =>
         m(i) = a
