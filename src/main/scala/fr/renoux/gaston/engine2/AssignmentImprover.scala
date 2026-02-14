@@ -108,30 +108,40 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
 
     val currentScore = schedule.getTotalScore
+    schedule.saveScores()
+
     /* First, let's see if we can just move the person onto the target topic */
     if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
       /* We can just move that person on the target topic */
       assignment.move(pid, currentTid, targetTid)
+
+      /* Accept this change, if it looks good */
+      schedule.recalculateScoreForPersonsPendingChanges()
       val newScore = schedule.getTotalScore
       if (newScore > currentScore) {
-        return true // accept this change, it looks good
+        return true
       }
-      val _ = assignment.undoMove(pid, currentTid, targetTid) // wasn't good, rollback the change
+
+      /* Wasn't good, rollback the changes */
+      val _ = assignment.undoMove(pid, currentTid, targetTid)
+      schedule.restoreSavedScores()
     }
 
     /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
     val targetTopicPersons = assignment.topicsToPersons(targetTid)
-    targetTopicPersons.foreach { otherPid =>
+    targetTopicPersons.foreach { otherPid => // TODO should implement a dropThenForeach method, to start looking at the correct index
       // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
       if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
         assignment.swap(pid, currentTid, otherPid, targetTid)
+        schedule.recalculateScoreForPersonsPendingChanges()
         val newScore = schedule.getTotalScore
         if (newScore > currentScore) {
           return true // accept this change, it looks good
         }
         val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+        schedule.restoreSavedScores()
       }
-    } // end foreachWhile
+    } // end foreach
 
     false
   }
