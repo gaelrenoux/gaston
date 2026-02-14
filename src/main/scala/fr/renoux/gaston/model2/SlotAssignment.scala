@@ -43,20 +43,19 @@ final class SlotAssignment(
     !personIsMandatory && topicPersonsCount > topicMin
   }
 
+  /** Moves one person from one topic to another.
+    * The score will be recalculated at the assignment level, and a notification will be sent to the schedule. */
   def move(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
     // TODO Dev mode control: pid should be on tid1
-    saveScores()
-    parent.saveScores()
     _move(pid, tid1, tid2)
-    val otherPersons = recalculateScoreFor(pid)
-    parent.recalculateScoreFor(pid, otherPersons)
+    val otherPersons = recalculateScoreFor(pid, tid2)
+    parent.registerPendingChanges(SmallIdSet(pid), otherPersons)
     this
   }
 
+  /** Undo a move. The score will not be recalculated at all, as we expect a restore of saved scores later down the line. */
   def undoMove(pid: PersonId, tid1: TopicId, tid2: TopicId): SlotAssignment = {
     _move(pid, tid2, tid1)
-    restoreSavedScores()
-    parent.restoreSavedScores()
     this
   }
 
@@ -68,20 +67,21 @@ final class SlotAssignment(
     parent.personsToTopics(pid) = parent.personsToTopics(pid) - tid1 + tid2 // TODO Not a fan of this
   }
 
+  /** Swaps two persons between two topics.
+    * First we have the first person and their current topic, then the second person and their current topic.
+    * The score will be recalculated at the assignment level, and a notification will be sent to the schedule.
+    */
   def swap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
     // TODO Dev mode control: pid1 should be on tid1, pid2 should be on tid2
-    saveScores()
-    parent.saveScores()
     _swap(pid1, tid1, pid2, tid2)
-    val otherPersons = recalculateScoreFor(pid1, pid2)
-    parent.recalculateScoreFor(pid1, pid2, otherPersons)
+    val otherPersons = recalculateScoreFor(pid1, tid2, pid2, tid1)
+    parent.registerPendingChanges(SmallIdSet(pid1, pid2), otherPersons)
     this
   }
 
+  /** Undo a swap. The score will not be recalculated at all, as we expect a restore of saved scores later down the line. */
   def undoSwap(pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId): SlotAssignment = {
     _swap(pid1, tid2, pid2, tid1)
-    restoreSavedScores()
-    parent.restoreSavedScores()
     this
   }
 
@@ -113,55 +113,52 @@ final class SlotAssignment(
     personsToScore(pid)
   }
 
-  private def saveScores(): Unit = {
+  def saveScores(): Unit = {
+    saveLocalScores()
+    parent.saveLocalScores()
+  }
+
+  /** Save locally stored scores for this assignment */
+  private[model2] def saveLocalScores(): Unit = {
     savedPersonsToScore.fillFrom(personsToScore)
   }
 
-  private def restoreSavedScores(): Unit = {
+  /** Restore locally stored scores for this assignment */
+  private[model2] def restoreSavedLocalScores(): Unit = {
+    /* Note: can't just switch values. We wanted saved score to be available for another restore if needed. */
     personsToScore.fillFrom(savedPersonsToScore)
   }
 
-  def recalculateAll() = {
+  def recalculateAll(): Unit = {
     problem.personsCount.foreach { person =>
-      _recalculateTargetPersonScoreFor(person)
+      val topic = personsToTopic(person)
+      personsToScore(person) = scoreWishesFor(person, topic)
     }
   }
 
-  /** Returns the other persons impacted by this one. */
-  private def recalculateScoreFor(person: PersonId): SmallIdSet[PersonId] = {
-    _recalculateTargetPersonScoreFor(person)
+  /** Recalculates the score for one or two persons, each on their new topics.
+    * Returns the other persons impacted by the primary person's presence or not (their scores have been recalculated as well).
+    */
+  def recalculateScoreFor(person1: PersonId, topic1: TopicId, person2: PersonId = PersonId.None, topic2: TopicId = TopicId.None): SmallIdSet[PersonId] = {
+    personsToScore(person1) = scoreWishesFor(person1, topic1)
+    if (person2 != PersonId.None) {
+      personsToScore(person2) = scoreWishesFor(person2, topic2)
+    }
 
-    /* Person that had a wish on this person have their score changed */
-    val otherPersons: SmallIdSet[PersonId] = problem.personsTargetedToPersonsWithWish(person)
-    _recalculateOtherPersonsScoreFor(otherPersons)
-    otherPersons
-  }
-
-  /** Returns the other persons impacted by these ones. */
-  private def recalculateScoreFor(person1: PersonId, person2: PersonId): SmallIdSet[PersonId] = {
-    _recalculateTargetPersonScoreFor(person1)
-    _recalculateTargetPersonScoreFor(person2)
-
-    /* Person that had a wish on these persons have their score changed */
+    /* Person that had a wish on these persons have their score changed, even though they did not change topics */
     val otherPersons: SmallIdSet[PersonId] =
-      (problem.personsTargetedToPersonsWithWish(person1) ++ problem.personsTargetedToPersonsWithWish(person2)) - person1 - person2
-    _recalculateOtherPersonsScoreFor(otherPersons)
+      if (person2 == PersonId.None) problem.personsTargetedToPersonsWithWish(person1)
+      else (problem.personsTargetedToPersonsWithWish(person1) ++ problem.personsTargetedToPersonsWithWish(person2)) - person1 - person2
+    otherPersons.foreach { p =>
+      val topic = personsToTopic(p)
+      personsToScore(p) = scoreWishesFor(p, topic)
+      // TODO if I split the score due to the topic and the score due to the persons on the topic, I can only recalculate the latter here
+    }
     otherPersons
   }
 
-  private def _recalculateTargetPersonScoreFor(person: PersonId): Unit = {
-    val topic = personsToTopic(person)
-    personsToScore(person) = scoreWishes(person, topic)
-  }
-
-  private def _recalculateOtherPersonsScoreFor(persons: SmallIdSet[PersonId]): Unit = {
-    persons.foreach { p =>
-      val topic = personsToTopic(p)
-      personsToScore(p) = scoreWishes(p, topic)
-    }
-  }
-
-  private def scoreWishes(pid: PersonId, tid: TopicId): Score = {
+  /** Score the wishes for a specific person, on specific topic (including wishes for the topic, but also wishes for persons on that topic) */
+  private def scoreWishesFor(pid: PersonId, tid: TopicId): Score = {
     /* Missing person gets a score of zero */
     // TODO add a test for this
     if (tid == TopicId.None) Score.Zero else {
