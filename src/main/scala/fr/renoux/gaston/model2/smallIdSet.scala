@@ -188,6 +188,10 @@ object SmallIdSet {
 
   inline def apply[I <: Id](id: I): SmallIdSet[I] = 1L << id.value
 
+  inline def apply[I <: Id](id1: I, id2: I): SmallIdSet[I] = {
+    (1L << id1.value) | (1L << id2.value)
+  }
+
   inline def apply[I <: Id](ids: I*): SmallIdSet[I] = {
     var result = 0L
     ids.fastForeach { id =>
