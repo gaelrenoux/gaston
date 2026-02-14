@@ -43,6 +43,9 @@ object IdMap {
     inline def foreach(inline f: (I, A) => Unit): Unit =
       m.fastForeachWithIndex { (a, i) => f(i, a) }
 
+    inline def foreachValue(inline f: A => Unit): Unit =
+      m.fastForeach(f)
+
     inline def keysFilter(inline f: (I, A) => Boolean): SmallIdSet[I] = {
       var r = SmallIdSet.empty[I]
       m.fastForeachWithIndex { (a, i) =>
