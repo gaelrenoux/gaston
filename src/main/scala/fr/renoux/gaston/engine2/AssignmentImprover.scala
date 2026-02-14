@@ -110,10 +110,46 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     val currentScore = schedule.getTotalScore
     schedule.saveScores()
 
+    val currentLinkedTids = problem.topicsToLinkedTopics(currentTid)
+    val currentLinkedTidsSize = currentLinkedTids.size
+    val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
+    val targetLinkedTidsSize = targetLinkedTids.size
+
     /* First, let's see if we can just move the person onto the target topic */
     if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+      // TODO Assumption: if a person can be removed/added from a topic, it can be removed/added to all linked topics. This supposes that linked topics have the same min/max numbers, and the same mandatory persons.
+      //   => Add check in the transcription, with reference to this method
+
+      /* We still need to check that they can be added on the linked topics of the target topic, because they might be mandatory there */
+      targetLinkedTids.exists { targetLinkedTid =>
+        val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
+        val currentTidInLinkedSlot = schedule.slotsToAssignment(linkedSlotId).personsToTopic(pid)
+        assignment.isDroppableFromTopic(pid, currentTidInLinkedSlot)
+      }
+
       /* We can just move that person on the target topic */
       assignment.move(pid, currentTid, targetTid)
+
+      /* Then we need to handle moving them out of the topics linked to the current one, and in the topics linked to the target one */
+      val undoQueue = SmallUndoQueue(currentLinkedTidsSize.value + targetLinkedTidsSize.value)
+      currentLinkedTids.foreach { currentLinkedTid =>
+        val linkedSlotId = schedule.topicsToSlot(currentLinkedTid)
+        val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+        val linkedTidToTarget = problem.unassignedTopic(linkedSlotId) // TODO unassigned topic is not great
+        // We assume that they can be removed from the linked topic: all linked topics should have the same constraints
+        linkedAssignment.move(pid, currentLinkedTid, linkedTidToTarget)
+        undoQueue.addMove(linkedSlotId, pid, currentLinkedTid, linkedTidToTarget)
+      }
+      targetLinkedTids.foreach { targetLinkedTid =>
+        val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
+        val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+        val currentTidThere = linkedAssignment.personsToTopic(pid)
+        // We assume that they can be added to the linked topic: all linked topics should have the same constraints. We still need to check their current topic.
+        if (assignment.isDroppableFromTopic(pid, currentTidThere)) {
+          val _ = linkedAssignment.move(pid, currentTidThere, targetLinkedTid)
+          undoQueue.addMove(linkedSlotId, pid, currentTidThere, targetLinkedTid)
+        }
+      }
 
       /* Accept this change, if it looks good */
       schedule.recalculateScoreForPersonsPendingChanges()
@@ -124,29 +160,80 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
       /* Wasn't good, rollback the changes */
       val _ = assignment.undoMove(pid, currentTid, targetTid)
+      undoQueue.undoMoves { (sid, pid, tid1, tid2) =>
+        val _ = schedule.slotsToAssignment(sid).undoMove(pid, tid1, tid2)
+      }
       schedule.restoreSavedScores()
     }
 
     /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
-    val targetTopicPersons = assignment.topicsToPersons(targetTid)
-    targetTopicPersons.foreach { otherPid => // TODO should implement a dropThenForeach method, to start looking at the correct index
-      // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
-      if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
-        assignment.swap(pid, currentTid, otherPid, targetTid)
-        schedule.recalculateScoreForPersonsPendingChanges()
-        val newScore = schedule.getTotalScore
-        if (newScore > currentScore) {
-          return true // accept this change, it looks good
+    /* TODO Linked topics are excluded for now, they are super hard to swap for */
+    if (currentLinkedTidsSize == 0 && targetLinkedTidsSize == 0) {
+      val targetTopicPersons = assignment.topicsToPersons(targetTid)
+      targetTopicPersons.foreach { otherPid => // TODO should implement a dropThenForeach method, to start looking at the correct index
+        // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+        if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+          assignment.swap(pid, currentTid, otherPid, targetTid)
+          schedule.recalculateScoreForPersonsPendingChanges()
+          val newScore = schedule.getTotalScore
+          if (newScore > currentScore) {
+            return true // accept this change, it looks good
+          }
+          val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+          schedule.restoreSavedScores()
         }
-        val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
-        schedule.restoreSavedScores()
-      }
-    } // end foreach
+      } // end foreach
+    }
 
     false
   }
 
-  // TODO From previous version:
-  // - Need to handle linked topic. Right now we just can't move people on/off them.
+
+//  // TODO Unfinished and unused for now
+//  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
+//  private def goodChangeForPersonTopicWithLinked(
+//      schedule: Schedule,
+//      assignment: SlotAssignment,
+//      pid: PersonId, currentTid: TopicId, targetTid: TopicId,
+//      handleLinked: Boolean
+//  ): Boolean = {
+//    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
+//
+//    if (problem.isPersonForbidden(pid, targetTid)) {
+//      return false // Person is forbidden on the target topic, don't bother
+//    }
+//
+//    val currentScore = schedule.getTotalScore
+//
+//    val currentLinkedTids = problem.topicsToLinkedTopics(currentTid)
+//    val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
+//
+//    /* First, let's see if we can just move the person onto the target topic */
+//    if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+//      /* We can just move that person on the target topic */
+//      assignment.move(pid, currentTid, targetTid)
+//      val newScore = schedule.getTotalScore
+//      if (newScore > currentScore) {
+//        return true // accept this change, it looks good
+//      }
+//      val _ = assignment.undoMove(pid, currentTid, targetTid) // wasn't good, rollback the change
+//    }
+//
+//    /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
+//    val targetTopicPersons = assignment.topicsToPersons(targetTid)
+//    targetTopicPersons.foreach { otherPid =>
+//      // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+//      if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+//        assignment.swap(pid, currentTid, otherPid, targetTid)
+//        val newScore = schedule.getTotalScore
+//        if (newScore > currentScore) {
+//          return true // accept this change, it looks good
+//        }
+//        val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+//      }
+//    } // end foreachWhile
+//
+//    false
+//  }
 
 }
