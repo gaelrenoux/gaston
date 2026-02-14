@@ -54,28 +54,46 @@ final class Schedule(
   /** This must be refilled on every recalculation, because the last step of the recalculation is a destructive sort */
   private val personsScoresSorted: Array[Score] = Array.fill(problem.personsCount.value)(Score.Missing)
 
-  /* The following fields are used to save scores, in order to restore them after an undo */
+  /* The following fields are used to save scores, in order to restore them after an undo. We only save score that are
+  * stored at the schedule level, the SlotAssignment saves its own scores. */
   private var savedTotalScore: Score = Score.Missing
   private val savedPersonsToNonSlotScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private val savedPersonsToScore: IdMap[PersonId, Score] = IdMap.fill[PersonId, Score](Score.Missing)
   private var savedPersonsTotalScore: Score = Score.Missing
   private var savedTopicsTotalScore: Score = Score.Missing
 
+  /** Persons who have been moved and whose score has changed on the assignment, but has not been recalculated on the schedule yet. */
+  private var personsWithPendingScoreChanges: SmallIdSet[PersonId] = SmallIdSet.empty[PersonId]
+
+  /** Same as personsWithPendingScoreChanges, except those persons haven't moved (but their groups have, so they might have new scores due to person-to-person preferences). */
+  private var personsUnmovedWithPendingScoreChanges: SmallIdSet[PersonId] = SmallIdSet.empty[PersonId]
+
+  private inline def assertNoPendingChanges(): Unit = {
+    assert(personsWithPendingScoreChanges.isEmpty && personsUnmovedWithPendingScoreChanges.isEmpty, "There should be no pending changes")
+  }
+
+  private inline def assertPendingChanges(): Unit = {
+    assert(personsWithPendingScoreChanges.nonEmpty || personsUnmovedWithPendingScoreChanges.isEmpty, "There should be some pending changes")
+  }
 
   def getTotalScore: Score = {
+    assertNoPendingChanges()
     totalScore
   }
 
   def getPersonsTotalScore: Score = {
+    assertNoPendingChanges()
     personsTotalScore
   }
 
   def getTopicsTotalScore: Score = {
+    assertNoPendingChanges()
     topicsTotalScore
   }
 
   /** This returns directly the inner value. Do NOT modify it. */
   def getPersonsToScore: IdMap[PersonId, Score] = {
+    assertNoPendingChanges()
     personsToScore
   }
 
@@ -89,7 +107,16 @@ final class Schedule(
     }
   }
 
+  /** Save all scores for this Schedule */
   def saveScores(): Unit = {
+    saveLocalScores()
+    slotsToAssignment.foreachValue(_.saveLocalScores())
+  }
+
+  /** Only save locally stored scores */
+  private[model2] def saveLocalScores(): Unit = {
+    assertNoPendingChanges()
+
     savedTotalScore = totalScore
     savedPersonsToNonSlotScore.fillFrom(personsToNonSlotScore)
     savedPersonsToScore.fillFrom(personsToScore)
@@ -98,51 +125,66 @@ final class Schedule(
   }
 
   def restoreSavedScores(): Unit = {
+    restoreSavedLocalScores()
+    slotsToAssignment.foreachValue(_.restoreSavedLocalScores())
+  }
+
+  private def restoreSavedLocalScores(): Unit = {
     totalScore = savedTotalScore
+    /* Note: can't just switch values. We wanted saved score to be available for another restore if needed. */
     personsToNonSlotScore.fillFrom(savedPersonsToNonSlotScore)
     personsToScore.fillFrom(savedPersonsToScore)
     personsTotalScore = savedPersonsTotalScore
     topicsTotalScore = savedTopicsTotalScore
+
+    personsWithPendingScoreChanges = SmallIdSet.empty
+    personsUnmovedWithPendingScoreChanges = SmallIdSet.empty
   }
 
-  // TODO I'm not a fan of the reversed logic between recalculateAll and recalculateScoreFor. In the first case, the
-  //  schedule calls the slot-assignment, while in the second the slot-assignment calls the schedule. I'm thinking I
-  //  should concentrate all external methods at the schedule level.
+  /** Register that some persons have changes in score, and therefore the global score needs a recalculation */
+  def registerPendingChanges(movedPersons: SmallIdSet[PersonId], unmovedPersons: SmallIdSet[PersonId]): Unit = {
+    personsWithPendingScoreChanges = personsWithPendingScoreChanges ++ movedPersons
+    personsUnmovedWithPendingScoreChanges = personsUnmovedWithPendingScoreChanges -- movedPersons ++ unmovedPersons
+  }
 
-  /** Calls the recalculateAll of the slot-assignment */
+  /** Calls the recalculateAll of the slot-assignments, and recalculate everything in the schedule as well. */
   def recalculateAll(): Unit = {
     recalculateTopicScore()
     slotsToAssignment.foreach { (slot, sa) =>
       sa.recalculateAll()
     }
     problem.personsCount.foreach { p =>
-      _recalculatePersonScoreFor(p, includeNonSlot = true)
-      personsScoresSorted(p.value) = personsToScore(p)
+      recalculatePersonScoreFor(p, includeNonSlot = true)
     }
-    Score.sort(personsScoresSorted)
-    personsTotalScore = personsScoresSorted.fastFoldRight(Score.Zero) { (score, acc) =>
-      (SmallProblem.RankFactor * acc: Score) + score
-    }
+    recalculatePersonScoreTotalOnly()
+
+    personsWithPendingScoreChanges = SmallIdSet.empty
+    personsUnmovedWithPendingScoreChanges = SmallIdSet.empty
+  }
+
+  private def recalculateTopicScore(): Unit = {
+    topicsTotalScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
     totalScore = personsTotalScore + topicsTotalScore
   }
 
-  /** Assumes the recalculation has already been done on the slot-assignment level
-    * @param otherPersons No need to recalculate global score for them, just slot-level is enough
+  /** Recalculate the score following all pending changes registered on persons.
+    * Note that the recalculation must already have been done on the slot-assignment level (otherwise, there would be no
+    * pending changes).
+    *
+    * For persons who didn't switch topic, we don't need to recalculate everything, as the only thing that might have
+    * changed is the appreciation of the persons they are with.
     */
-  def recalculateScoreFor(person: PersonId, otherPersons: SmallIdSet[PersonId]): Unit =
-    recalculateScoreFor(person, PersonId.None, otherPersons)
+  def recalculateScoreForPersonsPendingChanges(): Unit = {
+    assertPendingChanges()
 
-  /** Assumes the recalculation has already been done on the slot-assignment level
-    * @param otherPersons No need to recalculate global score for them, just slot-level is enough
-    */
-  def recalculateScoreFor(person1: PersonId, person2: PersonId, otherPersons: SmallIdSet[PersonId]): Unit = {
-    _recalculatePersonScoreFor(person1, includeNonSlot = true)
-    if (person2 != PersonId.None) {
-      _recalculatePersonScoreFor(person2, includeNonSlot = true)
+    personsWithPendingScoreChanges.foreach { pid =>
+      recalculatePersonScoreFor(pid, includeNonSlot = true)
     }
-    otherPersons.foreach { pid =>
-      _recalculatePersonScoreFor(pid, includeNonSlot = false)
+    personsUnmovedWithPendingScoreChanges.foreach { pid =>
+      recalculatePersonScoreFor(pid, includeNonSlot = false)
     }
+    personsWithPendingScoreChanges = SmallIdSet.empty
+    personsUnmovedWithPendingScoreChanges = SmallIdSet.empty
 
     // Possibility to check if that's a good idea here, before sorting
     // val maybeUseful = problem.personsCount.exists { pid => personsScores(pid) > previousPersonScores(pid) }
@@ -153,6 +195,12 @@ final class Schedule(
     //   problem.personsCount.foreach { pid => previousPersonScores(pid) = personsScores(pid) }
     //   ...
 
+    recalculatePersonScoreTotalOnly()
+  }
+
+  /** Assumes that the person-by-person score is OK.
+    * Recalculates the total person score (and the corresponding total score) based on those. */
+  private def recalculatePersonScoreTotalOnly(): Unit = {
     problem.personsCount.foreach { p =>
       personsScoresSorted(p.value) = personsToScore(p)
     }
@@ -162,11 +210,10 @@ final class Schedule(
     }
 
     totalScore = personsTotalScore + topicsTotalScore
-
   }
 
-  /** Scores a person, storing the result in personsScore and returning it. */
-  private def _recalculatePersonScoreFor(person: PersonId, includeNonSlot: Boolean): Unit = {
+  /** Scores a person, storing the result in personsScore. */
+  private def recalculatePersonScoreFor(person: PersonId, includeNonSlot: Boolean): Unit = {
     val slotsScore = {
       var s = Score.Zero
       slotsToAssignment.foreach { (_, sa) =>
@@ -180,7 +227,7 @@ final class Schedule(
         val topicIds = personsToTopics(person)
         val baseScore = problem.personsToBaseScore(person)
         val exclusiveScore = problem.prefsTopicsExclusive(person).evaluate(topicIds)
-        val linkedScore = getScoreLinked(topicIds)
+        val linkedScore = problem.scoreForPrefsTopicsLinked(topicIds)
         val s = baseScore + exclusiveScore + linkedScore
         personsToNonSlotScore(person) = s
         s
@@ -189,22 +236,6 @@ final class Schedule(
       }
 
     personsToScore(person) = nonSlotScore + slotsScore
-  }
-
-  def recalculateTopicScore(): Unit = {
-    topicsTotalScore = this.topicsPresent.mapSumToScore(problem.prefsTopicPure(_))
-    totalScore = personsTotalScore + topicsTotalScore
-  }
-
-  private def getScoreLinked(topicIds: SmallIdSet[TopicId]) = {
-    var linkedScore = Score.Zero
-    problem.prefsTopicsLinked.fastForeach { linked =>
-      val result = linked && topicIds
-      if (result.nonEmpty && result != linked) {
-        linkedScore += Score.MinReward.value * result.size.value
-      }
-    }
-    linkedScore
   }
 
   /** Verifies if the schedule is consistent. Very useful in tests. Poor performance. */
