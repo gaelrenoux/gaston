@@ -79,6 +79,20 @@ final class SmallProblem(
     val targetToSourcePids = targetSourcePids.groupToMap
     IdMap.from(targetToSourcePids.view.mapValues(SmallIdSet(_)))
   }
+  
+  /** Score a set of topics with respect to the linked-topic preferences. The score should be added to the score of the
+    * person having this set of topics. */
+  def scoreForPrefsTopicsLinked(topicIds: SmallIdSet[TopicId]) = {
+    var linkedScore = Score.Zero
+    prefsTopicsLinked.fastForeach { linked =>
+      val result = linked && topicIds
+      if (result.nonEmpty && result != linked) {
+        linkedScore += Score.MinReward.value * result.size.value
+      }
+    }
+    linkedScore
+  }
+
 
   def copy() = new SmallProblem(
     slotsCount = slotsCount,

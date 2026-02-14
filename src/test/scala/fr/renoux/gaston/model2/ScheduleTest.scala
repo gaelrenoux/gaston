@@ -10,8 +10,42 @@ class ScheduleTest extends TestBase {
   // TODO test move/swap individually
   // TODO missing tests on SlotAssignment stuff
 
+  object Model {
+    val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
+
+    given problem: SmallProblem = InputTranscription2(input).result.toEither.force
+
+    given SchedulePrinter = new SchedulePrinter(problem)
+
+    val Seq(d1, d2) = problem.slotsCount.range
+    val Seq(unassigned0, unassigned1, alpha, beta, gamma, delta, epsilon1, epsilon2, eta1, eta2, theta) =
+      problem.topicsCount.range
+    val Seq(alf, bab, cat, dan, eli, fay, guy, han, ing, jon, kal, luc) = problem.personsCount.range
+
+    def scheduleBase(myProblem: SmallProblem = problem) = mkSchedule(myProblem) {
+      d1.slot {
+        unassigned0.topicEmpty
+        alpha.topic(alf, dan, eli) // Alpha, ADE
+        epsilon1.topic(bab, cat, fay) // Epsilon #1, BCF
+        gamma.topic(guy, han, ing) // Gamma, GHI
+        eta1.topic(jon, kal, luc) // Eta ~1, JKL
+      }
+      d2.slot {
+        unassigned1.topicEmpty
+        beta.topic(bab, cat, fay) // Beta, BCF
+        epsilon2.topic(alf, dan, eli) // Epsilon #2, ADE,
+        delta.topic(guy, han, ing) // Delta, GHI
+        eta2.topic(jon, kal, luc) // Eta ~2, JKL
+      }
+    }
+
+    println(scheduleBase().toPrettyString)
+    val personScoresBase: Map[PersonId, Score] = problem.personsCount.range.map(_ -> Score.Zero).toMap
+  }
+
   "Basics " - {
     given countSlots: CountAll[SlotId] = CountAll[SlotId](2)
+
     given countTopics: CountAll[TopicId] = CountAll[TopicId](4)
 
     given countPersons: CountAll[PersonId] = CountAll[PersonId](4)
@@ -69,14 +103,14 @@ class ScheduleTest extends TestBase {
           0.topic(0, 1, 3)
           1.topic(2)
         }
-        1. slot {
+        1.slot {
           3.topic(0, 1, 2, 3)
         }
       }
       (schedule == notExpected) should be(false)
       (notExpected == schedule) should be(false)
     }
-    
+
     "SlotAssignment.equals" in {
       (schedule.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(true)
       val expected = mkSchedule(baseProblem) {
@@ -94,7 +128,7 @@ class ScheduleTest extends TestBase {
       val notExpected = mkSchedule(baseProblem) {
         0.slot {
           0.topic(0, 1, 3)
-          1.topic (2)
+          1.topic(2)
         }
         1.slot {
           3.topic(0, 1, 2, 3)
@@ -103,40 +137,11 @@ class ScheduleTest extends TestBase {
       (schedule.slotsToAssignment(0) == notExpected.slotsToAssignment(0)) should be(false)
       (notExpected.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(false)
     }
-    
+
   }
 
   "Scoring" - {
-    val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
-
-    given problem: SmallProblem = InputTranscription2(input).result.toEither.force
-
-    given SchedulePrinter = new SchedulePrinter(problem)
-
-    val Seq(d1, d2) = problem.slotsCount.range
-    val Seq(unassigned0, unassigned1, alpha, beta, gamma, delta, epsilon1, epsilon2, eta1, eta2, theta) =
-      problem.topicsCount.range
-    val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = problem.personsCount.range
-
-    def scheduleBase(myProblem: SmallProblem = problem) = mkSchedule(myProblem) {
-      d1.slot {
-        unassigned0.topicEmpty
-        alpha.topic(a, d, e) // Alpha, ADE
-        epsilon1.topic(b, c, f) // Epsilon #1, BCF
-        gamma.topic(g, h, i) // Gamma, GHI
-        eta1.topic(j, k, l) // Eta ~1, JKL
-      }
-      d2.slot {
-        unassigned1.topicEmpty
-        beta.topic(b, c, f) // Beta, BCF
-        epsilon2.topic(a, d, e) // Epsilon #2, ADE,
-        delta.topic(g, h, i) // Delta, GHI
-        eta2.topic(j, k, l) // Eta ~2, JKL
-      }
-    }
-
-    println(scheduleBase().toPrettyString)
-    val personScoresBase: Map[PersonId, Score] = problem.personsCount.range.map(_ -> Score.Zero).toMap
+    import Model.{*, given}
 
     "basic schedule" in {
       val schedule = scheduleBase()
@@ -145,17 +150,19 @@ class ScheduleTest extends TestBase {
     }
 
     "satisfied wish" in {
-      val betterSchedule = scheduleBase().on(d1)(_.move(f, epsilon1, alpha))
+      val betterSchedule = scheduleBase().on(d1)(_.move(fay, epsilon1, alpha))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (f -> 750)
+        personScoresBase + (fay -> 750)
       )
       betterSchedule.getTotalScore should be(750.0 / 2048)
     }
 
     "satisfied person-wish" in {
-      val betterSchedule = scheduleBase().on(d2)(_.move(h, delta, beta)).on(d1)(_.move(h, gamma, alpha))
+      val betterSchedule = scheduleBase().on(d2)(_.move(han, delta, beta)).on(d1)(_.move(han, gamma, alpha))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (c -> 500)
+        personScoresBase + (cat -> 500)
       )
       betterSchedule.getTotalScore should be(500.0 / 2048)
     }
@@ -166,7 +173,7 @@ class ScheduleTest extends TestBase {
       val problem2 = InputTranscription2(input2).problem
       val schedule = scheduleBase(problem2)
       schedule.getPersonsToScore.toMap should be(
-        personScoresBase + (b -> 100)
+        personScoresBase + (bab -> 100)
       )
       schedule.getTotalScore should be(100.0 / 2048)
     }
@@ -178,118 +185,148 @@ class ScheduleTest extends TestBase {
     }
 
     "unsatisfied incompatible" in {
-      val betterSchedule = scheduleBase().on(d1)(_.move(g, gamma, alpha)).on(d2)(_.move(g, delta, beta))
+      val betterSchedule = scheduleBase().on(d1)(_.move(guy, gamma, alpha)).on(d2)(_.move(guy, delta, beta))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (a -> -1000)
+        personScoresBase + (alf -> -1000)
       )
       betterSchedule.getTotalScore should be(-1000.0)
     }
 
     "unsatisfied forbidden" in {
-      val betterSchedule = scheduleBase().on(d2)(_.move(e, epsilon2, beta))
+      val betterSchedule = scheduleBase().on(d2)(_.move(eli, epsilon2, beta))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (e -> Score.MinReward)
+        personScoresBase + (eli -> Score.MinReward)
       )
       betterSchedule.getTotalScore should be(Score.MinReward)
     }
 
     "unsatisfied exclusive (on unassigned)" in {
-      val betterSchedule = scheduleBase().on(d1)(_.move(a, alpha, unassigned0)).on(d2)(_.move(a, epsilon2, unassigned1))
+      val betterSchedule = scheduleBase().on(d1)(_.move(alf, alpha, unassigned0)).on(d2)(_.move(alf, epsilon2, unassigned1))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (a -> (-100 - 100 - 50)) // two unassigned, plus the exclusive constraint
+        personScoresBase + (alf -> (-100 - 100 - 50)) // two unassigned, plus the exclusive constraint
       )
       betterSchedule.getTotalScore should be(-250)
     }
 
     "unsatisfied exclusive (on occurrences)" in {
-      val betterSchedule = scheduleBase().on(d1)(_.move(a, alpha, epsilon1))
+      val betterSchedule = scheduleBase().on(d1)(_.move(alf, alpha, epsilon1))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (a -> Score.MinReward)
+        personScoresBase + (alf -> Score.MinReward)
       )
       betterSchedule.getTotalScore should be(Score.MinReward)
     }
 
     "unsatisfied linked" in {
-      val betterSchedule = scheduleBase().on(d1)(_.move(j, eta1, alpha))
+      val betterSchedule = scheduleBase().on(d1)(_.move(jon, eta1, alpha))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (j -> Score.MinReward)
+        personScoresBase + (jon -> Score.MinReward)
       )
       betterSchedule.getTotalScore should be(Score.MinReward)
     }
 
     "weight is considered" in {
-      val betterSchedule = scheduleBase().on(d2)(_.move(d, epsilon2, beta))
+      val betterSchedule = scheduleBase().on(d2)(_.move(dan, epsilon2, beta))
+      betterSchedule.recalculateScoreForPersonsPendingChanges()
       betterSchedule.getPersonsToScore.toMap should be(
-        personScoresBase + (d -> 500)
+        personScoresBase + (dan -> 500)
       )
       betterSchedule.getTotalScore should be(500.0 / 2048)
     }
     // TODO test weight on other scores as well
 
+    "multiple moves in a row recalculate the score correctly" in {
+      val schedule = scheduleBase()
+      schedule.getTotalScore should be(Score.Zero)
+      schedule.on(d1)(_.move(fay, epsilon1, alpha))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(750.0 / 2048)
+      schedule.on(d1)(_.move(han, gamma, alpha))
+      schedule.on(d2)(_.move(han, delta, beta))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(750.0 / 2048 + 500.0 / 1024)
+    }
+  }
 
-    "Stored score behavior" - {
-      "multiple moves in a row recalculate the score correctly" in {
-        val schedule = scheduleBase()
-        schedule.getTotalScore should be(Score.Zero)
-        schedule.on(d1)(_.move(f, epsilon1, alpha))
-        schedule.getTotalScore should be(750.0 / 2048)
-        schedule.on(d1)(_.move(h, gamma, alpha))
-        schedule.on(d2)(_.move(h, delta, beta))
-        schedule.getTotalScore should be(750.0 / 2048 + 500.0 / 1024)
-      }
+  "Undoing" - {
+    import Model.*
 
-      "undoing restores the score correctly" in {
-        val schedule = scheduleBase()
-        schedule.getTotalScore should be(Score.Zero)
-        schedule.on(d1)(_.move(f, epsilon1, alpha))
-        schedule.getTotalScore should be(750.0 / 2048)
-        schedule.on(d1)(_.undoMove(f, epsilon1, alpha))
-        schedule.getTotalScore should be(Score.Zero)
-      }
+    "undoing and restores bring the schedule back to its initial stage" in {
+      val schedule = scheduleBase()
+      schedule.getTotalScore should be(Score.Zero)
+      schedule.saveScores()
 
-      "undoing restores the score correctly (more complex)" in {
-        val schedule = scheduleBase()
+      schedule.on(d1)(_.move(fay, epsilon1, alpha))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(750.0 / 2048)
 
-        // Some basic changes
-        schedule.getTotalScore should be(Score.Zero)
-        schedule.on(d1)(_.move(h, gamma, alpha))
-        schedule.on(d2)(_.move(h, delta, beta))
-        schedule.getTotalScore should be(500.0 / 2048)
+      schedule.on(d1)(_.undoMove(fay, epsilon1, alpha))
+      schedule.restoreSavedScores()
+      schedule.getTotalScore should be(Score.Zero)
+      schedule should be(scheduleBase())
+    }
 
-        // Move and undo, on a simple case
-        schedule.on(d1)(_.move(f, epsilon1, alpha))
-        schedule.getTotalScore should be(750.0 / 2048 + 500.0 / 1024)
-        schedule.on(d1)(_.undoMove(f, epsilon1, alpha))
-        schedule.getTotalScore should be(500.0 / 2048)
+    "undoing and restores bring the schedule back to its initial stage (more complex)" in {
+      val schedule = scheduleBase()
+      schedule.getTotalScore should be(Score.Zero)
+      schedule.saveScores()
 
-        // Free I out of linked topics
-        schedule.on(d1)(_.move(i, gamma, epsilon1))
-        schedule.on(d2)(_.move(i, delta, beta))
-        schedule.getTotalScore should be(500.0 / 2048)
+      // Some basic changes
+      schedule.on(d1)(_.move(han, gamma, alpha))
+      schedule.on(d2)(_.move(han, delta, beta))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(500.0 / 2048)
 
-        // Move and undo, with temporary incompatibility
-        schedule.on(d1)(_.move(i, epsilon1, alpha))
-        schedule.getTotalScore should be(500.0 / 2048 - 1000) // incompatible with A
-        schedule.on(d1)(_.undoMove(i, epsilon1, alpha))
-        schedule.getTotalScore should be(500.0 / 2048)
+      // Move and undo, on a simple case
+      schedule.saveScores()
+      schedule.on(d1)(_.move(fay, epsilon1, alpha))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(750.0 / 2048 + 500.0 / 1024)
+      schedule.on(d1)(_.undoMove(fay, epsilon1, alpha))
+      schedule.restoreSavedScores()
+      schedule.getTotalScore should be(500.0 / 2048)
 
-        // Simple change to force recalculation on A
-        schedule.on(d2)(_.move(a, epsilon2, beta))
-        schedule.getTotalScore should be(500.0 / 2048 - 800) // A got a wish and an incompatibility
-        schedule.on(d2)(_.undoMove(a, epsilon2, beta))
-        schedule.getTotalScore should be(500.0 / 2048)
+      // Free I out of linked topics
+      schedule.on(d1)(_.move(ing, gamma, epsilon1))
+      schedule.on(d2)(_.move(ing, delta, beta))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(500.0 / 2048)
 
-        // Swap and undo, changing the global score (not just the slot score)
-        schedule.on(d2)(_.swap(d, epsilon2, g, delta))
-        schedule.getTotalScore.value should be < (-1E9) // because Gamma and Delta are linked
-        schedule.on(d2)(_.undoSwap(d, epsilon2, g, delta))
-        schedule.getTotalScore should be(500.0 / 2048)
+      // One savepoint
+      schedule.saveScores()
 
-        // One last change to force recalculation on D
-        schedule.on(d2)(_.move(d, epsilon2, beta))
-        schedule.getTotalScore should be(500.0 / 2048 + 500.0 / 1024)
-      }
+      // Move and undo, with temporary incompatibility
+      schedule.on(d1)(_.move(ing, epsilon1, alpha))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(500.0 / 2048 - 1000) // incompatible with A
+      schedule.on(d1)(_.undoMove(ing, epsilon1, alpha))
+      schedule.restoreSavedScores()
+      schedule.getTotalScore should be(500.0 / 2048)
 
+      // Simple change to force recalculation on A
+      schedule.on(d2)(_.move(alf, epsilon2, beta))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(500.0 / 2048 - 800) // A got a wish and an incompatibility
+      schedule.on(d2)(_.undoMove(alf, epsilon2, beta))
+      schedule.restoreSavedScores()
+      schedule.getTotalScore should be(500.0 / 2048)
+
+      // Swap and undo, changing the global score (not just the slot score)
+      schedule.on(d2)(_.swap(dan, epsilon2, guy, delta))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore.value should be < (-1E9) // because Gamma and Delta are linked
+      schedule.on(d2)(_.undoSwap(dan, epsilon2, guy, delta))
+      schedule.restoreSavedScores()
+      schedule.getTotalScore should be(500.0 / 2048)
+
+      // One last change to force recalculation on D
+      schedule.on(d2)(_.move(dan, epsilon2, beta))
+      schedule.recalculateScoreForPersonsPendingChanges()
+      schedule.getTotalScore should be(500.0 / 2048 + 500.0 / 1024)
     }
   }
 
