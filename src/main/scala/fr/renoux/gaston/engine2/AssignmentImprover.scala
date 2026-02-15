@@ -117,7 +117,8 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
 
     /* First, let's see if we can just move the person onto the target topic */
     if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
-      // TODO Assumption: if a person can be removed/added from a topic, it can be removed/added to all linked topics. This supposes that linked topics have the same min/max numbers, and the same mandatory persons.
+      // TODO Assumption: if a person can be removed/added from a topic, it can be removed/added to all linked topics.
+      //   This supposes that linked topics have the same min/max numbers, and the same mandatory persons.
       //   => Add check in the transcription, with reference to this method
 
       /* We still need to check that they can be added on the linked topics of the target topic, because they might be mandatory there */
