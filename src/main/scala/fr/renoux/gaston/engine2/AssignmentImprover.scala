@@ -121,7 +121,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
       //   This supposes that linked topics have the same min/max numbers, and the same mandatory persons.
       //   => Add check in the transcription, with reference to this method
 
-      /* We still need to check that they can be added on the linked topics of the target topic, because they might be mandatory there */
+      /* We still need to check that they can be added on the linked topics of the target topic, because they might be mandatory on their current topic there */
       targetLinkedTids.exists { targetLinkedTid =>
         val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
         val currentTidInLinkedSlot = schedule.slotsToAssignment(linkedSlotId).personsToTopic(pid)
