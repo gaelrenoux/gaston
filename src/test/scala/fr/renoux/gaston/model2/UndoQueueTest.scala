@@ -3,6 +3,7 @@ package fr.renoux.gaston.model2
 import fr.renoux.gaston.TestBase
 import scala.collection.mutable
 
+
 class UndoQueueTest extends TestBase {
 
   "Bitwise operations" - {
