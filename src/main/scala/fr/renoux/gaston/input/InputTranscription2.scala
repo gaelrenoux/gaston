@@ -206,6 +206,7 @@ final class InputTranscription2(rawInput: InputModel) {
         prefsPersonPerson(pid, pid2) = prefsPersonPerson(pid, pid2) + (score.value * factor.value)
       }
       inPerson.forbidden.foreach { topicName =>
+          // TODO maybe unnecessary, as we already handle forbidden topics directly: see SmallProblem.topicsToForbiddens.
         topics.topicsIdsByBaseName(topicName).foreach { tid =>
           prefsPersonTopic(pid, tid) = Score.MinReward
         }
