@@ -57,12 +57,33 @@ final class SmallProblem(
     init
   }
 
-
   val personsToMandatoryTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
     val personsToTopicMap = topicsToMandatories.toSeq.flatMap { (tid, pids) =>
       pids.toSet.toSeq.map(_ -> tid)
     }.groupToMap
     IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_ *)))
+  }
+
+  /** For each person, the set of topic they are forbidden on. */
+  val personsToForbiddenTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
+    val personsToTopicMap = topicsToForbiddens.toSeq.flatMap { (tid, pids) =>
+      pids.toSet.toSeq.map(_ -> tid)
+    }.groupToMap
+    IdMap.from(personsToTopicMap.mapValuesStrict(SmallIdSet(_ *)))
+  }
+
+  /** For each person, the set of topic they aren't forbidden on. */
+  val personsToAllowedTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
+    personsToForbiddenTopics.mapValues(_.inversed)
+  }
+
+  /** For each person, the set of allowed topics they have a positive preference on. */
+  val personsToLikedTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
+    personsToAllowedTopics.mapValuesWithKey { (pid, tids) =>
+      tids.filter { tid =>
+          prefsPersonTopic(pid, tid) > Score.Zero
+      }
+    }
   }
 
   val personsWithPersonWish: SmallIdSet[PersonId] = SmallIdSet(
