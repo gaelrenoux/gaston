@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.{Count as _, *}
 
+
 final class Exclusivities(
     val topicsGroups: Array[SmallIdSet[TopicId]],
     val scores: Array[Score]

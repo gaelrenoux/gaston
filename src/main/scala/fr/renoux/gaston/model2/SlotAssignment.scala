@@ -222,8 +222,8 @@ final class SlotAssignment(
   override def equals(obj: Any): Boolean = obj match {
     case that: SlotAssignment =>
       problem == that.problem &&
-        slot == that.slot &&
-        personsToTopic.actualEquals(that.personsToTopic)
+          slot == that.slot &&
+          personsToTopic.actualEquals(that.personsToTopic)
     case _ => false
   }
 }

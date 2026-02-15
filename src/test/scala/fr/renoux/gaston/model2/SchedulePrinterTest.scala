@@ -5,6 +5,7 @@ import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2}
 import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
 
+
 class SchedulePrinterTest extends TestBase {
   "Printing nominal schedule" in {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force

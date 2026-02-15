@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
 
+
 class IdMatrixSymmetricalTest extends TestBase {
   val dimension = 3
   given countI: CountAll[SlotId] = CountAll[SlotId](dimension)
@@ -42,21 +43,21 @@ class IdMatrixSymmetricalTest extends TestBase {
       matrix(0, 0) should be("")
       matrix(1, 1) should be("no")
       matrix(2, 2) should be("yes")
-      for { i <- 0 until dimension } {
+      for {i <- 0 until dimension} {
         matrix(i, i) should be(testSeq(i)(i))
       }
     }
     "inside the matrix's stored side" in {
       matrix(1, 0) should be("no")
       matrix(2, 1) should be("yes")
-      for { i <- 0 until dimension; j <- 0 until i } {
+      for {i <- 0 until dimension; j <- 0 until i} {
         matrix(i, j) should be(testSeq(i)(j))
       }
     }
     "inside the matrix's non-stored side" in {
       matrix(0, 1) should be("no")
       matrix(1, 2) should be("yes")
-      for { i <- 0 until dimension; j <- (i + 1) until dimension } {
+      for {i <- 0 until dimension; j <- (i + 1) until dimension} {
         matrix(i, j) should be(testSeq(j)(i))
       }
     }
@@ -68,10 +69,10 @@ class IdMatrixSymmetricalTest extends TestBase {
       val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
       matrix(1, 1) = "hello"
       matrix(1, 1) should be("hello")
-      for { i <- 0 until dimension; j <- 0 to i; if (i, j) != (1, 1) } {
+      for {i <- 0 until dimension; j <- 0 to i; if (i, j) != (1, 1)} {
         matrix(i, j) should be(testSeq(i)(j))
       }
-      for { i <- 0 until dimension; j <- i + 1 until dimension } {
+      for {i <- 0 until dimension; j <- i + 1 until dimension} {
         matrix(i, j) should be(testSeq(j)(i))
       }
     }
@@ -80,10 +81,10 @@ class IdMatrixSymmetricalTest extends TestBase {
       matrix(1, 0) = "hello"
       matrix(1, 0) should be("hello")
       matrix(0, 1) should be("hello")
-      for { i <- 0 until dimension; j <- 0 to i; if (i, j) != (1, 0) } {
+      for {i <- 0 until dimension; j <- 0 to i; if (i, j) != (1, 0)} {
         matrix(i, j) should be(testSeq(i)(j))
       }
-      for { i <- 0 until dimension; j <- i + 1 until dimension; if (i, j) != (0, 1) } {
+      for {i <- 0 until dimension; j <- i + 1 until dimension; if (i, j) != (0, 1)} {
         matrix(i, j) should be(testSeq(j)(i))
       }
     }
@@ -92,10 +93,10 @@ class IdMatrixSymmetricalTest extends TestBase {
       matrix(1, 2) = "hello"
       matrix(1, 2) should be("hello")
       matrix(2, 1) should be("hello")
-      for { i <- 0 until dimension; j <- 0 to i; if (i, j) != (2, 1) } {
+      for {i <- 0 until dimension; j <- 0 to i; if (i, j) != (2, 1)} {
         matrix(i, j) should be(testSeq(i)(j))
       }
-      for { i <- 0 until dimension; j <- i + 1 until dimension; if (i, j) != (1, 2) } {
+      for {i <- 0 until dimension; j <- i + 1 until dimension; if (i, j) != (1, 2)} {
         matrix(i, j) should be(testSeq(j)(i))
       }
     }

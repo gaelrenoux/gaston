@@ -6,6 +6,7 @@ import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2}
 import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
 
+
 class ScheduleTest extends TestBase {
   // TODO test move/swap individually
   // TODO missing tests on SlotAssignment stuff
