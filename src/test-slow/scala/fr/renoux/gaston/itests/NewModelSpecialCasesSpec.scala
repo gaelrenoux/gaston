@@ -7,6 +7,8 @@ import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.util.Context
 import fr.renoux.gaston.{TestBase, model as oldModel}
 
+import scala.util.Random
+
 class NewModelSpecialCasesSpec extends TestBase {
 
   "R3 2024" - {
@@ -33,6 +35,7 @@ class NewModelSpecialCasesSpec extends TestBase {
       oldProblem.personsList
 
     "Specific starting case optimization" in {
+      given Random = new Random(0)
 
       val oldSchedule = oldModel.Schedule.from(
         d1a(

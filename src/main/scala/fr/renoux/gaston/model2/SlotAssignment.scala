@@ -3,6 +3,7 @@ package fr.renoux.gaston.model2
 import fr.renoux.gaston.util.*
 
 import scala.compiletime.uninitialized
+import scala.util.Random
 
 
 /** Assignments for a single slot (who is on what topic).
@@ -22,6 +23,29 @@ final class SlotAssignment(
 
   // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
   val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]] = personsToTopic.transpose
+
+  def getOpenTopics: SmallIdSet[TopicId] = {
+    var result = SmallIdSet.empty[TopicId]
+    problem.topicsCount.foreach { tid =>
+      if (topicsToPersons(tid).size < problem.topicsToMaxPersons(tid)) {
+        result += tid
+      }
+    }
+    result
+  }
+
+  def pickGoodOpenTopicFor(pid: PersonId)(using Random): TopicId = {
+    val openTopics = getOpenTopics
+    val bestTopics = problem.personsToLikedTopics(pid) && openTopics
+    if (bestTopics.nonEmpty) {
+      return bestTopics.pickRandom
+    }
+    val okTopics = problem.personsToNonHatedTopics(pid) && openTopics
+    if (okTopics.nonEmpty) {
+      return okTopics.pickRandom
+    }
+    problem.unassignedTopic(slot)
+  }
 
   /** Returns true if that person can be added to this topic, without moving anyone else. Checks if the maximum number of persons is respected. */
   def isAddableToTopic(pid: PersonId, tid: TopicId): Boolean = {
