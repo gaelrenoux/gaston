@@ -554,8 +554,34 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
-  "pickRandom" - {
+  "forall" - {
     given CountAll[SlotId] = CountAll[SlotId](64)
+
+    "nominal" in {
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      a.forall(_.value > 2) should be(true)
+      a.forall(_.value < 10) should be(false)
+      a.forall(_ => true) should be(true)
+      a.forall(_ => false) should be(false)
+    }
+
+    "set is empty" in {
+      val a = SmallIdSet.empty[SlotId]
+      a.forall(_.value % 3 == 0) should be(true)
+      a.forall(_ => false) should be(true)
+    }
+
+    "set is full" in {
+      SmallIdSet.full[SlotId].forall(_.value < 64) should be(true)
+    }
+
+    "set is full, but count is < 64" in {
+      given CountAll[SlotId] = CountAll[SlotId](32)
+      SmallIdSet.full[SlotId].forall(_.value < 32) should be(true)
+    }
+  }
+
+  "pickRandom" - {
 
     "always returns the same value if using the same random" in {
       val a = SmallIdSet[SlotId](3, 8, 14, 31, 33, 42, 47, 63)

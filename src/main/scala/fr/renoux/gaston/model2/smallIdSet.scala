@@ -20,6 +20,9 @@ object SmallIdSet {
     inline def contains(id: I): Boolean =
       (s & mask(id)) != 0L
 
+    inline def containsNot(id: I): Boolean =
+      (s & mask(id)) == 0L
+
     inline def containsAll(i: I, j: I): Boolean = {
       val fullMask = mask(i) | mask(j)
       (s & fullMask) == fullMask
@@ -151,8 +154,12 @@ object SmallIdSet {
       result
     }
 
-    def exists(f: I => Boolean)(using c: CountAll[I]): Boolean = {
+    inline def exists(inline f: I => Boolean)(using inline c: CountAll[I]): Boolean = {
       c.exists { i => s.contains(i) && f(i) }
+    }
+
+    inline def forall(inline f: I => Boolean)(using inline c: CountAll[I]): Boolean = {
+      c.forall { i => s.containsNot(i) || f(i) }
     }
 
     def toArray(using c: CountAll[I], ct: ClassTag[I]): Array[I] = {
