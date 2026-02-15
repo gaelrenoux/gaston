@@ -63,7 +63,7 @@ final class UndoQueue(capacity: Int = 8) {
 
   inline def undo
       (inline ifMove: (sid: SlotId, pid: PersonId, tid1: TopicId, tid2: TopicId) => Unit)
-      (inline ifSwap: (sid: SlotId, pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId) => Unit)
+          (inline ifSwap: (sid: SlotId, pid1: PersonId, tid1: TopicId, pid2: PersonId, tid2: TopicId) => Unit)
   : Unit = {
     var ix = nextEntry - 1
     while (ix >= 0) {

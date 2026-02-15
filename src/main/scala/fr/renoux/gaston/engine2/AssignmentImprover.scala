@@ -190,51 +190,51 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
   }
 
 
-//  // TODO Unfinished and unused for now
-//  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
-//  private def goodChangeForPersonTopicWithLinked(
-//      schedule: Schedule,
-//      assignment: SlotAssignment,
-//      pid: PersonId, currentTid: TopicId, targetTid: TopicId,
-//      handleLinked: Boolean
-//  ): Boolean = {
-//    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
-//
-//    if (problem.isPersonForbidden(pid, targetTid)) {
-//      return false // Person is forbidden on the target topic, don't bother
-//    }
-//
-//    val currentScore = schedule.getTotalScore
-//
-//    val currentLinkedTids = problem.topicsToLinkedTopics(currentTid)
-//    val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
-//
-//    /* First, let's see if we can just move the person onto the target topic */
-//    if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
-//      /* We can just move that person on the target topic */
-//      assignment.move(pid, currentTid, targetTid)
-//      val newScore = schedule.getTotalScore
-//      if (newScore > currentScore) {
-//        return true // accept this change, it looks good
-//      }
-//      val _ = assignment.undoMove(pid, currentTid, targetTid) // wasn't good, rollback the change
-//    }
-//
-//    /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
-//    val targetTopicPersons = assignment.topicsToPersons(targetTid)
-//    targetTopicPersons.foreach { otherPid =>
-//      // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
-//      if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
-//        assignment.swap(pid, currentTid, otherPid, targetTid)
-//        val newScore = schedule.getTotalScore
-//        if (newScore > currentScore) {
-//          return true // accept this change, it looks good
-//        }
-//        val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
-//      }
-//    } // end foreachWhile
-//
-//    false
-//  }
+  //  // TODO Unfinished and unused for now
+  //  /** Find a good way to move that person on that topic. Returns true if it was done, false if there's no good way. */
+  //  private def goodChangeForPersonTopicWithLinked(
+  //      schedule: Schedule,
+  //      assignment: SlotAssignment,
+  //      pid: PersonId, currentTid: TopicId, targetTid: TopicId,
+  //      handleLinked: Boolean
+  //  ): Boolean = {
+  //    /* The only iteration in this method is when we go over all persons on the target topic, when we try swaps */
+  //
+  //    if (problem.isPersonForbidden(pid, targetTid)) {
+  //      return false // Person is forbidden on the target topic, don't bother
+  //    }
+  //
+  //    val currentScore = schedule.getTotalScore
+  //
+  //    val currentLinkedTids = problem.topicsToLinkedTopics(currentTid)
+  //    val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
+  //
+  //    /* First, let's see if we can just move the person onto the target topic */
+  //    if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
+  //      /* We can just move that person on the target topic */
+  //      assignment.move(pid, currentTid, targetTid)
+  //      val newScore = schedule.getTotalScore
+  //      if (newScore > currentScore) {
+  //        return true // accept this change, it looks good
+  //      }
+  //      val _ = assignment.undoMove(pid, currentTid, targetTid) // wasn't good, rollback the change
+  //    }
+  //
+  //    /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
+  //    val targetTopicPersons = assignment.topicsToPersons(targetTid)
+  //    targetTopicPersons.foreach { otherPid =>
+  //      // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+  //      if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+  //        assignment.swap(pid, currentTid, otherPid, targetTid)
+  //        val newScore = schedule.getTotalScore
+  //        if (newScore > currentScore) {
+  //          return true // accept this change, it looks good
+  //        }
+  //        val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+  //      }
+  //    } // end foreachWhile
+  //
+  //    false
+  //  }
 
 }
