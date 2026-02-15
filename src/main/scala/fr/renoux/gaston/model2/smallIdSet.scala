@@ -129,6 +129,9 @@ object SmallIdSet {
       s & that
     }
 
+    /** Note: you'll have a 1 bit for non-existing value (higher than the count), but that's already the case with SmallIdSet.full. */
+    inline def inversed: SmallIdSet[I] = ~s
+
     /** Shouldn't be necessary, but type issue otherwise */
     private inline def mask(id: I): Long = SmallIdSet(id)
 
@@ -168,6 +171,18 @@ object SmallIdSet {
       val result = toArray
       result.shuffle
       result
+    }
+
+    def pickRandom(using rand: Random): I = if (isEmpty) Id.None.asInstanceOf[I] else {
+      var current = s
+      var targetIndex = rand.nextInt(size.value)
+      while (true) {
+        val bitIndex = java.lang.Long.numberOfTrailingZeros(current)
+        if (targetIndex == 0) return bitIndex
+        current &= (current - 1) // clear lowest set bit
+        targetIndex -= 1
+      }
+      throw new IllegalStateException("There's a bug in there")
     }
   }
 
