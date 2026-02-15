@@ -600,6 +600,18 @@ class SmallIdSetTest extends TestBase {
       }
     }
 
+    "only returns valid values on a full set" in {
+      given Random = Random(0)
+
+      given CountAll[SlotId] = CountAll[SlotId](32)
+
+      val a = SmallIdSet.full[SlotId]
+      fastLoop(0, 1000) { _ =>
+        a.pickRandom.value should be < 32
+      }
+
+    }
+
     "returns Id.None if the set is empty" in {
       given Random = Random(0)
 
