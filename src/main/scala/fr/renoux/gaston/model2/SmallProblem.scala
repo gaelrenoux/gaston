@@ -77,6 +77,15 @@ final class SmallProblem(
     personsToForbiddenTopics.mapValues(_.inversed)
   }
 
+  /** For each person, the set of allowed topics they have a non-negative preference on. */
+  val personsToNonHatedTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
+    personsToAllowedTopics.mapValuesWithKey { (pid, tids) =>
+      tids.filter { tid =>
+        prefsPersonTopic(pid, tid) >= Score.Zero
+      }
+    }
+  }
+
   /** For each person, the set of allowed topics they have a positive preference on. */
   val personsToLikedTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
     personsToAllowedTopics.mapValuesWithKey { (pid, tids) =>
