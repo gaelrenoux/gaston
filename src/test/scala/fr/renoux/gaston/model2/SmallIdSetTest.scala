@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestBase
 import fr.renoux.gaston.util.{Count as _, *}
 
 import scala.collection.mutable
+import scala.util.Random
 
 
 class SmallIdSetTest extends TestBase {
@@ -326,6 +327,23 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
+  "inversed" - {
+    "on empty set" in {
+      val set = SmallIdSet.empty[TopicId]
+      set.inversed should be(SmallIdSet.full[TopicId])
+    }
+
+    "on full set" in {
+      val set = SmallIdSet.full[TopicId]
+      set.inversed should be(SmallIdSet.empty[TopicId])
+    }
+
+    "on non-empty set" in {
+      val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
+      set.inversed should be(SmallIdSet(testKoIds*))
+    }
+  }
+
   "foreach" - {
     given CountAll[TopicId] = CountAll[TopicId](64)
 
@@ -357,7 +375,7 @@ class SmallIdSetTest extends TestBase {
     "on empty set" in {
       val set = SmallIdSet.empty[TopicId]
       val result = mutable.Set[TopicId]()
-      set.foreachWhile { i => 
+      set.foreachWhile { i =>
         if (i.value < 20) {
           result += i
           true
@@ -369,7 +387,7 @@ class SmallIdSetTest extends TestBase {
     "on non-empty set" in {
       val set: SmallIdSet[TopicId] = SmallIdSet(testOkIds*)
       val result = mutable.Set[TopicId]()
-      set.foreachWhile { i => 
+      set.foreachWhile { i =>
         if (i.value < 20) {
           result += i
           true
@@ -381,7 +399,7 @@ class SmallIdSetTest extends TestBase {
     "on full set" in {
       val set = SmallIdSet.full[TopicId]
       val result = mutable.Set[TopicId]()
-      set.foreachWhile { i => 
+      set.foreachWhile { i =>
         if (i.value < 20) {
           result += i
           true
@@ -393,7 +411,7 @@ class SmallIdSetTest extends TestBase {
     "precise split" in {
       val set = SmallIdSet[TopicId](1, 2, 3)
       val result = mutable.Set[TopicId]()
-      set.foreachWhile { i => 
+      set.foreachWhile { i =>
         if (i.value < 2) {
           result += i
           true
@@ -536,6 +554,35 @@ class SmallIdSetTest extends TestBase {
     }
   }
 
+  "pickRandom" - {
+    given CountAll[SlotId] = CountAll[SlotId](64)
+
+    "always returns the same value if using the same random" in {
+      val a = SmallIdSet[SlotId](3, 8, 14, 31, 33, 42, 47, 63)
+      val firstPick = a.pickRandom(using Random(0))
+      fastLoop(0, 100) { _ =>
+        a.pickRandom(using Random(0)) should be(firstPick)
+      }
+    }
+
+    "only returns values that exist in the set" in {
+      given Random = Random(0)
+
+      val a = SmallIdSet[SlotId](3, 8, 47, 63)
+      fastLoop(0, 1000) { _ =>
+        a.contains(a.pickRandom) should be(true)
+      }
+    }
+
+    "returns Id.None if the set is empty" in {
+      given Random = Random(0)
+
+      val a = SmallIdSet.empty[SlotId]
+      a.pickRandom should be(SlotId.None)
+    }
+
+  }
+
   "mergeIfIntersect" - {
 
     given CountAll[TopicId] = CountAll[TopicId](64)
@@ -553,7 +600,6 @@ class SmallIdSetTest extends TestBase {
         SmallIdSet[TopicId](1, 2) :: SmallIdSet[TopicId](3, 4) :: SmallIdSet[TopicId](2, 9) :: SmallIdSet[TopicId](3, 9) :: Nil
       ) should be(List(SmallIdSet[TopicId](1, 2, 3, 4, 9)))
     }
-
 
   }
 
