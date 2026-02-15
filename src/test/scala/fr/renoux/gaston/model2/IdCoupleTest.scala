@@ -4,7 +4,7 @@ import fr.renoux.gaston.TestBase
 
 
 class IdCoupleTest extends TestBase {
-  
+
   val i: SlotId = 13
   val j: TopicId = 42
 
@@ -13,7 +13,7 @@ class IdCoupleTest extends TestBase {
     couple._1 should be(i)
     couple._2 should be(j)
   }
-  
+
   "zero" - {
     "on the left" in {
       val couple = IdCouple(0, j)
@@ -31,7 +31,7 @@ class IdCoupleTest extends TestBase {
       couple._2 should be(0)
     }
   }
-  
+
   "-1" - {
     "on the left" in {
       val couple = IdCouple(-1, j)

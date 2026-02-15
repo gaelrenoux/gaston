@@ -15,10 +15,10 @@ class SmallProblemTest extends TestBase {
 
   val Seq(albert: PersonId, bianca: PersonId, charly: PersonId) = problem.personsCount.range.toSeq
   val Seq(
-  unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
-  alpha, beta, gamma, delta, // 6 to 9
-  epsilon1, epsilon2, eta1, eta2, // 10 to 13
-  theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
+      unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
+      alpha, beta, gamma, delta, // 6 to 9
+      epsilon1, epsilon2, eta1, eta2, // 10 to 13
+      theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
   ) = problem.topicsCount.range
 
   "topicsToLinkedTopics" in {
@@ -111,10 +111,10 @@ class SmallProblemTest extends TestBase {
       "getClass", "notify", "notifyAll", "wait" // technical methods
     )
     classOf[SmallProblem].getMethods.filter(_.getParameterCount == 0)
-      .filterNot { m => uncheckedMethods.contains(m.getName) }
-      .foreach { method =>
-        method.invoke(problem2) should be(method.invoke(problem))
-      }
+        .filterNot { m => uncheckedMethods.contains(m.getName) }
+        .foreach { method =>
+          method.invoke(problem2) should be(method.invoke(problem))
+        }
   }
 
 
