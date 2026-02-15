@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.TestBase
 
+
 class IdMatrix3Test extends TestBase {
   val depth = 2
   val height = 3
@@ -48,15 +49,19 @@ class IdMatrix3Test extends TestBase {
       matrix(0, 0, 1) should be("yes")
       matrix(1, 1, 3) should be("")
       matrix(1, 2, 3) should be("goodbye")
-      for { i <- 0 until depth; j <- 0 until height; k <- 0 until width } {
+      for {i <- 0 until depth; j <- 0 until height; k <- 0 until width} {
         matrix(i, j, k) should be(testSeq(i)(j)(k))
       }
     }
 
     "read key outside the matrix" in {
       val matrix = IdMatrix3.unsafeFrom[SlotId, TopicId, PersonId, String](testSeq)
-      an[ArrayIndexOutOfBoundsException] shouldBe thrownBy { matrix(1, 3, 3) }
-      an[ArrayIndexOutOfBoundsException] shouldBe thrownBy { matrix(-1, 1, 1) }
+      an[ArrayIndexOutOfBoundsException] shouldBe thrownBy {
+        matrix(1, 3, 3)
+      }
+      an[ArrayIndexOutOfBoundsException] shouldBe thrownBy {
+        matrix(-1, 1, 1)
+      }
       // an[ArrayIndexOutOfBoundsException] shouldBe thrownBy { map(1, -1, 1) } // No, because it's flattened!
     }
   }
@@ -70,7 +75,7 @@ class IdMatrix3Test extends TestBase {
       matrix(0, 0, 1) should be("no")
       matrix(1, 1, 3) should be("hello")
       matrix(1, 2, 3) should be("")
-      for { i <- 0 until depth; j <- 0 until height; k <- 0 until width } {
+      for {i <- 0 until depth; j <- 0 until height; k <- 0 until width} {
         if ((i, j, k) == (0, 0, 1)) matrix(i, j, k) should be("no")
         else if ((i, j, k) == (1, 1, 3)) matrix(i, j, k) should be("hello")
         else if ((i, j, k) == (1, 2, 3)) matrix(i, j, k) should be("")

@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestBase
 
 import scala.util.Random
 
+
 class CountTest extends TestBase {
 
   "basics" - {
@@ -305,13 +306,13 @@ class CountTest extends TestBase {
       given Random = new Random(0)
       val c: Count[PersonId] = 8
 
-      c.shuffled.toSet should be ((0 until 8).toSet)
+      c.shuffled.toSet should be((0 until 8).toSet)
     }
 
     "returns values in a random order" in {
       given Random = new Random(0)
       val c: Count[PersonId] = 8
-      c.shuffled shouldNot be ((0 until 8).toArray)
+      c.shuffled shouldNot be((0 until 8).toArray)
     }
 
 

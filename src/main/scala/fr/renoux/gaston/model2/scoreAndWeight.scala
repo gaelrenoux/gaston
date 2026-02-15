@@ -3,6 +3,7 @@ package fr.renoux.gaston.model2
 import java.util as jutil
 import scala.annotation.targetName
 
+
 opaque type Score >: Double = Double
 
 object Score {
