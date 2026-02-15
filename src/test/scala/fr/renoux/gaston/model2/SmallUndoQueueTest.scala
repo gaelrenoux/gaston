@@ -4,6 +4,7 @@ import fr.renoux.gaston.TestBase
 
 import scala.collection.mutable
 
+
 class SmallUndoQueueTest extends TestBase {
 
   "Bitwise operations" - {

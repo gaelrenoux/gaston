@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import scala.collection.immutable
 
+
 class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
 
   import problem.given
@@ -39,11 +40,11 @@ class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
       val topicScore = schedule.getTopicsTotalScore
       val personsScore = schedule.getPersonsTotalScore
       val personsScores: Iterable[String] = schedule.getPersonsToScore
-        .toMap.toSeq.sortBy(idScore => (-idScore._2.value, idScore._1))
-        .map { (pid, score) =>
-          val person = problem.personsToName(pid)
-          s"$person: $score"
-        }
+          .toMap.toSeq.sortBy(idScore => (-idScore._2.value, idScore._1))
+          .map { (pid, score) =>
+            val person = problem.personsToName(pid)
+            s"$person: $score"
+          }
 
       s"""Total score: $totalScore
          |  Pure topics: $topicScore

@@ -81,7 +81,7 @@ final class SmallProblem(
   val personsToLikedTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
     personsToAllowedTopics.mapValuesWithKey { (pid, tids) =>
       tids.filter { tid =>
-          prefsPersonTopic(pid, tid) > Score.Zero
+        prefsPersonTopic(pid, tid) > Score.Zero
       }
     }
   }
@@ -100,7 +100,7 @@ final class SmallProblem(
     val targetToSourcePids = targetSourcePids.groupToMap
     IdMap.from(targetToSourcePids.view.mapValues(SmallIdSet(_)))
   }
-  
+
   /** Score a set of topics with respect to the linked-topic preferences. The score should be added to the score of the
     * person having this set of topics. */
   def scoreForPrefsTopicsLinked(topicIds: SmallIdSet[TopicId]) = {
