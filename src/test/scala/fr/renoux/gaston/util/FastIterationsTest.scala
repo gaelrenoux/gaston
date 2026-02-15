@@ -197,12 +197,25 @@ class FastIterationsTest extends TestBase {
     "fastMap" - {
       "nominal" in {
         val array = Array("apple", "orange", "nut")
-        val result: Array[Int] = array.map(_.length)
+        val result: Array[Int] = array.fastMap(_.length)
         result should be(Array(5, 6, 3))
       }
       "empty" in {
         val array = Array.empty[String]
-        val result: Array[Int] = array.map(_.length)
+        val result: Array[Int] = array.fastMap(_.length)
+        result should be(Array.empty[Int])
+      }
+    }
+
+    "fastMapWithIndex" - {
+      "nominal" in {
+        val array = Array("apple", "orange", "nut")
+        val result: Array[Int] = array.fastMapWithIndex { (i, str) => i + str.length }
+        result should be(Array(5, 7, 5))
+      }
+      "empty" in {
+        val array = Array.empty[String]
+        val result: Array[Int] = array.fastMapWithIndex { (i, str) => i + str.length }
         result should be(Array.empty[Int])
       }
     }
