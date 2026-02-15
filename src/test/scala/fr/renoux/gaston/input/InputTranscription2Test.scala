@@ -7,10 +7,9 @@ import fr.renoux.gaston.util.{Count as _, *}
 
 
 class InputTranscription2Test extends TestBase {
-
+  
   val maxCount = Count.maxCount[Id].value
   val emptyIdSet = SmallIdSet.empty[Id]
-  val fullIdSet = SmallIdSet.full[Id]
 
   // TODO Add tests for bad model
 
@@ -110,11 +109,12 @@ class InputTranscription2Test extends TestBase {
           Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
           Seq.fill(6)(SmallIdSet(2))
       )
+      val fullSlotIdSet = SmallIdSet.full[SlotId]
       transcription.topics.topicsAllowedSlots.valuesSeq should be(
         (0 to 5).map(SmallIdSet(_)) ++
-          Seq(fullIdSet, fullIdSet, fullIdSet, SmallIdSet(1, 4)) ++
-          Seq(fullIdSet, fullIdSet, fullIdSet, fullIdSet) ++
-          Seq.fill(6)(fullIdSet)
+          Seq(fullSlotIdSet, fullSlotIdSet, fullSlotIdSet, SmallIdSet(1, 4)) ++
+          Seq(fullSlotIdSet, fullSlotIdSet, fullSlotIdSet, fullSlotIdSet) ++
+          Seq.fill(6)(fullSlotIdSet)
       )
       transcription.topics.topicsFollowup.valuesSeq should be(
         Seq.fill(6)(TopicId.None) ++
