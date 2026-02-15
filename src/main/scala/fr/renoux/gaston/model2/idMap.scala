@@ -56,7 +56,11 @@ object IdMap {
       r
     }
 
+    /** When mapping values, don't forget that ALL ids have an associated value, which may be the default one if you didn't set one manually. */
     inline def mapValues[B: ClassTag](inline f: A => B): IdMap[I, B] = m.fastMap(f)
+
+    /** When mapping values, don't forget that ALL ids have an associated value, which may be the default one if you didn't set one manually. */
+    inline def mapValuesWithKey[B: ClassTag](inline f: (I, A) => B): IdMap[I, B] = m.fastMapWithIndex(f)
 
     /** Returns a new IdMap from the id to the score, given a function to convert index and value into a score. */
     inline def mapToScore(inline f: (I, A) => Score): IdMap[I, Score] = {

@@ -123,6 +123,17 @@ extension [A](inline as: Array[A]) {
     result
   }
 
+  inline def fastMapWithIndex[B: ClassTag](inline f: (Int, A) => B): Array[B] = {
+    val asl = as.length
+    val result = new Array[B](asl)
+    var ix = 0
+    while (ix < asl) {
+      result(ix) = f(ix, as(ix))
+      ix += 1
+    }
+    result
+  }
+
   inline def fastFill(inline a: => A): Unit = {
     val asl = as.length
     var ix = 0
