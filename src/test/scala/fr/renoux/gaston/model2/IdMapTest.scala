@@ -78,6 +78,22 @@ class IdMapTest extends TestBase {
     result should be(SmallIdSet(1, 3, 5, 7, 9, 11, 13, 15))
   }
 
+  "mapValues" in {
+    val map = IdMap.from(testMapOk)
+    map.mapValues {
+      case null => 0 // unset value
+      case str => Integer.parseInt(str, 16)
+    } should be(IdMap.from(testOkIds.map(i => i -> i.value)))
+  }
+
+  "mapValuesWithKey" in {
+    val map = IdMap.from(testMapOk)
+    map.mapValuesWithKey {
+      case (ix, null) => 0 // unset value
+      case (ix, str) => ix.value + Integer.parseInt(str, 16)
+    } should be(IdMap.from(testOkIds.map(i => i -> 2 * i.value)))
+  }
+
   "mapToScore" in {
     val map = IdMap.from(testMapOk)
     val result = map.mapToScore { (id, str) =>
@@ -154,26 +170,26 @@ class IdMapTest extends TestBase {
     map2(42) should be("")
     map(42) should be("2a")
   }
-  
+
   "actualEquals" in {
     val map = IdMap.from(testMapAll)
-    map.actualEquals(map) should be (true)
-    
+    map.actualEquals(map) should be(true)
+
     val mapBis = IdMap.from(testMapAll)
     (map == mapBis) should be(false) // default Array equality
-    map.actualEquals(mapBis) should be (true)
-    mapBis.actualEquals(map) should be (true)
+    map.actualEquals(mapBis) should be(true)
+    mapBis.actualEquals(map) should be(true)
 
     val map2 = IdMap.from(testMapOk)
-    map2.actualEquals(map2) should be (true)
+    map2.actualEquals(map2) should be(true)
 
     val map2Bis = IdMap.from(testMapOk)
     (map2 == map2Bis) should be(false) // default Array equality
-    map2.actualEquals(map2Bis) should be (true)
-    map2Bis.actualEquals(map2) should be (true)
+    map2.actualEquals(map2Bis) should be(true)
+    map2Bis.actualEquals(map2) should be(true)
 
-    map.actualEquals(map2) should be (false)
-    map2.actualEquals(map) should be (false)
+    map.actualEquals(map2) should be(false)
+    map2.actualEquals(map) should be(false)
   }
 
 }
