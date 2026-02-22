@@ -84,6 +84,9 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
       pid: PersonId
   )(using Random): Boolean = {
     val currentTid: TopicId = assignment.personsToTopic(pid)
+    if (problem.isPersonMandatory(pid, currentTid)) {
+      return false // Person is mandatory on the current topic, don't bother
+    }
 
     topics.fastForeach { targetTid =>
       if (currentTid != targetTid) {
@@ -96,7 +99,10 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
   }
 
 
-  /** Find a good way to move that person, from that topic, to that topic. Returns true if it was done, false if there was no good way to do it. */
+  /** Find a good way to move that person, from that topic, to that topic. Returns true if it was done, false if there was no good way to do it.
+    *
+    * Assumption: the person is not mandatory on its current topic, and is not forbidden on the target topic. TODO: Add dev check for assumption
+    */
   private def goodChangeForPersonTopic(
       schedule: Schedule,
       assignment: SlotAssignment,
@@ -115,6 +121,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     val currentLinkedTidsSize = currentLinkedTids.size
     val targetLinkedTids = problem.topicsToLinkedTopics(targetTid)
     val targetLinkedTidsSize = targetLinkedTids.size
+    lazy val undoQueue = SmallUndoQueue(currentLinkedTidsSize.value + targetLinkedTidsSize.value)
 
     /* First, let's see if we can just move the person onto the target topic */
     if (assignment.isDroppableFromTopic(pid, currentTid) && assignment.isAddableToTopic(pid, targetTid)) {
@@ -125,35 +132,35 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
       /* We still need to check that they can be added on the linked topics of the target topic, because they might be mandatory on their current topic there */
       val canMoveFromTopicOnLinkedSlots = targetLinkedTids.forall { targetLinkedTid =>
         val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
-        val currentTidInLinkedSlot = schedule.slotsToAssignment(linkedSlotId).personsToTopic(pid)
-        assignment.isDroppableFromTopic(pid, currentTidInLinkedSlot)
+        val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+        val currentTidInLinkedSlot = linkedAssignment.personsToTopic(pid)
+        linkedAssignment.isDroppableFromTopic(pid, currentTidInLinkedSlot)
       }
 
       if (canMoveFromTopicOnLinkedSlots) {
 
         /* We can now move that person on the target topic */
         assignment.move(pid, currentTid, targetTid)
-        // note that we don't add this to the undoqueue, we can handle that manually
+        // note that we don't add this to the undoqueue, we can handle it manually
 
         /* Then we need to handle moving them out of the topics linked to the current one, and in the topics linked to the target one */
-        val undoQueue = SmallUndoQueue(currentLinkedTidsSize.value + targetLinkedTidsSize.value)
+        undoQueue.reset()
+        // TODO a lot of recalculation of stuff done in the check earlier, see if we can merge those steps
         currentLinkedTids.foreach { currentLinkedTid =>
           val linkedSlotId = schedule.topicsToSlot(currentLinkedTid)
           val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
           val linkedTidToTarget = linkedAssignment.pickGoodOpenTopicFor(pid)
-          // We assume that they can be removed from the linked topic: all linked topics should have the same constraints
+          // We've already checked everything can be done, so no more checks before the move
           linkedAssignment.move(pid, currentLinkedTid, linkedTidToTarget)
           undoQueue.addMove(linkedSlotId, pid, currentLinkedTid, linkedTidToTarget)
         }
         targetLinkedTids.foreach { targetLinkedTid =>
           val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
           val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
-          val currentTidThere = linkedAssignment.personsToTopic(pid)
-          // We assume that they can be added to the linked topic: all linked topics should have the same constraints. We still need to check their current topic.
-          if (assignment.isDroppableFromTopic(pid, currentTidThere)) {
-            val _ = linkedAssignment.move(pid, currentTidThere, targetLinkedTid)
-            undoQueue.addMove(linkedSlotId, pid, currentTidThere, targetLinkedTid)
-          }
+          val currentTidInLinkedSlot = linkedAssignment.personsToTopic(pid)
+          // We've already checked everything can be done, so no more checks before the move
+          linkedAssignment.move(pid, currentTidInLinkedSlot, targetLinkedTid)
+          undoQueue.addMove(linkedSlotId, pid, currentTidInLinkedSlot, targetLinkedTid)
         }
 
         /* Accept this change, if it looks good */
@@ -164,7 +171,7 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
         }
 
         /* Wasn't good, rollback the changes */
-        val _ = assignment.undoMove(pid, currentTid, targetTid)
+        assignment.undoMove(pid, currentTid, targetTid)
         undoQueue.undoMoves { (sid, pid, tid1, tid2) =>
           val _ = schedule.slotsToAssignment(sid).undoMove(pid, tid1, tid2)
         }
@@ -173,23 +180,69 @@ final class AssignmentImprover(private val problem: SmallProblem)(using private 
     }
 
     /* If moving the person wasn't possible or didn't improve the score, we'll try to swap the person with another one on that topic */
-    /* TODO Linked topics are excluded for now, they are super hard to swap for */
-    if (currentLinkedTidsSize == 0 && targetLinkedTidsSize == 0) {
-      val targetTopicPersons = assignment.topicsToPersons(targetTid)
-      targetTopicPersons.foreach { otherPid => // TODO should implement a dropThenForeach method, to start looking at the correct index
-        // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
-        if (pid.value < otherPid.value && !problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+    /* Method assumption is that the person is not mandatory on the source topic and not forbidden on the target topic, so we don't need to check for that */
+    val targetTopicPersons = assignment.topicsToPersons(targetTid)
+    // only examine persons that have a higher ID than the current one, to avoid looking at every swap twice (once from each side)
+    targetTopicPersons.dropThenForeach(pid.value) { otherPid =>
+      if (!problem.isPersonMandatory(otherPid, targetTid) && !problem.isPersonForbidden(otherPid, currentTid)) {
+
+        /* We still need to check that the swap can happen on the linked topics (pid or otherPid might be mandatory/forbidden on the non-linked topics there) */
+        lazy val canSwapOnCurrentLinkedSlots = currentLinkedTids.forall { currentLinkedTid =>
+          val linkedSlotId = schedule.topicsToSlot(currentLinkedTid)
+          val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+          val otherPersonThatTopicId = linkedAssignment.personsToTopic(otherPid)
+          linkedAssignment.isAddableToTopic(pid, otherPersonThatTopicId) && linkedAssignment.isDroppableFromTopic(otherPid, otherPersonThatTopicId)
+        }
+        lazy val canSwapOnTargetLinkedSlots = targetLinkedTids.forall { targetLinkedTid =>
+          val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
+          val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+          val thatTopicId = linkedAssignment.personsToTopic(pid)
+          linkedAssignment.isAddableToTopic(otherPid, thatTopicId) && linkedAssignment.isDroppableFromTopic(pid, thatTopicId)
+        }
+
+        if (canSwapOnCurrentLinkedSlots && canSwapOnTargetLinkedSlots) {
+
+          /* We can now swap the two persons on the target topic */
           assignment.swap(pid, currentTid, otherPid, targetTid)
+          // note that we don't add this to the undoqueue, we can handle it manually
+
+          /* Then we need to handle the swap on the topics linked to the current one, and on the topics linked to the target one */
+          undoQueue.reset()
+          // TODO a lot of recalculation of stuff done in the check earlier, see if we can merge those steps
+          currentLinkedTids.foreach { currentLinkedTid =>
+            val linkedSlotId = schedule.topicsToSlot(currentLinkedTid)
+            val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+            val otherPersonThatTopicId = linkedAssignment.personsToTopic(otherPid)
+            // We've already checked everything can be done, so no more checks before the move
+            linkedAssignment.swap(pid, currentLinkedTid, otherPid, otherPersonThatTopicId)
+            undoQueue.addSwap(linkedSlotId, pid, currentLinkedTid, otherPid, otherPersonThatTopicId)
+          }
+          targetLinkedTids.foreach { targetLinkedTid =>
+            val linkedSlotId = schedule.topicsToSlot(targetLinkedTid)
+            val linkedAssignment = schedule.slotsToAssignment(linkedSlotId)
+            val thatTopicId = linkedAssignment.personsToTopic(pid)
+            // We've already checked everything can be done, so no more checks before the move
+            linkedAssignment.swap(pid, thatTopicId, otherPid, targetLinkedTid)
+            undoQueue.addSwap(linkedSlotId, pid, thatTopicId, otherPid, targetLinkedTid)
+          }
+
+          /* Accept this change, if it looks good */
           schedule.recalculateScoreForPersonsPendingChanges()
           val newScore = schedule.getTotalScore
           if (newScore > currentScore) {
-            return true // accept this change, it looks good
+            return true
           }
-          val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid) // wasn't good, rollback the change
+
+          /* Wasn't good, rollback the changes */
+          val _ = assignment.undoSwap(pid, currentTid, otherPid, targetTid)
+          undoQueue.undoSwaps { (sid, pid1, tid1, pid2, tid2) =>
+            val _ = schedule.slotsToAssignment(sid).undoSwap(pid1, tid1, pid2, tid2)
+          }
           schedule.restoreSavedScores()
+
         }
-      } // end foreach
-    }
+      }
+    } // end dropThenForeach
 
     false
   }

@@ -60,31 +60,28 @@ class AssignmentImproverTest extends TestBase {
       println(s"Score: $newScore")
     }
 
-    // // TODO Actually they do improve things. Figure out why.
-    //    "Repeated improvements should do nothing (usually)" in {
-    //      given Random = new Random(0)
-    //      val schedule = scheduleBase()
-    //      improver.improve(schedule)
-    //      val newScore = schedule.getTotalScore
-    //      newScore should be > baseScore
-    //      //println(schedule.toPrettyString)
-    //      //println(s"Score: $newScore")
-    //      improver.improve(schedule)
-    //      val newNewScore = schedule.getTotalScore
-    //      newNewScore should be(newScore)
-    //      //println(schedule.toPrettyString)
-    //      //println(s"Score: $newScore")
-    //    }
+    "Repeated improvements should do nothing (usually)" in {
+      given Random = new Random(0)
+      val schedule = scheduleBase()
+      improver.improve(schedule)
+      val newScore = schedule.getTotalScore
+      newScore should be > baseScore
+      //println(schedule.toPrettyString)
+      //println(s"Score: $newScore")
+      improver.improve(schedule)
+      val newNewScore = schedule.getTotalScore
+      newNewScore should be(newScore)
+      //println(schedule.toPrettyString)
+      //println(s"Score: $newScore")
+    }
 
     "Multiple runs should produce the same result" in {
-      val allResults = (0 until 10000).map { _ =>
+      (0 until 10000).foreach { i =>
         given Random = new Random(0)
         val schedule = scheduleBase()
         improver.improve(schedule)
-        schedule.getTotalScore
-      }.toSet
-
-      allResults should be(Set(2.978515625))
+        (i, schedule.getTotalScore) should be(i -> 13.8671875)
+      }
     }
 
   }
@@ -154,13 +151,12 @@ class AssignmentImproverTest extends TestBase {
     "Multiple runs should produce the same result" in {
       given Random = new Random(0)
 
-      val allResults = (0 until 10000).map { _ =>
+      (0 until 10000).foreach { i =>
         val schedule = scheduleBase()
         improver.improve(schedule)
-        schedule.getTotalScore
-      }.toSet
+        (i, schedule.getTotalScore) should be(i -> 14.84375)
+      }
 
-      allResults should be(Set(-143.5546875)) // TODO score is so bad due to the linked constraint
     }
 
   }
