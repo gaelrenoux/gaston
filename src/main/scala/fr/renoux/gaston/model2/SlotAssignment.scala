@@ -14,33 +14,34 @@ import scala.util.Random
 final class SlotAssignment(
     val problem: SmallProblem,
     val slot: SlotId,
-    val personsToTopic: IdMap[PersonId, TopicId], // Default value (for persons that arent't there) is TopicId.None
+    val personsToTopic: IdMap[PersonId, TopicId], // Default value (for persons that aren't there) is TopicId.None
 ) {
 
   import problem.given
 
   var parent: Schedule = uninitialized // Will be set up on initialization of the schedule
 
+  /** Topics currently scheduled on that assignment */
+  var scheduledTopics: SmallIdSet[TopicId] = uninitialized // Will be set up on initialization of the schedule
+
   // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
   val topicsToPersons: IdMap[TopicId, SmallIdSet[PersonId]] = personsToTopic.transpose
 
+  /** Returns open topics currently planned on this assignment */
   def getOpenTopics: SmallIdSet[TopicId] = {
-    var result = SmallIdSet.empty[TopicId]
-    problem.topicsCount.foreach { tid =>
-      if (topicsToPersons(tid).size < problem.topicsToMaxPersons(tid)) {
-        result += tid
-      }
+    scheduledTopics.filter { tid =>
+      topicsToPersons(tid).size < problem.topicsToMaxPersons(tid)
     }
-    result
   }
 
+  /** Returns a possible target topic for a person. It's allowed, planned on this slot, and if possible the person likes it. Never a linked topic. */
   def pickGoodOpenTopicFor(pid: PersonId)(using Random): TopicId = {
     val openTopics = getOpenTopics
-    val bestTopics = problem.personsToLikedTopics(pid) && openTopics
+    val bestTopics = problem.personsToLikedTopics(pid) && openTopics && problem.unlinkedTopics
     if (bestTopics.nonEmpty) {
       return bestTopics.pickRandom
     }
-    val okTopics = problem.personsToNonHatedTopics(pid) && openTopics
+    val okTopics = problem.personsToNonHatedTopics(pid) && openTopics && problem.unlinkedTopics
     if (okTopics.nonEmpty) {
       return okTopics.pickRandom
     }
