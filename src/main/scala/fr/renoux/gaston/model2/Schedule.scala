@@ -274,6 +274,7 @@ final class Schedule(
 
   slotsToAssignment.foreach { (_, sa) =>
     sa.parent = this
+    sa.scheduledTopics = slotsToTopics(sa.slot)
   }
 }
 
