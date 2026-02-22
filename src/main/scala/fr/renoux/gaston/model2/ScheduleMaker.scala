@@ -95,6 +95,7 @@ object ScheduleMaker {
           schedule.personsToTopics(pid) = schedule.personsToTopics(pid) + topicDef.tid
           assignment.personsToTopic(pid) = topicDef.tid
           assignment.topicsToPersons(topicDef.tid) = assignment.topicsToPersons(topicDef.tid) + pid
+          assignment.scheduledTopics = schedule.slotsToTopics(slotDef.sid)
         }
       }
     }
