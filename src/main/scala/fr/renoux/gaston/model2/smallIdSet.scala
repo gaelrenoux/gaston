@@ -53,6 +53,14 @@ object SmallIdSet {
       else 63 - JLong.numberOfLeadingZeros(s)
     }
 
+    inline def dropThenForeach(c: Count[I])(inline f: I => Unit)(using inline ca: CountAll[I]): Unit = if (nonEmpty) {
+      fastLoop(c.value, ca.value) { i =>
+        if (contains(i)) {
+          f(i)
+        }
+      }
+    }
+
     inline def foreach(inline f: I => Unit)(using inline c: CountAll[I]): Unit = if (nonEmpty) {
       c.foreach { i =>
         if (contains(i)) {
