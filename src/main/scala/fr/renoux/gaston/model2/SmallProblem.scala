@@ -57,6 +57,15 @@ final class SmallProblem(
     init
   }
 
+  /** Topics who are not part of a linked constraint */
+  val unlinkedTopics: SmallIdSet[TopicId] = {
+    var init = SmallIdSet.full[TopicId]
+    prefsTopicsLinked.fastForeach { linkedTopics =>
+      init = init -- linkedTopics
+    }
+    init
+  }
+
   val personsToMandatoryTopics: IdMap[PersonId, SmallIdSet[TopicId]] = {
     val personsToTopicMap = topicsToMandatories.toSeq.flatMap { (tid, pids) =>
       pids.toSet.toSeq.map(_ -> tid)
