@@ -1,3 +1,8 @@
+TODO: Add a TON of tests on the schedule and assignment, because with the new system it's easy to forget to update somewhere
+
+
+
+
 - Add unit test for forced topics
 - When a schedule is a success (better than previous one), try to re-assign everyone a few times to see if you can improve it further
 - Better handling of constraints
