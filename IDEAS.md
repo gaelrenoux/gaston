@@ -1,3 +1,8 @@
+TODO: Add a TON of tests on the schedule and assignment, because with the new system it's easy to forget to update somewhere
+
+
+
+
 - Make a big pass on naming:
   - Rename unassigned stuff to holes (someone is not assigned on a slot). Rename the unassigned topic to maybe "free-time" or something like that.
   - Make slot-cycle a first class citizen, not just an idea (the slots are just a list of lists, there's no slot-cycle class).
