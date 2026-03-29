@@ -40,6 +40,7 @@ final class TableReader(input: InputModel) {
     /* Topics. Keep the order to zip with the choices later */
     val topicsSeq: Seq[InputTopic] =
       cellsWithContent.map { row =>
+        // TODO Handle frequent error: bad line due to wrong tableSettings.wishesStartRow. Shouldn't crash with an exception.
         val topicName: String = row(tableSettings.topicCol)
         val max: Option[PosInt] =
           row(tableSettings.maxPersonsCol).toIntOption.map(_ + tableSettings.personsCountAdd).map(_.refineUnsafe[Positive]: PosInt)
