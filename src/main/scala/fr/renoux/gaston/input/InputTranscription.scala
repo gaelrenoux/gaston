@@ -280,6 +280,13 @@ private[input] final class InputTranscription(rawInput: InputModel) {
       input.settings.unassigned.personMultipleAntiPreference.fold(Set.empty[TopicsExclusive]) { reward =>
         Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toArraySet, ArraySet.empty, reward))
       }
+    lazy val unassignedTopicsSameDayExclusivePreferences: Set[TopicsExclusive] =
+      input.settings.unassigned.personMultipleSameCycleAntiPreference.fold(Set.empty[Set[TopicsExclusive]]) { reward =>
+        slotSequences.map { slotCycle =>
+          val unassignedTopicsForCycle = unassignedTopicsByNameAndSlot.collect { case ((_, slot), topic) if slotCycle.contains(slot) => topic }
+          Set(TopicsExclusive(unassignedTopicsForCycle.toArraySet, ArraySet.empty, reward))
+        }.toSet
+      }.flatten
 
     lazy val personFreeSlotsPreferences: Seq[PersonFreeSlotPreference] =
       input.persons.flatMap { inPerson =>
@@ -300,6 +307,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         personPersonPreferences ++
         unassignedTopicPreferences ++
         unassignedTopicsExclusivePreferences ++
+        unassignedTopicsSameDayExclusivePreferences ++
         personFreeSlotsPreferences
     }
   }

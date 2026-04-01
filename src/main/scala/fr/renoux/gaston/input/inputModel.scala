@@ -105,7 +105,8 @@ object InputSettings {
       maxPersons: PosInt = Constants.IntLowMaxValue,
       personAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
       personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
-      personMultipleAntiPreference: Option[NonPosScore] = None
+      personMultipleAntiPreference: Option[NonPosScore] = None,
+      personMultipleSameCycleAntiPreference: Option[NonPosScore] = None,
   )
 
   /** If this is enabled, the anti-preference for unassigned will scale with the number of forbidden topics for each person.
