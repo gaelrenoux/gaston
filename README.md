@@ -39,6 +39,7 @@ The input file describes the problem to solve. It follows the HOCON format, and 
             - `allowed`: If true, Gaston will allow for people staying unassigned. Default is `false`.
             - `person-anti-preference`: Negative score attached to a person being unassigned. It's counted once for every slot when a person is unassigned. Default value is `-1000`.
             - `person-multiple-anti-preference`: Additional negative score attached if unassigned on multiple slots (in addition to the basic anti-preference). Useful if you want to make one unassignment acceptable, but not two. Default value is `0`.
+            - `person-multiple-same-cycle-anti-preference`: Yet another additional negative score attached if unassigned on multiple slots in the same cycle (in addition to the previous two anti-preferences). Default value is `0`.
             - `max`: On each slot, maximum number of persons who can be unassigned. Default is unlimited.
             - `min`: On each slot, minimum number of persons who can be unassigned (the idea being that enough unassigned persons can do something together). Default is `0`, i.e. no minimum.
             - `persons-anti-preference-scaling`: If present, this settings make the unassignment anti-preference scale with the number of forbidden entries of a person. The more topics are forbidden for them, the less impactful an unassignment will be. Default is none.
