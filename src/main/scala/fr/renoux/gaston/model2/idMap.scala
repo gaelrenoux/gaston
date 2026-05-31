@@ -104,6 +104,17 @@ object IdMap {
       }
       result
     }
+
+    /** Probably quite slow, but shouldn't be needed often (mostly useful in tests) */
+    inline def actualHashCode: Int = {
+      var i = 0
+      var result = 0
+      while (i < m.length) {
+        result = result + m(i).hashCode
+        i += 1
+      }
+      result
+    }
   }
 
   extension [I <: Id](m: IdMap[I, Score]) {
