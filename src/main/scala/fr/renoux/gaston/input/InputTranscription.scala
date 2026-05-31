@@ -73,8 +73,12 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
 
   /* Topics */
-  private val topicIx = new AtomicInteger(0) // ugly, simpler
-  lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] =
+  private val topicIx = new AtomicInteger(0) // ugly, simpler. Care taken to make sure it's deterministic.
+
+  lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] = {
+    // make sure the topicIx has already been used to generate the normal topics, to keep the ids deterministic (lazy vals may be called in a different order)
+    val _ = basicTopicsByPartIndexByOccurrenceIndexByName
+
     if (!input.settings.unassigned.allowed) Map.empty[(NonEmptyString, Slot), Topic] else {
       log.info("Unassigned persons are allowed")
       input.slots.flatten.map { inSlot =>
@@ -84,6 +88,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         (name, slot) -> topic
       }.toMap
     }
+  }
 
   lazy val basicTopicsByPartIndexByOccurrenceIndexByName: Map[NonEmptyString, Map[Int, Map[Int, Topic]]] = {
     input.topics.map { (inTopic: InputTopic) =>
@@ -306,6 +311,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   /* Construction of the Problem */
   lazy val problem: Problem = {
+    println(s"THE TOPICS: ${basicTopicsByPartIndexByOccurrenceIndexByName}")
     val p = new Problem(
       slotSequences,
       topicsByName.values.flatten.toSet,
