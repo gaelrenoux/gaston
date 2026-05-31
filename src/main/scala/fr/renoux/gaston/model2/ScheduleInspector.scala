@@ -2,8 +2,6 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.*
 
-import scala.collection.MapView
-
 final class ScheduleInspector(val schedule: Schedule) {
   val problem = schedule.problem
   import problem.given
