@@ -224,6 +224,7 @@ final class Schedule(
 
     val nonSlotScore =
       if (includeNonSlot) {
+        // TODO use scorePersonUnassignedCount
         val topicIds = personsToTopics(person)
         val baseScore = problem.personsToBaseScore(person)
         val exclusiveScore = problem.prefsTopicsExclusive(person).evaluate(topicIds)
@@ -251,6 +252,16 @@ final class Schedule(
           personsToTopics.actualEquals(that.personsToTopics) &&
           topicsToSlot.actualEquals(that.topicsToSlot)
     case _ => false
+  }
+
+  private def scorePersonUnassignedCount(problem: SmallProblem, pid: PersonId, topicIds: SmallIdSet[TopicId]): Score = {
+    // TODO Actually needs to check they're on different slot cycles
+    // TODO Needs to be included in tests
+    val minCount = problem.prefsPersonMinUnassigned(pid)
+    val unassignedCount: Count[TopicId] = (topicIds && problem.unassignedTopicIds).size
+    val diff = minCount - unassignedCount
+    if (diff <= 0) Score.Zero
+    else Score.MinReward * diff
   }
 
 

@@ -32,9 +32,10 @@ final class SmallProblem(
 
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
     val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
+    val prefsPersonMinUnassigned: IdMap[PersonId, Count[TopicId]],
+
     val prefsTopicPure: IdMap[TopicId, Score], // score added for simply having this topic on schedule
     val prefsTopicsExclusive: IdMap[PersonId, Exclusivities],
-
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] // a person must be either on all linked topics, or on none of them
 ) {
   given CountAll[SlotId] = CountAll(slotsCount)
@@ -46,6 +47,7 @@ final class SmallProblem(
   inline def unassignedTopic(slotId: SlotId): TopicId = slotId.value
 
   val unassignedTopicsCount: Count[TopicId] = slotsCount.value
+  val unassignedTopicIds: SmallIdSet[TopicId] = SmallIdSet.take(unassignedTopicsCount)
 
   val topicsToLinkedTopics: IdMap[TopicId, SmallIdSet[TopicId]] = {
     val init = IdMap.fill[TopicId, SmallIdSet[TopicId]](SmallIdSet.empty[TopicId])
@@ -156,6 +158,7 @@ final class SmallProblem(
     personsToBaseScore = personsToBaseScore.copy(),
     prefsPersonTopic = prefsPersonTopic.copy(),
     prefsPersonPerson = prefsPersonPerson.copy(),
+    prefsPersonMinUnassigned = prefsPersonMinUnassigned.copy(),
     prefsTopicPure = prefsTopicPure.copy(),
     prefsTopicsExclusive = prefsTopicsExclusive.copy(),
     prefsTopicsLinked = prefsTopicsLinked.fastCopy()

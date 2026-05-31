@@ -224,6 +224,8 @@ final class InputTranscription2(rawInput: InputModel) {
 
     // TODO Handle inputPerson.minFreeSlots
 
+    val prefsPersonMinUnassigned = ???
+
     val prefsTopicPure = IdMap.empty[TopicId, Score]
     input.topics.foreach { (inTopic: InputTopic) =>
       inTopic.occurrenceInstances.foreach { inTopicOcc =>
@@ -326,6 +328,7 @@ final class InputTranscription2(rawInput: InputModel) {
     personsToBaseScore = personsBaseScore,
     prefsPersonTopic = preferences.prefsPersonTopic,
     prefsPersonPerson = preferences.prefsPersonPerson,
+    prefsPersonMinUnassigned = preferences.prefsPersonMinUnassigned,
     prefsTopicPure = preferences.prefsTopicPure,
     prefsTopicsExclusive = preferences.prefsTopicsExclusive,
     prefsTopicsLinked = preferences.prefsTopicsLinked,
