@@ -14,12 +14,12 @@ Clone the repository, and build with: `sbt assembly`
 
 This produces a fat jar in target/scala-2.12, which you can then run with:
 ```
-java -jar target/scala-2.12/gaston-assembly-0.2-SNAPSHOT.jar --from problem.conf
+java -jar target/scala-3.5.2/gaston-assembly-1.3.0.jar --from problem.conf
 ```
 
 To get the full list of command line options, use:
 ```
-java -jar target/scala-2.12/gaston-assembly-0.2-SNAPSHOT.jar --help
+java -jar target/scala-3.5.2/gaston-assembly-1.3.0.jar --help
 ```
 
 
@@ -77,7 +77,7 @@ The input file describes the problem to solve. It follows the HOCON format, and 
 
 You can generate an input file with old default values with:
 ```
-java -jar target/scala-2.12/gaston-assembly-0.2-SNAPSHOT.jar --generate-input
+java -jar target/scala-3.5.2/gaston-assembly-1.3.0.jar --generate-input
 ```
 
 
