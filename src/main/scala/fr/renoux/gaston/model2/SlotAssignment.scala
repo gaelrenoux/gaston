@@ -244,6 +244,18 @@ final class SlotAssignment(
     }
   }
 
+  override def toString: String = {
+    val s = new StringBuilder("SlotAssignment(")
+    s.append(slot).append(", ")
+    s.append(personsToTopic.toPrettyString)
+    s.append(")")
+    s.toString
+  }
+
+  override def hashCode(): Int = {
+    37 * 37 * problem.hashCode() + 37 * slot.value + personsToTopic.actualHashCode
+  }
+
   override def equals(obj: Any): Boolean = obj match {
     case that: SlotAssignment =>
       problem == that.problem &&
