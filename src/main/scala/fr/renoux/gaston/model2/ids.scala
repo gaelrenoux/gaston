@@ -23,22 +23,10 @@ object Id {
 
   inline def None: Id = Int.MinValue
 
-  given [I <: Id]: Printable[I] with {
-    extension (i: I) override def toPrettyString: String = i.toString
-  }
-
   given [I <: Id]: Ordering[I] with {
     override def compare(x: I, y: I): Int = x.compareTo(y)
   }
 
-}
-
-object SlotId {
-  inline def None: SlotId = Int.MinValue
-
-  extension (id: SlotId) {
-    inline def next(using c: CountAll[SlotId]): SlotId = (id + 1) % c
-  }
 }
 
 object TopicId {
@@ -46,14 +34,6 @@ object TopicId {
 
   extension (id: TopicId) {
     inline def next(using c: CountAll[TopicId]): TopicId = (id + 1) % c
-  }
-}
-
-object PersonId {
-  inline def None: PersonId = Int.MinValue
-
-  extension (id: PersonId) {
-    inline def next(using c: CountAll[PersonId]): PersonId = (id + 1) % c
   }
 }
 
@@ -132,39 +112,12 @@ object Count {
       }
       i != c
     }
-
-    // TODO inline this method
-    /** Returns the first id in that count matching the condition. If none matches, returns Id.None. */
-    inline def find(inline f: I => Boolean): I = {
-      var i = 0
-      var notFound = true
-      var result: I = Id.None.value
-      while (notFound && i < c.value) {
-        if (f(i)) {
-          result = i
-          notFound = false
-        }
-        i += 1
-      }
-      result
-    }
-
-    /** Returns an array containing all values from the count, in a random order (using the Fisher-Yates shuffle) */
-    inline def shuffled(using ct: ClassTag[I], rand: Random): Array[I] = {
-      val result: Array[I] = Array.tabulate(c)(identity)
-      result.shuffle
-      result
-    }
   }
 
   /** A maximum count that won't overflow when it's summed with others */
   inline def maxCount[I >: Int <: Id]: Count[I] = 10_000
 
   val Zero: Count[Nothing] = 0
-
-  given [I <: Id]: Printable[Count[I]] with {
-    extension (c: Count[I]) override def toPrettyString: String = c.toString
-  }
 }
 
 /** A count of entity that's guaranteed to contain all possible values. Therefore, it can be made implicit. Not a
@@ -174,8 +127,4 @@ opaque type CountAll[I <: Id] <: Count[I] = Int
 
 object CountAll {
   def apply[I <: Id](c: Count[I]): CountAll[I] = c
-
-  given [I <: Id]: Printable[CountAll[I]] with {
-    extension (c: CountAll[I]) override def toPrettyString: String = c.toString
-  }
 }

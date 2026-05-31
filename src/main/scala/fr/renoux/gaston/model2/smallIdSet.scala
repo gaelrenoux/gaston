@@ -5,8 +5,6 @@ import fr.renoux.gaston.util.{Count as _, *}
 import java.lang.Long as JLong
 import scala.annotation.{tailrec, targetName}
 import scala.collection.mutable
-import scala.reflect.ClassTag
-import scala.util.Random
 
 
 /** Set of very small Ids (O to 63) as a single Long. Immutable, but very cheap to copy.
@@ -90,14 +88,6 @@ object SmallIdSet {
       }
     }
 
-    inline def mapSumToScore(inline f: I => Score)(using inline c: CountAll[I]): Score = {
-      var result: Score = 0.0
-      foreach { i =>
-        result = result + f(i)
-      }
-      result
-    }
-
     inline def inserted(id: I): SmallIdSet[I] = {
       s | mask(id)
     }
@@ -126,37 +116,15 @@ object SmallIdSet {
       s & ~that
     }
 
-    @targetName("SmallIdSetPlusPlusIterable")
-    inline def ++(ids: Iterable[I]): SmallIdSet[I] = {
-      ids.fastFoldLeft(s) { (set, id) => set | mask(id) }
-    }
-
-    @targetName("SmallIdSetMinusMinusIterable")
-    inline def --(ids: Iterable[I]): SmallIdSet[I] = {
-      ids.fastFoldLeft(s) { (set, id) => set & (~mask(id)) }
-    }
-
     @targetName("SmallIdSetIntersectIterable")
     inline infix def &&(that: SmallIdSet[I]): SmallIdSet[I] = {
       s & that
     }
 
-    inline def inversed(using inline c: CountAll[I]): SmallIdSet[I] = (~s) & SmallIdSet.full
-
     def toSet(using c: CountAll[I]): Set[I] = {
       val result = mutable.Set[I]()
       foreach { id => result += id }
       result.toSet
-    }
-
-    def filter(f: I => Boolean)(using c: CountAll[I]): SmallIdSet[I] = {
-      var result = SmallIdSet.empty[I]
-      c.foreach { i =>
-        if (s.contains(i) && f(i)) {
-          result = result.inserted(i)
-        }
-      }
-      result
     }
 
     inline def exists(inline f: I => Boolean)(using inline c: CountAll[I]): Boolean = {
@@ -167,35 +135,6 @@ object SmallIdSet {
       c.forall { i => s.containsNot(i) || f(i) }
     }
 
-    def toArray(using c: CountAll[I], ct: ClassTag[I]): Array[I] = {
-      val result = Array.fill[I](s.size.value)(Id.None.value)
-      var resultIx = 0
-      c.foreach { i =>
-        if (apply(i)) {
-          result(resultIx) = i
-          resultIx += 1
-        }
-      }
-      result
-    }
-
-    def toShuffledArray(using CountAll[I], ClassTag[I], Random): Array[I] = {
-      val result = toArray
-      result.shuffle
-      result
-    }
-
-    def pickRandom(using rand: Random): I = if (isEmpty) Id.None.asInstanceOf[I] else {
-      var current = s
-      var targetIndex = rand.nextInt(size.value)
-      while (true) {
-        val bitIndex = java.lang.Long.numberOfTrailingZeros(current)
-        if (targetIndex == 0) return bitIndex
-        current &= (current - 1) // clear lowest set bit
-        targetIndex -= 1
-      }
-      throw new IllegalStateException("There's a bug in there")
-    }
   }
 
   val MaxValue = 63
@@ -234,18 +173,6 @@ object SmallIdSet {
 
   def unsafeFrom[I <: Id](set: Long): SmallIdSet[I] = set
 
-  /** Mostly used when debugging */
-  @testOnly
-  def decode(set: Long): Set[Int] = {
-    val result = mutable.Set[Int]()
-    (0 until 64).foreach { i =>
-      if (((1L << i) & set) != 0L) {
-        val _ = result.add(i)
-      }
-    }
-    result.toSet
-  }
-
   /** Merges together all sets that shares at least one common element.
     * TODO performance is atrocious, but this will do for now
     */
@@ -267,15 +194,6 @@ object SmallIdSet {
       case (h: SmallIdSet[I]) :: t =>
         if ((h && set).nonEmpty) (h ++ set) :: t
         else h :: mergeFirstIfIntersect(set, t)
-    }
-  }
-
-  given [I >: Int <: Id : Printable]: Printable[SmallIdSet[I]] with {
-    extension (is: SmallIdSet[I]) {
-      override def toPrettyString: String =
-        if (is == -1) Printable.Universe
-        else if (is == 0) Printable.Empty
-        else summon[Printable[Iterable[I]]].toPrettyString(is.toSet(using CountAll[I](MaxValue + 1)))
     }
   }
 
