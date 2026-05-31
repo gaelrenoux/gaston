@@ -6,7 +6,7 @@ import fr.renoux.gaston.util.ArraySet
 /** Among the topics in the list, only a specific number of them can be present in the schedule. */
 final case class TopicsLimitedCount(topics: ArraySet[Topic], count: Int) extends Constraint {
 
-  assert(topics.size > count, s"$this should contain more topics than the target count of topic")
+  assert(topics.size > count, s"TopicsLimitedCount(${topics.toGoodString}, $count) should contain more topics than the target count of topic")
 
   override def isHardCoded: Boolean = false
 
