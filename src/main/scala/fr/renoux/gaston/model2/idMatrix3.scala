@@ -6,6 +6,7 @@ import scala.reflect.ClassTag
 
 
 /** IdMatrix3: like IdMatrix, except it's for id triplets. */
+// TODO Not used currently, very few tests => test thoroughly before using !
 opaque type IdMatrix3[I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A] =
   Array[A] // using a flattened matrix
 
