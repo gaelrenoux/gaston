@@ -86,12 +86,15 @@ object IdMap {
       }
     }
 
+    /** Returns all values from the map, in key order */
     inline def valuesSeq: Seq[A] = Seq(m *)
 
+    /** Returns all key/values from the map, in key order */
     inline def toSeq: Seq[(I, A)] = m.zipWithIndex.map(_.swap).toSeq
 
     inline def unsafeContent: Array[A] = m
 
+    /** Full size of the map. Remember that the map always contain all possible keys. */
     inline def size: Count[I] = m.length
 
     /** Given the two ID types are the same, the size of both maps are presumed to be equal. */
@@ -110,7 +113,7 @@ object IdMap {
       var i = 0
       var result = 0
       while (i < m.length) {
-        result = result + m(i).hashCode
+        result = 37 * result + m(i).##
         i += 1
       }
       result

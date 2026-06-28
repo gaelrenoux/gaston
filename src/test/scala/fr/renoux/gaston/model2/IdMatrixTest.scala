@@ -6,6 +6,7 @@ import fr.renoux.gaston.TestBase
 class IdMatrixTest extends TestBase {
   val height = 3
   val width = 4
+
   given countI: CountAll[SlotId] = CountAll[SlotId](height)
   given countJ: CountAll[TopicId] = CountAll[TopicId](width)
 
@@ -27,7 +28,7 @@ class IdMatrixTest extends TestBase {
       matrix.toSeq2 should be(expected)
     }
 
-    "from" in {
+    "unsafeFrom" in {
       val matrix = IdMatrix.unsafeFrom[SlotId, TopicId, String](testSeq)
       matrix.toSeq2 should be(testSeq)
     }
@@ -74,7 +75,13 @@ class IdMatrixTest extends TestBase {
     }
   }
 
-  "scoreSumLines" in {
+  "mapLines" in {
+    val matrix = IdMatrix.unsafeFrom[SlotId, TopicId, String](testSeq)
+    val mapped = matrix.mapLines { line => line.mkString }
+    mapped.toMap should be(Map(0 -> "yesnoyes", 1 -> "nonono", 2 -> "nonoyesno"))
+  }
+
+  "mapSumLinesToScore" in {
     val matrix = IdMatrix.unsafeFrom[SlotId, TopicId, String](testSeq)
     val scoreLines = matrix.mapSumLinesToScore {
       case (i, j, "yes") => (i.value + 1) * (j.value + 1)
@@ -83,6 +90,20 @@ class IdMatrixTest extends TestBase {
     }
 
     scoreLines.toMap should be(Map(0 -> 5, 1 -> -6, 2 -> 0))
+  }
+
+  "toMap2" in {
+    val matrix = IdMatrix.unsafeFrom[SlotId, TopicId, String](testSeq)
+    matrix.toMap2 should be(Map(
+      0 -> Map(0 -> "", 1 -> "yes", 2 -> "no", 3 -> "yes"),
+      1 -> Map(0 -> "no", 1 -> "no", 2 -> "no", 3 -> ""),
+      2 -> Map(0 -> "no", 1 -> "no", 2 -> "yes", 3 -> "no")
+    ))
+  }
+
+  "toSeq2" in {
+    val matrix = IdMatrix.unsafeFrom[SlotId, TopicId, String](testSeq)
+    matrix.toSeq2 should be(testSeq)
   }
 
   "copy" in {

@@ -37,7 +37,7 @@ class IdMatrix3Test extends TestBase {
       matrix.toSeq3 should be(expected)
     }
 
-    "from" in {
+    "unsafeFrom" in {
       val matrix = IdMatrix3.unsafeFrom[SlotId, TopicId, PersonId, String](testSeq)
       matrix.toSeq3 should be(testSeq)
     }
