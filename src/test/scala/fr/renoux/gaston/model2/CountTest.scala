@@ -49,6 +49,16 @@ class CountTest extends TestBase {
 
       r should be(0 until 8)
     }
+
+    "toPrettyString" in {
+      val c: Count[PersonId] = 8
+      c.toPrettyString should be("8")
+    }
+
+    "CountAll.toPrettyString" in {
+      val c: CountAll[PersonId] = CountAll(8)
+      c.toPrettyString should be("8")
+    }
   }
 
   "foreach" - {
@@ -211,36 +221,6 @@ class CountTest extends TestBase {
     }
   }
 
-  "exists" - {
-    "returns the correct value in the nominal cases" in {
-      val c: Count[PersonId] = 8
-      c.exists(_.value == 5) should be(true)
-      c.exists(_.value == 11) should be(false)
-    }
-    "returns the correct value on an empty count" in {
-      val c: Count[PersonId] = 0
-      c.exists(_.value == 5) should be(false)
-    }
-    "short-circuits as soon as the answer is known" in {
-      val c: Count[PersonId] = 8
-      var acc = 0
-      c.exists { id =>
-        acc += 1
-        id.value == 5
-      } should be(true)
-      acc should be(6)
-    }
-    "does the whole collection if required" in {
-      val c: Count[PersonId] = 8
-      var acc = 0
-      c.exists { id =>
-        acc += 1
-        id.value == 9
-      } should be(false)
-      acc should be(8)
-    }
-  }
-
   "forall" - {
     "returns the correct value in the nominal cases" in {
       val c: Count[PersonId] = 8
@@ -267,6 +247,36 @@ class CountTest extends TestBase {
         acc += 1
         id.value < 9
       } should be(true)
+      acc should be(8)
+    }
+  }
+
+  "exists" - {
+    "returns the correct value in the nominal cases" in {
+      val c: Count[PersonId] = 8
+      c.exists(_.value == 5) should be(true)
+      c.exists(_.value == 11) should be(false)
+    }
+    "returns the correct value on an empty count" in {
+      val c: Count[PersonId] = 0
+      c.exists(_.value == 5) should be(false)
+    }
+    "short-circuits as soon as the answer is known" in {
+      val c: Count[PersonId] = 8
+      var acc = 0
+      c.exists { id =>
+        acc += 1
+        id.value == 5
+      } should be(true)
+      acc should be(6)
+    }
+    "does the whole collection if required" in {
+      val c: Count[PersonId] = 8
+      var acc = 0
+      c.exists { id =>
+        acc += 1
+        id.value == 9
+      } should be(false)
       acc should be(8)
     }
   }

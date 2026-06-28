@@ -25,15 +25,10 @@ class IdMatrixSymmetricalTest extends TestBase {
       matrix.content.toSeq should be(expected)
     }
 
-    "from" in {
+    "unsafeFrom" in {
       val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
       matrix.content.toSeq should be(testSeq.flatten)
     }
-  }
-
-  "toSeq" in {
-    val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
-    matrix.toSeq2 should be(testSeq)
   }
 
   "apply" - {
@@ -106,6 +101,11 @@ class IdMatrixSymmetricalTest extends TestBase {
     val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
     val score = matrix.mapSumHalfToScore { (i, j, a) => i.value * 100 + j.value * 10 + a.length }
     score should be(0 + 102 + 112 + 202 + 213 + 223)
+  }
+
+  "toSeq2" in {
+    val matrix = IdMatrixSymmetrical.unsafeFrom[SlotId, String](testSeq)
+    matrix.toSeq2 should be(testSeq)
   }
 
 }
