@@ -13,6 +13,7 @@ import scala.reflect.ClassTag
   * `i >= j` (i being the line and j the column). When accessing a value at `(i, j)` with `i < j`, we simply reverse the
   * coordinates.
   */
+// TODO Not used currently, very few tests => test thoroughly before using !
 opaque type IdMatrixSymmetrical[I <: Id, A] = Array[A]
 
 object IdMatrixSymmetrical {

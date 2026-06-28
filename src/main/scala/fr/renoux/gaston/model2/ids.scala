@@ -17,7 +17,7 @@ object Id {
   extension (id: Id) {
     inline def value: Int = id
 
-    /** Non-natural are exceptional values: None, or subclass specific stuff. */
+    /** Non-natural are exceptional values: None, or subclass-specific stuff. */
     inline def isNatural: Boolean = id >= 0
   }
 
@@ -27,10 +27,7 @@ object Id {
     extension (i: I) override def toPrettyString: String = i.toString
   }
 
-  given [I <: Id]: Ordering[I] with {
-    override def compare(x: I, y: I): Int = x.compareTo(y)
-  }
-
+  given [I <: Id]: Ordering[I] = Ordering.Int.asInstanceOf[Ordering[I]]
 }
 
 object SlotId {
@@ -83,7 +80,7 @@ object Count {
 
     inline def random(using random: Random): I = random.nextInt(c)
 
-    inline def range: Seq[I] = (0 until c)
+    inline def range: Seq[I] = 0 until c
 
     inline def foreach(inline f: I => Unit): Unit = fastLoop(0, c)(f)
 
@@ -158,7 +155,7 @@ object Count {
   }
 
   /** A maximum count that won't overflow when it's summed with others */
-  inline def maxCount[I >: Int <: Id]: Count[I] = 10_000
+  inline def maxCount[I >: Int <: Id]: Count[I] = 10_000 //TODO should be dropped, usages can be replaced by a better solution
 
   val Zero: Count[Nothing] = 0
 

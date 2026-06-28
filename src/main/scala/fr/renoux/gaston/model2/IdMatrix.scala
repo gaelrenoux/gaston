@@ -35,7 +35,8 @@ object IdMatrix {
       val index = flatIndex(i, j)
       matrix(index) = a
     }
-
+    
+    /** For each line (corresponding to one value of I), apply a function that gets a result. */
     inline def mapLines[B: ClassTag](inline f: Array[A] => B): IdMap[I, B] = {
       val result = new Array[B](countI.value)
       countI.foreach { i =>
@@ -45,7 +46,9 @@ object IdMatrix {
       IdMap.unsafeFrom(result)
     }
 
-    // CHECK that in the bytecode, it's actually the simple loop
+    /** Converts each entry into a score (based on the indexes and value of the entry), then sum scores on each line
+      * to only get one final result per value of I. */
+    // TODO CHECK that in the bytecode, it's actually the simple loop
     inline def mapSumLinesToScore(f: (I, J, A) => Score): IdMap[I, Score] = {
       val result = IdMap.empty[I, Score]
       var index = 0
