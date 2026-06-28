@@ -44,6 +44,45 @@ class IdMapTest extends TestBase {
       val map = IdMap.tabulate[TopicId, String](id => testMapAll(id.value))
       map.toMap should be(testMapAll)
     }
+
+    "unsafeFrom" in {
+      val map = IdMap.unsafeFrom[TopicId, String](Array("hello", "world", "goodbye", "earth"))
+      map.toMap should be(Map(0 -> "hello", 1 -> "world", 2 -> "goodbye", 3 -> "earth"))
+    }
+
+    "empty" in {
+      val map = IdMap.empty[TopicId, String]
+      map.toMap should be(Seq.tabulate(64) { i => i -> null }.toMap)
+    }
+  }
+
+  "Basics" - {
+    "size" in {
+      val map = IdMap.from(testMapOk)
+      map.size should be(64)
+      // Not 4 ! This is the total size of the IdMap.
+    }
+
+    "valuesSeq" in {
+      val map = IdMap.from(testMapAll)
+      map.valuesSeq should be(testMapAll.toSeq.sortBy(_._1).map(_._2))
+    }
+
+    "toSeq" in {
+      val map = IdMap.from(testMapAll)
+      map.toSeq should be(testMapAll.toSeq.sortBy(_._1))
+    }
+
+    "unsafeContent" in {
+      val map = IdMap.from(testMapAll)
+      map.unsafeContent should be(Array(testMapAll.toSeq.sortBy(_._1).map(_._2) *))
+    }
+
+    "toPrettyString" in {
+      given CountAll[PersonId] = CountAll[PersonId](5)
+      val map = IdMap[PersonId, String](0 -> "Monday", 1 -> "Tuesday", 2 -> "Wednesday", 3 -> "Thursday", 4 -> "Friday")
+      map.toPrettyString should be("{ 0: Monday, 1: Tuesday, 2: Wednesday, 3: Thursday, 4: Friday }")
+    }
   }
 
   "apply" - {
@@ -60,10 +99,64 @@ class IdMapTest extends TestBase {
     }
   }
 
+  "update" - {
+    "modify existing key" in {
+      val map = IdMap.from(testMapOk)
+      map.update(8, "hello")
+      map(8) should be("hello")
+    }
+
+    "create new key" in {
+      val map = IdMap.from(testMapOk)
+      map.update(9, "hello")
+      map(9) should be("hello")
+    }
+
+    "key is 0" in {
+      val map = IdMap.from(testMapOk)
+      map.update(0, "hello")
+      map(0) should be("hello")
+    }
+
+    "key is max value" in {
+      val map = IdMap.from(testMapOk)
+      map.update(63, "hello")
+      map(63) should be("hello")
+    }
+
+    "key is negative" in {
+      val map = IdMap.from(testMapOk)
+      an[ArrayIndexOutOfBoundsException] should be thrownBy map.update(-1, "hello")
+    }
+
+    "key is too high" in {
+      val map = IdMap.from(testMapOk)
+      an[ArrayIndexOutOfBoundsException] should be thrownBy map.update(64, "hello")
+    }
+
+    "short-hand syntax" in {
+      val map = IdMap.from(testMapOk)
+      map(9) = "hello"
+      map(9) should be("hello")
+    }
+  }
+
   "foreach" in {
     val map = IdMap.from(testMapAll)
     val result = mutable.Map[Int, Int]()
     map.foreach { (tid: TopicId, str: String) =>
+      val _ = result.updateWith(2 * str.length + (tid.value % 2)) {
+        case None => Some(1)
+        case Some(x) => Some(x + 1)
+      }
+    }
+    result.toMap should be(Map(2 -> 8, 3 -> 8, 4 -> 24, 5 -> 24))
+  }
+
+  "foreachValue" in {
+    val map = IdMap.from(testMapAll)
+    val result = mutable.Map[Int, Int]()
+    map.foreachValue { (str: String) =>
       val _ = result.updateWith(str.length) {
         case None => Some(1)
         case Some(x) => Some(x + 1)
@@ -114,9 +207,9 @@ class IdMapTest extends TestBase {
     map.toReverseMap should be(testMapAll.map(_.swap))
   }
 
-  "sortedValues" in {
-    val map = IdMap.from(testAllInts.map[(TopicId, Score)](i => (i, 10 * i)))
-    map.sortedValues should be(testAllInts.map(_ * 10).sorted)
+  "toSortedMap" in {
+    val map = IdMap.from(testMapAll)
+    map.toSortedMap should be(mutable.SortedMap.from(testMapAll))
   }
 
   "reduceValues" in {
@@ -190,6 +283,40 @@ class IdMapTest extends TestBase {
 
     map.actualEquals(map2) should be(false)
     map2.actualEquals(map) should be(false)
+  }
+
+  "actualHashCode" in {
+    val map = IdMap.from(testMapAll)
+    map.actualHashCode should be(map.actualHashCode)
+
+    val mapBis = IdMap.from(testMapAll)
+    (map.hashCode == mapBis.hashCode) should be(false) // default Array hashCode
+    map.actualHashCode should be(mapBis.actualHashCode)
+
+    val map2 = IdMap.from(testMapOk)
+    map2.actualHashCode should be(map2.actualHashCode)
+
+    val map2Bis = IdMap.from(testMapOk)
+    (map2.hashCode == map2Bis.hashCode) should be(false) // default Array hashCode
+    map2.actualHashCode should be(map2Bis.actualHashCode)
+
+    map.actualHashCode shouldNot be(map2Bis.actualHashCode)
+  }
+
+  "Score IdMap" - {
+    "sortedValues" in {
+      val map = IdMap.from(testAllInts.map[(TopicId, Score)](i => (i, (1000 * i) % 43)))
+      val initialUnsafeContent = map.unsafeContent.clone()
+      map.sortedValues should be(testAllInts.map(i => (1000 * i) % 43).sorted)
+      map.unsafeContent.sameElements(initialUnsafeContent) should be(true) // map's array backend hasn't changed
+    }
+
+    "destructiveSortedValues" in {
+      val map = IdMap.from(testAllInts.map[(TopicId, Score)](i => (i, (1000 * i) % 43)))
+      val initialUnsafeContent = map.unsafeContent.clone()
+      map.destructiveSortedValues should be(testAllInts.map(i => (1000 * i) % 43).sorted)
+      map.unsafeContent.sameElements(initialUnsafeContent) should be(false) // map's array backend has changed
+    }
   }
 
 }
