@@ -36,6 +36,7 @@ object Score {
     inline def value: Double = s
   }
 
+  /** Sorts an array of score in-place */
   def sort(array: Array[Score]): Unit = {
     jutil.Arrays.sort(array)
   }
