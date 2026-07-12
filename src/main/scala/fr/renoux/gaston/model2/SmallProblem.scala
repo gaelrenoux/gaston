@@ -33,7 +33,7 @@ final class SmallProblem(
     val prefsPersonTopic: IdMatrix[PersonId, TopicId, Score], // also includes forbidden topics
     val prefsPersonPerson: IdMatrix[PersonId, PersonId, Score],
     val prefsTopicPure: IdMap[TopicId, Score], // score added for simply having this topic on schedule
-    val prefsTopicsExclusive: IdMap[PersonId, Exclusivities],
+    val prefsTopicsExclusive: IdMap[PersonId, Array[TopicGroupPref]],
 
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] // a person must be either on all linked topics, or on none of them
 ) {
@@ -157,7 +157,7 @@ final class SmallProblem(
     prefsPersonTopic = prefsPersonTopic.copy(),
     prefsPersonPerson = prefsPersonPerson.copy(),
     prefsTopicPure = prefsTopicPure.copy(),
-    prefsTopicsExclusive = prefsTopicsExclusive.copy(),
+    prefsTopicsExclusive = prefsTopicsExclusive.mapValues(_.fastCopy()),
     prefsTopicsLinked = prefsTopicsLinked.fastCopy()
   )
 

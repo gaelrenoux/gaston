@@ -73,6 +73,7 @@ final class RightCollector[B] extends PartialFunction[Either[Any, B], B] {
     x.getOrElse(throw new IllegalStateException(x.toString))
 }
 
+
 extension [A, B, CC[_]](it: IterableOps[Either[A, B], CC, ?]) {
   inline def unzipEither: (CC[A], CC[B]) = {
     val lefts = it.collect(new LeftCollector[A])
@@ -84,4 +85,8 @@ extension [A, B, CC[_]](it: IterableOps[Either[A, B], CC, ?]) {
 
 extension [A, CCI[_], CCO[_]](itIt: IterableOps[IterableOps[A, CCI, ?], CCO, ?]) {
   inline def mapMap[B](f: A => B): CCO[CCI[B]] = itIt.map(_.map(f))
+}
+
+extension [A, CCI[_]](optIt: Option[IterableOps[A, CCI, ?]]) {
+  inline def mapMap[B](f: A => B): Option[CCI[B]] = optIt.map(_.map(f))
 }

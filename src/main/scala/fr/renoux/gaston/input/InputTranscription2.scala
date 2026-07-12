@@ -206,7 +206,7 @@ final class InputTranscription2(rawInput: InputModel) {
         prefsPersonPerson(pid, pid2) = prefsPersonPerson(pid, pid2) + (score.value * factor.value)
       }
       inPerson.forbidden.foreach { topicName =>
-          // TODO maybe unnecessary, as we already handle forbidden topics directly: see SmallProblem.topicsToForbiddens.
+        // TODO maybe unnecessary, as we already handle forbidden topics directly: see SmallProblem.topicsToForbiddens.
         topics.topicsIdsByBaseName(topicName).foreach { tid =>
           prefsPersonTopic(pid, tid) = Score.MinReward
         }
@@ -234,52 +234,60 @@ final class InputTranscription2(rawInput: InputModel) {
       }
     }
 
-    val prefsTopicsExclusiveBuffer = mutable.Map[PersonId, (mutable.Buffer[SmallIdSet[TopicId]], mutable.Buffer[Score])]()
-    personsCount.foreach { pid =>
-      prefsTopicsExclusiveBuffer(pid) = (mutable.Buffer(), mutable.Buffer())
-    }
-    /* Exclusive preference over unassigned topics */
-    if (input.settings.unassigned.allowed) input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
+    /** For each person, the exclusive topics they have */
+    val prefsTopicsExclusive: IdMap[PersonId, Array[TopicGroupPref]] = {
+
+      val prefsTopicsExclusiveBuffer = mutable.Map[PersonId, mutable.Buffer[(SmallIdSet[TopicId], Score)]]()
       personsCount.foreach { pid =>
-        val inPerson = input.persons(pid.value)
-        val bufferEntry = prefsTopicsExclusiveBuffer(pid)
-        bufferEntry._1.append(unassignedTopicsSet)
-        bufferEntry._2.append(score.value / inPerson.weight.value)
+        prefsTopicsExclusiveBuffer(pid) = mutable.Buffer()
       }
-    }
-    /* Exclusive preference over multi-occurrence topics */
-    input.topics.filter(_.forcedOccurrences > 1).foreach { (inTopic: InputTopic) =>
-      val occurrenceFirstParts = inTopic.occurrenceInstances.map(_.partInstances.head)
-      val occurrenceFirstPartsIds = occurrenceFirstParts.map(t => topics.topicsIdByName(t.name))
-      val mandatoriesIds = topics.topicsMandatories(occurrenceFirstPartsIds.head)
-      val topicIdSet = SmallIdSet(occurrenceFirstPartsIds *)
-      personsCount.foreach { pid =>
-        if (!mandatoriesIds.contains(pid)) {
+
+      /* Exclusive preference over unassigned topics */
+      if (input.settings.unassigned.allowed) input.settings.unassigned.personMultipleAntiPreference.foreach { score =>
+        personsCount.foreach { pid =>
+          val inPerson = input.persons(pid.value)
           val bufferEntry = prefsTopicsExclusiveBuffer(pid)
-          bufferEntry._1.append(topicIdSet)
-          bufferEntry._2.append(Score.MinReward)
+          bufferEntry.append(unassignedTopicsSet -> score.value / inPerson.weight.value)
         }
       }
-    }
-    /* Exclusive preference explicitly required by global constraints */
-    input.constraints.exclusive.foreach { inConstraint =>
-      val exemptedPersonIds = inConstraint.forcedExemptions.map(personsIdByName)
-      inConstraint.topics.develop(topics.topicsFirstPartIdsByBaseName(_).toSet).foreach { topicIds =>
+
+      /* Exclusive preference over multi-occurrence topics */
+      input.topics.filter(_.forcedOccurrences > 1).foreach { (inTopic: InputTopic) =>
+        val occurrenceFirstParts = inTopic.occurrenceInstances.map(_.partInstances.head)
+        val occurrenceFirstPartsIds = occurrenceFirstParts.map(t => topics.topicsIdByName(t.name))
+        val mandatoriesIds = topics.topicsMandatories(occurrenceFirstPartsIds.head)
+        val topicIdSet = SmallIdSet(occurrenceFirstPartsIds *)
         personsCount.foreach { pid =>
-          if (!exemptedPersonIds.contains(pid)) {
+          if (!mandatoriesIds.contains(pid)) {
             val bufferEntry = prefsTopicsExclusiveBuffer(pid)
-            bufferEntry._1.append(SmallIdSet(topicIds))
-            bufferEntry._2.append(Score.MinReward)
+            bufferEntry.append(topicIdSet -> Score.MinReward)
           }
         }
       }
-    }
-    val prefsTopicsExclusive: IdMap[PersonId, Exclusivities] = IdMap.from[PersonId, Exclusivities](
-      prefsTopicsExclusiveBuffer.view.mapValues { case (topicSets, scores) =>
-        Exclusivities(topicSets.toArray, scores.toArray)
+
+      /* Exclusive preference explicitly required by global constraints */
+      input.constraints.exclusive.foreach { inConstraint =>
+        val includedPersonIds = inConstraint.inclusions.mapMap(personsIdByName)  
+        val exemptedPersonIds = inConstraint.forcedExemptions.map(personsIdByName)
+        inConstraint.topics.develop(topics.topicsFirstPartIdsByBaseName(_).toSet).foreach { topicIds =>
+          personsCount.foreach { pid =>
+            if (includedPersonIds.forall(_.contains(pid)) && !exemptedPersonIds.contains(pid)) {
+              val bufferEntry = prefsTopicsExclusiveBuffer(pid)
+              bufferEntry.append(SmallIdSet(topicIds) -> Score.MinReward)
+            }
+          }
+        }
       }
-      // TODO Merge if possible
-    )
+
+      /* Aggregate it all */
+      IdMap.from[PersonId, Array[TopicGroupPref]](
+        prefsTopicsExclusiveBuffer.view.mapValues { buffer =>
+          buffer.map { (topics, score) =>
+            TopicGroupPref(topics, score)
+          }.toArray
+        }
+      )
+    }
 
     val prefsTopicsLinked: Array[SmallIdSet[TopicId]] = {
       val linkedFromConstraints = input.constraints.linked.map { inConstraint =>
@@ -348,22 +356,22 @@ object InputTranscription2 {
 
   private def checkErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++
-      checkSettingsErrors(input) ++
-      checkSlotErrors(input) ++
-      checkTopicErrors(input) ++
-      checkPersonErrors(input) ++
-      checkConstraintErrors(input)
+        checkSettingsErrors(input) ++
+        checkSlotErrors(input) ++
+        checkTopicErrors(input) ++
+        checkPersonErrors(input) ++
+        checkConstraintErrors(input)
   }
 
   private def checkSettingsErrors(input: InputModel): Set[String] = {
     Set.empty[String] ++ {
       if (input.settings.defaultMinPersonsPerTopic <= input.settings.defaultMaxPersonsPerTopic) None
       else Some(s"Settings: default min persons per topic (${input.settings.defaultMinPersonsPerTopic}) " +
-        s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic})")
+          s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic})")
     } ++ {
       if (input.settings.unassigned.minPersons <= input.settings.unassigned.maxPersons) None
       else Some(s"Settings: Min persons on unassigned (${input.settings.unassigned.minPersons}) " +
-        s"is higher than max persons on unassigned (${input.settings.unassigned.maxPersons})")
+          s"is higher than max persons on unassigned (${input.settings.unassigned.maxPersons})")
     }
   }
 
@@ -383,16 +391,16 @@ object InputTranscription2 {
       duplicates.map { d => s"Duplicate topic name: $d" }
     } ++ {
       input.topics
-        .filter { t => t.name.startsWith(Topic.SyntheticPrefix) }
-        .map { t => s"Topic [${t.name}]: prefix ${Topic.SyntheticPrefix} is reserved by the software" }
+          .filter { t => t.name.startsWith(Topic.SyntheticPrefix) }
+          .map { t => s"Topic [${t.name}]: prefix ${Topic.SyntheticPrefix} is reserved by the software" }
     } ++ {
       input.topics
-        .filter { t => t.name.contains(InputTopic.PartMarker) || t.name.contains(InputTopic.OccurrenceMarker) }
-        .map { t => s"Topic [${t.name}]: Name cannot contain characters '${InputTopic.PartMarker}' or '${InputTopic.OccurrenceMarker}'" }
+          .filter { t => t.name.contains(InputTopic.PartMarker) || t.name.contains(InputTopic.OccurrenceMarker) }
+          .map { t => s"Topic [${t.name}]: Name cannot contain characters '${InputTopic.PartMarker}' or '${InputTopic.OccurrenceMarker}'" }
     } ++ {
       input.topics
-        .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
-        .map { t => s"Topic [${t.name}]: Min (${t.min.getOrElse(0)}) is higher than max (${t.max.getOrElse(0)})" }
+          .filter { t => t.min.lazyZip(t.max).exists(_ > _) }
+          .map { t => s"Topic [${t.name}]: Min (${t.min.getOrElse(0)}) is higher than max (${t.max.getOrElse(0)})" }
     } ++ {
       input.topics.flatMap { t =>
         val badSlots = t.slots.getOrElse(Set.empty).filter(s => !input.slotsSet.exists(_.name == s)).map(s => s"[$s]")
@@ -473,8 +481,8 @@ object InputTranscription2 {
       }
     } ++ {
       input.constraints.exclusive
-        .filter(_.topics.size < 2)
-        .map(c => s"Exclusive constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
+          .filter(_.topics.size < 2)
+          .map(c => s"Exclusive constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
     } ++ {
       input.constraints.linked.flatMap { inConstraint =>
         val badTopics = inConstraint.topics.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
@@ -483,8 +491,8 @@ object InputTranscription2 {
       }
     } ++ {
       input.constraints.linked
-        .filter(_.topics.size < 2)
-        .map(c => s"Linked constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
+          .filter(_.topics.size < 2)
+          .map(c => s"Linked constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
     } ++ {
       input.constraints.linked.flatMap { inConstraint =>
         val badTopics = inConstraint.topics.flatMap(input.topicsByName.get).filter(_.forcedOccurrences > 1).map(t => s"[${t.name}]")
@@ -499,24 +507,24 @@ object InputTranscription2 {
       }
     } ++ {
       input.constraints.simultaneous
-        .filter(_.topics.size < 2)
-        .map(c => s"Simultaneous constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
+          .filter(_.topics.size < 2)
+          .map(c => s"Simultaneous constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
     } ++ {
       input.constraints.simultaneous
-        .flatMap { inConstraint =>
-          val badTopics = inConstraint.topics.flatMap(input.topicsByName.get).filter(_.forcedDuration > 1).map(t => s"[${t.name}]")
-          if (badTopics.isEmpty) None
-          else Some(s"Simultaneous constraint: can't handle long-duration topic: ${badTopics.toList.sorted.mkString(", ")}")
-        }
+          .flatMap { inConstraint =>
+            val badTopics = inConstraint.topics.flatMap(input.topicsByName.get).filter(_.forcedDuration > 1).map(t => s"[${t.name}]")
+            if (badTopics.isEmpty) None
+            else Some(s"Simultaneous constraint: can't handle long-duration topic: ${badTopics.toList.sorted.mkString(", ")}")
+          }
     } ++ {
       input.constraints.simultaneous
-        .flatMap { inConstraint =>
-          val topics = inConstraint.topics.flatMap(input.topicsByName.get)
-          if (topics.map(_.forcedOccurrences).toSet.size > 1) {
-            val badTopics = topics.map(t => s"[${t.name}]")
-            Some(s"Simultaneous constraint: different occurrence counts: ${badTopics.toList.sorted.mkString(", ")}") // TODO Not sure about that one
-          } else None
-        }
+          .flatMap { inConstraint =>
+            val topics = inConstraint.topics.flatMap(input.topicsByName.get)
+            if (topics.map(_.forcedOccurrences).toSet.size > 1) {
+              val badTopics = topics.map(t => s"[${t.name}]")
+              Some(s"Simultaneous constraint: different occurrence counts: ${badTopics.toList.sorted.mkString(", ")}") // TODO Not sure about that one
+            } else None
+          }
     } ++ {
       input.constraints.notSimultaneous.flatMap { inConstraint =>
         val badTopics = inConstraint.topics.filter(!input.topicsNameSet.contains(_)).map(t => s"[$t]")
@@ -525,8 +533,8 @@ object InputTranscription2 {
       }
     } ++ {
       input.constraints.notSimultaneous
-        .filter(_.topics.size < 2)
-        .map(c => s"Not-simultaneous constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
+          .filter(_.topics.size < 2)
+          .map(c => s"Not-simultaneous constraint: should contain at least two topics: ${c.topics.headOption.fold("None")(t => s"[$t]")}")
     }
   }
 
