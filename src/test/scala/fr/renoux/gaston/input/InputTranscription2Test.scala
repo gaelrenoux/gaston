@@ -7,7 +7,7 @@ import fr.renoux.gaston.util.{Count as _, *}
 
 
 class InputTranscription2Test extends TestBase {
-  
+
   val maxCount = Count.maxCount[Id].value
   val emptyIdSet = SmallIdSet.empty[Id]
 
@@ -24,17 +24,17 @@ class InputTranscription2Test extends TestBase {
       Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night").map(s =>
         s"@Unassigned ($s)"
       ) ++
-        Seq("Alpha", "Beta", "Gamma", "Delta") ++
-        Seq("Epsilon #1", "Epsilon #2", "Eta ~1", "Eta ~2") ++
-        Seq("Theta #1 ~1", "Theta #1 ~2", "Theta #2 ~1", "Theta #2 ~2", "Theta #3 ~1", "Theta #3 ~2")
+          Seq("Alpha", "Beta", "Gamma", "Delta") ++
+          Seq("Epsilon #1", "Epsilon #2", "Eta ~1", "Eta ~2") ++
+          Seq("Theta #1 ~1", "Theta #1 ~2", "Theta #2 ~1", "Theta #2 ~2", "Theta #3 ~1", "Theta #3 ~2")
     )
 
     object ExpectedTopics {
       val Seq(
-      unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
-      alpha, beta, gamma, delta, // 6 to 9
-      epsilon1, epsilon2, eta1, eta2, // 10 to 13
-      theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
+          unassignedD1a, unassignedD1e, unassignedD2a, unassignedD3a, unassignedD3e, unassignedD3n, // 0 to 5
+          alpha, beta, gamma, delta, // 6 to 9
+          epsilon1, epsilon2, eta1, eta2, // 10 to 13
+          theta11, theta12, theta21, theta22, theta31, theta32 // 14 to 19
       ) = (0 until 20)
     }
 
@@ -86,41 +86,41 @@ class InputTranscription2Test extends TestBase {
         Seq("D1-afternoon", "D1-evening", "D2-afternoon", "D3-afternoon", "D3-evening", "D3-night").map(s =>
           s"@Unassigned ($s)"
         ) ++
-          Seq("Alpha", "Beta", "Gamma", "Delta") ++
-          Seq("Epsilon #1", "Epsilon #2", "Eta ~1", "Eta ~2") ++
-          Seq("Theta #1 ~1", "Theta #1 ~2", "Theta #2 ~1", "Theta #2 ~2", "Theta #3 ~1", "Theta #3 ~2")
+            Seq("Alpha", "Beta", "Gamma", "Delta") ++
+            Seq("Epsilon #1", "Epsilon #2", "Eta ~1", "Eta ~2") ++
+            Seq("Theta #1 ~1", "Theta #1 ~2", "Theta #2 ~1", "Theta #2 ~2", "Theta #3 ~1", "Theta #3 ~2")
       )
       transcription.topics.topicsForced.toSet should be((0 to 5).toSet ++ Set(8) ++ (14 to 19).toSet)
       transcription.topics.topicsMax.valuesSeq should be(
         Seq.fill(6)(maxCount) ++
-          Seq(defMaxPersonsPerTopic, 5, defMaxPersonsPerTopic, defMaxPersonsPerTopic) ++
-          Seq(defMaxPersonsPerTopic, defMaxPersonsPerTopic, defMaxPersonsPerTopic, defMaxPersonsPerTopic) ++
-          Seq.fill(6)(7)
+            Seq(defMaxPersonsPerTopic, 5, defMaxPersonsPerTopic, defMaxPersonsPerTopic) ++
+            Seq(defMaxPersonsPerTopic, defMaxPersonsPerTopic, defMaxPersonsPerTopic, defMaxPersonsPerTopic) ++
+            Seq.fill(6)(7)
       )
       transcription.topics.topicsMin.valuesSeq should be(
         Seq.fill(6)(0) ++
-          Seq(defMinPersonsPerTopic, defMinPersonsPerTopic, 2, defMinPersonsPerTopic) ++
-          Seq(defMinPersonsPerTopic, defMinPersonsPerTopic, defMinPersonsPerTopic, defMinPersonsPerTopic) ++
-          Seq.fill(6)(5)
+            Seq(defMinPersonsPerTopic, defMinPersonsPerTopic, 2, defMinPersonsPerTopic) ++
+            Seq(defMinPersonsPerTopic, defMinPersonsPerTopic, defMinPersonsPerTopic, defMinPersonsPerTopic) ++
+            Seq.fill(6)(5)
       )
       transcription.topics.topicsMandatories.valuesSeq should be(
         Seq.fill(6)(emptyIdSet) ++
-          Seq(SmallIdSet(0, 1), emptyIdSet, emptyIdSet, SmallIdSet(0)) ++
-          Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
-          Seq.fill(6)(SmallIdSet(2))
+            Seq(SmallIdSet(0, 1), emptyIdSet, emptyIdSet, SmallIdSet(0)) ++
+            Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+            Seq.fill(6)(SmallIdSet(2))
       )
       val fullSlotIdSet = SmallIdSet.full[SlotId]
       transcription.topics.topicsAllowedSlots.valuesSeq should be(
         (0 to 5).map(SmallIdSet(_)) ++
-          Seq(fullSlotIdSet, fullSlotIdSet, fullSlotIdSet, SmallIdSet(1, 4)) ++
-          Seq(fullSlotIdSet, fullSlotIdSet, fullSlotIdSet, fullSlotIdSet) ++
-          Seq.fill(6)(fullSlotIdSet)
+            Seq(fullSlotIdSet, fullSlotIdSet, fullSlotIdSet, SmallIdSet(1, 4)) ++
+            Seq(fullSlotIdSet, fullSlotIdSet, fullSlotIdSet, fullSlotIdSet) ++
+            Seq.fill(6)(fullSlotIdSet)
       )
       transcription.topics.topicsFollowup.valuesSeq should be(
         Seq.fill(6)(TopicId.None) ++
-          Seq(TopicId.None, TopicId.None, TopicId.None, TopicId.None) ++
-          Seq(TopicId.None, TopicId.None, 13, TopicId.None) ++
-          Seq(15, TopicId.None, 17, TopicId.None, 19, TopicId.None)
+            Seq(TopicId.None, TopicId.None, TopicId.None, TopicId.None) ++
+            Seq(TopicId.None, TopicId.None, 13, TopicId.None) ++
+            Seq(15, TopicId.None, 17, TopicId.None, 19, TopicId.None)
       )
     }
 
@@ -129,18 +129,18 @@ class InputTranscription2Test extends TestBase {
         transcription.constraints.topicsSimultaneous.size should be(6 + 14)
         transcription.constraints.topicsSimultaneous.valuesSeq should be(
           Seq.fill(6)(emptyIdSet) ++
-            Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
-            Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
-            Seq.fill(6)(emptyIdSet)
+              Seq(SmallIdSet(7), SmallIdSet(6), emptyIdSet, emptyIdSet) ++
+              Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+              Seq.fill(6)(emptyIdSet)
         )
       }
 
       "topicsNotSimultaneous" in {
         transcription.constraints.topicsNotSimultaneous.valuesSeq should be(
           Seq.fill(6)(emptyIdSet) ++
-            Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
-            Seq(SmallIdSet(11, 12, 13), SmallIdSet(10, 12, 13), SmallIdSet(10, 11, 13), SmallIdSet(10, 11, 12)) ++
-            Seq.fill(6)(emptyIdSet)
+              Seq(emptyIdSet, emptyIdSet, emptyIdSet, emptyIdSet) ++
+              Seq(SmallIdSet(11, 12, 13), SmallIdSet(10, 12, 13), SmallIdSet(10, 11, 13), SmallIdSet(10, 11, 12)) ++
+              Seq.fill(6)(emptyIdSet)
         )
       }
     }
@@ -223,32 +223,29 @@ class InputTranscription2Test extends TestBase {
         // 6 exclusive groups: unassigned topics, epsilon occurrences, theta occurrences, first manual groups, second manual group duplicated (because it contains Epsilon)
 
         val exclusivities0 = transcription.preferences.prefsTopicsExclusive(0)
-        exclusivities0.count should be(3) // Albert is exempted from both manual exclusives
-        exclusivities0.topicsGroups.toSeq should be(Seq(
-          SmallIdSet(0 until 6),
-          SmallIdSet(epsilon1, epsilon2), // Epsilon
-          SmallIdSet(theta11, theta21, theta31) // Theta
-        ))
-        exclusivities0.scores.toSeq should be(Seq(-50, Score.MinReward, Score.MinReward))
+        exclusivities0.length should be(3) // Albert is exempted from both manual exclusives
+        exclusivities0 should contain theSameElementsAs Seq(
+          TopicGroupPref(SmallIdSet(0 until 6), -50),
+          TopicGroupPref(SmallIdSet(epsilon1, epsilon2), Score.MinReward), // Epsilon
+          TopicGroupPref(SmallIdSet(theta11, theta21, theta31), Score.MinReward) // Theta
+        )
 
         val exclusivities1 = transcription.preferences.prefsTopicsExclusive(1)
-        exclusivities1.count should be(5) // Bianca is exempted from the first manual exclusive
-        exclusivities1.topicsGroups.toSeq should be(Seq(
-          SmallIdSet(0 until 6),
-          SmallIdSet(epsilon1, epsilon2), // Epsilon
-          SmallIdSet(theta11, theta21, theta31), // Theta
-          SmallIdSet(epsilon1, eta1), SmallIdSet(epsilon2, eta1) // Manual constraint
-        ))
-        exclusivities1.scores.toSeq should be(Seq(-50, Score.MinReward, Score.MinReward, Score.MinReward, Score.MinReward))
+        exclusivities1.length should be(5) // Bianca is exempted from the first manual exclusive
+        exclusivities1 should contain theSameElementsAs Seq(
+          TopicGroupPref(SmallIdSet(0 until 6), -50),
+          TopicGroupPref(SmallIdSet(epsilon1, epsilon2), Score.MinReward), // Epsilon
+          TopicGroupPref(SmallIdSet(theta11, theta21, theta31), Score.MinReward), // Theta
+          TopicGroupPref(SmallIdSet(epsilon1, eta1), Score.MinReward), TopicGroupPref(SmallIdSet(epsilon2, eta1), Score.MinReward) // Manual constraint
+        )
 
         val exclusivities2 = transcription.preferences.prefsTopicsExclusive(2)
-        exclusivities2.count should be(3) // Charly is exempted from the second manual exclusive and is mandatory on Theta
-        exclusivities2.topicsGroups.toSeq should be(Seq(
-          SmallIdSet(0 until 6),
-          SmallIdSet(epsilon1, epsilon2), // Epsilon
-          SmallIdSet(alpha, beta, gamma) // Manual constraint
-        ))
-        exclusivities2.scores.toSeq should be(Seq(-25, Score.MinReward, Score.MinReward)) // Half score, weight is 2
+        exclusivities2.length should be(3) // Charly is exempted from the second manual exclusive and is mandatory on Theta
+        exclusivities2 should contain theSameElementsAs Seq(
+          TopicGroupPref(SmallIdSet(0 until 6), -25),
+          TopicGroupPref(SmallIdSet(epsilon1, epsilon2), Score.MinReward), // Epsilon
+          TopicGroupPref(SmallIdSet(alpha, beta, gamma), Score.MinReward) // Manual constraint
+        )
       }
 
       "prefsTopicsLinked" in {

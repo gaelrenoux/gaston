@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model2
 
-import fr.renoux.gaston.util.{fastFoldRight, fastForeach, fastLoop, testOnly}
+import fr.renoux.gaston.util.*
 
 
 // TODO for all of those, check if having an Array isn't better than having a SmallIdSet
@@ -226,7 +226,7 @@ final class Schedule(
       if (includeNonSlot) {
         val topicIds = personsToTopics(person)
         val baseScore = problem.personsToBaseScore(person)
-        val exclusiveScore = problem.prefsTopicsExclusive(person).evaluate(topicIds)
+        val exclusiveScore = problem.prefsTopicsExclusive(person).fastFoldLeft(Score.Zero) { (score, pref) => score + pref.evaluate(topicIds) }
         val linkedScore = problem.scoreForPrefsTopicsLinked(topicIds)
         val s = baseScore + exclusiveScore + linkedScore
         personsToNonSlotScore(person) = s

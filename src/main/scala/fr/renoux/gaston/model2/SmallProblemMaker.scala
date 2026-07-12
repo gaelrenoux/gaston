@@ -36,7 +36,7 @@ object SmallProblemMaker {
       prefsPersonTopic = IdMatrix.fill[PersonId, TopicId, Score](Score.Zero),
       prefsPersonPerson = IdMatrix.fill[PersonId, PersonId, Score](Score.Zero),
       prefsTopicPure = IdMap.fill[TopicId, Score](Score.Zero),
-      prefsTopicsExclusive = IdMap.fill[PersonId, Exclusivities](Exclusivities.empty),
+      prefsTopicsExclusive = IdMap.fill[PersonId, Array[TopicGroupPref]](Array.empty),
 
       prefsTopicsLinked = Array.empty
     )
