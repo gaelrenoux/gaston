@@ -223,6 +223,8 @@ final case class InputSimultaneousConstraint(
     topics: Set[NonEmptyString]
 )
 
+/** A person (outside of those exempted) mustn't be in more than one of those topics. If the inclusions are empty,
+  * applies to everyone, otherwise applies only to those in inclusions. Exemptions have priority over inclusions. */
 final case class InputExclusiveConstraint(
     topics: Set[NonEmptyString],
     inclusions: Option[Set[NonEmptyString]] = None,
