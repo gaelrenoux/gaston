@@ -1,4 +1,9 @@
-TODO: Add a TON of tests on the schedule and assignment, because with the new system it's easy to forget to update somewhere
+Tests status
+- In model2
+  - Tests verified on all Id* stuff in model2, the tests are complete.
+  - Test also OK on Printable and ScoreAndWeight
+  - Verify the rest
+- TODO: Add a TON of tests on the schedule and assignment, because with the new system it's easy to forget to update somewhere
 
 
 
