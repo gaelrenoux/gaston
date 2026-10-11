@@ -1,0 +1,1504 @@
+
+********************************************************************************
+00:00:00: Starting with global-seed: -4991486943868134012
+********************************************************************************
+
+00:00:00: Starting on thread scala-execution-context-global-28 with thread-seed: -4377220198243755669
+00:00:00: Starting on thread scala-execution-context-global-29 with thread-seed: -7026502655274571783
+00:00:00: Starting on thread scala-execution-context-global-30 with thread-seed: -5694406221257962003
+00:00:00: Starting on thread scala-execution-context-global-31 with thread-seed: 5729853724228952454
+00:00:00: Starting on thread scala-execution-context-global-32 with thread-seed: 214408762786081594
+00:00:00: Starting on thread scala-execution-context-global-33 with thread-seed: 7808380710842577965
+00:00:00: Starting on thread scala-execution-context-global-34 with thread-seed: 3182181619995248502
+00:00:00: Starting on thread scala-execution-context-global-35 with thread-seed: 6521978668938436301
+00:00:00: Starting on thread scala-execution-context-global-36 with thread-seed: -5103000366336214445
+00:00:00: Starting on thread scala-execution-context-global-37 with thread-seed: 4089164773960555659
+00:00:00: Starting on thread scala-execution-context-global-38 with thread-seed: 1067149649780104905
+00:00:00: Starting on thread scala-execution-context-global-39 with thread-seed: -7826909138354053218
+00:00:00: Starting on thread scala-execution-context-global-40 with thread-seed: 7264640253777312774
+00:00:00: Starting on thread scala-execution-context-global-41 with thread-seed: 7779562150726460775
+00:00:00: Starting on thread scala-execution-context-global-42 with thread-seed: -6858484042714314334
+00:00:00: Starting on thread scala-execution-context-global-43 with thread-seed: -763963216808839228
+00:00:00: Starting on thread scala-execution-context-global-44 with thread-seed: 8235018760289092374
+00:00:00: Starting on thread scala-execution-context-global-45 with thread-seed: 4510879436483522468
+00:00:00: Starting on thread scala-execution-context-global-46 with thread-seed: -8243017467066204562
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-38 with chain-seed: -621022086812831609
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-33 with chain-seed: 53671956627605578
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-44 with chain-seed: -8278885365790809105
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-42 with chain-seed: 6662680948411861254
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-32 with chain-seed: 8852395507399941665
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-41 with chain-seed: 1318725018298390968
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-37 with chain-seed: 6231495665386799278
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-31 with chain-seed: -7033054183090289517
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-45 with chain-seed: -853002307425305763
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-39 with chain-seed: -5807722944986127590
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-40 with chain-seed: -8061215308649230289
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-35 with chain-seed: 6667150458623311958
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-36 with chain-seed: -5731905946001869573
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-46 with chain-seed: -7157094843377177077
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-29 with chain-seed: -4486169199316205026
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-28 with chain-seed: -2542202981911100940
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-43 with chain-seed: 904021041351001037
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-34 with chain-seed: -7541573458307167479
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-30 with chain-seed: -179582623705015502
+
+********************************************************************************
+00:00:20: From thread scala-execution-context-global-42:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn, Tilleul, gaëlle roth, Elmi, Oror, Vivi, Olivier, Fanny, Cibou, Valentin, Tanguy
+    L'Insondable #1 ==> Gaël, Michael, Shyria, Pénélope
+    Old Friends ==> Steve (MND), Adrien, Tiramisù, BPM, Finn, Chloé
+    Syntthétiques: Les Voix ==> Pacman (MND), Lexy, Julien F, Fabien, Judith/Lal', Natacha
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Rafik, stephanie, loic
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Deryn, Tilleul, Michael, Rafik, Viviane, Finn, Cactus, Steve, Julien F, Chloé, Judith/Lal', Tanguy, Fanny, loic, Cibou, Natacha, Olivier, stephanie
+    Brindlewood Bay ==> Adrien (MND), Tiramisù, gaëlle roth, Elmi, Oror
+    Dune: Imperium #2 ==> Gaël, Vivi, Valentin
+    Myrmes #1 ==> Shyria, Fabien
+    Myrmes #2 ==> BPM, Lexy
+    Scythe #2 ==> Pacman, Pénélope
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Gaël, gaëlle roth, Viviane, Finn, Lexy, Cactus, Vivi, Julien F, Chloé, Olivier, Fanny, loic, Cibou, Valentin, Tanguy
+    Community Radio ==> Adrien (MND), Deryn, Rafik, Steve, Fabien, Pacman, stephanie, Pénélope, Tilleul, Tiramisù
+    D&D5: Monstres et ce a quoi servent leur corps ! ~1 ==> Michael (MND), Oror, Natacha
+    Scythe #1 ==> BPM, Elmi, Shyria, Judith/Lal'
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Chamonix Sentinelles ==> Shyria (MND), Deryn, Viviane, Cactus, Valentin
+    D&D5: Monstres et ce a quoi servent leur corps ! ~2 ==> Michael (MND), Oror, Natacha
+    Data Police ==> Steve (MND), Gaël, Tilleul, Olivier, Pénélope
+    Deathmatch Island ==> Adrien (MND), Rafik, Lexy, Tanguy
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), BPM, Finn, Vivi, Julien F, Fabien, Judith/Lal', Fanny, Cibou
+    Vampire Dark Age ==> Elmi (MND), gaëlle roth, stephanie, loic
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Deryn, Gaël, Tiramisù, Michael, BPM, Shyria, Finn, Lexy, Cactus, Fabien, Valentin, Cibou
+    Périls & Princesses ==> Pacman (MND), Viviane, Tanguy, Fanny, Pénélope
+    Slay the Spire #2 ==> Tilleul, Rafik, Judith/Lal'
+    Tu ne tairas point ==> Adrien (MND), Elmi, Vivi, Chloé, Olivier
+    Ulysse 31 ==> Natacha (MND), gaëlle roth, Oror, Julien F, stephanie, loic
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Adrien, Deryn, Tiramisù, Rafik, Elmi, Viviane, Cactus, Vivi, Julien F, Judith/Lal', Natacha, Olivier, stephanie, Valentin, Tanguy, loic, Pénélope
+    Dogs in the Vineyard ==> BPM (MND), Gaël, gaëlle roth, Oror
+    Fallen London ==> Tilleul (MND), Michael, Lexy, Chloé, Pacman
+    Pack Horse Library ==> Cibou (MND), Shyria, Finn, Fabien, Fanny
+Unscheduled topics: Alchimistes #1, Alchimistes #2, Aventure(s) au Pays des Merveilles, Bienvenue à Poudlard, Celestopol, Citizen Sleeper, Cyberpunk Red, Donjon & Cie, Dune: Imperium #1, HeartRunner #1, HeartRunner #2, Jeu mystère (Bruine OU Métamorphe), L'Insondable #2, La Porte de la mer Languide ~1, La Porte de la mer Languide ~2, Les Errants d'Ukyo, Magie de Minuit - Momi Magique, Magna Veritas, Microscope, Monsters and Other Childish Things ~1, Monsters and Other Childish Things ~2, Nebeltahl ~1, Nebeltahl ~2, Secrets of Éon, Sign (mini-GN), Slay the Spire #1, Slugblaster, Stalker AnomalYZE : roadside picnic, Toi qui #1, Toi qui #2, Toutes petites aventures, Vampire TES, Wanderhome, Whitechapel ~1, Whitechapel ~2, Zombicides #1, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #1, [De bile et d'acier] Perdu·e dans la montagne #2
+Schedule-chain seed: 6662680948411861254
+
+Schedule score is -208.85400426803918
+
+Person       Score     ( Detail )
+loic         087.88    ( 227  136 -092 -092 -092 )
+Pénélope     069.71    ( 143  057 -043 -043 -043 )
+BPM          025.73    ( MND  102  102 -059 -059 -060 )
+Lexy         025.26    ( 152  061 -062 -062 -062 )
+Oror         006.24    ( 061  025  012 -092 )
+Olivier      001.68    ( 077  077 -038 -038 -038 -038 )
+Finn        -000.49    ( 069  069  056 -065 -065 -065 )
+Deryn       -013.78    ( 062  096  077 -062 -062 -062 -062 )
+Viviane     -017.50    ( 054  091 -054 -054 -054 )
+Vivi        -021.96    ( 141  059  059 -070 -070 -070 -070 )
+gaëlle r    -024.75    ( 114  045 -092 -092 )
+Julien F    -029.28    ( 091  073  018 -070 -070 -070 )
+Cibou       -031.25    ( 103  MND  072 -052 -052 -052 -052 )
+Adrien      -031.64    ( MND  MND  MND  MND  044 -076 )
+stephani    -032.54    ( 135 -084 -084 )
+Pacman      -034.49    ( MND  MND  MND  040  020 -094 )
+Steve       -038.10    ( MND  MND  035 -073 )
+Michael     -042.20    ( 178  MND  MND  047 -089 -089 -089 )
+Valentin    -044.43    ( 071  061 -034 -035 -035 -035 -035 )
+Fanny       -046.67    ( 094  075  019 -078 -078 -078 )
+Chloé       -048.06    ( MND  069  034 -076 -076 )
+Fabien      -048.57    ( 059  015  015  015 -076 -076 )
+Tanguy      -064.49    ( 080  040 -046 -046 -046 -046 )
+Judith/L    -070.58    ( 081  098  074 -081 -081 -081 -081 )
+Gaël        -075.48    ( 238 -078 -078 -078 -078 )
+Shyria      -079.34    ( MND  040 -030 -030 -030 -030 )
+Rafik       -091.58    ( 063  048 -067 -068 -068 )
+Tiramisù    -094.40    ( MND  062 -078 -078 )
+Tilleul     -096.39    ( MND  043  022 -053 -054 -054 )
+Cactus      -098.58    ( 057  MND  072 -057 -057 -057 -057 )
+Natacha     -102.46    ( MND  065 -084 -084 )
+Elmi        -109.85    ( MND  083  042 -078 -078 -078 )
+
+
+********************************************************************************
+
+
+********************************************************************************
+00:00:20: From thread scala-execution-context-global-31:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Lexy, Cactus, Vivi, Valentin, Tanguy
+    Citizen Sleeper ==> Tilleul (MND), Rafik, Oror, Pacman, stephanie
+    Pack Horse Library ==> Cibou (MND), Gaël, Shyria, Olivier, Fanny
+    Tu ne tairas point ==> Adrien (MND), BPM, Elmi, Fabien, Chloé
+    Ulysse 31 ==> Natacha (MND), Tiramisù, Michael, gaëlle roth, Julien F, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Steve, Judith/Lal', Pénélope
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Tilleul, Michael, gaëlle roth, Cibou, Valentin, Tanguy
+    Brindlewood Bay ==> Adrien (MND), Gaël, Shyria, Oror, Judith/Lal'
+    Cyberpunk Red ==> Elmi (MND), Rafik, Julien F, stephanie, loic
+    L'Insondable #2 ==> Viviane, Cactus, Pacman, Pénélope
+    Sign (mini-GN) ==> Fabien (MND), Tiramisù, BPM, Vivi, Chloé, Fanny, Natacha
+    Toi qui #1 ==> Deryn (MND), Finn, Lexy, Steve, Olivier
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Shyria, stephanie
+    Community Radio ==> Adrien (MND), Deryn, Michael, Finn, Oror, Steve, Julien F, Fabien, Chloé, Fanny
+    Dune: Imperium #2 ==> Gaël, Valentin
+    Fallen London ==> Tilleul (MND), Tiramisù, Lexy, Cactus, loic
+    Les Errants d'Ukyo ==> Vivi (MND), Rafik, BPM, Elmi, Cibou
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), gaëlle roth, Natacha
+    Périls & Princesses ==> Pacman (MND), Viviane, Judith/Lal', Tanguy, Pénélope
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Deryn, Tiramisù, BPM, Elmi, Lexy, Oror, Steve, Julien F, stephanie, Judith/Lal', Valentin, Cibou, Viviane, Shyria, loic, Pénélope
+    Microscope ==> Gaël (MND), Adrien, Tilleul, Tanguy
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), gaëlle roth, Natacha
+    Slay the Spire #1 ==> Michael, Rafik, Vivi, Pacman
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), Finn, Fabien, Chloé, Fanny
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Finn, Chloé, Tanguy, Fanny, Pénélope, Cibou
+    Dogs in the Vineyard ==> BPM (MND), gaëlle roth, Lexy, loic
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Adrien, Tilleul, Viviane, Oror
+    Myrmes #1 ==> Gaël, Olivier
+    Scythe #2 ==> Shyria, Judith/Lal'
+    Toi qui #2 ==> Deryn (MND), Tiramisù, Elmi, Julien F, Pacman
+    Zombicides #1 ==> Rafik, Fabien
+    [De bile et d'acier] Perdu·e dans la montagne #1 ==> Cactus (MND), Michael, stephanie, Valentin, Natacha
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Adrien, Deryn, Gaël, Michael, BPM, Finn, Lexy, Oror, Vivi, Julien F, Fabien, Chloé, Olivier, Judith/Lal', Fanny, Pénélope, Cibou, Tilleul, Tiramisù, Rafik, gaëlle roth, Viviane, Shyria
+    HeartRunner #2 ==> Valentin (MND), Elmi, Pacman, stephanie
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Tanguy, loic, Natacha
+Unscheduled topics: Alchimistes #1, Alchimistes #2, Aventure(s) au Pays des Merveilles, Bienvenue à Poudlard, Celestopol, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Data Police, Deathmatch Island, Donjon & Cie, Dune: Imperium #1, HeartRunner #1, L'Insondable #1, La Porte de la mer Languide ~1, La Porte de la mer Languide ~2, Magie de Minuit - Momi Magique, Magna Veritas, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Old Friends, Scythe #1, Secrets of Éon, Segmentation (GN), Slay the Spire #2, Slugblaster, Stalker AnomalYZE : roadside picnic, Syntthétiques: Les Voix, Toutes petites aventures, Vampire Dark Age, Vampire TES, Whitechapel ~1, Whitechapel ~2, Zombicides #2
+Schedule-chain seed: -7033054183090289517
+
+Schedule score is 8.541652800851377
+
+Person       Score     ( Detail )
+Elmi         129.88    ( MND  104  042  042  021 -078 )
+Shyria       120.54    ( 200  040 -030 -030 -030 -030 )
+Cibou        112.29    ( 103  MND  215 -052 -052 -052 -052 )
+BPM          105.31    ( MND  102  082  041 -060 -060 )
+Viviane      104.05    ( 054  121  091 -054 -054 -054 )
+Steve        101.76    ( 070  070  035 -073 )
+Julien F     095.63    ( 091  073  036  036 -070 -070 )
+Tiramisù     093.10    ( 062  062  062  062 -078 -078 )
+Chloé        089.87    ( 069  069  069  034 -076 -076 )
+Lexy         085.87    ( 152  061  061 -062 -062 -062 )
+Tanguy       081.63    ( 100  080  040 -046 -046 -046 )
+Olivier      077.76    ( MND  MND  077  077 -038 -038 )
+Fanny        069.52    ( 094  057  038  038 -078 -078 )
+Natacha      065.22    ( MND  065 )
+Judith/L     059.04    ( 081  123  074  025 -081 -081 -081 )
+Pénélope     054.86    ( 143  086 -043 -043 -043 -043 )
+Valentin     051.52    ( 071  MND  121 -034 -035 -035 -035 )
+loic         044.45    ( 136 -092 )
+Tilleul      043.77    ( MND  MND  109  043 -054 -054 )
+gaëlle r     043.44    ( 114  114 -092 -092 )
+Deryn        033.87    ( 062  MND  MND  MND  096 -062 -062 )
+Pacman       031.03    ( MND  100  100  020 -094 -094 )
+Vivi         029.05    ( 141  MND  MND  099 -070 -070 -070 )
+Gaël         026.78    ( MND  238  024 -078 -078 -078 )
+Fabien       024.96    ( MND  059  059  044  015 -076 -076 )
+stephani     021.52    ( 081  054  054 -084 -084 )
+Michael      021.12    ( 178  063  031  016 -089 -089 -089 )
+Cactus       015.22    ( 057  MND  MND  MND  072 -057 -057 )
+Adrien       012.48    ( MND  MND  MND  059  029 -076 )
+Finn         008.93    ( MND  069  069 -065 -065 )
+Rafik        004.33    ( 143  032  032 -067 -067 -068 )
+Oror         000.21    ( 061  061  037  025 -092 -092 )
+
+
+********************************************************************************
+
+00:00:20: We have tried 35 schedules on thread scala-execution-context-global-31 (best score on thread is 8.541652800851377)
+00:00:20: We have tried 42 schedules on thread scala-execution-context-global-42 (best score on thread is -208.85400426803918)
+00:00:20: We have tried 38 schedules on thread scala-execution-context-global-32 (best score on thread is -66.36836808557851)
+
+********************************************************************************
+00:00:20: From thread scala-execution-context-global-36:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Cibou, Oror, Tiramisù, Lexy
+    Alchimistes #1 ==> Gaël, BPM, Chloé
+    Fallen London ==> Tilleul (MND), gaëlle roth, Finn, Pacman, stephanie
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Shyria, Steve, Valentin, Fanny
+    L'Insondable #1 ==> Adrien, Fabien, loic, Pénélope
+    Secrets of Éon ==> Natacha (MND), Michael, Elmi, Judith/Lal', Tanguy
+    Toi qui #2 ==> Deryn (MND), Rafik, Cactus, Julien F, Olivier
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Deryn, gaëlle roth, BPM, Finn, Lexy, Pénélope, Cibou, Viviane, Shyria, Valentin, Tanguy
+    Data Police ==> Steve (MND), Gaël, Elmi, Olivier, stephanie
+    Deathmatch Island ==> Adrien (MND), Rafik, Chloé, Judith/Lal', loic
+    Sign (mini-GN) ==> Fabien (MND), Tiramisù, Oror, Julien F, Pacman, Fanny, Natacha
+    Slay the Spire #2 ==> Tilleul, Michael, Cactus, Vivi
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> 
+    Celestopol ==> Shyria (MND), Tilleul, Michael, Finn, Tanguy
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Oror, Judith/Lal'
+    Myrmes #1 ==> Gaël, Pénélope
+    Old Friends ==> Steve (MND), Adrien, Deryn, Tiramisù, BPM, Fabien
+    Syntthétiques: Les Voix ==> Pacman (MND), Rafik, Fanny, Natacha
+    Vampire Dark Age ==> Elmi (MND), gaëlle roth, Viviane, stephanie, loic
+    Zombicides #1 ==> Lexy, Julien F
+    [De bile et d'acier] Perdu·e dans la montagne #1 ==> Cactus (MND), Vivi, Chloé, Valentin, Cibou
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Adrien, Deryn, Gaël, Tiramisù, Michael, Elmi, Cactus, Fabien, Chloé, stephanie, Cibou, Rafik, gaëlle roth, Viviane, Shyria, Steve, Vivi, Valentin, Tanguy
+    Magie de Minuit - Momi Magique ==> Natacha (MND), BPM, Lexy, Fanny, Pénélope
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Oror, Judith/Lal'
+    Slugblaster ==> Tilleul (MND), Finn, Julien F, Pacman, loic
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Michael, gaëlle roth, BPM, Julien F, Pacman, Olivier, Judith/Lal', Valentin, Fanny, loic, Cibou, Natacha
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Tilleul, Cactus, Fabien, Chloé
+    Les Errants d'Ukyo ==> Vivi (MND), Rafik, Elmi, Shyria, Oror
+    Microscope ==> Gaël (MND), stephanie, Tanguy, Pénélope
+    Toi qui #1 ==> Deryn (MND), Adrien, Tiramisù, Finn, Lexy
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Tilleul, Rafik, Finn, Cactus, Vivi, Tanguy, Cibou, Olivier, stephanie
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Julien F, Valentin, loic
+    Donjon & Cie ==> Gaël (MND), Michael, Lexy, Pénélope, Viviane, Shyria
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, Deryn, BPM, Oror, Fabien, Judith/Lal', Fanny, Natacha
+Unscheduled topics: Alchimistes #2, Bienvenue à Poudlard, Brindlewood Bay, Chamonix Sentinelles, Citizen Sleeper, Community Radio, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Dune: Imperium #1, Dune: Imperium #2, HeartRunner #1, HeartRunner #2, L'Insondable #2, La Porte de la mer Languide ~1, La Porte de la mer Languide ~2, Magna Veritas, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Pack Horse Library, Périls & Princesses, Scythe #1, Scythe #2, Slay the Spire #1, Stalker AnomalYZE : roadside picnic, Toutes petites aventures, Tu ne tairas point, Ulysse 31, Vampire TES, Wanderhome, Wester x Mystic GameMaster Emulator, Whitechapel ~1, Whitechapel ~2, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #2
+Schedule-chain seed: -5731905946001869573
+
+Schedule score is 12.057466560448137
+
+Person       Score     ( Detail )
+Valentin     267.68    ( 071  152  121  030 -035 -035 -035 )
+Judith/L     220.95    ( 081  098  074  049 -081 )
+Viviane      157.92    ( 054  MND  152  061 -054 -054 )
+Rafik        134.49    ( 143  063  032  032 -068 -068 )
+Deryn        130.02    ( 062  MND  MND  096  096 -062 -062 )
+Fanny        129.10    ( 057  057  038  038  019 -078 )
+Natacha      111.82    ( MND  MND  065  065  065 -084 )
+Elmi         109.05    ( MND  MND  083  062  042 -078 )
+stephani     102.60    ( 135  081  054 -084 -084 )
+Tanguy       101.63    ( 100  080  060 -046 -046 -046 )
+Pénélope     098.29    ( 114  114 -043 -043 -043 )
+Finn         092.26    ( 069  069  042  042 -065 -065 )
+Chloé        089.87    ( MND  103  069  069 -076 -076 )
+Olivier      077.76    ( MND  MND  077  077 -038 -038 )
+Michael      068.14    ( 178  063  047  047 -089 -089 -089 )
+Tilleul      066.50    ( MND  MND  109  065 -053 -054 )
+Cibou        060.78    ( 103  215 -052 -052 -052 -052 -052 )
+Julien F     060.27    ( 073  055  036  036 -069 -070 )
+Shyria       060.08    ( MND  120 -030 -030 )
+Lexy         055.57    ( 121  061  061 -062 -062 -062 )
+BPM          045.87    ( 102  102  020 -059 -060 -060 )
+Pacman       045.39    ( MND  MND  100  040 -095 )
+loic         043.44    ( 227 -092 -092 )
+Steve        031.83    ( MND  MND  105 -073 )
+Oror         030.78    ( 061  037  025 -092 )
+Tiramisù     030.60    ( MND  062  062  062 -078 -078 )
+gaëlle r     019.70    ( 114  114  068 -092 -092 -092 )
+Adrien       010.35    ( MND  074  044  044 -076 -076 )
+Fabien       010.25    ( MND  059  059  029  015 -076 -076 )
+Vivi         009.28    ( 141  MND  MND  079 -070 -070 -070 )
+Cactus       006.40    ( 057  MND  072  048 -057 -057 -057 )
+Gaël         002.97    ( MND  MND  238 -078 -078 -078 )
+
+
+********************************************************************************
+
+00:00:20: We have tried 35 schedules on thread scala-execution-context-global-36 (best score on thread is 12.057466560448137)
+00:00:20: We have tried 39 schedules on thread scala-execution-context-global-46 (best score on thread is -111.62190259505668)
+00:00:20: We have tried 39 schedules on thread scala-execution-context-global-40 (best score on thread is -108.47036400063331)
+00:00:20: We have tried 47 schedules on thread scala-execution-context-global-35 (best score on thread is -38.25094601624474)
+00:00:20: We have tried 35 schedules on thread scala-execution-context-global-41 (best score on thread is -202.28409305796396)
+00:00:21: We have tried 38 schedules on thread scala-execution-context-global-37 (best score on thread is -296.2531663175962)
+00:00:21: We have tried 34 schedules on thread scala-execution-context-global-28 (best score on thread is -112.98010483257295)
+00:00:21: We have tried 38 schedules on thread scala-execution-context-global-34 (best score on thread is -42.5380908614799)
+00:00:21: We have tried 50 schedules on thread scala-execution-context-global-30 (best score on thread is -202.84872423438958)
+
+********************************************************************************
+00:00:22: From thread scala-execution-context-global-33:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> 
+    Dune: Imperium #1 ==> Chloé, Pénélope
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Shyria, Lexy, Julien F, Judith/Lal'
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Tiramisù, Oror
+    Old Friends ==> Steve (MND), BPM, Finn, Cactus, Rafik, gaëlle roth
+    Sign (mini-GN) ==> Fabien (MND), Pacman, stephanie, Fanny, Cibou
+    Slay the Spire #1 ==> Tilleul, Michael
+    Tu ne tairas point ==> Adrien (MND), Elmi, loic, Valentin, Tanguy
+    Vampire TES ==> Vivi (MND), Deryn, Gaël
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> gaëlle roth, Elmi, Julien F, Fabien, Pénélope, Valentin, Tanguy
+    Alchimistes #2 ==> BPM, Viviane, Shyria
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Tiramisù, Oror
+    Slay the Spire #2 ==> Rafik, Lexy, Steve
+    Syntthétiques: Les Voix ==> Pacman (MND), Gaël, Tilleul, Michael, Judith/Lal', Natacha
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), stephanie, Fanny, loic
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), Adrien, Vivi, Chloé, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Michael, Rafik, Vivi, Pacman, Olivier, Judith/Lal', Valentin, Cibou, Viviane, Shyria
+    Community Radio ==> Adrien (MND), Deryn, gaëlle roth, Finn, Cactus, Oror, Steve, Fanny, loic, Natacha
+    Fallen London ==> Tilleul (MND), Tiramisù, Elmi, Lexy, stephanie
+    Microscope ==> Gaël (MND), Julien F, Tanguy, Pénélope
+    Nebeltahl ~1 ==> Fabien (MND), BPM, Chloé
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Gaël, Shyria, Finn, Lexy, stephanie, Pénélope, Cibou, Valentin, Tanguy
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Tilleul, Michael, Cactus, Vivi
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Oror, Julien F, Judith/Lal'
+    Nebeltahl ~2 ==> Fabien (MND), BPM, Chloé
+    Toi qui #1 ==> Deryn (MND), Adrien, Tiramisù, Steve, Olivier
+    Vampire Dark Age ==> Elmi (MND), Pacman, loic, Rafik, gaëlle roth
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Tiramisù, Michael, BPM, Lexy, Cactus, Fabien, Chloé, Pacman, Olivier, Judith/Lal', Tanguy, Fanny, loic, Cibou, Viviane, Shyria
+    Les Errants d'Ukyo ==> Vivi (MND), Rafik, Elmi, stephanie, Natacha
+    Slugblaster ==> Tilleul (MND), Adrien, Gaël, Julien F, Valentin
+    Wanderhome ==> Deryn (MND), Finn (MND), gaëlle roth, Oror, Pénélope
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Vivi, Valentin, Cibou, Natacha
+    Brindlewood Bay ==> Adrien (MND), BPM, Viviane, Olivier, Tanguy
+    Chamonix Sentinelles ==> Shyria (MND), Tiramisù, Michael, Oror, Fanny
+    Cyberpunk Red ==> Elmi (MND), Chloé, Pacman, Rafik, gaëlle roth
+    Scythe #1 ==> stephanie, Judith/Lal', loic, Pénélope
+    Scythe #2 ==> Finn, Cactus
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Gaël, Lexy, Julien F, Fabien
+Unscheduled topics: Alchimistes #1, Celestopol, Citizen Sleeper, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Data Police, Deathmatch Island, Dogs in the Vineyard, Donjon & Cie, Dune: Imperium #2, HeartRunner #1, HeartRunner #2, Jeu mystère (Bruine OU Métamorphe), L'Insondable #1, L'Insondable #2, La Porte de la mer Languide ~1, La Porte de la mer Languide ~2, Magna Veritas, Myrmes #1, Myrmes #2, Pack Horse Library, Périls & Princesses, Secrets of Éon, Segmentation (GN), Toi qui #2, Ulysse 31, Wester x Mystic GameMaster Emulator, Whitechapel ~1, Whitechapel ~2, Zombicides #1, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: 53671956627605578
+
+Schedule score is 35.0070156924435
+
+Person       Score     ( Detail )
+Cibou        255.83    ( 103  215  144 -052 -052 -052 -052 )
+Lexy         176.78    ( 152  121  091 -062 -062 -062 )
+Julien F     166.00    ( 055  055  055  055  018 -070 )
+Oror         147.24    ( 049  037  037  025 )
+gaëlle r     135.35    ( 114  114 -092 )
+Fanny        129.10    ( MND  057  057  057  038 -078 )
+Natacha      111.82    ( MND  MND  087  065  043 -084 )
+Valentin     111.12    ( 071  091  091 -035 -035 -035 -035 )
+Tiramisù     109.05    ( 062  062  062 -078 )
+Vivi         107.50    ( 141  MND  MND  099  079 -070 -070 -070 )
+Gaël         105.56    ( MND  238  024 -078 -078 )
+Viviane      104.05    ( 054  MND  152  061 -054 -054 -054 )
+Adrien       102.94    ( MND  MND  MND  044  044  015 )
+Tilleul      098.97    ( MND  MND  MND  109  043 -053 )
+Fabien       098.49    ( MND  MND  MND  074  074  059  044 -076 -076 )
+Chloé        089.87    ( 069  069  069  034 -076 -076 )
+Cactus       087.33    ( 057  MND  072  048  024 -057 -057 )
+Rafik        087.21    ( 143  032  032  016 -067 -068 )
+Judith/L     083.59    ( 081  123  074  049 -081 -081 -081 )
+Shyria       080.54    ( MND  200 -030 -030 -030 -030 )
+Olivier      077.76    ( MND  MND  077  077 -038 -038 )
+Tanguy       061.63    ( 100  060  040 -046 -046 -046 )
+Pacman       050.78    ( MND  100  100  040 -095 -095 )
+Elmi         046.55    ( MND  MND  042  042  042 -078 )
+BPM          044.24    ( 102  061 -059 -060 )
+loic         043.44    ( 227 -092 -092 )
+Michael      036.79    ( 178  063  047  016 -089 -089 -089 )
+Deryn        034.30    ( 062  MND  MND  MND  096 -062 -062 )
+Steve        032.08    ( MND  070  035 -073 )
+Pénélope     026.29    ( 114  086 -043 -043 -043 -043 )
+stephani     021.52    ( 135  054 -084 -084 )
+Finn         008.93    ( MND  MND  069  069 -065 -065 )
+
+
+********************************************************************************
+
+00:00:22: We have tried 39 schedules on thread scala-execution-context-global-33 (best score on thread is 35.0070156924435)
+00:00:23: We have tried 40 schedules on thread scala-execution-context-global-38 (best score on thread is 26.18631430983118)
+00:00:24: We have tried 43 schedules on thread scala-execution-context-global-39 (best score on thread is 3.630683190822946)
+00:00:24: We have tried 45 schedules on thread scala-execution-context-global-44 (best score on thread is -100.04928195688214)
+00:00:26: We have tried 52 schedules on thread scala-execution-context-global-43 (best score on thread is -414.0066128539187)
+
+********************************************************************************
+00:00:33: From thread scala-execution-context-global-29:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Adrien, Deryn, gaëlle roth, Lexy, Fabien, Valentin, Cibou, Tilleul, Tiramisù, Olivier, stephanie, loic, Pénélope
+    Chamonix Sentinelles ==> Shyria (MND), Michael, Finn, Oror, Chloé
+    Les Errants d'Ukyo ==> Vivi (MND), Rafik, BPM, Elmi, Tanguy
+    Scythe #1 ==> Cactus, Judith/Lal'
+    Syntthétiques: Les Voix ==> Pacman (MND), Gaël, Steve, Julien F, Fanny, Natacha
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Judith/Lal'
+    Deathmatch Island ==> Adrien (MND), Rafik, Elmi, Valentin, Tanguy
+    Dune: Imperium #1 ==> Finn, Pénélope
+    L'Insondable #2 ==> Julien F, Olivier, loic, Natacha
+    Sign (mini-GN) ==> Fabien (MND), BPM, Oror, Chloé, Pacman, Fanny, Cibou
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Gaël, Michael, gaëlle roth, Lexy
+    Toi qui #2 ==> Deryn (MND), Tiramisù, Cactus, Steve, stephanie
+    Vampire TES ==> Vivi (MND), Viviane, Shyria
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Michael, BPM, Shyria, Oror, Vivi, Cibou, Valentin, Tanguy
+    Community Radio ==> Adrien (MND), Gaël, Tilleul, gaëlle roth, Lexy, Julien F, Fabien, Chloé, stephanie, loic
+    Secrets of Éon ==> Natacha (MND), Elmi, Steve, Judith/Lal', Fanny
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Tiramisù, Viviane, Pénélope
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Rafik, Pacman, Olivier
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Elmi, Finn, Lexy, Cactus, Chloé, Judith/Lal', Tanguy, Fanny, Pénélope, Cibou, Rafik, gaëlle roth
+    Brindlewood Bay ==> Adrien (MND), Tilleul, Michael, Vivi, Olivier
+    Dune: Imperium #2 ==> Gaël, Pacman, Valentin
+    L'Insondable #1 ==> Deryn, Viviane, Steve, Fabien
+    Myrmes #2 ==> BPM, Shyria
+    Ulysse 31 ==> Natacha (MND), Tiramisù, Oror, Julien F, stephanie, loic
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Julien F, Chloé, Valentin
+    Fallen London ==> Tilleul (MND), Tiramisù, Lexy, Pacman, stephanie
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Vivi, Fabien, Viviane, Shyria
+    Microscope ==> Gaël (MND), Michael, Tanguy, Pénélope
+    Pack Horse Library ==> Cibou (MND), Cactus, Oror, Judith/Lal', Fanny
+    Scythe #2 ==> BPM, loic
+    Toi qui #1 ==> Deryn (MND), Adrien, Rafik, Finn, Olivier
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Gaël, Michael, Rafik, Lexy, Cactus, Vivi, Julien F, Olivier, Fanny, Pénélope, Cibou, Viviane, Shyria, Valentin, Tanguy
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, Deryn, Tilleul, BPM, Finn, Oror, Judith/Lal', Natacha
+    Vampire Dark Age ==> Elmi (MND), gaëlle roth, Fabien, stephanie, loic
+Unscheduled topics: Alchimistes #1, Alchimistes #2, Aventure(s) au Pays des Merveilles, Bienvenue à Poudlard, Celestopol, Citizen Sleeper, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Data Police, Dogs in the Vineyard, Donjon & Cie, HeartRunner #1, HeartRunner #2, Jeu mystère (Bruine OU Métamorphe), La Porte de la mer Languide ~1, La Porte de la mer Languide ~2, Magna Veritas, Monsters and Other Childish Things ~1, Monsters and Other Childish Things ~2, Myrmes #1, Nebeltahl ~1, Nebeltahl ~2, Old Friends, Périls & Princesses, Slay the Spire #1, Slay the Spire #2, Slugblaster, Tu ne tairas point, Wanderhome, Whitechapel ~1, Whitechapel ~2, Zombicides #1, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #1, [De bile et d'acier] Perdu·e dans la montagne #2
+Schedule-chain seed: -4486169199316205026
+
+Schedule score is 39.37568407739775
+
+Person       Score     ( Detail )
+Michael      188.09    ( 178  063  047  047  031 -089 -089 )
+Rafik        150.37    ( 143  063  048  032 -068 -068 )
+Viviane      134.68    ( 054  152  091 -054 -054 -054 )
+Judith/L     132.69    ( 081  123  098  074 -081 -081 -081 )
+Fanny        126.12    ( 094  094  057  038 -078 -078 )
+Valentin     112.12    ( 071  152  030 -034 -035 -035 -035 )
+Tiramisù     109.05    ( MND  062  062  062 -078 )
+BPM          107.36    ( 102  102  082 -059 -059 -060 )
+stephani     105.35    ( 135  054 -084 )
+Gaël         105.12    ( MND  238  024 -078 -078 )
+Steve        102.01    ( 070  070  035 -073 )
+Oror         098.27    ( 061  049  037  031  012 -092 )
+Elmi         088.22    ( MND  MND  062  062  042 -078 )
+loic         087.88    ( 227  136 -092 -092 -092 )
+Pacman       085.51    ( MND  MND  100  040  040 -094 )
+Tanguy       081.63    ( 100  080  040 -046 -046 -046 )
+Shyria       080.41    ( MND  200 -030 -030 -030 -030 )
+Julien F     077.45    ( 091  073  036  018 -070 -070 )
+Tilleul      076.23    ( MND  MND  109  022 -054 )
+Finn         064.49    ( MND  069  069  056 -065 -065 )
+Chloé        062.18    ( MND  069  034  034 -076 )
+Lexy         055.57    ( 152  091 -062 -062 -062 )
+Pénélope     054.86    ( 114  114 -043 -043 -043 -043 )
+Fabien       054.37    ( MND  059  059  059  029 -076 -076 )
+Natacha      046.60    ( MND  MND  MND  065  065 -084 )
+gaëlle r     043.44    ( 114  114 -092 -092 )
+Adrien       041.89    ( MND  MND  MND  074  044 -076 )
+Cibou        040.52    ( 103  MND  144 -052 -052 -052 -052 )
+Olivier      039.72    ( 077  077 -038 -038 -038 )
+Deryn        033.87    ( 062  MND  MND  MND  096 -062 -062 )
+Vivi         028.45    ( 141  MND  MND  059  040 -070 -070 -070 )
+Cactus       006.40    ( 057  MND  072  048 -057 -057 -057 )
+
+
+********************************************************************************
+
+00:00:33: We have tried 61 schedules on thread scala-execution-context-global-29 (best score on thread is 39.37568407739775)
+00:00:33: We have tried 58 schedules on thread scala-execution-context-global-45 (best score on thread is -132.95113708272302)
+
+********************************************************************************
+00:00:42: From thread scala-execution-context-global-35:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Gaël, Shyria, Fabien, Cibou, Valentin, Tanguy
+    Citizen Sleeper ==> Tilleul (MND), Oror, Julien F, Pacman, stephanie
+    D&D5: Monstres et ce a quoi servent leur corps ! ~1 ==> Michael (MND), Tiramisù, gaëlle roth
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Adrien, Steve, Judith/Lal', Natacha
+    Toi qui #1 ==> Deryn (MND), Rafik, Finn, Lexy, Pénélope
+    Zombicides #2 ==> BPM, Olivier
+    [De bile et d'acier] Perdu·e dans la montagne #1 ==> Cactus (MND), Elmi, Chloé, Fanny, loic
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Vivi, Chloé, loic
+    D&D5: Monstres et ce a quoi servent leur corps ! ~2 ==> Michael (MND), Tiramisù, gaëlle roth
+    Dune: Imperium #2 ==> Shyria, Julien F
+    Secrets of Éon ==> Natacha (MND), Elmi, Oror, Steve
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Rafik, Lexy, Fabien
+    Syntthétiques: Les Voix ==> Pacman (MND), Gaël, stephanie, Judith/Lal'
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Tanguy, Pénélope
+    Tu ne tairas point ==> Adrien (MND), BPM, Olivier, Fanny
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), Valentin, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Vivi, Valentin
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Rafik, Oror
+    Community Radio ==> Adrien (MND), Michael, Julien F
+    Dogs in the Vineyard ==> BPM (MND), Tilleul, Lexy
+    Donjon & Cie ==> Gaël (MND), gaëlle roth, stephanie, Tanguy
+    L'Insondable #2 ==> Viviane, Chloé, Olivier, Pénélope
+    Myrmes #1 ==> Shyria, loic
+    Nebeltahl ~1 ==> Fabien (MND), Tiramisù, Cactus
+    Old Friends ==> Steve (MND), Deryn, Finn, Pacman
+    Pack Horse Library ==> Cibou (MND), Elmi, Judith/Lal'
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Michael, Cibou, Natacha
+    Alchimistes #2 ==> Viviane, Olivier
+    Celestopol ==> Shyria (MND), gaëlle roth, BPM, Julien F, Tanguy
+    Deathmatch Island ==> Adrien (MND), Elmi, Steve, Chloé, Valentin
+    Myrmes #2 ==> Pacman, Pénélope
+    Nebeltahl ~2 ==> Fabien (MND), Tiramisù, Cactus
+    Slay the Spire #1 ==> Judith/Lal', loic
+    Vampire TES ==> Vivi (MND), Gaël, stephanie
+    Wanderhome ==> Deryn (MND), Finn (MND), Tilleul, Lexy, Fanny
+    Zombicides #1 ==> Rafik, Oror
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Lexy, Vivi, Judith/Lal', Cibou
+    Fallen London ==> Tilleul (MND), Michael, Finn, Cactus, stephanie
+    HeartRunner #1 ==> Valentin (MND), Rafik, Shyria, Olivier
+    La Porte de la mer Languide ~1 ==> Fabien (MND), Oror, Tanguy, Fanny
+    Périls & Princesses ==> Pacman (MND), Gaël, Viviane, Chloé, Pénélope
+    Ulysse 31 ==> Natacha (MND), Tiramisù, Julien F, loic
+    Vampire Dark Age ==> Elmi (MND), Adrien, Deryn, gaëlle roth, BPM
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Gaël, Michael, Rafik, Viviane, Finn, Lexy, Cactus, Julien F, Chloé, Olivier, Pénélope, Cibou
+    Brindlewood Bay ==> Adrien (MND), Tilleul, Shyria, Judith/Lal', Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, BPM, Pacman, stephanie
+    HeartRunner #2 ==> Valentin (MND), Tiramisù, Vivi, loic
+    La Porte de la mer Languide ~2 ==> Fabien (MND), Oror, Tanguy, Fanny
+Unscheduled topics: Alchimistes #1, Chamonix Sentinelles, Data Police, Dune: Imperium #1, L'Insondable #1, Les Errants d'Ukyo, Magie de Minuit - Momi Magique, Magna Veritas, Microscope, Monsters and Other Childish Things ~1, Monsters and Other Childish Things ~2, Scythe #1, Scythe #2, Segmentation (GN), Sign (mini-GN), Slay the Spire #2, Slugblaster, Toi qui #2, Wester x Mystic GameMaster Emulator, Whitechapel ~1, Whitechapel ~2
+Schedule-chain seed: 6667150458623311958
+
+Schedule score is 199.91582655302125
+
+Person       Score     ( Detail )
+gaëlle r     318.18    ( 114  114  045  045 )
+Fabien       262.48    ( MND  MND  MND  MND  074  074  074  074  044 -076 )
+Tiramisù     250.00    ( 062  062  062  062 )
+Fanny        245.28    ( MND  057  057  057  038  019  019 )
+Cactus       216.35    ( 057  MND  MND  072  072  072 -057 )
+Steve        209.79    ( MND  105  070  035 )
+Tilleul      195.65    ( MND  MND  MND  109  065  022 )
+Tanguy       193.88    ( 100  080  060 -046 )
+Judith/L     189.53    ( 081  123  074  074 -081 -081 )
+BPM          185.31    ( MND  082  082  041  041 -060 )
+Chloé        158.83    ( 103  069  069  069 -076 -076 )
+Olivier      155.53    ( 231  077 -038 -038 -038 -038 )
+Deryn        153.85    ( 062  MND  MND  MND  096  058 -062 )
+Valentin     151.52    ( 071  MND  MND  121  030 -035 -035 )
+Shyria       150.25    ( MND  200  040 -030 -030 -030 )
+Julien F     150.17    ( 091  091  073  036 -070 -070 )
+Lexy         148.16    ( 091  061  061  061 -062 -062 )
+Viviane      134.68    ( 054  MND  152  091 -054 -054 -054 )
+loic         134.35    ( 182  136 -092 -092 )
+stephani     132.38    ( 081  054  054  027 -084 )
+Oror         129.94    ( 061  049  037  037  037 -091 )
+Vivi         127.26    ( 141  MND  MND  099  099 -070 -070 -070 )
+Pénélope     126.86    ( 143  114 -043 -043 -043 )
+Pacman       125.51    ( MND  MND  100  100  020 -094 )
+Elmi         125.00    ( MND  MND  062  062 )
+Gaël         122.35    ( MND  238  119 -078 -078 -078 )
+Rafik        119.29    ( 143  063  032  016 -067 -068 )
+Finn         115.58    ( MND  MND  069  069  042 -065 )
+Cibou        112.29    ( 103  MND  215 -052 -052 -052 -052 )
+Natacha      111.82    ( MND  MND  MND  109  087 -084 )
+Michael      109.72    ( 178  MND  MND  063  047 -089 -089 )
+Adrien       088.24    ( MND  MND  MND  MND  059  029 )
+
+
+********************************************************************************
+
+00:00:42: We have tried 74 schedules on thread scala-execution-context-global-35 (best score on thread is 199.91582655302125)
+00:00:42: We have tried 67 schedules on thread scala-execution-context-global-46 (best score on thread is 10.446262672241799)
+00:00:44: We have tried 65 schedules on thread scala-execution-context-global-34 (best score on thread is 97.09937763718165)
+00:00:46: We have tried 69 schedules on thread scala-execution-context-global-38 (best score on thread is 181.38580032399727)
+00:00:47: We have tried 65 schedules on thread scala-execution-context-global-40 (best score on thread is 88.70108420807925)
+00:00:47: We have tried 71 schedules on thread scala-execution-context-global-39 (best score on thread is 177.50022901793548)
+00:00:48: We have tried 109 schedules on thread scala-execution-context-global-30 (best score on thread is 37.76549183536204)
+00:00:49: We have tried 64 schedules on thread scala-execution-context-global-31 (best score on thread is 51.79362686489459)
+00:00:50: We have tried 82 schedules on thread scala-execution-context-global-44 (best score on thread is 74.75111339503944)
+00:00:54: We have tried 87 schedules on thread scala-execution-context-global-29 (best score on thread is 94.18291953047782)
+00:00:55: We have tried 75 schedules on thread scala-execution-context-global-32 (best score on thread is 161.84923194045695)
+00:00:55: We have tried 89 schedules on thread scala-execution-context-global-43 (best score on thread is -288.0931661434264)
+00:00:59: We have tried 85 schedules on thread scala-execution-context-global-37 (best score on thread is 56.48253953137867)
+00:01:02: We have tried 83 schedules on thread scala-execution-context-global-36 (best score on thread is 160.43948458872364)
+00:01:07: We have tried 87 schedules on thread scala-execution-context-global-34 (best score on thread is 110.65639777277026)
+00:01:09: We have tried 99 schedules on thread scala-execution-context-global-38 (best score on thread is 186.07909134539324)
+00:01:11: We have tried 100 schedules on thread scala-execution-context-global-39 (best score on thread is 180.9166373216359)
+00:01:14: We have tried 83 schedules on thread scala-execution-context-global-31 (best score on thread is 105.18518130588365)
+00:01:14: We have tried 79 schedules on thread scala-execution-context-global-28 (best score on thread is 39.59205161166274)
+00:01:17: We have tried 94 schedules on thread scala-execution-context-global-32 (best score on thread is 173.5788536869686)
+00:01:17: We have tried 116 schedules on thread scala-execution-context-global-44 (best score on thread is 147.62909158508927)
+00:01:18: We have tried 115 schedules on thread scala-execution-context-global-43 (best score on thread is -134.14896381874684)
+00:01:21: We have tried 91 schedules on thread scala-execution-context-global-40 (best score on thread is 104.55152277170053)
+
+********************************************************************************
+00:01:22: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Tilleul, gaëlle roth, Shyria, Finn, Lexy, Vivi, stephanie, Valentin, Pénélope, Cibou, Natacha
+    Donjon & Cie ==> Gaël (MND), Michael, Rafik, Oror, Pacman, Tanguy
+    La Porte de la mer Languide ~1 ==> Fabien (MND), BPM, Judith/Lal'
+    Old Friends ==> Steve (MND), Deryn, Tiramisù, Cactus, Olivier, loic
+    Tu ne tairas point ==> Adrien (MND), Elmi, Julien F, Chloé, Fanny
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, stephanie, Tanguy, Fanny, Viviane, Shyria
+    Deathmatch Island ==> Adrien (MND), Rafik, Elmi, Vivi, Olivier
+    La Porte de la mer Languide ~2 ==> Fabien (MND), BPM, Judith/Lal'
+    Slay the Spire #2 ==> Tilleul, Lexy
+    Ulysse 31 ==> Natacha (MND), Gaël, Tiramisù, Julien F, Pacman, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Oror, Steve, Pénélope
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), gaëlle roth, Chloé, Valentin, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Rafik, Elmi, Chloé, Tanguy, Pénélope, Cibou
+    Alchimistes #1 ==> BPM, Viviane
+    Data Police ==> Steve (MND), Gaël, Tiramisù, Shyria, stephanie
+    HeartRunner #1 ==> Valentin (MND), Fabien, Pacman, Olivier
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Cactus, Oror, Fanny, Natacha
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Michael, gaëlle roth, Lexy
+    Toi qui #2 ==> Deryn (MND), Finn, Julien F, Judith/Lal', loic
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), gaëlle roth, Julien F, stephanie, Valentin
+    L'Insondable #2 ==> Gaël, Viviane, Olivier, loic
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Shyria, Lexy
+    Pack Horse Library ==> Cibou (MND), Cactus, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, Michael, BPM, Elmi, Oror, Fanny, Steve, Vivi
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Tanguy, Pénélope
+    Zombicides #1 ==> Rafik, Fabien
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> loic, Pénélope
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), BPM, Finn, Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Chloé, stephanie
+    Dune: Imperium #1 ==> Julien F, Fabien
+    Dune: Imperium #2 ==> Tiramisù, Olivier
+    HeartRunner #2 ==> Valentin (MND), Rafik, Lexy
+    Microscope ==> Gaël (MND), Adrien, Tanguy
+    Syntthétiques: Les Voix ==> Pacman (MND), Oror, Judith/Lal', Fanny
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Cibou
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin
+    Community Radio ==> Adrien (MND), Gaël, Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Viviane, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Rafik, stephanie, Cibou
+Unscheduled topics: Bienvenue à Poudlard, Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Fallen London, L'Insondable #1, Les Errants d'Ukyo, Monsters and Other Childish Things ~1, Monsters and Other Childish Things ~2, Myrmes #1, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Scythe #2, Secrets of Éon, Sign (mini-GN), Slay the Spire #1, Slugblaster, Toi qui #1, Vampire TES, Whitechapel ~1, Whitechapel ~2, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 225.7500268054904
+
+Person       Score     ( Detail )
+Valentin     272.73    ( 071  MND  MND  152  121 -035 -035 )
+Steve        244.76    ( MND  MND  175  070 )
+Vivi         237.15    ( 141  MND  099  079  059 -070 -070 )
+Oror         233.13    ( 061  037  037  037  037  025 )
+Shyria       230.12    ( MND  200  120 -030 -030 -030 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Julien F     220.54    ( 091  091  036  036  036 -070 )
+Cibou        215.31    ( 103  MND  215 -052 -052 )
+Pénélope     212.57    ( 143  114  086 -043 -043 -043 )
+Lexy         208.76    ( 121  121  091 -062 -062 )
+Michael      203.76    ( 178  078  063  047  016 -089 -089 )
+gaëlle r     203.54    ( 114  114  068 -092 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Olivier      193.57    ( 231  077 -038 -038 -038 )
+Tanguy       187.76    ( 100  100  080 -046 -046 )
+stephani     183.68    ( 135  081  081  054 -084 -084 )
+Gaël         183.57    ( MND  MND  238  024 -078 )
+loic         179.80    ( 227  136 -092 -092 )
+Adrien       176.47    ( MND  MND  MND  074  074  029 )
+Deryn        173.08    ( 062  MND  MND  MND  096  077 -062 )
+Tiramisù     171.55    ( MND  062  062  062  062 -078 )
+Cactus       168.27    ( 057  MND  MND  072  072  024 -057 )
+Rafik        166.91    ( 143  063  063  032 -067 -068 )
+Chloé        165.62    ( MND  069  069  069  034 -076 )
+Finn         143.35    ( MND  MND  069  069  069 -065 )
+Viviane      134.68    ( 054  MND  152  091 -054 -054 -054 )
+Natacha      133.55    ( MND  MND  109  065  043 -084 )
+Elmi         129.88    ( MND  MND  104  062  042 -078 )
+BPM          124.24    ( MND  102  082 -059 )
+Fabien       113.20    ( MND  MND  074  074  059  059 -076 -076 )
+Fanny        110.23    ( 057  038  038  038  019 -078 )
+Tilleul      109.98    ( MND  MND  109  109 -053 -054 )
+
+
+********************************************************************************
+
+00:01:22: We have tried 107 schedules on thread scala-execution-context-global-46 (best score on thread is 225.7500268054904)
+
+********************************************************************************
+00:01:22: From thread scala-execution-context-global-36:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> 
+    Alchimistes #1 ==> Shyria, Olivier
+    Fallen London ==> Tilleul (MND), Finn, Lexy, Cactus, stephanie
+    HeartRunner #2 ==> Valentin (MND), Michael, Elmi, Pacman
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Adrien, Tiramisù, Steve
+    L'Insondable #1 ==> Gaël, Fabien, Judith/Lal', loic
+    Myrmes #2 ==> BPM, Pénélope
+    Secrets of Éon ==> Natacha (MND), Tanguy, Fanny, Cibou
+    Toi qui #2 ==> Deryn (MND), Julien F, Rafik, gaëlle roth
+    Zombicides #2 ==> Oror, Chloé
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, gaëlle roth, Viviane, Cactus, Vivi, Tanguy, Fanny, Cibou
+    Data Police ==> Steve (MND), Gaël, Valentin, Olivier, stephanie
+    Deathmatch Island ==> Adrien (MND), Rafik, Elmi, Shyria, Chloé
+    Sign (mini-GN) ==> Fabien (MND), Tiramisù, BPM, Oror, Julien F, Pacman, Natacha
+    Slay the Spire #2 ==> Lexy, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Tilleul, Judith/Lal', Pénélope
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Deryn
+    Celestopol ==> Shyria (MND), Tilleul, Julien F, Tanguy
+    Community Radio ==> Adrien (MND), Michael, Chloé
+    HeartRunner #1 ==> Valentin (MND), Oror
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), gaëlle roth, Fanny
+    Myrmes #1 ==> Lexy, stephanie
+    Old Friends ==> Steve (MND), Tiramisù, BPM, Fabien
+    Syntthétiques: Les Voix ==> Pacman (MND), Gaël, Viviane, Natacha
+    Vampire Dark Age ==> Elmi (MND), Rafik, Finn, loic
+    Zombicides #1 ==> Judith/Lal', Pénélope
+    [De bile et d'acier] Perdu·e dans la montagne #1 ==> Cactus (MND), Vivi, Cibou
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Gaël, Tiramisù, Michael, BPM, Cactus, Vivi, Julien F, stephanie, loic, Cibou, Valentin, Tanguy
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Shyria, Lexy, Fabien, Judith/Lal'
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), gaëlle roth, Fanny
+    Slay the Spire #1 ==> Rafik, Pacman
+    Slugblaster ==> Tilleul (MND), Adrien, Elmi, Viviane, Steve
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Oror, Chloé, Pénélope
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> gaëlle roth, Shyria, Lexy, Judith/Lal', Valentin, Fanny, Cibou
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Fabien, Chloé, loic, Natacha
+    Citizen Sleeper ==> Tilleul (MND), Cactus, Oror, Julien F, Pacman
+    Les Errants d'Ukyo ==> Vivi (MND), Rafik, BPM, Elmi, stephanie
+    Microscope ==> Gaël (MND), Michael, Tanguy, Pénélope
+    Toi qui #1 ==> Deryn (MND), Adrien, Tiramisù, Finn, Olivier
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> 
+    Cyberpunk Red ==> Elmi (MND), Rafik, stephanie, Valentin
+    Donjon & Cie ==> Gaël (MND), Tanguy, Viviane, Shyria
+    Magna Veritas ==> BPM (MND), gaëlle roth, loic, Pénélope
+    Pack Horse Library ==> Cibou (MND), Cactus, Olivier, Fanny
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, Deryn, Finn, Oror, Vivi, Julien F, Judith/Lal', Natacha
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Michael, Lexy, Fabien
+Unscheduled topics: Alchimistes #2, Bienvenue à Poudlard, Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Dune: Imperium #1, Dune: Imperium #2, L'Insondable #2, La Porte de la mer Languide ~1, La Porte de la mer Languide ~2, Nebeltahl ~1, Nebeltahl ~2, Périls & Princesses, Scythe #1, Scythe #2, Tu ne tairas point, Ulysse 31, Vampire TES, Wester x Mystic GameMaster Emulator, Whitechapel ~1, Whitechapel ~2, [De bile et d'acier] Perdu·e dans la montagne #2
+Schedule-chain seed: -5731905946001869573
+
+Schedule score is 232.28246737534786
+
+Person       Score     ( Detail )
+Gaël         319.40    ( MND  MND  238  238 -078 -078 )
+Cibou        307.34    ( 103  MND  215  144 -052 -052 -052 )
+Viviane      272.73    ( 054  MND  152  061  061 -054 )
+Shyria       260.46    ( MND  200  120 -030 -030 )
+Tanguy       247.76    ( 100  100  080  060 -046 -046 )
+Valentin     242.42    ( 071  MND  MND  152  091 -035 -035 )
+Julien F     238.72    ( 091  073  073  036  036 -070 )
+Finn         236.11    ( MND  MND  069  069  056  042 )
+Rafik        234.25    ( 143  063  032  032  032 -067 )
+Elmi         229.17    ( MND  MND  104  062  042  021 )
+Pénélope     227.43    ( 114  114  086 -043 -043 )
+Adrien       220.59    ( MND  MND  074  059  044  044 )
+Natacha      217.39    ( MND  MND  065  065  065  022 )
+Pacman       205.51    ( MND  MND  100  100  100 -094 )
+Michael      203.76    ( 178  063  063  047  031 -089 -089 )
+Olivier      192.73    ( MND  MND  077  077  077 -038 )
+Judith/L     181.41    ( 081  123  123  098 -081 -081 -081 )
+loic         178.79    ( 227  227 -092 -092 -092 )
+Lexy         176.78    ( 152  121  091 -062 -062 -062 )
+Fabien       174.24    ( MND  059  059  059  044  029 -076 )
+Tiramisù     171.55    ( MND  062  062  062  062 -078 )
+BPM          166.74    ( MND  102  102  082 -059 -060 )
+Chloé        165.62    ( MND  103  069  034  034 -076 )
+Cactus       159.45    ( 057  MND  072  072  072 -057 -057 )
+gaëlle r     157.07    ( 114  114  114 -092 -092 )
+stephani     156.65    ( 135  081  054  054 -084 -084 )
+Oror         154.48    ( 061  061  049  037  037 -091 )
+Fanny        144.99    ( 094  094  057  057 -078 -078 )
+Steve        139.86    ( MND  MND  105  035 )
+Vivi         138.34    ( 141  MND  MND  079  059 -070 -070 )
+Tilleul      130.43    ( MND  MND  MND  MND  065  065 )
+Deryn        096.15    ( 062  MND  MND  MND  MND  096 -062 )
+
+
+********************************************************************************
+
+00:01:22: We have tried 107 schedules on thread scala-execution-context-global-36 (best score on thread is 232.28246737534786)
+00:01:27: We have tried 111 schedules on thread scala-execution-context-global-34 (best score on thread is 131.60469822105313)
+00:01:28: We have tried 128 schedules on thread scala-execution-context-global-29 (best score on thread is 121.55990892234215)
+00:01:40: We have tried 101 schedules on thread scala-execution-context-global-28 (best score on thread is 112.49139445434284)
+00:01:41: We have tried 141 schedules on thread scala-execution-context-global-37 (best score on thread is 208.73562671684493)
+
+********************************************************************************
+00:01:44: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Shyria, Lexy, Vivi, Valentin, Pénélope, Cibou
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Rafik, Julien F, loic
+    Donjon & Cie ==> Gaël (MND), Tilleul, Michael, Oror, Pacman, Tanguy
+    La Porte de la mer Languide ~1 ==> Fabien (MND), BPM, Judith/Lal'
+    Old Friends ==> Steve (MND), Deryn, Tiramisù, Finn, Cactus, stephanie
+    Tu ne tairas point ==> Adrien (MND), gaëlle roth, Elmi, Chloé, Olivier
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, gaëlle roth, stephanie, Tanguy, Viviane, Shyria
+    Deathmatch Island ==> Adrien (MND), Rafik, Elmi, Vivi, Olivier
+    La Porte de la mer Languide ~2 ==> Fabien (MND), BPM, Judith/Lal'
+    Slay the Spire #2 ==> Tilleul, Lexy
+    Ulysse 31 ==> Natacha (MND), Gaël, Tiramisù, Julien F, Pacman, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Oror, Steve, Pénélope
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), Chloé, Valentin, Fanny, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Rafik, Chloé, Tanguy, Cibou, loic, Pénélope
+    Alchimistes #1 ==> BPM, Finn
+    Data Police ==> Steve (MND), Gaël, gaëlle roth, Shyria, stephanie
+    HeartRunner #1 ==> Valentin (MND), Fabien, Pacman, Olivier
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Viviane, Cactus, Fanny, Natacha
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Michael, Elmi, Lexy
+    Toi qui #2 ==> Deryn (MND), Tiramisù, Oror, Julien F, Judith/Lal'
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), Michael, gaëlle roth, stephanie, Valentin
+    L'Insondable #2 ==> Gaël, Viviane, Olivier, loic
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Shyria, Lexy
+    Pack Horse Library ==> Cibou (MND), Cactus, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, BPM, Elmi, Oror, Julien F, Fanny, Steve, Vivi
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Tanguy, Pénélope
+    Zombicides #1 ==> Rafik, Fabien
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> loic, Pénélope
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), BPM, Finn, Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Fabien, Chloé
+    Dune: Imperium #1 ==> Julien F, stephanie
+    Dune: Imperium #2 ==> Tiramisù, Olivier
+    HeartRunner #2 ==> Valentin (MND), Rafik, Lexy
+    Microscope ==> Gaël (MND), Adrien, Tanguy
+    Syntthétiques: Les Voix ==> Pacman (MND), Oror, Judith/Lal', Fanny
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Cibou
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin
+    Community Radio ==> Adrien (MND), Gaël, Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Rafik, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Viviane, stephanie, Cibou
+Unscheduled topics: Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Fallen London, L'Insondable #1, Les Errants d'Ukyo, Monsters and Other Childish Things ~1, Monsters and Other Childish Things ~2, Myrmes #1, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Scythe #2, Secrets of Éon, Sign (mini-GN), Slay the Spire #1, Slugblaster, Toi qui #1, Vampire TES, Whitechapel ~1, Whitechapel ~2, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 266.99425726146944
+
+Person       Score     ( Detail )
+loic         315.15    ( 227  227  136 -092 -092 -092 )
+Valentin     272.73    ( 071  MND  MND  152  121 -035 -035 )
+gaëlle r     248.99    ( 114  114  068  045 -092 )
+Steve        244.76    ( MND  MND  175  070 )
+Vivi         237.15    ( 141  MND  099  079  059 -070 -070 )
+Shyria       230.12    ( MND  200  120 -030 -030 -030 )
+Elmi         229.17    ( MND  MND  104  062  042  021 )
+Fanny        226.42    ( MND  057  038  038  038  038  019 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Julien F     220.54    ( 091  073  055  036  036 -070 )
+Michael      219.44    ( 178  078  063  047  031 -089 -089 )
+Viviane      218.86    ( 054  MND  152  121 -054 -054 )
+Natacha      217.39    ( MND  MND  MND  109  065  043 )
+Cibou        215.31    ( 103  MND  215 -052 -052 )
+Pénélope     212.57    ( 143  114  086 -043 -043 -043 )
+Lexy         208.76    ( 121  121  091 -062 -062 )
+Oror         208.59    ( 061  037  037  037  025  012 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Olivier      193.57    ( 231  077 -038 -038 -038 )
+Fabien       188.95    ( MND  MND  074  074  059  059 -076 )
+Tanguy       187.76    ( 100  100  080 -046 -046 )
+Tilleul      185.93    ( MND  MND  109  109  022 -053 )
+Gaël         183.57    ( MND  MND  238  024 -078 )
+Rafik        182.78    ( 143  063  063  048 -067 -068 )
+Adrien       176.47    ( MND  MND  MND  074  074  029 )
+Deryn        173.08    ( 062  MND  MND  MND  096  077 -062 )
+Tiramisù     171.55    ( MND  062  062  062  062 -078 )
+Cactus       168.27    ( 057  MND  MND  072  072  024 -057 )
+Chloé        165.62    ( MND  069  069  069  034 -076 )
+Finn         143.35    ( MND  MND  069  069  069 -065 )
+stephani     129.62    ( 135  081  081 -084 -084 )
+BPM          124.24    ( MND  102  082 -059 )
+
+
+********************************************************************************
+
+00:01:44: We have tried 127 schedules on thread scala-execution-context-global-46 (best score on thread is 266.99425726146944)
+00:01:45: We have tried 149 schedules on thread scala-execution-context-global-44 (best score on thread is 155.31599984736084)
+00:01:52: We have tried 121 schedules on thread scala-execution-context-global-31 (best score on thread is 144.8848945908925)
+00:01:57: We have tried 142 schedules on thread scala-execution-context-global-34 (best score on thread is 155.4201298052875)
+00:01:57: We have tried 127 schedules on thread scala-execution-context-global-40 (best score on thread is 121.25824392665317)
+00:02:01: We have tried 123 schedules on thread scala-execution-context-global-28 (best score on thread is 196.44597611524907)
+
+********************************************************************************
+00:02:05: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Michael, Vivi, Cibou
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Julien F, loic
+    Donjon & Cie ==> Gaël (MND), Tilleul, Pacman, Tanguy, Rafik, gaëlle roth
+    La Porte de la mer Languide ~1 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Old Friends ==> Steve (MND), Deryn, BPM, Finn, Cactus
+    Scythe #2 ==> Shyria, Lexy
+    Tu ne tairas point ==> Adrien (MND), Tiramisù, stephanie, Valentin
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Viviane, Shyria, Valentin, Tanguy
+    Deathmatch Island ==> Adrien (MND), Gaël, Michael, Rafik, stephanie
+    La Porte de la mer Languide ~2 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Slay the Spire #2 ==> Tilleul, Lexy
+    Ulysse 31 ==> Natacha (MND), gaëlle roth, Julien F, Pacman, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Tiramisù, Steve, Fanny
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), BPM, Vivi, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Elmi, Tanguy, loic, Cibou, Rafik, gaëlle roth
+    Alchimistes #1 ==> BPM, Chloé
+    Data Police ==> Steve (MND), Gaël, Michael, Shyria, stephanie
+    HeartRunner #1 ==> Valentin (MND), Oror, Pacman, Olivier
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Viviane, Cactus, Fanny, Natacha
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Lexy, Julien F, Fabien
+    Toi qui #2 ==> Deryn (MND), Tiramisù, Finn, Judith/Lal', Pénélope
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), Michael, gaëlle roth, stephanie, Valentin
+    L'Insondable #2 ==> Gaël, Viviane, Olivier, loic
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Shyria, Lexy
+    Pack Horse Library ==> Cibou (MND), Cactus, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, BPM, Elmi, Oror, Julien F, Fanny, Steve, Vivi
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Tanguy, Pénélope
+    Zombicides #1 ==> Rafik, Fabien
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> loic, Pénélope
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), BPM, Fanny, Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Finn, Chloé
+    Dune: Imperium #1 ==> Julien F, stephanie
+    Dune: Imperium #2 ==> Tiramisù, Olivier
+    HeartRunner #2 ==> Valentin (MND), Rafik, Lexy
+    Microscope ==> Gaël (MND), Adrien, Tanguy
+    Syntthétiques: Les Voix ==> Pacman (MND), Oror, Fabien, Judith/Lal'
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Cibou
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin
+    Community Radio ==> Adrien (MND), Gaël, Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Rafik, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Viviane, stephanie, Cibou
+Unscheduled topics: Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Fallen London, L'Insondable #1, Les Errants d'Ukyo, Myrmes #1, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Secrets of Éon, Sign (mini-GN), Slay the Spire #1, Slugblaster, Toi qui #1, Vampire TES, Whitechapel ~1, Whitechapel ~2, Zombicides #2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 284.75493799824244
+
+Person       Score     ( Detail )
+loic         315.15    ( 227  227  136 -092 -092 -092 )
+gaëlle r     248.99    ( 114  114  068  045 -092 )
+BPM          246.69    ( MND  102  102  082  020 -059 )
+Steve        244.76    ( MND  MND  175  070 )
+Valentin     242.42    ( 071  MND  MND  152  091 -035 -035 )
+Vivi         237.15    ( 141  MND  099  079  059 -070 -070 )
+Elmi         234.05    ( MND  MND  104  104  104 -078 )
+Shyria       230.50    ( MND  200  120 -030 -030 -030 )
+Fanny        226.42    ( MND  057  057  038  038  019  019 )
+Finn         222.22    ( MND  MND  069  069  069  014 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Viviane      218.86    ( 054  MND  152  121 -054 -054 )
+Natacha      217.39    ( MND  MND  MND  109  065  043 )
+Cibou        215.31    ( 103  MND  215 -052 -052 )
+Pénélope     213.71    ( 143  114 -043 )
+stephani     213.46    ( 135  081  081 -084 )
+Lexy         208.76    ( 121  121  091 -062 -062 )
+Michael      203.76    ( 178  078  047  047  031 -089 -089 )
+Julien F     202.36    ( 091  073  055  036  018 -070 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Fabien       188.95    ( MND  MND  074  074  059  044  015 -076 )
+Tanguy       187.76    ( 100  100  080 -046 -046 )
+Tilleul      185.93    ( MND  MND  109  109  022 -053 )
+Gaël         183.57    ( MND  MND  238  024 -078 )
+Rafik        182.78    ( 143  063  063  048 -067 -068 )
+Adrien       176.47    ( MND  MND  MND  074  074  029 )
+Deryn        173.08    ( 062  MND  MND  MND  096  077 -062 )
+Oror         171.78    ( 061  049  037  025 )
+Tiramisù     171.55    ( MND  062  062  062  062 -078 )
+Cactus       168.27    ( 057  MND  MND  072  072  024 -057 )
+Chloé        165.62    ( MND  069  069  069  034 -076 )
+Olivier      116.65    ( MND  MND  231 -038 -038 -038 )
+
+
+********************************************************************************
+
+00:02:05: We have tried 147 schedules on thread scala-execution-context-global-46 (best score on thread is 284.75493799824244)
+00:02:11: We have tried 166 schedules on thread scala-execution-context-global-43 (best score on thread is 11.193192869139954)
+00:02:12: We have tried 139 schedules on thread scala-execution-context-global-31 (best score on thread is 154.53132065806062)
+00:02:24: We have tried 197 schedules on thread scala-execution-context-global-37 (best score on thread is 237.52355935492068)
+00:02:27: We have tried 155 schedules on thread scala-execution-context-global-32 (best score on thread is 191.70967273243656)
+00:02:32: We have tried 82 schedules on thread scala-execution-context-global-33 (best score on thread is 154.37345631271663)
+00:02:43: We have tried 192 schedules on thread scala-execution-context-global-34 (best score on thread is 178.6971957398718)
+00:02:44: We have tried 218 schedules on thread scala-execution-context-global-37 (best score on thread is 237.9089268148071)
+
+********************************************************************************
+00:02:50: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Vivi, Cibou
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Julien F, loic
+    Donjon & Cie ==> Gaël (MND), Michael, Rafik, Pacman, stephanie
+    La Porte de la mer Languide ~1 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Old Friends ==> Steve (MND), Deryn, Tiramisù, Finn
+    Scythe #2 ==> BPM, Shyria
+    Slugblaster ==> Tilleul (MND), Lexy, Cactus
+    Tu ne tairas point ==> Adrien (MND), gaëlle roth, Valentin, Tanguy
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, Viviane, Valentin, Tanguy
+    Deathmatch Island ==> Adrien (MND), Gaël, Rafik, Shyria, stephanie
+    La Porte de la mer Languide ~2 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Slay the Spire #2 ==> Tilleul, Lexy
+    Ulysse 31 ==> Natacha (MND), gaëlle roth, Julien F, Pacman, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Tiramisù, Steve, Fanny
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), BPM, Vivi, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Cibou
+    Alchimistes #1 ==> Elmi, Shyria
+    Data Police ==> Steve (MND), Gaël, BPM, stephanie, Tanguy
+    HeartRunner #1 ==> Valentin (MND), Oror, Julien F, Olivier
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Tiramisù, Viviane, Cactus, Natacha
+    Sign (mini-GN) ==> Fabien (MND), Chloé, Pacman, Fanny
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Michael, gaëlle roth
+    Toi qui #2 ==> Deryn (MND), Rafik, Finn, Judith/Lal', Pénélope
+    Zombicides #2 ==> Lexy, loic
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), Michael, gaëlle roth, stephanie, Valentin
+    L'Insondable #2 ==> Gaël, Viviane, Olivier, loic
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Shyria, Lexy
+    Pack Horse Library ==> Cibou (MND), Cactus, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, BPM, Elmi, Oror, Julien F, Fanny, Steve, Vivi
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Tanguy, Pénélope
+    Zombicides #1 ==> Rafik, Fabien
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> loic, Pénélope
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), BPM, Olivier, Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Finn, Fanny
+    Dune: Imperium #1 ==> Julien F, stephanie
+    Dune: Imperium #2 ==> Tiramisù, Chloé
+    HeartRunner #2 ==> Valentin (MND), Lexy, Cibou
+    Microscope ==> Gaël (MND), Adrien, Tanguy
+    Syntthétiques: Les Voix ==> Pacman (MND), Oror, Fabien, Judith/Lal'
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Rafik
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin
+    Community Radio ==> Adrien (MND), Viviane, Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Gaël, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Rafik, stephanie, Cibou
+Unscheduled topics: Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Fallen London, L'Insondable #1, Les Errants d'Ukyo, Myrmes #1, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Secrets of Éon, Slay the Spire #1, Toi qui #1, Vampire TES, Whitechapel ~1, Whitechapel ~2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 323.6351641419599
+
+Person       Score     ( Detail )
+Cibou        358.85    ( 103  MND  215  144 -052 -052 )
+loic         315.15    ( 227  227  136 -092 -092 -092 )
+gaëlle r     295.45    ( 114  114  068 )
+Gaël         278.80    ( MND  MND  238  119 -078 )
+Julien F     256.91    ( 091  073  073  055  036 -070 )
+Tanguy       253.88    ( 100  080  080  040 -046 )
+Rafik        250.45    ( 143  063  048  032  032 -067 )
+BPM          246.74    ( MND  102  102  082  020 -059 )
+Steve        244.76    ( MND  MND  175  070 )
+Valentin     242.42    ( 071  MND  MND  152  091 -035 -035 )
+stephani     240.49    ( 135  081  081  027 -084 )
+Vivi         237.15    ( 141  MND  099  079  059 -070 -070 )
+Elmi         234.05    ( MND  MND  104  104  104 -078 )
+Shyria       230.87    ( MND  200  120 -030 -030 -030 )
+Fanny        226.42    ( MND  057  057  057  038  019 )
+Finn         222.22    ( MND  MND  069  069  069  014 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Michael      219.44    ( 178  078  063  047  031 -089 -089 )
+Viviane      218.86    ( 054  MND  152  121 -054 -054 )
+Natacha      217.39    ( MND  MND  MND  109  065  043 )
+Pénélope     213.71    ( 143  114 -043 )
+Lexy         208.76    ( 121  121  091 -062 -062 )
+Fabien       203.66    ( MND  MND  MND  074  074  059  059  015 -076 )
+Chloé        200.11    ( MND  069  069  069  069 -076 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Cactus       192.31    ( 057  MND  MND  072  072  048 -057 )
+Adrien       176.47    ( MND  MND  MND  074  074  029 )
+Deryn        173.08    ( 062  MND  MND  MND  096  077 -062 )
+Oror         171.78    ( 061  049  037  025 )
+Tiramisù     171.55    ( MND  062  062  062  062 -078 )
+Tilleul      164.19    ( MND  MND  MND  109  109 -053 )
+Olivier      154.69    ( MND  MND  231 -038 -038 )
+
+
+********************************************************************************
+
+00:02:50: We have tried 196 schedules on thread scala-execution-context-global-46 (best score on thread is 323.6351641419599)
+00:02:51: We have tried 198 schedules on thread scala-execution-context-global-43 (best score on thread is 97.61980440381242)
+00:03:01: We have tried 110 schedules on thread scala-execution-context-global-33 (best score on thread is 188.5043570104041)
+00:03:11: We have tried 222 schedules on thread scala-execution-context-global-34 (best score on thread is 226.73681256079288)
+00:03:19: We have tried 272 schedules on thread scala-execution-context-global-44 (best score on thread is 161.45544982788476)
+00:03:19: We have tried 128 schedules on thread scala-execution-context-global-30 (best score on thread is 85.94137099302779)
+00:03:20: We have tried 227 schedules on thread scala-execution-context-global-43 (best score on thread is 118.99209699563232)
+00:03:24: We have tried 133 schedules on thread scala-execution-context-global-33 (best score on thread is 201.74695203364683)
+00:03:27: We have tried 147 schedules on thread scala-execution-context-global-28 (best score on thread is 216.66649300425837)
+00:03:32: We have tried 59 schedules on thread scala-execution-context-global-41 (best score on thread is 119.35927917716958)
+00:03:37: We have tried 242 schedules on thread scala-execution-context-global-39 (best score on thread is 186.07380005959374)
+00:03:51: We have tried 250 schedules on thread scala-execution-context-global-43 (best score on thread is 132.42341340240188)
+00:04:04: We have tried 90 schedules on thread scala-execution-context-global-41 (best score on thread is 127.5515306223649)
+
+********************************************************************************
+00:04:06: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Vivi, Cibou
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Julien F, loic
+    Donjon & Cie ==> Gaël (MND), Michael, Rafik, Shyria, Pacman
+    La Porte de la mer Languide ~1 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Old Friends ==> Steve (MND), Deryn, Tiramisù, Finn
+    Scythe #2 ==> BPM, stephanie
+    Slugblaster ==> Tilleul (MND), Lexy, Cactus
+    Tu ne tairas point ==> Adrien (MND), gaëlle roth, Valentin, Tanguy
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, Viviane, Valentin, Tanguy
+    Deathmatch Island ==> Adrien (MND), Rafik, Shyria, Lexy, stephanie
+    La Porte de la mer Languide ~2 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Slay the Spire #2 ==> Gaël, Tilleul
+    Ulysse 31 ==> Natacha (MND), gaëlle roth, Julien F, Pacman, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Tiramisù, Steve, Fanny
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), BPM, Vivi, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Cibou
+    Alchimistes #1 ==> Viviane, Shyria
+    Data Police ==> Steve (MND), Gaël, BPM, stephanie, Tanguy
+    HeartRunner #1 ==> Valentin (MND), Oror, Julien F, Olivier
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Tiramisù, gaëlle roth, Cactus, Natacha
+    Sign (mini-GN) ==> Fabien (MND), Chloé, Pacman, Fanny
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Michael, Elmi
+    Toi qui #2 ==> Deryn (MND), Rafik, Finn, Judith/Lal', Pénélope
+    Zombicides #2 ==> Lexy, loic
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), Michael, gaëlle roth, Valentin
+    Les Errants d'Ukyo ==> Vivi (MND), Shyria, stephanie, Tanguy
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Viviane, Lexy
+    Pack Horse Library ==> Cibou (MND), Cactus, Olivier, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, Gaël, BPM, Elmi, Oror, Steve, Julien F, loic
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Fanny, Pénélope
+    Zombicides #1 ==> Rafik, Fabien
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> loic, Pénélope
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), Tiramisù, BPM, Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, Finn, Fanny
+    Dune: Imperium #1 ==> Julien F, stephanie
+    Dune: Imperium #2 ==> Chloé, Olivier
+    HeartRunner #2 ==> Valentin (MND), Adrien, Cibou
+    Microscope ==> Gaël (MND), Fabien, Tanguy
+    Syntthétiques: Les Voix ==> Pacman (MND), Lexy, Oror, Judith/Lal'
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Rafik
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin
+    Community Radio ==> Adrien (MND), Viviane, Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Gaël, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Rafik, stephanie, Cibou
+Unscheduled topics: Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Dogs in the Vineyard, Fallen London, L'Insondable #1, L'Insondable #2, Myrmes #1, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Secrets of Éon, Slay the Spire #1, Toi qui #1, Vampire TES, Whitechapel ~1, Whitechapel ~2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 338.6342279518966
+
+Person       Score     ( Detail )
+loic         407.07    ( 227  227  136 -092 -092 )
+Cibou        358.85    ( 103  MND  215  144 -052 -052 )
+Elmi         333.33    ( MND  MND  104  104  104  021 )
+gaëlle r     295.45    ( 114  114  068 )
+Gaël         278.69    ( MND  MND  238  119 -078 )
+Fanny        264.15    ( MND  057  057  057  057  038 )
+Julien F     256.91    ( 091  073  073  055  036 -070 )
+Tanguy       253.88    ( 100  080  080  040 -046 )
+Rafik        250.45    ( 143  063  048  032  032 -067 )
+Tiramisù     250.00    ( MND  062  062  062  062 )
+Viviane      249.16    ( 054  MND  152  152 -054 -054 )
+BPM          246.74    ( MND  102  102  082  020 -059 )
+Steve        244.76    ( MND  MND  175  070 )
+Valentin     242.42    ( 071  MND  MND  152  091 -035 -035 )
+Olivier      231.61    ( MND  MND  231  077 -038 -038 )
+Finn         222.22    ( MND  MND  069  069  069  014 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Michael      219.44    ( 178  078  063  047  031 -089 -089 )
+Natacha      217.39    ( MND  MND  MND  109  065  043 )
+Pénélope     213.71    ( 143  114 -043 )
+Lexy         210.44    ( 121  091  061 -062 )
+Adrien       205.88    ( MND  MND  MND  074  074  059 )
+Chloé        200.11    ( MND  069  069  069  069 -076 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Cactus       192.31    ( 057  MND  MND  072  072  048 -057 )
+Fabien       188.95    ( MND  MND  MND  074  074  059  059 -076 )
+stephani     183.68    ( 135  135  081 -084 -084 )
+Shyria       180.46    ( MND  120  120 -030 -030 )
+Vivi         177.87    ( 141  MND  MND  099  079 -070 -070 )
+Deryn        173.08    ( 062  MND  MND  MND  096  077 -062 )
+Oror         171.78    ( 061  049  037  025 )
+Tilleul      164.19    ( MND  MND  MND  109  109 -053 )
+
+
+********************************************************************************
+
+00:04:06: We have tried 275 schedules on thread scala-execution-context-global-46 (best score on thread is 338.6342279518966)
+00:04:09: We have tried 338 schedules on thread scala-execution-context-global-44 (best score on thread is 163.91997167506779)
+00:04:13: We have tried 141 schedules on thread scala-execution-context-global-40 (best score on thread is 127.41881839878491)
+00:04:19: We have tried 289 schedules on thread scala-execution-context-global-39 (best score on thread is 217.40163434676748)
+00:04:24: We have tried 283 schedules on thread scala-execution-context-global-43 (best score on thread is 136.56791630650227)
+00:04:25: We have tried 191 schedules on thread scala-execution-context-global-33 (best score on thread is 201.81663055111)
+00:04:26: We have tried 114 schedules on thread scala-execution-context-global-41 (best score on thread is 145.57120339750955)
+
+********************************************************************************
+00:04:40: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Vivi, Cibou
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), Rafik, loic
+    Donjon & Cie ==> Gaël (MND), Michael, Pacman, stephanie, Tanguy
+    La Porte de la mer Languide ~1 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Old Friends ==> Steve (MND), Deryn, BPM, Finn
+    Scythe #2 ==> Shyria, Lexy
+    Slugblaster ==> Tilleul (MND), Cactus, Julien F
+    Tu ne tairas point ==> Adrien (MND), Tiramisù, gaëlle roth, Valentin
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, Viviane, Valentin, Tanguy
+    Deathmatch Island ==> Adrien (MND), Gaël, Shyria, Rafik, gaëlle roth
+    La Porte de la mer Languide ~2 ==> Fabien (MND), Elmi, Pénélope
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Oror, Chloé, Judith/Lal'
+    Slay the Spire #2 ==> Tilleul, loic
+    Ulysse 31 ==> Natacha (MND), Tiramisù, Julien F, Pacman, stephanie
+    Wanderhome ==> Deryn (MND), Finn (MND), Lexy, Steve, Fanny
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), BPM, Vivi, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> 
+    Alchimistes #1 ==> Elmi, Viviane
+    Data Police ==> Steve (MND), Gaël, Shyria, stephanie, Tanguy
+    Dogs in the Vineyard ==> BPM (MND), gaëlle roth, Cibou
+    HeartRunner #1 ==> Valentin (MND), Oror, Julien F, Olivier
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Tiramisù, Cactus, Natacha
+    Sign (mini-GN) ==> Fabien (MND), Chloé, Pacman, Fanny
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Michael, Lexy
+    Toi qui #2 ==> Deryn (MND), Rafik, Finn, Judith/Lal'
+    Zombicides #2 ==> loic, Pénélope
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), Michael, gaëlle roth, Valentin
+    Les Errants d'Ukyo ==> Vivi (MND), Shyria, stephanie, Tanguy
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Viviane, Lexy
+    Pack Horse Library ==> Cibou (MND), Cactus, Olivier, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, BPM, Elmi, Oror, Steve, Julien F, Fabien, loic
+    Toutes petites aventures ==> Deryn (MND), Finn (MND), Fanny, Pénélope
+    Zombicides #1 ==> Gaël, Rafik
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> Chloé, loic
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), Tiramisù, Finn, Natacha
+    Cyberpunk Red ==> Elmi (MND), gaëlle roth, BPM, Fanny
+    Dune: Imperium #1 ==> Julien F, stephanie
+    Dune: Imperium #2 ==> Fabien, Olivier
+    HeartRunner #2 ==> Valentin (MND), Adrien, Rafik
+    Microscope ==> Gaël (MND), Tanguy, Pénélope
+    Syntthétiques: Les Voix ==> Pacman (MND), Lexy, Oror, Judith/Lal'
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Cibou
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin, Cibou
+    Community Radio ==> Adrien (MND), Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Gaël, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Rafik, Viviane, stephanie
+Unscheduled topics: Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Fallen London, L'Insondable #1, L'Insondable #2, Myrmes #1, Myrmes #2, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Secrets of Éon, Slay the Spire #1, Toi qui #1, Vampire TES, Whitechapel ~1, Whitechapel ~2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 339.07495045100893
+
+Person       Score     ( Detail )
+Pénélope     328.00    ( 143  114  114 -043 )
+Tanguy       313.88    ( 100  100  080  080 -046 )
+Shyria       300.46    ( MND  120  120  120 -030 -030 )
+gaëlle r     295.45    ( 114  114  068 )
+stephani     294.54    ( 135  135  081  027 -084 )
+Gaël         278.69    ( MND  MND  238  119 -078 )
+Finn         277.78    ( MND  MND  069  069  069  069 )
+Lexy         271.05    ( 121  091  061  061 -062 )
+Rafik        266.33    ( 143  063  063  032  032 -067 )
+BPM          265.31    ( MND  MND  102  102  041  020 )
+Fanny        264.15    ( MND  057  057  057  057  038 )
+Julien F     256.91    ( 091  073  073  055  036 -070 )
+Tiramisù     250.00    ( MND  062  062  062  062 )
+Viviane      249.16    ( 054  MND  152  152 -054 -054 )
+Steve        244.76    ( MND  MND  175  070 )
+Valentin     242.42    ( 071  MND  MND  152  091 -035 -035 )
+Elmi         234.05    ( MND  MND  104  104  104 -078 )
+Olivier      231.61    ( MND  MND  231  077 -038 -038 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Michael      219.44    ( 178  078  063  047  031 -089 -089 )
+Natacha      217.39    ( MND  MND  MND  109  065  043 )
+Cibou        215.31    ( 103  MND  215 -052 -052 )
+Adrien       205.88    ( MND  MND  MND  074  074  059 )
+Fabien       203.66    ( MND  MND  MND  074  074  059  059  015 -076 )
+Chloé        200.11    ( MND  069  069  069  069 -076 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Cactus       192.31    ( 057  MND  MND  072  072  048 -057 )
+loic         178.79    ( 227  227 -092 -092 -092 )
+Vivi         177.87    ( 141  MND  MND  099  079 -070 -070 )
+Deryn        173.08    ( 062  MND  MND  MND  096  077 -062 )
+Oror         171.78    ( 061  049  037  025 )
+Tilleul      164.19    ( MND  MND  MND  109  109 -053 )
+
+
+********************************************************************************
+
+00:04:40: We have tried 315 schedules on thread scala-execution-context-global-46 (best score on thread is 339.07495045100893)
+00:04:57: We have tried 324 schedules on thread scala-execution-context-global-43 (best score on thread is 187.22650344363728)
+00:04:58: We have tried 51 schedules on thread scala-execution-context-global-42 (best score on thread is -103.79721154108594)
+00:04:59: We have tried 143 schedules on thread scala-execution-context-global-41 (best score on thread is 164.14114094799845)
+00:05:10: We have tried 243 schedules on thread scala-execution-context-global-33 (best score on thread is 208.20277188956194)
+00:05:21: We have tried 85 schedules on thread scala-execution-context-global-35 (best score on thread is 224.01067468068246)
+00:05:25: We have tried 357 schedules on thread scala-execution-context-global-39 (best score on thread is 217.99352248614002)
+00:05:28: We have tried 170 schedules on thread scala-execution-context-global-41 (best score on thread is 175.75981098430645)
+00:06:00: We have tried 396 schedules on thread scala-execution-context-global-39 (best score on thread is 224.76162080753147)
+00:06:03: We have tried 490 schedules on thread scala-execution-context-global-44 (best score on thread is 234.14024353909127)
+00:06:25: We have tried 425 schedules on thread scala-execution-context-global-39 (best score on thread is 233.84350617911338)
+00:06:53: We have tried 310 schedules on thread scala-execution-context-global-33 (best score on thread is 230.16084836497305)
+00:07:40: We have tried 633 schedules on thread scala-execution-context-global-44 (best score on thread is 234.53496961703877)
+00:07:54: We have tried 371 schedules on thread scala-execution-context-global-33 (best score on thread is 235.5503498692764)
+
+********************************************************************************
+00:07:57: From thread scala-execution-context-global-46:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Cibou, Vivi
+    Bienvenue à Poudlard ==> Fanny (MND), Natacha (MND), loic, Pénélope
+    Donjon & Cie ==> Gaël (MND), Michael, Rafik, Pacman
+    La Porte de la mer Languide ~1 ==> Fabien (MND), Elmi, Oror
+    Monsters and Other Childish Things ~1 ==> Olivier (MND), Chloé, Judith/Lal'
+    Myrmes #2 ==> Finn, Lexy
+    Old Friends ==> Steve (MND), Deryn, BPM, stephanie
+    Scythe #2 ==> Shyria, Julien F
+    Slugblaster ==> Tilleul (MND), gaëlle roth, Cactus
+    Tu ne tairas point ==> Adrien (MND), Tiramisù, Valentin, Tanguy
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael, Viviane, Valentin, Tanguy
+    Deathmatch Island ==> Adrien (MND), Rafik, Shyria, Vivi, stephanie
+    La Porte de la mer Languide ~2 ==> Fabien (MND), Elmi, Oror
+    Monsters and Other Childish Things ~2 ==> Olivier (MND), Chloé, Judith/Lal'
+    Slay the Spire #2 ==> Gaël, Tilleul
+    Ulysse 31 ==> Natacha (MND), Tiramisù, gaëlle roth, Julien F, Pacman, loic
+    Wanderhome ==> Deryn (MND), Finn (MND), Lexy, Steve, Pénélope
+    [De bile et d'acier] Perdu·e dans la montagne #2 ==> Cactus (MND), BPM, Fanny, Cibou
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> 
+    Alchimistes #1 ==> Elmi, Shyria
+    Data Police ==> Steve (MND), Gaël, Tiramisù, stephanie, Tanguy
+    Dogs in the Vineyard ==> BPM (MND), gaëlle roth, Oror
+    HeartRunner #1 ==> Valentin (MND), Julien F, Olivier, Cibou
+    Jeu mystère (Bruine OU Métamorphe) ==> Vivi (MND), Viviane, Cactus, Natacha
+    Sign (mini-GN) ==> Fabien (MND), Chloé, Pacman, Fanny
+    Stalker AnomalYZE : roadside picnic ==> Tilleul (MND), Adrien, Michael, Lexy
+    Toi qui #2 ==> Deryn (MND), Rafik, Finn, Judith/Lal'
+    Zombicides #2 ==> loic, Pénélope
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Citizen Sleeper ==> Tilleul (MND), gaëlle roth, Cactus, Julien F, Valentin
+    Les Errants d'Ukyo ==> Vivi (MND), Michael, stephanie, Tanguy
+    Magie de Minuit - Momi Magique ==> Natacha (MND), Lexy, Fabien, Viviane, Shyria
+    Pack Horse Library ==> Cibou (MND), Olivier, Judith/Lal'
+    Segmentation (GN) ==> Tiramisù (MND), Chloé (MND), Pacman (MND), Adrien, Deryn, BPM, Elmi, Finn, Oror, Steve, Fanny
+    Slay the Spire #1 ==> loic, Pénélope
+    Zombicides #1 ==> Gaël, Rafik
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Alchimistes #2 ==> loic, Pénélope
+    Aventure(s) au Pays des Merveilles ==> Viviane (MND), Deryn, Tilleul, Vivi
+    Celestopol ==> Shyria (MND), BPM, Finn, Natacha
+    Cyberpunk Red ==> Elmi (MND), Chloé, Rafik, gaëlle roth
+    Dune: Imperium #1 ==> Tiramisù, stephanie
+    Dune: Imperium #2 ==> Fabien, Olivier
+    HeartRunner #2 ==> Valentin (MND), Adrien, Oror
+    Microscope ==> Gaël (MND), Julien F, Tanguy
+    Syntthétiques: Les Voix ==> Pacman (MND), Lexy, Judith/Lal', Fanny
+    Wester x Mystic GameMaster Emulator ==> Cactus (MND), Michael, Cibou
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Deryn, Michael, Shyria, Cactus, Vivi, Olivier, Judith/Lal', Valentin, Cibou
+    Community Radio ==> Adrien (MND), Finn, Lexy, Julien F, Fabien, Tanguy, Fanny, Natacha
+    Magna Veritas ==> BPM (MND), gaëlle roth, Oror, Chloé, loic
+    Périls & Princesses ==> Pacman (MND), Gaël, Pénélope, Tilleul, Tiramisù
+    Vampire Dark Age ==> Elmi (MND), Rafik, Viviane, stephanie
+Unscheduled topics: Brindlewood Bay, Chamonix Sentinelles, D&D5: Monstres et ce a quoi servent leur corps ! ~1, D&D5: Monstres et ce a quoi servent leur corps ! ~2, Fallen London, L'Insondable #1, L'Insondable #2, Myrmes #1, Nebeltahl ~1, Nebeltahl ~2, Scythe #1, Secrets of Éon, Toi qui #1, Toutes petites aventures, Vampire TES, Whitechapel ~1, Whitechapel ~2, [De bile et d'acier] Perdu·e dans la montagne #1
+Schedule-chain seed: -7157094843377177077
+
+Schedule score is 343.7942170010095
+
+Person       Score     ( Detail )
+Viviane      424.24    ( 054  MND  152  152  121 -054 )
+Cibou        358.85    ( 103  MND  215  144 -052 -052 )
+loic         315.15    ( 227  227  136 -092 -092 -092 )
+Chloé        310.34    ( MND  069  069  069  069  034 )
+BPM          306.12    ( MND  MND  102  102  082  020 )
+gaëlle r     295.45    ( 114  114  068 )
+Julien F     275.09    ( 091  091  073  055  036 -070 )
+Lexy         271.05    ( 121  091  061  061 -062 )
+Deryn        269.23    ( 062  MND  MND  096  096  077 -062 )
+stephani     267.51    ( 135  135  081 -084 )
+Tanguy       253.88    ( 100  080  080  040 -046 )
+Fabien       247.77    ( MND  MND  MND  074  074  059  059  059 -076 )
+Fanny        245.28    ( MND  057  057  038  038  038  019 )
+Steve        244.76    ( MND  MND  175  070 )
+Valentin     242.42    ( 071  MND  MND  152  091 -035 -035 )
+Rafik        234.58    ( 143  063  032  032  032 -067 )
+Elmi         234.05    ( MND  MND  104  104  104 -078 )
+Oror         233.13    ( 061  049  037  037  025  025 )
+Olivier      231.61    ( MND  MND  231  077 -038 -038 )
+Shyria       230.87    ( MND  200  120 -030 -030 -030 )
+Judith/L     220.95    ( 081  123  074  025 -081 )
+Michael      219.44    ( 178  078  063  047  031 -089 -089 )
+Natacha      217.39    ( MND  MND  MND  109  065  043 )
+Finn         212.80    ( MND  069  069  069  069 -065 )
+Pénélope     212.57    ( 143  114  086 -043 -043 -043 )
+Adrien       205.88    ( MND  MND  MND  074  074  059 )
+Gaël         200.24    ( MND  MND  238  119 -078 -078 )
+Pacman       200.00    ( MND  MND  MND  100  060  040 )
+Cactus       192.31    ( 057  MND  MND  072  072  048 -057 )
+Vivi         177.87    ( 141  MND  MND  099  079 -070 -070 )
+Tiramisù     171.55    ( MND  062  062  062  062 -078 )
+Tilleul      164.19    ( MND  MND  MND  109  109 -053 )
+
+
+********************************************************************************
+
+00:07:57: We have tried 441 schedules on thread scala-execution-context-global-46 (best score on thread is 343.7942170010095)
+00:08:06: We have tried 533 schedules on thread scala-execution-context-global-39 (best score on thread is 233.9608091589871)
+00:08:54: We have tried 410 schedules on thread scala-execution-context-global-33 (best score on thread is 238.37973389575538)
+00:08:58: We have tried 305 schedules on thread scala-execution-context-global-41 (best score on thread is 182.94356254184282)
+00:09:51: We have tried 805 schedules on thread scala-execution-context-global-44 (best score on thread is 234.5351954351325)
+00:11:29: We have tried 426 schedules on thread scala-execution-context-global-43 (best score on thread is 228.84401607936775)
+00:12:12: We have tried 465 schedules on thread scala-execution-context-global-41 (best score on thread is 204.15249325415033)
+00:13:23: We have tried 573 schedules on thread scala-execution-context-global-39 (best score on thread is 246.92464529108656)
+00:13:47: We have tried 473 schedules on thread scala-execution-context-global-43 (best score on thread is 229.3335809790145)
+00:15:21: We have tried 711 schedules on thread scala-execution-context-global-39 (best score on thread is 251.40575502969773)
+00:29:38: We have tried 63 schedules on thread scala-execution-context-global-42 (best score on thread is -5.82823881915776)
+00:30:11: We have tried 99 schedules on thread scala-execution-context-global-42 (best score on thread is 29.410764039394884)
+00:30:32: We have tried 125 schedules on thread scala-execution-context-global-42 (best score on thread is 76.82609873101983)
+00:31:05: We have tried 178 schedules on thread scala-execution-context-global-42 (best score on thread is 134.31419744885875)
+00:34:16: We have tried 241 schedules on thread scala-execution-context-global-42 (best score on thread is 156.76599907134838)
+00:40:53: We have tried 169 schedules on thread scala-execution-context-global-28 (best score on thread is 217.45709543383944)
+00:42:53: We have tried 199 schedules on thread scala-execution-context-global-31 (best score on thread is 227.87174455301414)
+00:49:17: We have tried 104 schedules on thread scala-execution-context-global-35 (best score on thread is 226.8638935257256)
+00:49:53: We have tried 146 schedules on thread scala-execution-context-global-35 (best score on thread is 226.86642076490082)
+00:52:07: We have tried 256 schedules on thread scala-execution-context-global-28 (best score on thread is 235.56835804590696)
+00:56:24: We have tried 339 schedules on thread scala-execution-context-global-28 (best score on thread is 253.85550769556195)
+01:02:30: We have tried 377 schedules on thread scala-execution-context-global-28 (best score on thread is 260.8075634360558)
+01:03:10: We have tried 413 schedules on thread scala-execution-context-global-28 (best score on thread is 275.9125030247551)
+01:04:18: We have tried 172 schedules on thread scala-execution-context-global-40 (best score on thread is 128.76624312404917)
+01:04:47: We have tried 213 schedules on thread scala-execution-context-global-40 (best score on thread is 147.38036623290384)
+01:22:03: We have tried 87 schedules on thread scala-execution-context-global-45 (best score on thread is -118.05360873583035)
+01:22:25: We have tried 111 schedules on thread scala-execution-context-global-45 (best score on thread is 76.66478649299535)
+01:22:50: We have tried 138 schedules on thread scala-execution-context-global-45 (best score on thread is 125.51868632207614)
+01:23:25: We have tried 182 schedules on thread scala-execution-context-global-45 (best score on thread is 158.83183648439172)
+01:23:57: We have tried 219 schedules on thread scala-execution-context-global-45 (best score on thread is 158.97924033953035)
+01:24:26: We have tried 256 schedules on thread scala-execution-context-global-45 (best score on thread is 162.1994212036937)
+01:27:16: We have tried 323 schedules on thread scala-execution-context-global-45 (best score on thread is 201.5114369345332)
