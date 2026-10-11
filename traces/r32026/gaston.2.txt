@@ -1,0 +1,2128 @@
+
+********************************************************************************
+00:00:00: Starting with global-seed: -3024452895118390304
+********************************************************************************
+
+00:00:00: Starting on thread scala-execution-context-global-45 with thread-seed: -4862707794655121413
+00:00:00: Starting on thread scala-execution-context-global-47 with thread-seed: 348977283018939920
+00:00:00: Starting on thread scala-execution-context-global-48 with thread-seed: -3744723912598005822
+00:00:00: Starting on thread scala-execution-context-global-46 with thread-seed: -6207038111216420220
+00:00:00: Starting on thread scala-execution-context-global-50 with thread-seed: -5121224476885477474
+00:00:00: Starting on thread scala-execution-context-global-52 with thread-seed: -4794950447318411847
+00:00:00: Starting on thread scala-execution-context-global-53 with thread-seed: 3629047473583916398
+00:00:00: Starting on thread scala-execution-context-global-51 with thread-seed: -3175793286643194409
+00:00:00: Starting on thread scala-execution-context-global-49 with thread-seed: 2147377068789892995
+00:00:00: Starting on thread scala-execution-context-global-55 with thread-seed: 8883629980517923712
+00:00:00: Starting on thread scala-execution-context-global-54 with thread-seed: -7646504513164441642
+00:00:00: Starting on thread scala-execution-context-global-61 with thread-seed: 5834710260010066
+00:00:00: Starting on thread scala-execution-context-global-57 with thread-seed: -4926809779561430739
+00:00:00: Starting on thread scala-execution-context-global-58 with thread-seed: 8281026850514502802
+00:00:00: Starting on thread scala-execution-context-global-56 with thread-seed: -6218540922754231426
+00:00:00: Starting on thread scala-execution-context-global-59 with thread-seed: -6791641692301763499
+00:00:00: Starting on thread scala-execution-context-global-60 with thread-seed: 8524732259176346557
+00:00:00: Starting on thread scala-execution-context-global-62 with thread-seed: -268910827519214347
+00:00:00: Starting on thread scala-execution-context-global-63 with thread-seed: 1894220006382330689
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-48 with chain-seed: -6106411840179131518
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-50 with chain-seed: 2888318690350089864
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-59 with chain-seed: 7498918412730018893
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-63 with chain-seed: -1758596450290448729
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-51 with chain-seed: 4985249459978726319
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-61 with chain-seed: 3802964840023271344
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-60 with chain-seed: 4074630293974291640
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-57 with chain-seed: 2552356863205526147
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-54 with chain-seed: -3789535013592945708
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-49 with chain-seed: 8538921079950490047
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-46 with chain-seed: 4904705701087726471
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-45 with chain-seed: 375309645806528643
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-52 with chain-seed: 9148399763460291213
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-56 with chain-seed: -4403650704053173126
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-62 with chain-seed: 8091603159602425347
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-55 with chain-seed: 7223485428402628584
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-47 with chain-seed: 7951375537386462600
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-58 with chain-seed: -8121710787335378309
+00:00:00: Starting new schedule chain on thread scala-execution-context-global-53 with chain-seed: -3759800933076974561
+
+********************************************************************************
+00:00:20: From thread scala-execution-context-global-51:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Vivienne, Olivier
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM, Pénélope
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Aurore, Deryn, Thierry, Eliandrana
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Chloé, Tiramisù, Gawel
+    Le troisième hiver ==> Steve (MND), Finn, Pacman, Michael
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Grégoire, Duck / Rafik, Vincent B
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Viviane, Baptiste
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Comme un lundi ==> Gawel (MND), Tiramisù, Duck / Rafik, Tilleul
+    Fast Food ==> Olivier (MND), Adrien, Shyria, Aurore, Steve
+    On mighty thews ==> Viviane (MND), Julien, Elmi, Pénélope
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Valentin, Vivienne, Judith, BPM, Thierry, Grégoire, Baptiste, Natacha, Michael
+    Toutes Petites Aventures ==> Finn (MND), Deryn, Vincent B, Eliandrana, Cactus
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Chloé, Finn, Julien, Shyria, Deryn, Pénélope, Tiramisù, Valentin, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Adrien, Vivienne, Gawel, Eliandrana
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Elmi, Grégoire, Duck / Rafik, Natacha
+    Objection ! ==> Steve (MND), Judith, BPM, Thierry, Pacman
+    Road Trip ~1 ==> Olivier (MND), Aurore, Viviane, Baptiste
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Elmi, Grégoire, Vincent B
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Thierry, Duck / Rafik, Pénélope
+    Freezing Moon ==> Shyria (MND), Chloé, Tiramisù, Julien, Pacman
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Steve
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Deryn, Cactus
+    Road Trip ~2 ==> Olivier (MND), Aurore, Viviane, Baptiste
+    Soth ==> Gawel (MND), Judith, BPM, Natacha, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Valentin, Aurore, Vivienne, Elmi, Judith, BPM, Grégoire, Duck / Rafik, Baptiste, Natacha, Pénélope, Cactus, Thierry, Viviane
+    Brindlewood Bay ==> Adrien (MND), Shyria, Vincent B, Eliandrana
+    Definitely Wizards ==> Finn (MND), Chloé, Deryn, Olivier, Gawel, Tilleul
+    La Couvée #3 ==> Michael (MND), Tiramisù, Julien, Steve, Pacman
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Shyria, Deryn
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Pacman, Gawel, Pénélope
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Finn, Steve, Olivier
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Vivienne, Viviane, Baptiste, Natacha
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Adrien, Julien, Vincent B
+    La Couvée #1 ==> Michael (MND), Aurore, Elmi, Thierry, Grégoire
+    Lanfeust de Troy Impro ==> Eliandrana (MND), BPM, Duck / Rafik
+Unscheduled topics: Arcana − Ambre Tailhades et Luc Mercier ~1, Arcana − Ambre Tailhades et Luc Mercier ~2, Aventures au Pays des Merveilles (Girl Underground), Dogside Dogs
+Schedule-chain seed: 4985249459978726319
+
+Schedule score is -232.33775709294588
+
+Person       Score     ( Detail )
+Cactus       369.23    ( 243  MND  MND  MND  138  092  046  046  046 -243 )
+Deryn        353.49    ( 114  156  156  156 -114 -114 )
+Gawel        333.33    ( MND  MND  100  100  100  033 )
+Baptiste     297.77    ( 414  074  056  037  037  019 -414 )
+Eliandra     258.06    ( MND  081  081  065  016  016 )
+Vivienne     253.70    ( 743  MND  127  095  032 -371 -371 )
+Finn         253.17    ( MND  MND  139  139  111 -136 )
+Julien       245.24    ( 167  133  100  067 -221 )
+Pacman       232.56    ( MND  116  047  023  023  023 )
+Natacha      207.52    ( MND  158  158 -371 )
+Steve        205.13    ( MND  MND  103  051  026  026 )
+BPM          166.13    ( 194  129  097  065  032 -350 )
+Duck / R     142.86    ( 167  167  133  067  067 -457 )
+Judith       141.39    ( MND  128  077  077 -371 )
+Adrien       137.25    ( MND  MND  MND  059  059  020 )
+Olivier      135.71    ( MND  MND  MND  286  071 -221 )
+Michael      125.87    ( 436  MND  MND  MND  084  042 -436 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+Elmi         088.34    ( 115  092  092  092  069 -371 )
+Aurore       071.43    ( 100  100  100  060  040 -329 )
+Vincent      035.71    ( 102  102  102  061  061 -393 )
+Thierry      030.08    ( 088  088  070  053  018 -286 )
+Viviane      021.98    ( MND  103  103  077  026 -286 )
+Grégoire     001.95    ( 091  091  055  055  018 -307 )
+Pénélope    -057.14    ( 238  095  095 -243 -243 )
+Tiramisù    -074.68    ( 076  076  076  045  045 -393 )
+Shyria      -079.22    ( MND  MND  227  136 -221 -221 )
+Chloé       -094.35    ( MND  149  090  030  030 -393 )
+Tilleul     -153.57    ( MND  MND  MND  100  075 -329 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:00:20: We have tried 98 schedules on thread scala-execution-context-global-51 (best score on thread is -232.33775709294588)
+00:00:21: We have tried 134 schedules on thread scala-execution-context-global-57 (best score on thread is -497.2491477827017)
+
+********************************************************************************
+00:00:22: From thread scala-execution-context-global-56:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Finn, Valentin, Deryn, Judith, Baptiste, Michael
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Viviane, Gawel, Pénélope
+    Célestopol ==> Shyria (MND), Julien, Elmi, Thierry, Pacman
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Grégoire, Duck / Rafik, Vincent B
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Adrien, Aurore, Natacha, Cactus
+    Road Trip ~1 ==> Olivier (MND), Chloé, Steve, BPM
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Shyria, Vivienne, Duck / Rafik, Natacha, Cactus
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Julien, Pénélope, Vincent B, Tilleul
+    Definitely Wizards ==> Finn (MND), Deryn, Judith, Thierry, Baptiste, Eliandrana
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Adrien, Tiramisù, Pacman
+    La Couvée #3 ==> Michael (MND), Aurore, Elmi, Grégoire, Gawel
+    Road Trip ~2 ==> Olivier (MND), Chloé, Steve, BPM
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Deryn, Vivienne, Grégoire
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Shyria, Viviane
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Adrien, Chloé, Aurore, Olivier
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Finn, Thierry, Duck / Rafik, Michael
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Baptiste, Vincent B, Eliandrana, Pénélope
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Elmi, Gawel
+    Le troisième hiver ==> Steve (MND), Tiramisù, BPM, Pacman
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Elmi, Pénélope
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Shyria, Viviane
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, BPM, Grégoire, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Finn, Deryn, Vivienne, Gawel
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Aurore, Olivier
+    La Couvée #2 ==> Michael (MND), Tiramisù, Julien, Thierry, Eliandrana
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Judith, Duck / Rafik, Baptiste, Pacman
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Valentin
+    Comme un lundi ==> Gawel (MND), Chloé, Tiramisù, Thierry, Grégoire, Tilleul
+    Fast Food ==> Olivier (MND), Shyria, Aurore, Vincent B, Eliandrana
+    La Couvée #1 ==> Michael (MND), Vivienne, BPM
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Finn, Deryn, Elmi, Duck / Rafik
+    Objection ! ==> Steve (MND), Viviane, Pacman, Pénélope
+    SublimES© ==> Adrien (MND), Natacha (MND), Julien, Judith, Baptiste
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Olivier
+    Brindlewood Bay ==> Adrien (MND), Steve, Elmi, Tilleul
+    Freezing Moon ==> Shyria (MND), Julien, Aurore, Pénélope
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Vivienne, Judith, BPM, Viviane, Baptiste, Natacha, Michael, Tiramisù, Valentin
+    Soth ==> Gawel (MND), Grégoire, Duck / Rafik, Eliandrana
+    Toutes Petites Aventures ==> Finn (MND), Deryn, Thierry, Vincent B, Cactus
+Unscheduled topics: Dogside Dogs, On mighty thews
+Schedule-chain seed: -4403650704053173126
+
+Schedule score is 17.256714691844962
+
+Person       Score     ( Detail )
+Chloé        626.87    ( MND  179  179  149  090  030 )
+Thierry      456.14    ( 088  088  088  070  070  053 )
+Shyria       369.48    ( MND  MND  227  227  136 -221 )
+Cactus       369.23    ( 243  MND  MND  MND  138  092  046  046  046 -243 )
+Vincent      367.35    ( 102  102  102  020  020  020 )
+Julien       366.67    ( 167  133  067 )
+Aurore       360.00    ( 100  100  060  060  040 )
+Viviane      358.97    ( MND  077  077  077  077  051 )
+Deryn        353.49    ( 114  156  156  156 -114 -114 )
+Baptiste     334.99    ( 414  074  056  056  019  019 -414 )
+Steve        333.33    ( MND  MND  103  103  077  051 )
+BPM          322.58    ( 194  065  032  032 )
+Tiramisù     318.18    ( 076  076  076  045  045 )
+Vivienne     317.12    ( 743  MND  159  127  032 -371 -371 )
+Gawel        300.00    ( MND  MND  100  100  100 )
+Eliandra     290.32    ( MND  081  065  065  065  016 )
+Finn         280.95    ( MND  MND  139  139  139 -136 )
+Pacman       279.07    ( MND  116  070  047  023  023 )
+Tilleul      250.00    ( MND  MND  MND  100  075  075 )
+Pénélope     233.33    ( 238  095  095  048 -243 )
+Duck / R     176.19    ( 167  167  133  100  067 -457 )
+Michael      167.83    ( 436  MND  MND  MND  084  084 -436 )
+Judith       167.03    ( MND  128  103  077  026 -371 )
+Natacha      154.89    ( MND  MND  MND  263  158 -371 )
+Adrien       137.25    ( MND  MND  MND  059  039  039 )
+Elmi         111.33    ( 115  115  092  092  069 -371 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+Grégoire     074.68    ( 091  091  091  055  055 -307 )
+Olivier     -078.57    ( MND  MND  MND  071  071 -221 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:00:22: We have tried 120 schedules on thread scala-execution-context-global-56 (best score on thread is 17.256714691844962)
+00:00:23: We have tried 133 schedules on thread scala-execution-context-global-46 (best score on thread is -84.1323496250876)
+00:00:24: We have tried 144 schedules on thread scala-execution-context-global-53 (best score on thread is -76.17414974876311)
+00:00:24: We have tried 143 schedules on thread scala-execution-context-global-48 (best score on thread is -5.380705189335515)
+00:00:24: We have tried 139 schedules on thread scala-execution-context-global-54 (best score on thread is -29.06046571577724)
+
+********************************************************************************
+00:00:26: From thread scala-execution-context-global-47:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Chloé, Finn, Deryn, Elmi, BPM, Viviane, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Judith, Tilleul
+    Célestopol ==> Shyria (MND), Julien, Duck / Rafik, Pacman, Eliandrana
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Olivier, Grégoire, Gawel
+    La Couvée #1 ==> Michael (MND), Aurore, Vivienne, Thierry, Baptiste
+    Le troisième hiver ==> Steve (MND), Adrien, Tiramisù, Vincent B
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Valentin
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Judith, Tilleul
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Baptiste, Pacman, Vincent B, Pénélope
+    Cthulhu − La Mustsara ==> Adrien (MND), Shyria, Steve, BPM, Grégoire
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Finn, Olivier, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Tiramisù, Julien, Elmi, Gawel
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Aurore, Deryn, Thierry, Eliandrana
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Finn, Julien, Aurore, Deryn, Vivienne, Judith, Thierry, Grégoire, Baptiste, Gawel, Michael
+    Freezing Moon ==> Shyria (MND), Pacman, Eliandrana, Pénélope, Cactus
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Elmi, Natacha, Tilleul
+    Objection ! ==> Steve (MND), Adrien, Tiramisù, BPM, Duck / Rafik
+    Road Trip ~1 ==> Olivier (MND), Chloé, Viviane, Vincent B
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Beta Microscope with time travel ==> Tilleul (MND), Baptiste, Pénélope
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Deryn, Vivienne
+    Definitely Wizards ==> Finn (MND), Tiramisù, Aurore, Thierry, Duck / Rafik
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien
+    La Couvée #2 ==> Michael (MND), Grégoire, Pacman
+    Road Trip ~2 ==> Olivier (MND), Chloé, Viviane, Vincent B
+    Soth ==> Gawel (MND), Elmi, BPM, Eliandrana
+    SublimES© ==> Adrien (MND), Natacha (MND), Shyria, Steve, Judith
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Valentin, Deryn, Vivienne
+    Brindlewood Bay ==> Adrien (MND), Aurore, Elmi, Gawel
+    Dogside Dogs ==> Olivier (MND), Tiramisù, Shyria, Steve, BPM, Pacman
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Duck / Rafik, Eliandrana, Pénélope, Michael
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Viviane, Grégoire, Natacha
+    Toutes Petites Aventures ==> Finn (MND), Chloé, Thierry, Baptiste, Vincent B, Cactus
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> 
+    Comme un lundi ==> Gawel (MND), Adrien, Tiramisù, Shyria, Natacha
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Olivier, Duck / Rafik, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Finn, Julien, Aurore, Elmi
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Steve, Grégoire, Vincent B
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Valentin, Deryn, Vivienne, Judith, BPM, Baptiste, Michael, Thierry, Viviane
+Unscheduled topics: Fast Food, On mighty thews
+Schedule-chain seed: 7951375537386462600
+
+Schedule score is 65.73325896690721
+
+Person       Score     ( Detail )
+Natacha      526.32    ( MND  MND  MND  158  158 )
+Duck / R     400.00    ( 167  133  100 )
+Tiramisù     363.64    ( 076  076  076  076  045  015 )
+Tilleul      350.00    ( MND  MND  MND  125  125  100 )
+Pénélope     328.57    ( 238  095  095  095  048 -243 )
+Vincent      326.53    ( 102  102  061  020  020  020 )
+Vivienne     317.12    ( 743  MND  159  127  032 -371 -371 )
+Baptiste     316.38    ( 414  093  074  056  037  019 -414 )
+Pacman       279.07    ( MND  116  116  023  023 )
+Cactus       276.92    ( 243  MND  MND  MND  092  046  046  046  046 -243 )
+Eliandra     274.19    ( MND  081  065  065  048  016 )
+Judith       243.96    ( MND  128  128  128  077 -371 )
+Steve        230.77    ( MND  MND  077  077  051  026 )
+Shyria       227.27    ( MND  MND  136  045  045 )
+Olivier      214.29    ( MND  MND  MND  071  071  071 )
+Julien       211.90    ( 167  133  100  033 -221 )
+Deryn        208.02    ( 114  156  156  125 -114 -114 -114 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+Adrien       196.08    ( MND  MND  MND  078  078  039 )
+Michael      167.83    ( 436  MND  MND  MND  084  084 -436 )
+BPM          166.13    ( 194  129  065  065  065 -350 )
+Elmi         111.33    ( 115  115  092  092  069 -371 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+Thierry      100.25    ( 088  088  088  070  053 -286 )
+Aurore       091.43    ( 100  100  100  060  060 -329 )
+Gawel        073.81    ( MND  MND  267  100  100 -393 )
+Viviane      073.26    ( MND  103  103  077  077 -286 )
+Grégoire     038.31    ( 091  091  055  055  055 -307 )
+Finn         006.35    ( MND  MND  139  139 -136 -136 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:00:26: We have tried 151 schedules on thread scala-execution-context-global-47 (best score on thread is 65.73325896690721)
+00:00:26: We have tried 128 schedules on thread scala-execution-context-global-52 (best score on thread is -9.976649891760127)
+00:00:27: We have tried 29 schedules on thread scala-execution-context-global-50 (best score on thread is -2177.8176180318223)
+00:00:32: We have tried 151 schedules on thread scala-execution-context-global-63 (best score on thread is -143.78283847938545)
+00:00:32: We have tried 158 schedules on thread scala-execution-context-global-58 (best score on thread is 37.31230152306513)
+00:00:36: We have tried 166 schedules on thread scala-execution-context-global-60 (best score on thread is -142.44924409878558)
+00:00:41: We have tried 128 schedules on thread scala-execution-context-global-45 (best score on thread is -245.80263149399514)
+00:00:47: We have tried 224 schedules on thread scala-execution-context-global-54 (best score on thread is -5.312878792026893)
+00:00:50: We have tried 242 schedules on thread scala-execution-context-global-57 (best score on thread is -29.316026515641305)
+00:00:51: We have tried 97 schedules on thread scala-execution-context-global-50 (best score on thread is -352.0020461671294)
+00:00:55: We have tried 268 schedules on thread scala-execution-context-global-53 (best score on thread is -30.5951061873017)
+00:00:58: We have tried 271 schedules on thread scala-execution-context-global-46 (best score on thread is 50.71630403487155)
+00:00:59: We have tried 261 schedules on thread scala-execution-context-global-63 (best score on thread is -96.70822976745978)
+00:00:59: We have tried 282 schedules on thread scala-execution-context-global-60 (best score on thread is -31.44962387384349)
+
+********************************************************************************
+00:01:00: From thread scala-execution-context-global-58:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Finn, Valentin, Julien, Aurore, Deryn, Vivienne, Elmi, Judith, BPM, Grégoire, Baptiste, Gawel, Pénélope, Cactus, Michael
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Chloé, Shyria
+    Dogside Dogs ==> Olivier (MND), Adrien, Duck / Rafik, Pacman, Vincent B, Tilleul
+    Objection ! ==> Steve (MND), Tiramisù, Eliandrana, Thierry, Viviane
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Chloé, Shyria
+    Comme un lundi ==> Gawel (MND), Tiramisù, BPM, Duck / Rafik, Eliandrana, Pénélope
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, Elmi, Vincent B
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Tilleul
+    La Couvée #3 ==> Michael (MND), Grégoire, Cactus
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Aurore, Deryn, Olivier, Viviane
+    Toutes Petites Aventures ==> Finn (MND), Julien, Judith, Thierry, Baptiste, Pacman
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> 
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Pénélope
+    Célestopol ==> Shyria (MND), Aurore, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Baptiste, Natacha, Thierry, Viviane
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Chloé, Julien, Gawel
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Grégoire, Duck / Rafik
+    Le troisième hiver ==> Steve (MND), Adrien, Deryn, Vivienne
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Elmi, Olivier, Vincent B, Michael
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Vivienne
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Olivier, Duck / Rafik, Vincent B
+    Freezing Moon ==> Shyria (MND), Julien, Eliandrana, Pénélope
+    La Couvée #1 ==> Michael (MND), Aurore, Elmi, Gawel
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Finn, Deryn, Judith, BPM, Baptiste, Tiramisù, Valentin, Thierry, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Steve, Grégoire, Tilleul
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Valentin
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Julien, Steve, Vincent B, Pénélope
+    Brindlewood Bay ==> Adrien (MND), Elmi, Thierry, Gawel
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Chloé, Finn, Deryn, Vivienne
+    La Couvée #2 ==> Michael (MND), Tiramisù, BPM, Natacha, Eliandrana
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Shyria, Judith, Duck / Rafik, Baptiste
+    Road Trip ~1 ==> Olivier (MND), Aurore, Grégoire, Pacman
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Chloé, Shyria, Deryn, Thierry, Viviane
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Finn, Duck / Rafik, Pénélope, Michael
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Vivienne, Baptiste, Natacha
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Tiramisù, Steve, Vincent B
+    Road Trip ~2 ==> Olivier (MND), Aurore, Grégoire, Pacman
+    Soth ==> Gawel (MND), Adrien, Elmi, BPM, Eliandrana, Cactus
+Unscheduled topics: Fast Food, On mighty thews
+Schedule-chain seed: -8121710787335378309
+
+Schedule score is 121.20743309727072
+
+Person       Score     ( Detail )
+Deryn        447.04    ( 114  156  156  125  125 -114 -114 )
+Duck / R     433.33    ( 167  133  067  067 )
+Vincent      408.16    ( 102  102  102  061  020  020 )
+Baptiste     372.21    ( 414  093  074  056  019  019 -414 )
+Pacman       372.09    ( MND  116  093  093  070 )
+Tiramisù     348.48    ( 076  076  076  076  045 )
+Olivier      285.71    ( MND  MND  MND  143  071  071 )
+Vivienne     285.41    ( 743  MND  159  095  032 -371 -371 )
+Cactus       276.92    ( 243  MND  MND  MND  092  046  046  046  046 -243 )
+Natacha      263.16    ( MND  MND  MND  158 )
+Eliandra     258.06    ( MND  081  081  065  016  016 )
+Steve        256.41    ( MND  MND  077  077  051  051 )
+Finn         253.17    ( MND  MND  139  139  111 -136 )
+Pénélope     233.33    ( 238  095  095  048 -243 )
+Shyria       233.12    ( MND  MND  227  227 -221 )
+Judith       192.67    ( MND  128  103  103  026 -371 )
+Adrien       176.47    ( MND  MND  MND  078  059  039 )
+Tilleul      175.00    ( MND  MND  MND  100  050  025 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+Elmi         134.32    ( 115  115  092  092  092 -371 )
+BPM          133.87    ( 194  129  097  065 -350 )
+Aurore       131.43    ( 100  100  100  100  060 -329 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+Chloé        084.75    ( MND  149  119  119  090 -393 )
+Thierry      082.71    ( 088  088  088  088  018 -286 )
+Grégoire     074.68    ( 091  091  091  055  055 -307 )
+Gawel        073.81    ( MND  MND  267  100  100 -393 )
+Viviane      073.26    ( MND  103  103  077  077 -286 )
+Julien       045.24    ( 167  067  033 -221 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:01:00: We have tried 271 schedules on thread scala-execution-context-global-58 (best score on thread is 121.20743309727072)
+00:01:04: We have tried 138 schedules on thread scala-execution-context-global-51 (best score on thread is -207.7559913216592)
+00:01:07: We have tried 80 schedules on thread scala-execution-context-global-61 (best score on thread is 108.91605603584212)
+00:01:17: We have tried 332 schedules on thread scala-execution-context-global-53 (best score on thread is -12.99293492092179)
+00:01:22: We have tried 319 schedules on thread scala-execution-context-global-63 (best score on thread is -78.18283501935221)
+00:01:34: We have tried 365 schedules on thread scala-execution-context-global-48 (best score on thread is 120.49528832432492)
+00:01:37: We have tried 239 schedules on thread scala-execution-context-global-54 (best score on thread is -0.07512837773423087)
+00:01:38: We have tried 352 schedules on thread scala-execution-context-global-46 (best score on thread is 57.21260143359025)
+00:01:47: We have tried 366 schedules on thread scala-execution-context-global-53 (best score on thread is 26.2249153466621)
+
+********************************************************************************
+00:01:51: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Tiramisù, Elmi, Thierry, Grégoire
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Aurore, Eliandrana, Cactus
+    Objection ! ==> Steve (MND), BPM, Viviane, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Pacman
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Duck / Rafik, Baptiste
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Cactus, Vivienne
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, Elmi, BPM, Grégoire
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Aurore, Deryn, Thierry, Viviane
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Finn, Tiramisù, Baptiste
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Gawel
+    La Couvée #1 ==> Michael (MND), Julien, Natacha
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Duck / Rafik, Vincent B, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Pacman
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Valentin, Deryn
+    Brindlewood Bay ==> Adrien (MND), Shyria, BPM, Tilleul
+    Comme un lundi ==> Gawel (MND), Tiramisù, Grégoire, Duck / Rafik, Eliandrana
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Chloé, Thierry
+    Definitely Wizards ==> Finn (MND), Julien, Judith, Baptiste, Natacha, Pénélope
+    Fast Food ==> Olivier (MND), Aurore, Vivienne, Elmi, Viviane
+    Le troisième hiver ==> Steve (MND), Pacman, Vincent B, Michael
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Michael
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Steve, Vincent B, Pénélope
+    Célestopol ==> Shyria (MND), Julien, Elmi, Thierry, Pacman
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Finn, Aurore, Deryn, Vivienne
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Tiramisù, Olivier, Eliandrana
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Adrien, Chloé, Duck / Rafik
+    Soth ==> Gawel (MND), Judith, BPM, Grégoire, Baptiste, Natacha
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Shyria, Deryn, Judith, BPM, Thierry, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Julien, Grégoire, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Steve, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Vivienne, Viviane, Baptiste, Pacman, Eliandrana
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Vivienne, Baptiste
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Adrien, Aurore, Eliandrana, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Deryn, Steve, Duck / Rafik, Tilleul
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Judith, BPM, Grégoire, Gawel, Michael, Tiramisù, Valentin, Thierry, Viviane
+Unscheduled topics: Dogside Dogs, On mighty thews
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 131.99401653121038
+
+Person       Score     ( Detail )
+Duck / R     466.67    ( 167  133  067  067  033 )
+Aurore       420.00    ( 100  100  060  060  060  040 )
+Pacman       395.35    ( MND  116  093  093  070  023 )
+Baptiste     372.21    ( 414  093  074  056  056  019 -414 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Grégoire     363.64    ( 091  091  091  055  018  018 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Elmi         298.85    ( 092  092  092  011  011 )
+Tiramisù     287.88    ( 076  076  076  045  015 )
+Vivienne     285.41    ( 743  MND  159  095  032 -371 -371 )
+Viviane      282.05    ( MND  077  077  077  051 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Eliandra     274.19    ( MND  081  065  065  048  016 )
+Tilleul      250.00    ( MND  MND  MND  100  100  050 )
+Julien       245.24    ( 167  133  100  067 -221 )
+Vincent      244.90    ( 102  061  020  020  020  020 )
+Deryn        239.20    ( 114  156  156  156 -114 -114 -114 )
+Finn         225.40    ( MND  MND  139  139  083 -136 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Judith       192.67    ( MND  128  103  077  077 -371 )
+Pénélope     185.71    ( 190  095  095  048 -243 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Natacha      157.89    ( MND  MND  MND  )
+Michael      125.87    ( 436  MND  MND  MND  084  042 -436 )
+Adrien       117.65    ( MND  MND  MND  059  039  020 )
+Chloé        114.61    ( MND  179  179  149 -393 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+Thierry      082.71    ( 088  088  070  070  053 -286 )
+Cactus       034.07    ( 243  MND  MND  MND  138  046  046  046 -243 -243 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:01:51: We have tried 369 schedules on thread scala-execution-context-global-57 (best score on thread is 131.99401653121038)
+00:02:07: We have tried 221 schedules on thread scala-execution-context-global-51 (best score on thread is -103.37538689338848)
+00:02:07: We have tried 242 schedules on thread scala-execution-context-global-45 (best score on thread is -199.45454682938265)
+00:02:23: We have tried 294 schedules on thread scala-execution-context-global-54 (best score on thread is 34.52349504698053)
+00:02:24: We have tried 384 schedules on thread scala-execution-context-global-60 (best score on thread is -30.794879115166445)
+00:02:31: We have tried 416 schedules on thread scala-execution-context-global-46 (best score on thread is 111.17819381274983)
+00:02:31: We have tried 424 schedules on thread scala-execution-context-global-53 (best score on thread is 42.9321155329078)
+00:02:43: We have tried 328 schedules on thread scala-execution-context-global-45 (best score on thread is -129.75264318657062)
+00:02:49: We have tried 514 schedules on thread scala-execution-context-global-48 (best score on thread is 130.73967933727124)
+00:02:50: We have tried 481 schedules on thread scala-execution-context-global-58 (best score on thread is 121.2099273469039)
+00:02:51: We have tried 407 schedules on thread scala-execution-context-global-54 (best score on thread is 83.8725198172053)
+
+********************************************************************************
+00:02:53: From thread scala-execution-context-global-53:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Valentin, Deryn
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Chloé, Julien
+    Definitely Wizards ==> Finn (MND), Elmi, Judith, Viviane, Duck / Rafik, Pénélope
+    Freezing Moon ==> Shyria (MND), BPM, Eliandrana, Cactus
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Thierry, Grégoire, Vincent B, Michael
+    Objection ! ==> Steve (MND), Adrien, Tiramisù, Vivienne, Gawel
+    Road Trip ~1 ==> Olivier (MND), Aurore, Baptiste, Pacman
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Chloé, Julien
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Pénélope
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Deryn, Thierry
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Steve, Michael
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Duck / Rafik, Vincent B
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Shyria, Judith, Viviane
+    Road Trip ~2 ==> Olivier (MND), Aurore, Baptiste, Pacman
+    Soth ==> Gawel (MND), Adrien, Elmi, BPM, Grégoire
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Valentin, Julien, Deryn, Vivienne, Pénélope, Michael
+    Brindlewood Bay ==> Adrien (MND), Judith, Baptiste, Natacha
+    Célestopol ==> Shyria (MND), Elmi, Pacman, Gawel, Eliandrana
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Chloé, Finn, Aurore, Olivier
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Grégoire, Duck / Rafik, Thierry, Viviane
+    Le troisième hiver ==> Steve (MND), Tiramisù, BPM, Vincent B
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Olivier, Vincent B, Pénélope
+    Cthulhu − La Mustsara ==> Adrien (MND), Shyria, Steve, Grégoire
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Tilleul
+    La Couvée #3 ==> Michael (MND), Aurore, Eliandrana
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Julien, Deryn, Elmi, Duck / Rafik
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Finn, Tiramisù, Vivienne, Judith, BPM, Thierry, Baptiste, Natacha, Gawel
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Vivienne, Natacha, Cactus
+    Dogside Dogs ==> Olivier (MND), Adrien, Shyria, Steve, BPM, Pacman
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Viviane, Baptiste, Eliandrana, Pénélope
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Chloé, Julien, Vincent B
+    La Couvée #2 ==> Michael (MND), Tiramisù, Elmi, Grégoire, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Aurore, Deryn, Thierry, Duck / Rafik, Tilleul
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Chloé, Finn, Julien, Aurore, Deryn, Elmi, Judith, Grégoire, Duck / Rafik, Baptiste, Pénélope, Thierry, Viviane
+    Comme un lundi ==> Gawel (MND), Tiramisù, Shyria, Eliandrana, Vincent B, Tilleul
+    La Couvée #1 ==> Michael (MND), Vivienne, BPM, Pacman, Cactus
+    SublimES© ==> Adrien (MND), Natacha (MND), Valentin, Steve, Olivier
+Unscheduled topics: Fast Food, On mighty thews
+Schedule-chain seed: -3759800933076974561
+
+Schedule score is 149.2971352831187
+
+Person       Score     ( Detail )
+BPM          387.10    ( 194  129  065 )
+Pacman       325.58    ( MND  116  093  093  023 )
+Tiramisù     318.18    ( 076  076  076  045  045 )
+Vivienne     317.12    ( 743  MND  159  127  032 -371 -371 )
+Gawel        300.00    ( MND  MND  167  100  033 )
+Baptiste     297.77    ( 414  074  056  037  037  019 -414 )
+Vincent      285.71    ( 102  061  061  020  020  020 )
+Cactus       276.92    ( 243  MND  MND  MND  092  046  046  046  046 -243 )
+Steve        256.41    ( MND  MND  077  077  051  051 )
+Finn         253.17    ( MND  MND  139  139  111 -136 )
+Eliandra     241.94    ( MND  081  065  065  016  016 )
+Deryn        239.20    ( 114  156  156  156 -114 -114 -114 )
+Shyria       227.27    ( MND  MND  136  045  045 )
+Tilleul      225.00    ( MND  MND  MND  100  075  050 )
+Adrien       215.69    ( MND  MND  MND  078  078  059 )
+Olivier      214.29    ( MND  MND  MND  071  071  071 )
+Valentin     170.45    ( 529  MND  MND  MND  170 -264 -264 )
+Judith       167.03    ( MND  128  103  077  077 -371 )
+Julien       157.14    ( 167  167  167  100 -221 -221 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+Duck / R     142.86    ( 167  167  133  100  033 -457 )
+Pénélope     133.33    ( 238  190  095  095 -243 -243 )
+Natacha      102.26    ( MND  MND  MND  211  158 -371 )
+Elmi         099.84    ( 115  092  092  092  080 -371 )
+Chloé        084.75    ( MND  149  119  119  090 -393 )
+Thierry      082.71    ( 088  088  088  053  053 -286 )
+Grégoire     074.68    ( 091  091  091  055  055 -307 )
+Viviane      073.26    ( MND  103  103  077  077 -286 )
+Aurore       071.43    ( 100  100  100  060  040 -329 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:02:53: We have tried 541 schedules on thread scala-execution-context-global-53 (best score on thread is 149.2971352831187)
+
+********************************************************************************
+00:02:54: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Duck / Rafik, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Tiramisù, Elmi, Thierry, Grégoire
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Aurore, Eliandrana, Cactus
+    Objection ! ==> Steve (MND), BPM, Viviane, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Pacman
+    SublimES© ==> Adrien (MND), Natacha (MND), Julien, Judith, Baptiste
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, BPM, Grégoire, Vincent B
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Finn, Aurore, Deryn, Thierry
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Viviane, Baptiste, Natacha
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Tiramisù, Elmi, Gawel
+    La Couvée #1 ==> Michael (MND), Vivienne, Cactus
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Duck / Rafik, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Pacman
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Valentin, Vivienne, Michael
+    Comme un lundi ==> Gawel (MND), Tiramisù, Judith, Baptiste, Natacha, Eliandrana
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Chloé, Aurore
+    Definitely Wizards ==> Finn (MND), Grégoire, Tilleul, Pénélope, Thierry, Viviane
+    Dogside Dogs ==> Olivier (MND), Adrien, Vincent B
+    Le troisième hiver ==> Steve (MND), Deryn, Duck / Rafik, Pacman
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Aurore, Steve, Vincent B, Pénélope
+    Brindlewood Bay ==> Adrien (MND), Shyria, Elmi, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Finn, Deryn, Vivienne, Olivier
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Julien, Pacman
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Tiramisù, Grégoire, Duck / Rafik, Michael
+    Soth ==> Gawel (MND), Judith, BPM, Baptiste, Natacha, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Shyria, Deryn, Judith, BPM, Thierry, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Julien, Grégoire, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Steve, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Vivienne, Viviane, Baptiste, Pacman, Eliandrana
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Vivienne, Baptiste
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Adrien, Aurore, Eliandrana, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Tiramisù, Steve, Duck / Rafik, Tilleul
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Valentin, Deryn, Judith, BPM, Grégoire, Gawel, Michael, Thierry, Viviane
+Unscheduled topics: Fast Food, On mighty thews
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 233.12024683281544
+
+Person       Score     ( Detail )
+Deryn        447.04    ( 114  156  156  125  125 -114 -114 )
+Aurore       440.00    ( 100  100  060  060  060  060 )
+Duck / R     400.00    ( 167  133  067  033 )
+Baptiste     390.82    ( 414  093  074  074  056  019 -414 )
+Elmi         390.80    ( 115  092  092  069  011  011 )
+Viviane      384.62    ( MND  103  077  077  077  051 )
+Cactus       369.23    ( 243  MND  MND  MND  138  092  046  046  046 -243 )
+Natacha      368.42    ( MND  MND  MND  158 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Tiramisù     363.64    ( 076  076  076  045  045  045 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Pacman       348.84    ( MND  093  093  070  070  023 )
+Eliandra     338.71    ( MND  081  081  065  065  048 )
+Grégoire     327.27    ( 091  091  055  055  018  018 )
+Vincent      326.53    ( 102  102  061  020  020  020 )
+Finn         280.95    ( MND  MND  139  139  139 -136 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Tilleul      250.00    ( MND  MND  MND  100  100  050 )
+Vivienne     221.99    ( 743  MND  159  032  032 -371 -371 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Pénélope     185.71    ( 190  095  095  048 -243 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Julien       178.57    ( 167  133  067  033 -221 )
+Michael      167.83    ( 436  MND  MND  MND  084  084 -436 )
+Adrien       137.25    ( MND  MND  MND  078  039  020 )
+Thierry      135.34    ( 088  088  088  088  070 -286 )
+Judith       115.75    ( MND  128  077  077 -371 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:02:54: We have tried 497 schedules on thread scala-execution-context-global-57 (best score on thread is 233.12024683281544)
+00:02:58: We have tried 538 schedules on thread scala-execution-context-global-46 (best score on thread is 141.2952740175907)
+00:03:26: We have tried 464 schedules on thread scala-execution-context-global-63 (best score on thread is -4.447429897189293)
+
+********************************************************************************
+00:03:41: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Tiramisù, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Elmi, Thierry, Grégoire, Duck / Rafik
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Aurore, Eliandrana, Cactus
+    Objection ! ==> Steve (MND), BPM, Pacman, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Julien, Judith, Baptiste
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Vivienne, Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, BPM, Grégoire, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Tiramisù, Aurore
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Finn, Deryn, Thierry, Duck / Rafik
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Baptiste, Natacha
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Elmi, Gawel
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Pacman, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Viviane
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Valentin, Deryn
+    Comme un lundi ==> Gawel (MND), Elmi, Viviane, Grégoire, Duck / Rafik, Eliandrana
+    Célestopol ==> Shyria (MND), Julien, Aurore, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Thierry, Baptiste, Tilleul, Pénélope
+    Dogside Dogs ==> Olivier (MND), Adrien, Vivienne
+    La Couvée #1 ==> Michael (MND), Tiramisù, Cactus
+    Le troisième hiver ==> Steve (MND), Chloé, Natacha, Vincent B
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Aurore, Steve, Vincent B, Pénélope
+    Brindlewood Bay ==> Adrien (MND), Shyria, Elmi, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Finn, Deryn, Vivienne
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Julien, Olivier, Pacman
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Tiramisù, Grégoire, Duck / Rafik, Michael
+    Soth ==> Gawel (MND), Judith, BPM, Baptiste, Natacha, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Shyria, Deryn, Judith, BPM, Thierry, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Julien, Grégoire, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Steve, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Vivienne, Viviane, Baptiste, Pacman, Eliandrana
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Vivienne, Baptiste
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Adrien, Aurore, Eliandrana, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Deryn, Steve, Duck / Rafik, Tilleul
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Judith, BPM, Grégoire, Gawel, Michael, Tiramisù, Valentin, Thierry, Viviane
+Unscheduled topics: Fast Food, On mighty thews
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 244.26246762357653
+
+Person       Score     ( Detail )
+Duck / R     500.00    ( 167  167  067  067  033 )
+Aurore       440.00    ( 100  100  060  060  060  060 )
+Viviane      410.26    ( MND  103  103  077  077  051 )
+Baptiste     372.21    ( 414  093  074  056  056  019 -414 )
+Cactus       369.23    ( 243  MND  MND  MND  138  092  046  046  046 -243 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Eliandra     338.71    ( MND  081  081  065  065  048 )
+Elmi         333.33    ( 115  092  069  034  011  011 )
+Grégoire     327.27    ( 091  091  055  055  018  018 )
+Vincent      326.53    ( 102  102  061  020  020  020 )
+Pacman       325.58    ( MND  116  070  070  047  023 )
+Natacha      315.79    ( MND  MND  MND  158 )
+Finn         280.95    ( MND  MND  139  139  139 -136 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Tiramisù     257.58    ( 076  076  045  045  015 )
+Vivienne     253.70    ( 743  MND  159  063  032 -371 -371 )
+Tilleul      250.00    ( MND  MND  MND  100  100  050 )
+Deryn        239.20    ( 114  156  156  156 -114 -114 -114 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Judith       192.67    ( MND  128  103  077  077 -371 )
+Pénélope     185.71    ( 190  095  095  048 -243 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Julien       178.57    ( 167  133  067  033 -221 )
+Michael      167.83    ( 436  MND  MND  MND  084  084 -436 )
+Chloé        144.46    ( MND  179  179  149  030 -393 )
+Adrien       137.25    ( MND  MND  MND  078  039  020 )
+Thierry      135.34    ( 088  088  088  088  070 -286 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:03:41: We have tried 570 schedules on thread scala-execution-context-global-57 (best score on thread is 244.26246762357653)
+00:03:52: We have tried 591 schedules on thread scala-execution-context-global-60 (best score on thread is -29.822226436625343)
+00:03:55: We have tried 444 schedules on thread scala-execution-context-global-54 (best score on thread is 87.92489461007898)
+00:04:13: We have tried 634 schedules on thread scala-execution-context-global-46 (best score on thread is 161.94193005914678)
+00:04:19: We have tried 492 schedules on thread scala-execution-context-global-54 (best score on thread is 92.82127202668727)
+00:04:23: We have tried 120 schedules on thread scala-execution-context-global-55 (best score on thread is -92.00062876072319)
+00:04:25: We have tried 572 schedules on thread scala-execution-context-global-63 (best score on thread is 6.477594398293128)
+00:04:25: We have tried 364 schedules on thread scala-execution-context-global-45 (best score on thread is -26.537198116140083)
+00:04:31: We have tried 667 schedules on thread scala-execution-context-global-58 (best score on thread is 225.4924492670697)
+00:04:34: We have tried 674 schedules on thread scala-execution-context-global-46 (best score on thread is 173.22287582557146)
+00:04:39: We have tried 710 schedules on thread scala-execution-context-global-60 (best score on thread is -10.722994811414711)
+
+********************************************************************************
+00:04:58: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Tiramisù, Elmi, Thierry, Duck / Rafik
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Aurore, Eliandrana, Cactus
+    Objection ! ==> Steve (MND), BPM, Pacman, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Grégoire, Baptiste
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, Elmi, BPM, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Finn, Vivienne
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Aurore, Deryn, Thierry, Duck / Rafik
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Grégoire, Baptiste, Natacha
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Tiramisù, Gawel
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Pacman, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Viviane
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> 
+    Comme un lundi ==> Gawel (MND), Viviane, Grégoire, Tilleul, Eliandrana, Cactus
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Thierry, Baptiste, Natacha, Pénélope
+    Dogside Dogs ==> Olivier (MND), Adrien, Duck / Rafik, Vincent B
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Vivienne, Michael
+    Le troisième hiver ==> Steve (MND), Tiramisù, Aurore, Deryn
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Valentin, Vivienne
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Steve, Elmi, Vincent B, Pénélope
+    Brindlewood Bay ==> Adrien (MND), Julien, Shyria, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Aurore, Deryn, Olivier
+    La Couvée #1 ==> Michael (MND), Grégoire, Pacman
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Finn, Tiramisù, Duck / Rafik
+    Soth ==> Gawel (MND), Judith, BPM, Baptiste, Natacha, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Shyria, Deryn, Judith, BPM, Thierry, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Julien, Grégoire, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Steve, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Vivienne, Viviane, Baptiste, Pacman, Eliandrana
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Vivienne, Baptiste
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Adrien, Aurore, Eliandrana, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Tiramisù, Steve, Duck / Rafik, Tilleul
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Valentin, Deryn, Judith, BPM, Grégoire, Gawel, Michael, Thierry, Viviane
+Unscheduled topics: Fast Food, On mighty thews
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 246.0974772406274
+
+Person       Score     ( Detail )
+Deryn        447.04    ( 114  156  156  125  125 -114 -114 )
+Duck / R     433.33    ( 167  167  067  033 )
+Viviane      410.26    ( MND  103  103  077  077  051 )
+Aurore       380.00    ( 100  100  060  060  060 )
+Baptiste     372.21    ( 414  093  074  056  056  019 -414 )
+Natacha      368.42    ( MND  MND  MND  158 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Eliandra     338.71    ( MND  081  081  065  065  048 )
+Tiramisù     333.33    ( 076  076  045  045  045  045 )
+Vincent      326.53    ( 102  102  061  020  020  020 )
+Elmi         321.84    ( 092  092  092  023  011  011 )
+Grégoire     290.91    ( 091  055  055  055  018  018 )
+Vivienne     285.41    ( 743  MND  159  095  032 -371 -371 )
+Pacman       279.07    ( MND  116  070  047  023  023 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Cactus       276.92    ( 243  MND  MND  MND  138  046  046  046 -243 )
+Julien       245.24    ( 167  133  067  067  033 -221 )
+Finn         225.40    ( MND  MND  139  139  083 -136 )
+Tilleul      225.00    ( MND  MND  MND  100  075  050 )
+Judith       218.32    ( MND  128  103  077  077 -371 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Pénélope     185.71    ( 190  095  095  048 -243 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+Adrien       137.25    ( MND  MND  MND  078  039  020 )
+Thierry      135.34    ( 088  088  088  088  070 -286 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:04:58: We have tried 742 schedules on thread scala-execution-context-global-57 (best score on thread is 246.0974772406274)
+00:04:58: Starting new schedule chain on thread scala-execution-context-global-48 with chain-seed: -5122861027426219193
+00:04:58: We have tried 559 schedules on thread scala-execution-context-global-48 (best score on thread is 149.57079319147846)
+00:05:10: We have tried 255 schedules on thread scala-execution-context-global-55 (best score on thread is 45.747924711757804)
+00:05:19: We have tried 595 schedules on thread scala-execution-context-global-48 (best score on thread is 149.57079319147846)
+
+********************************************************************************
+00:05:28: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Tiramisù, Thierry, Grégoire, Duck / Rafik
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Aurore, Eliandrana, Cactus
+    Objection ! ==> Steve (MND), Elmi, BPM, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Baptiste, Pacman
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, Elmi, BPM, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Finn, Vivienne
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Aurore, Deryn, Thierry, Duck / Rafik
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Grégoire, Baptiste, Natacha
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Tiramisù, Gawel
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Pacman, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Viviane
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Vivienne
+    Comme un lundi ==> Gawel (MND), Viviane, Grégoire, Tilleul, Eliandrana, Cactus
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Thierry, Baptiste, Natacha, Pénélope
+    Dogside Dogs ==> Olivier (MND), Adrien, Duck / Rafik, Vincent B
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Michael
+    Le troisième hiver ==> Steve (MND), Tiramisù, Aurore, Deryn
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Valentin
+    Brindlewood Bay ==> Adrien (MND), Shyria, Vivienne, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Aurore, Deryn, Olivier
+    La Couvée #1 ==> Michael (MND), Elmi, Pacman
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Finn, Grégoire, Duck / Rafik, Vincent B
+    On mighty thews ==> Viviane (MND), Tiramisù, Julien, Steve, Pénélope
+    Soth ==> Gawel (MND), Judith, BPM, Baptiste, Natacha, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Shyria, Deryn, Judith, BPM, Thierry, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Julien, Grégoire, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Steve, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Vivienne, Viviane, Baptiste, Pacman, Eliandrana
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Vivienne, Baptiste
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Adrien, Aurore, Eliandrana, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Steve, Grégoire, Duck / Rafik, Tilleul
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Deryn, Judith, BPM, Gawel, Michael, Tiramisù, Valentin, Thierry, Viviane
+Unscheduled topics: Aventures au Pays des Merveilles (Girl Underground), Fast Food
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 246.11367607830846
+
+Person       Score     ( Detail )
+Deryn        447.04    ( 114  156  156  125  125 -114 -114 )
+Duck / R     433.33    ( 167  167  067  033 )
+Viviane      410.26    ( MND  103  103  077  077  051 )
+Aurore       380.00    ( 100  100  060  060  060 )
+Baptiste     372.21    ( 414  093  074  056  056  019 -414 )
+Natacha      368.42    ( MND  MND  MND  158 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Eliandra     338.71    ( MND  081  081  065  065  048 )
+Grégoire     327.27    ( 091  055  055  055  055  018 )
+Tiramisù     318.18    ( 076  076  076  045  045 )
+Pacman       302.33    ( MND  116  070  070  023  023 )
+Elmi         298.85    ( 092  092  092  011  011 )
+Vincent      285.71    ( 102  061  061  020  020  020 )
+Vivienne     285.41    ( 743  MND  159  095  032 -371 -371 )
+Julien       278.57    ( 167  133  100  067  033 -221 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Cactus       276.92    ( 243  MND  MND  MND  138  046  046  046 -243 )
+Finn         225.40    ( MND  MND  139  139  083 -136 )
+Tilleul      225.00    ( MND  MND  MND  100  075  050 )
+Judith       218.32    ( MND  128  103  077  077 -371 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Pénélope     185.71    ( 190  095  095  048 -243 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+Adrien       137.25    ( MND  MND  MND  078  039  020 )
+Thierry      135.34    ( 088  088  088  088  070 -286 )
+Valentin     102.27    ( 529  MND  MND  MND  102 -264 -264 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:05:28: We have tried 780 schedules on thread scala-execution-context-global-57 (best score on thread is 246.11367607830846)
+00:05:32: We have tried 587 schedules on thread scala-execution-context-global-54 (best score on thread is 136.89358911331678)
+00:05:43: We have tried 619 schedules on thread scala-execution-context-global-48 (best score on thread is 149.57079319147846)
+00:05:56: We have tried 313 schedules on thread scala-execution-context-global-55 (best score on thread is 88.38691955922157)
+00:06:01: We have tried 333 schedules on thread scala-execution-context-global-52 (best score on thread is 46.42447533567395)
+00:06:04: We have tried 658 schedules on thread scala-execution-context-global-48 (best score on thread is 149.57079319147846)
+00:06:10: We have tried 763 schedules on thread scala-execution-context-global-63 (best score on thread is 6.499875710668846)
+00:06:17: We have tried 865 schedules on thread scala-execution-context-global-58 (best score on thread is 244.61885845295222)
+00:06:35: We have tried 784 schedules on thread scala-execution-context-global-48 (best score on thread is 149.57079319147846)
+00:07:03: We have tried 130 schedules on thread scala-execution-context-global-49 (best score on thread is -218.88583299630182)
+00:07:11: We have tried 868 schedules on thread scala-execution-context-global-46 (best score on thread is 203.44288618644424)
+
+********************************************************************************
+00:07:40: From thread scala-execution-context-global-58:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Valentin, Deryn, Vivienne, Judith, BPM, Grégoire, Baptiste, Pénélope, Cactus, Michael
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Chloé, Julien
+    Fast Food ==> Olivier (MND), Shyria, Aurore, Tilleul, Eliandrana
+    Objection ! ==> Steve (MND), Adrien, Tiramisù, Viviane, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Elmi, Thierry, Duck / Rafik, Pacman, Vincent B
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Chloé, Julien
+    Comme un lundi ==> Gawel (MND), Baptiste, Tilleul, Eliandrana, Pénélope
+    Cthulhu − La Mustsara ==> Adrien (MND), Shyria, Steve, Grégoire, Vincent B
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Pacman
+    La Couvée #3 ==> Michael (MND), Tiramisù, Aurore, Thierry
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Deryn, Judith, Viviane
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Elmi, BPM, Olivier, Duck / Rafik
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Vivienne
+    Beta Microscope with time travel ==> Tilleul (MND), Viviane, Gawel, Pénélope
+    Célestopol ==> Shyria (MND), Julien, Aurore, Elmi, BPM
+    Definitely Wizards ==> Finn (MND), Tiramisù, Judith, Thierry, Baptiste, Michael
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Olivier, Grégoire, Duck / Rafik
+    Le troisième hiver ==> Steve (MND), Chloé, Deryn, Vincent B
+    SublimES© ==> Adrien (MND), Natacha (MND), Valentin, Pacman, Cactus
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Deryn
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Aurore, Olivier, Duck / Rafik
+    Freezing Moon ==> Shyria (MND), Tiramisù, Julien, Eliandrana, Pénélope
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Adrien, Vincent B, Tilleul
+    La Couvée #1 ==> Michael (MND), Steve, Elmi, Grégoire
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Finn, Vivienne, Judith, BPM, Baptiste, Natacha, Gawel, Thierry, Viviane
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Valentin
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Elmi, Judith, Baptiste, Pénélope
+    Brindlewood Bay ==> Adrien (MND), Shyria, BPM, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Chloé, Finn, Deryn, Vivienne
+    La Couvée #2 ==> Michael (MND), Julien, Natacha, Gawel, Eliandrana
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Tiramisù, Steve, Duck / Rafik, Vincent B
+    Road Trip ~1 ==> Olivier (MND), Aurore, Grégoire, Pacman
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Shyria, Deryn, Thierry
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Duck / Rafik, Vincent B, Pénélope, Michael
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Vivienne, Viviane, Baptiste, Natacha
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Tiramisù, Steve
+    Road Trip ~2 ==> Olivier (MND), Aurore, Grégoire, Pacman
+    Soth ==> Gawel (MND), Adrien, Elmi, BPM, Eliandrana, Cactus
+Unscheduled topics: Dogside Dogs, On mighty thews
+Schedule-chain seed: -8121710787335378309
+
+Schedule score is 259.1009462142292
+
+Person       Score     ( Detail )
+Duck / R     566.67    ( 167  167  133  067  033 )
+Chloé        507.46    ( MND  149  119  119  090  030 )
+Aurore       460.00    ( 100  100  100  060  060  040 )
+Elmi         425.29    ( 115  092  092  092  023  011 )
+Natacha      421.05    ( MND  MND  MND  158  158 )
+Vincent      408.16    ( 102  102  061  061  061  020 )
+Pacman       395.35    ( MND  093  093  070  070  070 )
+Tiramisù     393.94    ( 076  076  076  076  045  045 )
+Baptiste     390.82    ( 414  074  074  074  056  019 -414 )
+Viviane      384.62    ( MND  103  077  077  077  051 )
+Vivienne     380.55    ( 743  MND  159  127  095 -371 -371 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Julien       311.90    ( 167  167  133  067 -221 )
+Eliandra     306.45    ( MND  081  081  065  065  016 )
+Olivier      285.71    ( MND  MND  MND  143  071  071 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Cactus       276.92    ( 243  MND  MND  MND  092  046  046  046  046 -243 )
+BPM          262.90    ( 194  129  097  097  097 -350 )
+Finn         253.17    ( MND  MND  139  139  111 -136 )
+Pénélope     233.33    ( 238  095  095  048 -243 )
+Tilleul      225.00    ( MND  MND  MND  100  075  050 )
+Deryn        208.02    ( 114  156  156  125 -114 -114 -114 )
+Adrien       196.08    ( MND  MND  MND  078  059  059 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Valentin     170.45    ( 529  MND  MND  MND  170 -264 -264 )
+Judith       167.03    ( MND  128  103  077  051 -371 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+Thierry      135.34    ( 088  088  088  088  070 -286 )
+Grégoire     111.04    ( 091  091  091  091  055 -307 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:07:40: We have tried 991 schedules on thread scala-execution-context-global-58 (best score on thread is 259.1009462142292)
+00:07:41: We have tried 902 schedules on thread scala-execution-context-global-46 (best score on thread is 203.97434616507766)
+
+********************************************************************************
+00:07:52: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Vincent B, Tilleul
+    La Couvée #2 ==> Michael (MND), Tiramisù, Thierry, Grégoire, Duck / Rafik
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Aurore, Eliandrana, Cactus
+    Objection ! ==> Steve (MND), Elmi, BPM, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Baptiste, Pacman
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, Elmi, BPM, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Finn, Vivienne, Tiramisù, Valentin
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Deryn, Thierry, Duck / Rafik, Gawel
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Julien, Aurore, Baptiste, Natacha
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Grégoire, Pacman, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Viviane
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Vivienne
+    Comme un lundi ==> Gawel (MND), Viviane, Grégoire, Tilleul, Eliandrana, Cactus
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Thierry, Baptiste, Natacha, Pénélope
+    Dogside Dogs ==> Olivier (MND), Adrien, Duck / Rafik, Vincent B
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Michael
+    Le troisième hiver ==> Steve (MND), Tiramisù, Aurore, Deryn
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Valentin
+    Brindlewood Bay ==> Adrien (MND), Shyria, Vivienne, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Aurore, Deryn, Olivier
+    La Couvée #1 ==> Michael (MND), Elmi, Pacman
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Finn, Grégoire, Duck / Rafik, Vincent B
+    On mighty thews ==> Viviane (MND), Tiramisù, Julien, Steve, Pénélope
+    Soth ==> Gawel (MND), Judith, BPM, Baptiste, Natacha, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Shyria, Deryn, Judith, BPM, Thierry, Pénélope, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Julien, Grégoire, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Steve, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Vivienne, Viviane, Baptiste, Pacman, Eliandrana
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn, Julien, Vivienne, Baptiste
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Elmi, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Adrien, Aurore, Eliandrana, Pénélope
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Tiramisù, Steve, Duck / Rafik, Tilleul
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Valentin, Deryn, Judith, BPM, Grégoire, Gawel, Michael, Thierry, Viviane
+Unscheduled topics: Aventures au Pays des Merveilles (Girl Underground), Fast Food, HeartRunner − Cyberpunk #2
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 287.67517166710724
+
+Person       Score     ( Detail )
+Deryn        447.04    ( 114  156  156  125  125 -114 -114 )
+Duck / R     433.33    ( 167  167  067  033 )
+Viviane      410.26    ( MND  103  103  077  077  051 )
+Baptiste     372.21    ( 414  093  074  056  056  019 -414 )
+Natacha      368.42    ( MND  MND  MND  158 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Aurore       340.00    ( 100  100  060  060  020 )
+Eliandra     338.71    ( MND  081  081  065  065  048 )
+Tiramisù     303.03    ( 076  076  045  045  045  015 )
+Pacman       302.33    ( MND  116  070  070  023  023 )
+Gawel        300.00    ( MND  MND  167  100  033 )
+Elmi         298.85    ( 092  092  092  011  011 )
+Grégoire     290.91    ( 091  055  055  055  018  018 )
+Vincent      285.71    ( 102  061  061  020  020  020 )
+Vivienne     285.41    ( 743  MND  159  095  032 -371 -371 )
+Julien       278.57    ( 167  133  100  067  033 -221 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Cactus       276.92    ( 243  MND  MND  MND  138  046  046  046 -243 )
+Valentin     272.73    ( 529  MND  MND  170  102 -264 -264 )
+Finn         225.40    ( MND  MND  139  139  083 -136 )
+Tilleul      225.00    ( MND  MND  MND  100  075  050 )
+Judith       218.32    ( MND  128  103  077  077 -371 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Pénélope     185.71    ( 190  095  095  048 -243 )
+Steve        179.49    ( MND  MND  077  051  026  026 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+Adrien       137.25    ( MND  MND  MND  078  039  020 )
+Thierry      135.34    ( 088  088  088  088  070 -286 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:07:52: We have tried 997 schedules on thread scala-execution-context-global-57 (best score on thread is 287.67517166710724)
+00:08:09: We have tried 1071 schedules on thread scala-execution-context-global-58 (best score on thread is 270.88049503704633)
+00:08:18: We have tried 654 schedules on thread scala-execution-context-global-54 (best score on thread is 143.01838642226713)
+00:08:19: We have tried 987 schedules on thread scala-execution-context-global-63 (best score on thread is 7.0217582009693125)
+
+********************************************************************************
+00:08:26: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Aurore, Pacman
+    La Couvée #2 ==> Michael (MND), Tiramisù, Elmi, Grégoire, Cactus
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Finn, Thierry, Duck / Rafik, Vincent B
+    Objection ! ==> Steve (MND), Vivienne, BPM, Gawel, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Baptiste, Eliandrana
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Valentin, Vivienne, Baptiste, Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, Elmi, BPM, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Aurore, Duck / Rafik
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Finn, Deryn, Thierry, Gawel
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Tiramisù, Julien, Natacha
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Grégoire, Pacman, Pénélope
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Viviane
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> 
+    Comme un lundi ==> Gawel (MND), Adrien, Tiramisù, Eliandrana, Cactus
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Baptiste, Natacha, Tilleul, Pénélope
+    Fast Food ==> Olivier (MND), Aurore, Vivienne, Viviane, Duck / Rafik
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Chloé, Grégoire, Michael
+    Le troisième hiver ==> Steve (MND), Deryn, Thierry, Vincent B
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Deryn
+    Brindlewood Bay ==> Adrien (MND), Shyria, Vincent B, Tilleul
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Finn, Valentin, Olivier
+    La Couvée #1 ==> Michael (MND), Thierry, Baptiste
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Tiramisù, Aurore, Judith, Natacha
+    On mighty thews ==> Viviane (MND), Julien, Steve, Pacman, Pénélope
+    Soth ==> Gawel (MND), Elmi, BPM, Grégoire, Duck / Rafik, Eliandrana
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Julien, Shyria, Deryn, Vivienne, Judith, BPM, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Steve, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Grégoire, Duck / Rafik, Pénélope
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Pacman, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Elmi, Baptiste, Eliandrana, Thierry, Viviane
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Steve, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Aurore, Eliandrana, Pénélope
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Adrien, Tiramisù, Tilleul
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Julien, Deryn, Elmi, Duck / Rafik
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Vivienne, Judith, BPM, Grégoire, Baptiste, Gawel, Michael, Thierry, Viviane
+Unscheduled topics: Aventures au Pays des Merveilles (Girl Underground), Dogside Dogs
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 317.69269783456787
+
+Person       Score     ( Detail )
+Pénélope     666.67    ( 238  190  095  095  048 )
+Natacha      631.58    ( MND  MND  MND  263  158 )
+Elmi         494.25    ( 115  092  092  092  092  011 )
+Thierry      403.51    ( 088  088  088  070  053  018 )
+Vivienne     380.55    ( 743  MND  159  127  095 -371 -371 )
+Duck / R     366.67    ( 167  100  067  033 )
+Aurore       360.00    ( 100  100  060  060  040 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Eliandra     338.71    ( MND  081  081  065  065  048 )
+Baptiste     334.99    ( 414  093  056  056  056  019 -414 )
+Viviane      333.33    ( MND  103  103  077  051 )
+Tiramisù     333.33    ( 076  076  076  045  045  015 )
+Grégoire     327.27    ( 091  091  055  055  018  018 )
+Vincent      326.53    ( 102  102  061  020  020  020 )
+Julien       311.90    ( 167  133  100  100  033 -221 )
+Pacman       302.33    ( MND  116  070  070  023  023 )
+Tilleul      300.00    ( MND  MND  MND  100  100  100 )
+Gawel        300.00    ( MND  MND  167  100  033 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Steve        230.77    ( MND  MND  077  051  051  051 )
+Cactus       230.77    ( 243  MND  MND  MND  092  046  046  046 -243 )
+Finn         225.40    ( MND  MND  139  139  083 -136 )
+Deryn        208.02    ( 114  156  156  125 -114 -114 -114 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Judith       192.67    ( MND  128  103  077  077 -371 )
+Valentin     170.45    ( 529  MND  MND  MND  170 -264 -264 )
+Adrien       156.86    ( MND  MND  MND  078  059  020 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+00:08:26: We have tried 1124 schedules on thread scala-execution-context-global-57 (best score on thread is 317.69269783456787)
+00:08:31: We have tried 923 schedules on thread scala-execution-context-global-48 (best score on thread is 162.5755320063904)
+00:10:17: We have tried 1285 schedules on thread scala-execution-context-global-58 (best score on thread is 299.6274746064162)
+00:11:33: We have tried 745 schedules on thread scala-execution-context-global-54 (best score on thread is 161.34051617929464)
+00:12:24: We have tried 793 schedules on thread scala-execution-context-global-54 (best score on thread is 180.2383613917699)
+00:13:36: We have tried 246 schedules on thread scala-execution-context-global-51 (best score on thread is -71.42155784186951)
+00:14:12: We have tried 289 schedules on thread scala-execution-context-global-51 (best score on thread is -53.366384114962685)
+00:14:17: We have tried 943 schedules on thread scala-execution-context-global-54 (best score on thread is 187.09397028746514)
+00:14:49: We have tried 333 schedules on thread scala-execution-context-global-51 (best score on thread is 7.542371622574059)
+00:15:18: We have tried 395 schedules on thread scala-execution-context-global-51 (best score on thread is 9.445008313032886)
+00:15:45: We have tried 521 schedules on thread scala-execution-context-global-51 (best score on thread is 108.90170219388)
+00:16:15: We have tried 586 schedules on thread scala-execution-context-global-51 (best score on thread is 129.24542380885572)
+00:16:43: We have tried 619 schedules on thread scala-execution-context-global-51 (best score on thread is 143.44618797993783)
+00:22:49: We have tried 143 schedules on thread scala-execution-context-global-50 (best score on thread is -232.26507553479718)
+00:23:13: We have tried 687 schedules on thread scala-execution-context-global-51 (best score on thread is 183.17433246233668)
+00:23:21: We have tried 1489 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:23:28: We have tried 187 schedules on thread scala-execution-context-global-50 (best score on thread is -110.20178746021332)
+00:25:58: We have tried 960 schedules on thread scala-execution-context-global-60 (best score on thread is 7.488176932441716)
+00:26:28: We have tried 1008 schedules on thread scala-execution-context-global-60 (best score on thread is 80.10144060996919)
+00:26:50: We have tried 328 schedules on thread scala-execution-context-global-47 (best score on thread is 127.13454398534752)
+00:28:31: We have tried 1101 schedules on thread scala-execution-context-global-60 (best score on thread is 131.48622711661284)
+00:28:41: We have tried 1062 schedules on thread scala-execution-context-global-48 (best score on thread is 185.11363277508576)
+00:30:51: We have tried 1163 schedules on thread scala-execution-context-global-48 (best score on thread is 211.49562262334408)
+00:30:55: We have tried 1280 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:32:13: We have tried 534 schedules on thread scala-execution-context-global-52 (best score on thread is 48.34163745212945)
+00:32:22: We have tried 1263 schedules on thread scala-execution-context-global-48 (best score on thread is 224.625316773267)
+00:33:12: Starting new schedule chain on thread scala-execution-context-global-60 with chain-seed: 4255694634065508742
+00:33:12: We have tried 1280 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:33:39: We have tried 1341 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:34:22: We have tried 1385 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:34:32: We have tried 824 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94308203687987)
+00:35:14: We have tried 1413 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:35:40: We have tried 1532 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:37:16: We have tried 357 schedules on thread scala-execution-context-global-50 (best score on thread is -104.45495700387022)
+00:37:53: We have tried 1587 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:38:07: We have tried 447 schedules on thread scala-execution-context-global-50 (best score on thread is -47.39594697786766)
+00:38:23: We have tried 1612 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:39:49: We have tried 1701 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:39:56: We have tried 523 schedules on thread scala-execution-context-global-50 (best score on thread is -42.025842942400246)
+00:40:13: Starting new schedule chain on thread scala-execution-context-global-58 with chain-seed: 2482820883903350235
+00:40:13: We have tried 1489 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:40:33: We have tried 1589 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:40:36: We have tried 538 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:40:57: We have tried 1753 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:41:22: We have tried 1025 schedules on thread scala-execution-context-global-54 (best score on thread is 192.78127708373012)
+00:41:52: We have tried 1671 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:42:16: We have tried 1744 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:42:17: We have tried 1848 schedules on thread scala-execution-context-global-60 (best score on thread is 158.48495485614643)
+00:42:21: We have tried 541 schedules on thread scala-execution-context-global-50 (best score on thread is -8.377510862972322)
+00:42:45: We have tried 1810 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:43:23: We have tried 582 schedules on thread scala-execution-context-global-50 (best score on thread is 19.23794577945155)
+00:43:50: Starting new schedule chain on thread scala-execution-context-global-47 with chain-seed: -7793834966808702643
+00:43:50: We have tried 538 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:43:52: We have tried 1417 schedules on thread scala-execution-context-global-48 (best score on thread is 233.8739110345777)
+00:44:10: We have tried 643 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:44:33: We have tried 1442 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:44:42: We have tried 1930 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:45:06: We have tried 598 schedules on thread scala-execution-context-global-52 (best score on thread is 68.6873487059645)
+00:45:27: We have tried 692 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:45:31: We have tried 1985 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:45:58: We have tried 2108 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:46:21: We have tried 1152 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+00:46:24: We have tried 2186 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:48:01: We have tried 2269 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:49:02: We have tried 2420 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:49:16: We have tried 668 schedules on thread scala-execution-context-global-50 (best score on thread is 90.47627360559436)
+00:49:43: We have tried 698 schedules on thread scala-execution-context-global-50 (best score on thread is 98.30227771616896)
+00:50:10: We have tried 2035 schedules on thread scala-execution-context-global-60 (best score on thread is 176.37370726229463)
+00:50:29: We have tried 2508 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:50:49: Starting new schedule chain on thread scala-execution-context-global-48 with chain-seed: -1811717775191189232
+00:50:49: We have tried 1442 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:51:10: We have tried 1474 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:51:35: We have tried 2587 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:51:53: We have tried 794 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:52:11: We have tried 1490 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:52:14: We have tried 2642 schedules on thread scala-execution-context-global-58 (best score on thread is 299.69692161588415)
+00:52:16: We have tried 837 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:52:52: We have tried 1638 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:53:43: We have tried 1705 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:54:19: We have tried 2801 schedules on thread scala-execution-context-global-58 (best score on thread is 301.2210500181797)
+00:55:04: We have tried 1855 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+00:55:22: We have tried 2176 schedules on thread scala-execution-context-global-60 (best score on thread is 202.24521018275038)
+00:55:25: We have tried 2893 schedules on thread scala-execution-context-global-58 (best score on thread is 301.96439509573645)
+00:56:10: We have tried 2980 schedules on thread scala-execution-context-global-58 (best score on thread is 302.8004878769014)
+00:56:24: Starting new schedule chain on thread scala-execution-context-global-51 with chain-seed: 6760544530114817458
+00:56:24: We have tried 839 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+00:56:49: We have tried 924 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+00:57:49: We have tried 808 schedules on thread scala-execution-context-global-50 (best score on thread is 108.94254682018848)
+00:57:57: We have tried 945 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:58:05: We have tried 991 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+00:58:26: We have tried 1012 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+00:58:31: We have tried 128 schedules on thread scala-execution-context-global-61 (best score on thread is 117.42070464065581)
+00:58:44: We have tried 1114 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+00:58:46: Starting new schedule chain on thread scala-execution-context-global-58 with chain-seed: -3703406827491573718
+00:58:46: We have tried 3041 schedules on thread scala-execution-context-global-58 (best score on thread is 303.27704687076084)
+00:59:06: We have tried 3078 schedules on thread scala-execution-context-global-58 (best score on thread is 303.27704687076084)
+00:59:25: We have tried 1146 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+00:59:56: We have tried 175 schedules on thread scala-execution-context-global-61 (best score on thread is 123.71580756512402)
+01:00:33: We have tried 1128 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+01:00:37: We have tried 675 schedules on thread scala-execution-context-global-52 (best score on thread is 140.67487370478054)
+01:00:53: We have tried 290 schedules on thread scala-execution-context-global-61 (best score on thread is 124.54119664961856)
+01:01:08: We have tried 1191 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+01:01:36: We have tried 1226 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+01:02:13: We have tried 737 schedules on thread scala-execution-context-global-52 (best score on thread is 152.17696504938579)
+01:02:14: We have tried 1273 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+01:02:15: We have tried 1232 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:02:16: We have tried 3144 schedules on thread scala-execution-context-global-58 (best score on thread is 303.27704687076084)
+01:03:20: We have tried 1409 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+01:04:10: We have tried 1505 schedules on thread scala-execution-context-global-47 (best score on thread is 131.48634587304394)
+01:06:06: Starting new schedule chain on thread scala-execution-context-global-50 with chain-seed: -8603646522334749391
+01:06:06: We have tried 808 schedules on thread scala-execution-context-global-50 (best score on thread is 108.94254682018848)
+01:06:12: We have tried 1291 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:06:14: We have tried 904 schedules on thread scala-execution-context-global-52 (best score on thread is 223.26121875991112)
+01:06:38: We have tried 864 schedules on thread scala-execution-context-global-50 (best score on thread is 108.94254682018848)
+01:06:46: We have tried 940 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:06:46: We have tried 1322 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:07:39: We have tried 1390 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:07:57: We have tried 1620 schedules on thread scala-execution-context-global-47 (best score on thread is 162.8361949036381)
+01:08:03: We have tried 1516 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:09:47: Starting new schedule chain on thread scala-execution-context-global-52 with chain-seed: -2322879861512078068
+01:09:47: We have tried 940 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:10:09: We have tried 981 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:10:29: We have tried 998 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:10:56: We have tried 1025 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:11:33: We have tried 1066 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:11:54: We have tried 1118 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:11:56: We have tried 1644 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:12:32: We have tried 1198 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:13:11: We have tried 1240 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:13:32: We have tried 1286 schedules on thread scala-execution-context-global-52 (best score on thread is 272.13362426916024)
+01:13:52: We have tried 1371 schedules on thread scala-execution-context-global-52 (best score on thread is 277.45420759852277)
+01:13:59: We have tried 3203 schedules on thread scala-execution-context-global-58 (best score on thread is 303.27704687076084)
+01:14:00: We have tried 1863 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:14:32: We have tried 1902 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:14:39: We have tried 3246 schedules on thread scala-execution-context-global-58 (best score on thread is 303.27704687076084)
+01:15:17: We have tried 1472 schedules on thread scala-execution-context-global-52 (best score on thread is 293.5283211191647)
+01:15:29: We have tried 1998 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:16:37: We have tried 2103 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+
+********************************************************************************
+01:16:41: From thread scala-execution-context-global-57:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Deryn, Pénélope
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Julien, Aurore, Elmi
+    La Couvée #2 ==> Michael (MND), Tiramisù, Grégoire, Cactus
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Finn, Thierry, Duck / Rafik, Vincent B
+    Objection ! ==> Steve (MND), Vivienne, BPM, Gawel, Eliandrana
+    Road Trip ~1 ==> Olivier (MND), Chloé, Shyria, Viviane
+    SublimES© ==> Adrien (MND), Natacha (MND), Judith, Baptiste, Pacman
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Vivienne, Baptiste, Michael
+    Cthulhu − La Mustsara ==> Adrien (MND), Steve, BPM, Grégoire, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Finn, Valentin, Aurore
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Deryn, Elmi, Thierry, Gawel
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Tiramisù, Julien, Natacha, Pénélope
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Duck / Rafik, Pacman
+    Road Trip ~2 ==> Olivier (MND), Chloé, Shyria, Viviane
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Deryn
+    Comme un lundi ==> Gawel (MND), Adrien, Grégoire, Tilleul, Eliandrana, Pénélope
+    Célestopol ==> Shyria (MND), Julien, Elmi, BPM, Pacman
+    Definitely Wizards ==> Finn (MND), Judith, Baptiste, Natacha, Cactus, Michael
+    Fast Food ==> Olivier (MND), Aurore, Vivienne, Viviane, Duck / Rafik
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Chloé
+    Le troisième hiver ==> Steve (MND), Tiramisù, Thierry, Vincent B
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Valentin
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Steve, Pénélope, Vincent B, Tilleul
+    Brindlewood Bay ==> Adrien (MND), Julien, Shyria, Eliandrana
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Deryn, Olivier, Duck / Rafik
+    La Couvée #1 ==> Michael (MND), Elmi, Thierry, Pacman
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Finn, Tiramisù, Aurore
+    Soth ==> Gawel (MND), Judith, BPM, Grégoire, Baptiste, Natacha
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> Chloé, Valentin, Julien, Shyria, Deryn, Vivienne, Judith, BPM, Cactus
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Steve, Olivier, Vincent B
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Grégoire, Duck / Rafik, Pénélope
+    La Couvée #3 ==> Michael (MND), Adrien, Aurore, Baptiste, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Elmi, Pacman, Eliandrana, Thierry, Viviane
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Finn
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Steve, Olivier, Vincent B
+    Freezing Moon ==> Shyria (MND), Aurore, Eliandrana, Pénélope
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Adrien, Tiramisù, Tilleul
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Julien, Deryn, Elmi, Duck / Rafik
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Vivienne, Judith, BPM, Grégoire, Baptiste, Gawel, Michael, Thierry, Viviane
+Unscheduled topics: Dogside Dogs, On mighty thews
+Schedule-chain seed: 2552356863205526147
+
+Schedule score is 319.50137654731617
+
+Person       Score     ( Detail )
+Thierry      403.51    ( 088  088  088  070  053  018 )
+Elmi         402.30    ( 115  092  092  069  023  011 )
+Duck / R     400.00    ( 167  133  067  033 )
+Vivienne     380.55    ( 743  MND  159  127  095 -371 -371 )
+Natacha      368.42    ( MND  MND  MND  158 )
+Grégoire     363.64    ( 091  091  091  055  018  018 )
+Aurore       360.00    ( 100  100  060  060  040 )
+Olivier      357.14    ( MND  MND  MND  143  143  071 )
+Viviane      333.33    ( MND  103  103  077  051 )
+Vincent      326.53    ( 102  102  061  020  020  020 )
+Cactus       323.08    ( 243  MND  MND  MND  092  092  046  046  046 -243 )
+Eliandra     306.45    ( MND  081  081  065  065  016 )
+Tiramisù     303.03    ( 076  076  045  045  045  015 )
+Pacman       302.33    ( MND  116  070  070  023  023 )
+Gawel        300.00    ( MND  MND  167  100  033 )
+Baptiste     279.16    ( 414  056  056  056  019  019 -414 )
+Julien       278.57    ( 167  133  100  067  033 -221 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Tilleul      250.00    ( MND  MND  MND  100  075  075 )
+Deryn        239.20    ( 114  156  156  156 -114 -114 -114 )
+Pénélope     233.33    ( 238  095  095  048 -243 )
+Steve        230.77    ( MND  MND  077  051  051  051 )
+Finn         225.40    ( MND  MND  139  139  083 -136 )
+Judith       218.32    ( MND  128  103  077  077 -371 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+BPM          198.39    ( 194  129  097  065  065 -350 )
+Valentin     170.45    ( 529  MND  MND  MND  170 -264 -264 )
+Adrien       156.86    ( MND  MND  MND  078  059  020 )
+Michael      146.85    ( 436  MND  MND  MND  084  063 -436 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+01:16:41: We have tried 1252 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+01:16:57: We have tried 2119 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:17:22: We have tried 1694 schedules on thread scala-execution-context-global-52 (best score on thread is 298.9123961557786)
+01:17:48: We have tried 1722 schedules on thread scala-execution-context-global-52 (best score on thread is 317.61401087502225)
+01:18:17: We have tried 1767 schedules on thread scala-execution-context-global-52 (best score on thread is 317.6636111964748)
+01:19:11: We have tried 2370 schedules on thread scala-execution-context-global-51 (best score on thread is 191.94904362805335)
+01:19:44: We have tried 2415 schedules on thread scala-execution-context-global-51 (best score on thread is 225.70129338348698)
+01:20:10: We have tried 2514 schedules on thread scala-execution-context-global-51 (best score on thread is 270.3219329636168)
+01:20:52: We have tried 2589 schedules on thread scala-execution-context-global-51 (best score on thread is 313.9994791773377)
+
+********************************************************************************
+01:22:34: From thread scala-execution-context-global-51:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Judith, Baptiste
+    Brindlewood Bay ==> Adrien (MND), Shyria, BPM, Thierry
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Finn, Deryn, Duck / Rafik, Vincent B
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Vivienne, Natacha, Tilleul
+    La Couvée #1 ==> Michael (MND), Aurore, Elmi, Gawel, Eliandrana
+    On mighty thews ==> Viviane (MND), Tiramisù, Julien, Steve, Pénélope
+    Road Trip ~1 ==> Olivier (MND), Chloé, Grégoire, Pacman
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> Valentin, Julien, Shyria, Deryn, Vivienne, Pénélope, Cactus, Michael
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Aurore, Viviane, Duck / Rafik
+    Road Trip ~2 ==> Olivier (MND), Chloé, Grégoire, Pacman
+    Soth ==> Gawel (MND), Adrien, Elmi, BPM, Natacha, Eliandrana
+    Toutes Petites Aventures ==> Finn (MND), Steve, Judith, Thierry, Baptiste, Vincent B
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Valentin
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Finn, Deryn, Thierry, Pénélope
+    Freezing Moon ==> Shyria (MND), Elmi, Duck / Rafik, Pacman, Eliandrana
+    La Couvée #2 ==> Michael (MND), Grégoire, Baptiste
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Aurore, Judith, Viviane, Natacha
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Julien, BPM, Olivier, Vincent B
+    Objection ! ==> Steve (MND), Adrien, Chloé, Tiramisù, Gawel
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> Finn, Deryn, Vivienne, BPM, Thierry
+    Célestopol ==> Shyria (MND), Chloé, Aurore, Elmi, Pacman
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Viviane, Baptiste, Eliandrana, Pénélope
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Tiramisù, Julien, Gawel
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Grégoire, Duck / Rafik, Vincent B, Michael
+    SublimES© ==> Adrien (MND), Natacha (MND), Steve, Olivier, Cactus
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Julien, Tilleul
+    Comme un lundi ==> Gawel (MND), Adrien, BPM, Viviane, Grégoire, Eliandrana
+    Definitely Wizards ==> Finn (MND), Judith, Thierry, Duck / Rafik, Baptiste, Pénélope
+    Fast Food ==> Olivier (MND), Shyria, Aurore, Vivienne, Vincent B
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Elmi
+    La Couvée #3 ==> Michael (MND), Tiramisù, Cactus
+    Le troisième hiver ==> Steve (MND), Chloé, Deryn, Pacman
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> 
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Julien, Tilleul
+    Cthulhu − La Mustsara ==> Adrien (MND), Shyria, Steve, Gawel, Vincent B
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Valentin, Aurore, Vivienne, Olivier
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Elmi, Grégoire, Duck / Rafik, Pénélope
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Finn, Tiramisù, Deryn, Judith, BPM, Baptiste, Michael, Thierry, Viviane
+Unscheduled topics: Aventures au Pays des Merveilles (Girl Underground), Dogside Dogs
+Schedule-chain seed: 6760544530114817458
+
+Schedule score is 332.03500372983143
+
+Person       Score     ( Detail )
+Julien       478.57    ( 167  167  167  100  100 -221 )
+Natacha      473.68    ( MND  MND  MND  263  158 )
+Deryn        447.04    ( 114  156  156  125  125 -114 -114 )
+Pacman       441.86    ( MND  116  116  093  093  023 )
+Grégoire     436.36    ( 091  091  091  055  055  055 )
+Chloé        417.91    ( MND  179  179  030  030 )
+Vincent      408.16    ( 102  102  102  061  020  020 )
+Gawel        400.00    ( MND  MND  167  100  100  033 )
+Baptiste     390.82    ( 414  093  074  056  056  019 -414 )
+Viviane      384.62    ( MND  103  077  077  077  051 )
+Elmi         379.31    ( 092  092  092  069  023  011 )
+Aurore       360.00    ( 100  100  060  060  040 )
+Tilleul      350.00    ( MND  MND  MND  125  125  100 )
+Vivienne     348.84    ( 743  MND  159  095  095 -371 -371 )
+Tiramisù     348.48    ( 076  076  076  076  045 )
+Duck / R     333.33    ( 133  100  067  033 )
+Pénélope     328.57    ( 190  095  095  095  095 -243 )
+Cactus       323.08    ( 243  MND  MND  MND  092  092  046  046  046 -243 )
+Eliandra     306.45    ( MND  081  081  065  065  016 )
+Olivier      285.71    ( MND  MND  MND  143  071  071 )
+Shyria       278.57    ( MND  MND  227  136  136 -221 )
+Finn         253.17    ( MND  MND  139  139  111 -136 )
+Steve        230.77    ( MND  MND  077  077  051  026 )
+BPM          230.65    ( 194  129  097  097  065 -350 )
+Adrien       215.69    ( MND  MND  MND  078  078  059 )
+Judith       192.67    ( MND  128  103  103  077 -371 )
+Valentin     170.45    ( 529  MND  MND  MND  170 -264 -264 )
+Michael      167.83    ( 436  MND  MND  MND  084  084 -436 )
+Thierry      152.88    ( 088  088  088  088  088 -286 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+01:22:34: We have tried 2765 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:23:02: We have tried 143 schedules on thread scala-execution-context-global-59 (best score on thread is -162.3721507693969)
+01:24:05: We have tried 1817 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+01:24:26: We have tried 998 schedules on thread scala-execution-context-global-46 (best score on thread is 220.71148038091104)
+01:24:52: We have tried 1044 schedules on thread scala-execution-context-global-46 (best score on thread is 221.67696503815682)
+01:25:46: Starting new schedule chain on thread scala-execution-context-global-51 with chain-seed: 1635338802834784815
+01:25:46: We have tried 2765 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:26:25: We have tried 2878 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:26:56: We have tried 2942 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:28:22: We have tried 3038 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:28:28: Starting new schedule chain on thread scala-execution-context-global-47 with chain-seed: 8246646776479810996
+01:28:28: We have tried 1817 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+01:29:04: Starting new schedule chain on thread scala-execution-context-global-52 with chain-seed: -7087395078785957014
+
+********************************************************************************
+01:29:04: From thread scala-execution-context-global-52:
+Schedule:
+  1 - jeudi aprèm
+    @Unassigned (1 - jeudi aprèm) ==> Finn, Valentin, Deryn, Vivienne, Judith
+    Lanfeust de Troy Impro ==> Eliandrana (MND), Julien, BPM, Duck / Rafik, Pénélope
+    Mystery Flesh Pit National Park ==> Tilleul (MND), Shyria, Thierry, Vincent B, Michael
+    Objection ! ==> Steve (MND), Tiramisù, Viviane, Pacman, Gawel
+    Road Trip ~1 ==> Olivier (MND), Chloé, Aurore, Grégoire
+    SublimES© ==> Adrien (MND), Natacha (MND), Elmi, Baptiste, Cactus
+  2 - jeudi soir
+    @Unassigned (2 - jeudi soir) ==> 
+    Beta Microscope with time travel ==> Tilleul (MND), Tiramisù, Duck / Rafik, Vincent B, Pénélope
+    Freezing Moon ==> Shyria (MND), Vivienne, Thierry, Pacman, Cactus
+    Friendship is magic! My little pony 🌈 ==> Judith (MND), Finn, Deryn, Viviane, Baptiste
+    HeartRunner − Cyberpunk #3 ==> Valentin (MND), Julien, Steve, Michael
+    Road Trip ~2 ==> Olivier (MND), Chloé, Aurore, Grégoire
+    Soth ==> Gawel (MND), Adrien, Elmi, BPM, Natacha, Eliandrana
+  3 - vendredi aprèm
+    @Unassigned (3 - vendredi aprèm) ==> Chloé, Deryn, Vivienne, Baptiste, Pénélope, Cactus, Michael
+    Arcana − Ambre Tailhades et Luc Mercier ~1 ==> Natacha (MND), Julien, Elmi, Judith
+    Célestopol ==> Shyria (MND), Aurore, BPM, Thierry, Pacman
+    Fast Food ==> Olivier (MND), Adrien, Viviane, Vincent B, Eliandrana
+    HeartRunner − Cyberpunk #2 ==> Valentin (MND), Grégoire, Gawel, Tilleul
+    Le troisième hiver ==> Steve (MND), Finn, Tiramisù, Duck / Rafik
+  4 - vendredi soir
+    @Unassigned (4 - vendredi soir) ==> 
+    Arcana − Ambre Tailhades et Luc Mercier ~2 ==> Natacha (MND), Julien, Elmi, Judith
+    Aventures au Pays des Merveilles (Girl Underground) ==> Viviane (MND), Steve, Olivier, Vincent B, Pénélope
+    Brindlewood Bay ==> Adrien (MND), Shyria, Tilleul, Eliandrana
+    De bile et d'acier − Perdu·e dans la montagne #2 ==> Cactus (MND), Valentin, Aurore, Vivienne, Duck / Rafik
+    La Couvée #3 ==> Michael (MND), Tiramisù, BPM, Grégoire, Gawel
+    Toutes Petites Aventures ==> Finn (MND), Chloé, Deryn, Thierry, Baptiste, Pacman
+  5 - samedi aprèm
+    @Unassigned (5 - samedi aprèm) ==> 
+    De bile et d'acier − Perdu·e dans la montagne #1 ==> Cactus (MND), Chloé, Deryn, Steve, Gawel
+    Definitely Wizards ==> Finn (MND), Tiramisù, Julien, Olivier, Eliandrana, Pénélope
+    Donjons et Chatons − Le Chateau tombé du ciel ==> Tilleul (MND), Grégoire, Duck / Rafik, Baptiste, Vincent B
+    HeartRunner − Cyberpunk #1 ==> Valentin (MND), Adrien, BPM, Pacman
+    La Couvée #1 ==> Michael (MND), Aurore, Elmi, Thierry
+    Le Lycée des Corps Brisés ==> Vivienne (MND), Shyria, Judith, Viviane, Natacha
+  6 - samedi soir
+    @Unassigned (6 - samedi soir) ==> Valentin, Julien
+    Comme un lundi ==> Gawel (MND), Tiramisù, Duck / Rafik, Tilleul, Eliandrana, Pénélope
+    Cthulhu − La Mustsara ==> Adrien (MND), Shyria, Steve, Grégoire, Vincent B
+    Les Terres Suspendues − Les arrivants ==> Cactus (MND), Aurore, Deryn, Elmi, Olivier
+    Segmentation (GN) ==> Chloé (MND), Pacman (MND), Finn, Vivienne, Judith, BPM, Baptiste, Natacha, Michael, Thierry, Viviane
+Unscheduled topics: Dogside Dogs, La Couvée #2, On mighty thews
+Schedule-chain seed: -2322879861512078068
+
+Schedule score is 353.12443686426684
+
+Person       Score     ( Detail )
+Natacha      631.58    ( MND  MND  MND  263  158 )
+Olivier      500.00    ( MND  MND  MND  286  143  071 )
+BPM          483.87    ( 194  129  097  032  032 )
+Aurore       480.00    ( 100  100  100  060  060  060 )
+Grégoire     472.73    ( 091  091  091  091  055  055 )
+Pacman       418.60    ( MND  116  116  070  070  047 )
+Deryn        415.86    ( 114  156  156  156  062 -114 -114 )
+Thierry      403.51    ( 088  088  070  070  053  035 )
+Duck / R     400.00    ( 167  133  067  033 )
+Tiramisù     393.94    ( 076  076  076  076  045  045 )
+Julien       378.57    ( 167  167  167  100 -221 )
+Pénélope     376.19    ( 238  190  095  095 -243 )
+Baptiste     372.21    ( 414  093  093  074  056  019 -414 )
+Eliandra     370.97    ( MND  081  081  081  065  065 )
+Vincent      367.35    ( 102  102  061  061  020  020 )
+Gawel        366.67    ( MND  MND  167  100  100 )
+Shyria       363.64    ( MND  MND  227  136 )
+Elmi         356.32    ( 115  092  092  034  011  011 )
+Vivienne     348.84    ( 743  MND  159  127  063 -371 -371 )
+Viviane      333.33    ( MND  103  077  077  077 )
+Cactus       276.92    ( 243  MND  MND  MND  092  046  046  046  046 -243 )
+Tilleul      275.00    ( MND  MND  MND  100  100  075 )
+Judith       243.96    ( MND  128  128  128  077 -371 )
+Michael      230.77    ( 436  MND  MND  084  084  063 -436 )
+Steve        205.13    ( MND  MND  077  051  051  026 )
+Chloé        204.16    ( MND  179  179  149  090 -393 )
+Adrien       176.47    ( MND  MND  MND  059  059  059 )
+Valentin     170.45    ( 529  MND  MND  MND  170 -264 -264 )
+Finn         169.84    ( MND  MND  111  111  083 -136 )
+
+Other:
+  PersonPersonPreference(3 -> Baptiste, 13 -> Judith, 18.610421836228287)
+  PersonPersonPreference(13 -> Judith, 3 -> Baptiste, 25.641025641025642)
+  PersonPersonPreference(13 -> Judith, 16 -> Natacha, 25.641025641025642)
+  PersonPersonPreference(16 -> Natacha, 13 -> Judith, 52.63157894736842)
+
+********************************************************************************
+
+01:29:04: We have tried 1833 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:29:34: We have tried 1868 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:30:00: We have tried 1895 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:30:13: We have tried 3242 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:30:33: We have tried 1936 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+01:30:37: We have tried 1977 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:30:40: We have tried 187 schedules on thread scala-execution-context-global-59 (best score on thread is -162.32212230443406)
+01:30:56: We have tried 1984 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+01:31:47: We have tried 273 schedules on thread scala-execution-context-global-59 (best score on thread is -82.17688463571298)
+01:32:39: We have tried 3466 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:35:07: Starting new schedule chain on thread scala-execution-context-global-51 with chain-seed: -1847295049342948464
+01:35:07: We have tried 3494 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:38:03: We have tried 3604 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:38:27: We have tried 3639 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:39:01: We have tried 3681 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:39:22: We have tried 3740 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:40:10: We have tried 2040 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+01:41:00: We have tried 3809 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:41:26: We have tried 2109 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+01:43:33: We have tried 2098 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:45:35: We have tried 3915 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:46:51: We have tried 3970 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:47:28: We have tried 2185 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:47:52: We have tried 2281 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:49:41: We have tried 2355 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:52:06: We have tried 2453 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:53:48: Starting new schedule chain on thread scala-execution-context-global-54 with chain-seed: 7528477874747368968
+01:53:48: We have tried 1152 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+01:54:09: We have tried 2652 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:54:36: We have tried 2699 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:54:44: We have tried 4097 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+01:54:54: We have tried 1193 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+01:55:11: We have tried 2733 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:55:16: We have tried 355 schedules on thread scala-execution-context-global-61 (best score on thread is 205.0591754438277)
+01:55:30: We have tried 1213 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+01:55:47: We have tried 2807 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:55:57: We have tried 1349 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+01:56:24: We have tried 2920 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:56:59: We have tried 2963 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+01:58:12: We have tried 448 schedules on thread scala-execution-context-global-61 (best score on thread is 297.7077882726985)
+01:59:43: We have tried 1969 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:00:05: We have tried 2059 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:00:39: We have tried 2123 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:01:30: We have tried 4141 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+02:03:58: We have tried 2141 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:04:32: We have tried 4202 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+02:05:37: We have tried 4248 schedules on thread scala-execution-context-global-51 (best score on thread is 332.03500372983143)
+02:09:28: We have tried 2154 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:13:14: Starting new schedule chain on thread scala-execution-context-global-52 with chain-seed: 4730358776860066070
+02:13:14: We have tried 2975 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+02:13:36: We have tried 3000 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+02:14:41: We have tried 3087 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+02:15:06: We have tried 3198 schedules on thread scala-execution-context-global-52 (best score on thread is 353.12443686426684)
+02:17:06: We have tried 355 schedules on thread scala-execution-context-global-59 (best score on thread is -68.308357962031)
+02:26:44: We have tried 529 schedules on thread scala-execution-context-global-61 (best score on thread is 311.7139083805468)
+02:27:13: We have tried 578 schedules on thread scala-execution-context-global-61 (best score on thread is 329.38567112330816)
+02:29:19: We have tried 2272 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:29:55: We have tried 2283 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:31:06: We have tried 2377 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:31:16: We have tried 2449 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:31:40: We have tried 2427 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:31:57: We have tried 2521 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:32:03: We have tried 419 schedules on thread scala-execution-context-global-59 (best score on thread is -18.81836439781926)
+02:32:42: We have tried 2590 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:33:40: We have tried 2711 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:34:35: We have tried 679 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+02:36:01: We have tried 457 schedules on thread scala-execution-context-global-59 (best score on thread is -18.815212967199685)
+02:36:01: Starting new schedule chain on thread scala-execution-context-global-48 with chain-seed: 5184511124655872251
+02:36:01: We have tried 2711 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+02:36:09: We have tried 2527 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:38:15: We have tried 542 schedules on thread scala-execution-context-global-59 (best score on thread is 69.09149596120831)
+02:38:35: We have tried 571 schedules on thread scala-execution-context-global-59 (best score on thread is 73.07242432333017)
+02:42:02: We have tried 2694 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:44:52: We have tried 1458 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+02:45:33: We have tried 1536 schedules on thread scala-execution-context-global-54 (best score on thread is 212.50017923508565)
+02:47:16: We have tried 644 schedules on thread scala-execution-context-global-59 (best score on thread is 123.92743725243184)
+02:47:38: We have tried 686 schedules on thread scala-execution-context-global-59 (best score on thread is 123.97161289804663)
+02:47:42: We have tried 866 schedules on thread scala-execution-context-global-50 (best score on thread is 108.94254682018848)
+02:48:01: We have tried 782 schedules on thread scala-execution-context-global-59 (best score on thread is 147.19357876124846)
+02:48:21: We have tried 833 schedules on thread scala-execution-context-global-59 (best score on thread is 160.20248007497923)
+02:49:52: We have tried 974 schedules on thread scala-execution-context-global-59 (best score on thread is 189.03792596770523)
+02:51:30: We have tried 1117 schedules on thread scala-execution-context-global-59 (best score on thread is 219.91185147080907)
+02:51:41: We have tried 363 schedules on thread scala-execution-context-global-55 (best score on thread is 90.54242823037896)
+02:52:13: We have tried 1248 schedules on thread scala-execution-context-global-59 (best score on thread is 241.72664819866537)
+02:53:04: We have tried 1313 schedules on thread scala-execution-context-global-59 (best score on thread is 246.3235471407728)
+02:54:03: We have tried 616 schedules on thread scala-execution-context-global-55 (best score on thread is 115.48860194512133)
+02:54:40: We have tried 1445 schedules on thread scala-execution-context-global-59 (best score on thread is 247.3994206794721)
+02:55:57: We have tried 865 schedules on thread scala-execution-context-global-55 (best score on thread is 152.3408531041977)
+02:56:28: We have tried 1556 schedules on thread scala-execution-context-global-59 (best score on thread is 252.13361801493008)
+02:58:12: We have tried 1079 schedules on thread scala-execution-context-global-55 (best score on thread is 153.98092049932472)
+02:58:23: We have tried 1774 schedules on thread scala-execution-context-global-59 (best score on thread is 257.1998941150299)
+02:58:37: We have tried 2884 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+02:59:25: We have tried 1199 schedules on thread scala-execution-context-global-55 (best score on thread is 222.4137043313632)
+02:59:47: We have tried 1283 schedules on thread scala-execution-context-global-55 (best score on thread is 246.30946144241565)
+03:00:42: We have tried 1392 schedules on thread scala-execution-context-global-55 (best score on thread is 254.63990401405152)
+03:01:08: We have tried 1998 schedules on thread scala-execution-context-global-59 (best score on thread is 257.89949548971606)
+03:01:36: We have tried 2052 schedules on thread scala-execution-context-global-59 (best score on thread is 284.56969678990447)
+03:01:49: We have tried 1508 schedules on thread scala-execution-context-global-55 (best score on thread is 262.17957543802066)
+03:02:01: We have tried 2965 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+03:03:05: We have tried 2205 schedules on thread scala-execution-context-global-59 (best score on thread is 305.71644349097176)
+03:03:27: We have tried 451 schedules on thread scala-execution-context-global-45 (best score on thread is 58.456545943731925)
+03:03:33: We have tried 2260 schedules on thread scala-execution-context-global-59 (best score on thread is 307.3542667976799)
+03:03:55: We have tried 2326 schedules on thread scala-execution-context-global-59 (best score on thread is 310.0078271507663)
+03:04:01: We have tried 1726 schedules on thread scala-execution-context-global-55 (best score on thread is 270.2826715289319)
+03:04:56: We have tried 3023 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+03:05:02: We have tried 2388 schedules on thread scala-execution-context-global-59 (best score on thread is 310.0750041025386)
+03:05:08: We have tried 555 schedules on thread scala-execution-context-global-45 (best score on thread is 110.93234909105267)
+03:07:36: Starting new schedule chain on thread scala-execution-context-global-61 with chain-seed: 8052354021149697975
+03:07:36: We have tried 679 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+03:07:57: We have tried 713 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+03:08:18: We have tried 734 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+03:08:42: Starting new schedule chain on thread scala-execution-context-global-55 with chain-seed: 3836600641766009976
+03:08:42: We have tried 1731 schedules on thread scala-execution-context-global-55 (best score on thread is 286.37828473483097)
+03:08:54: We have tried 838 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+03:10:33: We have tried 1010 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+03:15:20: We have tried 1097 schedules on thread scala-execution-context-global-46 (best score on thread is 231.4171825456367)
+03:15:44: We have tried 1199 schedules on thread scala-execution-context-global-46 (best score on thread is 251.59732168538454)
+03:16:27: We have tried 1241 schedules on thread scala-execution-context-global-46 (best score on thread is 257.20380280860775)
+03:18:11: We have tried 1427 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+03:28:48: We have tried 735 schedules on thread scala-execution-context-global-45 (best score on thread is 121.99855080160793)
+03:29:09: We have tried 778 schedules on thread scala-execution-context-global-45 (best score on thread is 124.78540346912467)
+03:29:39: We have tried 811 schedules on thread scala-execution-context-global-45 (best score on thread is 195.48652852088412)
+03:34:18: We have tried 734 schedules on thread scala-execution-context-global-53 (best score on thread is 149.5627129543388)
+03:36:12: We have tried 908 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:39:44: We have tried 824 schedules on thread scala-execution-context-global-53 (best score on thread is 156.45925548019272)
+03:43:39: We have tried 969 schedules on thread scala-execution-context-global-53 (best score on thread is 162.64677568252543)
+03:44:03: We have tried 1053 schedules on thread scala-execution-context-global-53 (best score on thread is 181.97676696825832)
+03:50:40: Starting new schedule chain on thread scala-execution-context-global-45 with chain-seed: 6234873391020445470
+03:50:40: We have tried 908 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:51:03: We have tried 984 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:51:24: We have tried 1077 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:51:56: We have tried 1124 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:52:48: We have tried 1187 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:53:20: We have tried 1282 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:54:00: We have tried 1327 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:57:07: We have tried 1423 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:57:43: We have tried 1465 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:58:22: We have tried 1532 schedules on thread scala-execution-context-global-45 (best score on thread is 250.3355923590205)
+03:58:47: We have tried 1182 schedules on thread scala-execution-context-global-63 (best score on thread is 155.73091540962653)
+03:59:05: We have tried 1656 schedules on thread scala-execution-context-global-45 (best score on thread is 261.9939239194677)
+04:00:11: We have tried 1734 schedules on thread scala-execution-context-global-45 (best score on thread is 264.6823032179807)
+04:00:50: We have tried 1877 schedules on thread scala-execution-context-global-45 (best score on thread is 314.3483576568967)
+04:02:39: We have tried 1997 schedules on thread scala-execution-context-global-45 (best score on thread is 314.5409335339478)
+04:04:01: We have tried 2200 schedules on thread scala-execution-context-global-45 (best score on thread is 328.24954640916553)
+04:04:51: We have tried 2263 schedules on thread scala-execution-context-global-45 (best score on thread is 334.78169272475986)
+04:06:30: We have tried 2465 schedules on thread scala-execution-context-global-45 (best score on thread is 341.04174736376)
+04:07:02: We have tried 2497 schedules on thread scala-execution-context-global-45 (best score on thread is 341.90687905666914)
+04:07:26: We have tried 2531 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:09:29: Starting new schedule chain on thread scala-execution-context-global-45 with chain-seed: 6081893175189994058
+04:09:29: We have tried 2531 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:10:23: We have tried 1369 schedules on thread scala-execution-context-global-63 (best score on thread is 250.42873630655262)
+04:12:53: We have tried 1578 schedules on thread scala-execution-context-global-63 (best score on thread is 276.6971627987432)
+04:16:10: We have tried 2650 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:17:44: We have tried 2733 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:18:05: We have tried 2851 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:18:32: We have tried 2940 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:20:28: We have tried 3022 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:21:38: We have tried 3130 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:21:56: We have tried 3205 schedules on thread scala-execution-context-global-47 (best score on thread is 179.1964977014348)
+04:22:21: We have tried 3190 schedules on thread scala-execution-context-global-45 (best score on thread is 342.6867744110489)
+04:23:57: We have tried 3369 schedules on thread scala-execution-context-global-47 (best score on thread is 281.40581259785597)
+04:27:48: We have tried 3564 schedules on thread scala-execution-context-global-47 (best score on thread is 287.9804086833258)
+04:27:53: Starting new schedule chain on thread scala-execution-context-global-63 with chain-seed: -5393204327399098001
+04:27:53: We have tried 1591 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+04:31:13: We have tried 3657 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+04:33:37: Starting new schedule chain on thread scala-execution-context-global-47 with chain-seed: -1001969322606556285
+04:33:37: We have tried 3657 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+04:33:46: We have tried 39 schedules on thread scala-execution-context-global-62 (best score on thread is -289.04086479429486)
+04:37:10: We have tried 3753 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+04:37:48: We have tried 3803 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+04:44:14: We have tried 45 schedules on thread scala-execution-context-global-62 (best score on thread is -218.87293241580045)
+04:44:47: We have tried 95 schedules on thread scala-execution-context-global-62 (best score on thread is 67.9283400381638)
+04:45:29: We have tried 145 schedules on thread scala-execution-context-global-62 (best score on thread is 116.14481402975674)
+04:48:05: We have tried 210 schedules on thread scala-execution-context-global-62 (best score on thread is 121.62684446315595)
+04:52:31: We have tried 1117 schedules on thread scala-execution-context-global-53 (best score on thread is 191.2945723989524)
+04:55:25: We have tried 1303 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+04:58:11: Starting new schedule chain on thread scala-execution-context-global-53 with chain-seed: 1014651248837517648
+04:58:11: We have tried 1303 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+04:58:31: We have tried 1332 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+04:58:57: We have tried 1408 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+05:00:09: We have tried 1474 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+05:00:32: We have tried 1555 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+05:00:54: We have tried 1592 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+05:01:43: Starting new schedule chain on thread scala-execution-context-global-46 with chain-seed: 5339191407332602631
+05:01:43: We have tried 1427 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:02:05: We have tried 1464 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:02:28: We have tried 1500 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:02:49: We have tried 1597 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:02:51: We have tried 1649 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+05:02:54: We have tried 1713 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+05:03:42: We have tried 1684 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:04:09: We have tried 1727 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:05:16: We have tried 1790 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+05:22:24: We have tried 1695 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+06:03:56: We have tried 178 schedules on thread scala-execution-context-global-49 (best score on thread is -217.70403676618486)
+06:07:41: We have tried 270 schedules on thread scala-execution-context-global-49 (best score on thread is -119.93788590684568)
+06:08:19: We have tried 317 schedules on thread scala-execution-context-global-49 (best score on thread is -83.99086825182175)
+06:14:29: We have tried 421 schedules on thread scala-execution-context-global-49 (best score on thread is -43.53151098762848)
+06:16:17: We have tried 436 schedules on thread scala-execution-context-global-49 (best score on thread is -35.813264303462866)
+06:21:57: We have tried 1753 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+06:26:15: We have tried 504 schedules on thread scala-execution-context-global-49 (best score on thread is -11.870651382794875)
+06:27:16: Starting new schedule chain on thread scala-execution-context-global-57 with chain-seed: -2490934986800559550
+06:27:16: We have tried 1252 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+06:27:40: We have tried 1303 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+06:28:18: We have tried 1355 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+06:41:58: We have tried 1869 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+06:43:07: We have tried 1958 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+06:45:00: We have tried 2133 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+06:51:01: We have tried 2234 schedules on thread scala-execution-context-global-46 (best score on thread is 259.04611287268665)
+06:51:29: We have tried 2330 schedules on thread scala-execution-context-global-46 (best score on thread is 295.813188339307)
+06:53:27: We have tried 2548 schedules on thread scala-execution-context-global-46 (best score on thread is 311.4522667578693)
+06:55:09: We have tried 2689 schedules on thread scala-execution-context-global-46 (best score on thread is 315.06055124613897)
+06:55:42: We have tried 2757 schedules on thread scala-execution-context-global-46 (best score on thread is 327.67686969546463)
+06:55:55: We have tried 2525 schedules on thread scala-execution-context-global-59 (best score on thread is 316.6052341757909)
+06:57:27: We have tried 2915 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+06:59:27: Starting new schedule chain on thread scala-execution-context-global-46 with chain-seed: 3167588299433182378
+06:59:27: We have tried 2915 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+06:59:52: We have tried 3035 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:00:26: We have tried 3083 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:01:00: We have tried 3129 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:01:34: We have tried 3203 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:02:09: We have tried 3339 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:02:33: We have tried 3369 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:02:58: We have tried 3406 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:03:29: We have tried 3451 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:03:58: We have tried 3538 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:04:22: We have tried 3571 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:06:07: We have tried 3636 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:06:49: We have tried 3694 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:07:50: We have tried 3777 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:08:18: We have tried 3888 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:09:44: We have tried 4020 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:11:47: We have tried 4208 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:13:51: We have tried 4433 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:14:15: We have tried 4540 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:15:34: We have tried 4634 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:16:03: We have tried 4708 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:16:31: We have tried 4791 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:17:51: We have tried 4922 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:18:26: We have tried 5025 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:19:01: We have tried 5070 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:20:02: We have tried 5158 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:21:28: We have tried 5311 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:21:49: We have tried 2674 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+07:21:56: We have tried 5380 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:23:29: We have tried 5524 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:23:55: We have tried 5645 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:24:33: We have tried 5696 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:36:02: Starting new schedule chain on thread scala-execution-context-global-59 with chain-seed: 7531740221508966037
+07:36:02: We have tried 2674 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+07:36:57: We have tried 2695 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+07:37:39: We have tried 2704 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+07:38:13: We have tried 2739 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+07:39:06: We have tried 1389 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:39:39: We have tried 1462 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:40:15: We have tried 1533 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:41:12: We have tried 1606 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:43:13: We have tried 1812 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+07:43:44: We have tried 1742 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:44:04: We have tried 1773 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:49:21: We have tried 1768 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+07:50:08: We have tried 1841 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+07:50:11: We have tried 5832 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:50:57: We have tried 1827 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+07:52:10: We have tried 6020 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:53:12: We have tried 6106 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:54:24: We have tried 6252 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:54:32: We have tried 1884 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+07:56:09: We have tried 6450 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+07:56:51: We have tried 6503 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+08:09:08: We have tried 1937 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+08:14:55: We have tried 1030 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:15:37: We have tried 1093 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:16:36: We have tried 1999 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+08:16:41: We have tried 1249 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:17:37: We have tried 1312 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:18:09: We have tried 1408 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:18:09: We have tried 2089 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+08:19:12: We have tried 1531 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:20:42: We have tried 1589 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:21:54: We have tried 1717 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:22:42: We have tried 1772 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:24:24: We have tried 1948 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:26:30: We have tried 2181 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:28:24: We have tried 2777 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+08:30:08: Starting new schedule chain on thread scala-execution-context-global-61 with chain-seed: 3925797163891636329
+08:30:08: We have tried 2217 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:33:33: We have tried 2479 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:34:30: We have tried 2565 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:35:15: We have tried 2620 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:35:35: We have tried 2914 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+08:36:52: We have tried 2724 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:38:07: We have tried 2823 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:38:43: We have tried 2927 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:40:17: We have tried 3055 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:42:02: We have tried 3194 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:45:04: We have tried 3417 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:46:25: We have tried 2063 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+08:47:47: We have tried 2127 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+08:53:46: We have tried 3059 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+08:56:46: Starting new schedule chain on thread scala-execution-context-global-61 with chain-seed: 5722145611183750094
+08:56:46: We have tried 3417 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:57:08: We have tried 3455 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+08:59:11: We have tried 3112 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+09:05:49: We have tried 2188 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+09:08:38: We have tried 2259 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+09:12:20: We have tried 2432 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+09:13:48: We have tried 2485 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+09:14:00: We have tried 3170 schedules on thread scala-execution-context-global-59 (best score on thread is 317.36675555038363)
+09:14:19: We have tried 2613 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+09:14:52: We have tried 3854 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+09:15:42: We have tried 3904 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+09:16:02: We have tried 2669 schedules on thread scala-execution-context-global-63 (best score on thread is 291.1624414378642)
+09:17:49: We have tried 3559 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+09:18:17: We have tried 3612 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+09:20:25: We have tried 3657 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+09:24:15: We have tried 2181 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+09:24:30: We have tried 3702 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+09:24:57: We have tried 3729 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+09:25:24: We have tried 2217 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+09:26:28: We have tried 2300 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+09:45:17: We have tried 2755 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+09:46:03: We have tried 2851 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+09:47:07: We have tried 2927 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+10:19:17: We have tried 3789 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+10:21:55: We have tried 6550 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:24:20: Starting new schedule chain on thread scala-execution-context-global-46 with chain-seed: 8930532678063852967
+10:24:20: We have tried 6550 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:24:43: We have tried 6625 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:30:57: We have tried 4011 schedules on thread scala-execution-context-global-47 (best score on thread is 312.65887820350594)
+10:37:33: We have tried 3054 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+10:39:02: We have tried 6669 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:39:06: We have tried 3120 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+10:42:44: We have tried 6718 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:44:10: We have tried 6782 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:45:44: We have tried 6841 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+10:46:14: We have tried 6896 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:08:16: We have tried 1982 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:21:37: We have tried 2040 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:21:53: We have tried 6954 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:23:02: We have tried 6998 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:25:05: We have tried 2075 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:25:56: We have tried 2183 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:27:12: We have tried 3217 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:29:22: We have tried 3421 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:29:27: We have tried 2339 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:30:42: We have tried 3593 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:30:58: We have tried 3835 schedules on thread scala-execution-context-global-61 (best score on thread is 338.43721384363914)
+11:31:16: We have tried 2414 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:31:31: We have tried 3670 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:31:50: We have tried 2463 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:31:54: We have tried 3762 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:33:21: We have tried 3878 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:33:58: We have tried 2613 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:34:04: We have tried 3967 schedules on thread scala-execution-context-global-48 (best score on thread is 256.6012836772385)
+11:35:07: We have tried 2709 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:36:26: We have tried 2767 schedules on thread scala-execution-context-global-53 (best score on thread is 192.71015522891855)
+11:40:48: We have tried 7056 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:41:11: We have tried 7126 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:41:14: We have tried 2459 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
+11:41:57: We have tried 7181 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:42:33: We have tried 7228 schedules on thread scala-execution-context-global-46 (best score on thread is 329.1031168813282)
+11:43:17: We have tried 2500 schedules on thread scala-execution-context-global-57 (best score on thread is 319.50137654731617)
