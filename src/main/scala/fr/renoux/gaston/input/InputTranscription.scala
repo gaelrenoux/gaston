@@ -228,11 +228,10 @@ private[input] final class InputTranscription(rawInput: InputModel) {
           PersonGroupAntiPreference(person, group.toArraySet, settings.incompatibilityAntiPreference)
       }
 
-    /** Wishes are scaled so that everyone has the same maximum score. Otherwise, you could put either very small scores
-     * (and therefore stay the lowest score in the schedule and therefore privileged when improving), or with such
-     * high values that everyone else's preference don't matter any more.
-     *
-     * We do not handle negative preferences here (they're excluded from the total). */
+    /** Wishes are scaled so that everyone has the same total number of points over all their wishes
+      * (Constants.PersonTotalScore).
+      *
+      * We do not handle negative preferences here (they're excluded from the total). */
     // TODO Right now, negative prefs are ignored in the total count. Either handle them or just forbid negative wishes.
     lazy val personScoreFactors: Map[NonEmptyString, Double] = input.personsSet.view.map { inPerson =>
       val totalTopicWishesScore = inPerson.wishes.filter(_._2.value > 0).values.sum.value
