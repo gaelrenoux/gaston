@@ -1,5 +1,6 @@
 package fr.renoux.gaston.command
 
+import fr.renoux.gaston.BuildInfo
 import scopt.Read
 
 import java.nio.file.{Path, Paths}
@@ -25,7 +26,7 @@ object CommandLine {
   private given Read[Duration] = Read.reads(Duration(_))
 
   private val parser = new scopt.OptionParser[CommandLine]("gaston") {
-    head("gaston", "0.1")
+    head("gaston", BuildInfo.Version)
 
     opt[Path]('f', "from").optional().valueName("<file>")
       .action((path, in) => in.copy(inputFile = Some(path)))
@@ -70,7 +71,7 @@ object CommandLine {
       }
       .text("How many improvement loops should run in parallel. Default is the number of available CPUs minus 1.")
 
-    help("help").text("prints this usage text")
+    help("help").text("Prints this usage text.")
   }
 
   def parse(args: Seq[String]): CommandLine =
