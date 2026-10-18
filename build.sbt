@@ -84,3 +84,16 @@ Test / testOptions += Tests.Argument("-oD") // show test duration
 
 /* Stays inside the sbt console when we press "ctrl-c" in tests" */
 Global / cancelable := true
+
+/* Exposes the project's version to the code (displayed by the command line) */
+Compile / sourceGenerators += Def.task {
+  val file = (Compile / sourceManaged).value / "fr" / "renoux" / "gaston" / "BuildInfo.scala"
+  IO.write(file,
+    s"""package fr.renoux.gaston
+       |
+       |object BuildInfo {
+       |  val Version: String = "${version.value}"
+       |}
+       |""".stripMargin)
+  Seq(file)
+}.taskValue
