@@ -316,16 +316,17 @@ is index 0, second row is index 1, and so on).
 - `mandatory-person-col`: Column for a mandatory person on a topic (see field `gaston.persons.mandatory`, there is often
   only one person per topic). It is not possible to set multiple mandatory persons on a topic in the table, this is
   something you will have to do by modifying the input file afterwards. Default value is `1`.
-- `min-persons-col`: Column for the min number of persons on a topic (see field `gaston.topics.min`). Default value is
-  `2`. If a cell's content is not a number (including if it is left empty), that topic won't have a specific min.
-- `max-persons-col`: Column for the max number of persons on a topic (see field `gaston.topics.max`). Default value is
-  `3`. If a cell's content is not a number (including if it is left empty), that topic won't have a specific max.
+- `min-persons-col`: Column for the min number of persons on a topic (see field `gaston.topics.min`). If a cell's
+  content is not a number (including if it is left empty), that topic won't have a specific min. Default value is empty
+  (topics won't have a specific min).
+- `max-persons-col`: Column for the max number of persons on a topic (see field `gaston.topics.max`).  If a cell's
+  content is not a number (including if it is left empty), that topic won't have a specific max. Default value is `3`.
 - `persons-count-add`: A number to add to the min and max number of persons read, because sometimes the mandatory person
   isn't counted in the table. Default value is `0`.
 - `mandatory-person-weight`: A special weight for a person if they are mandatory on at least one topic (see field
   `gaston.persons.weight`). Default value is `1`, i.e. same as everyone else.
 - `forbidden-person-marker`: This text in a wish cell indicates that that person is forbidden on that topic (see field
-  `gaston.persons.forbidden`). Default value is `0`.
+  `gaston.persons.forbidden`). Default value is empty (no forbidden marker).
 - `preferences-score-mapping`: An object mapping for each possible text in a wish cell, the associated score. Unknown
   texts are ignored. Optional: if the field is missing (or set to `null`), the text in the cell will be converted to a
   number and used (if the text is not a number, it is ignored).
