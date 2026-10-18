@@ -1,6 +1,6 @@
 package fr.renoux.gaston.model.preferences
 
-import fr.renoux.gaston.model.{Person, Preference, Schedule, Score, Topic}
+import fr.renoux.gaston.model.*
 
 /**
  * This person wants a minimum of X free slots in its schedule. If >1, those free slots must be on different slot-sequences.
