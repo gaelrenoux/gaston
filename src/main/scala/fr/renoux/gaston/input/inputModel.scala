@@ -105,17 +105,15 @@ object InputSettings {
       maxPersons: PosInt = Constants.IntLowMaxValue,
       personAntiPreference: NonPosScore = NonPosScore(-1000.0), // default is the negative of Score.PersonTotalScore
       personAntiPreferenceScaling: Option[InputSettings.UnassignedAntiPreferenceScaling] = None,
-      personMultipleAntiPreference: Option[NonPosScore] = None,
       personMultipleSameCycleAntiPreference: Option[NonPosScore] = None,
   )
 
-  /** If this is enabled, the anti-preference for unassigned will scale with the number of forbidden topics for each person.
-   * @param maximumAntiPreference The maximum value of the anti-preference (i.e., closest to zero).
-   * @param forbiddenRatioForMaximum At this ratio of forbidden topics, the anti-preference will be up to its maximal value.
-   */
+  /** If this is enabled, the anti-preference for unassigned will scale with the number of forbidden topics for each person. */
   final case class UnassignedAntiPreferenceScaling(
-      maximumAntiPreference: NonPosScore = NonPosScore(-1.0),
-      forbiddenRatioForMaximum: Double = 0.75,
+      forbiddenRatioForZeroUnassigned: Double = 0,
+      forbiddenRatioForOneUnassigned: Double = 0.25, // that's 0.04 unassigned per 1% of forbidden topics
+      baseAntiPreference: NonPosScore = NonPosScore(-5.0), // default is 1% of the scaling anti-preference
+      scalingAntiPreference: NonPosScore = NonPosScore(-500.0), // default is half the negative of Score.PersonTotalScore
   )
 }
 
