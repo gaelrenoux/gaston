@@ -24,8 +24,8 @@ class InputSpec extends AnyFlatSpec with Matchers {
 
     object slots {
       lazy val a: Slot = Slot(0, "A", persons.all, Some(b), maxTopics = 4)
-      lazy val b: Slot = Slot(1, "B", persons.all, None, maxTopics = Int.MaxValue)
-      lazy val c: Slot = Slot(2, "C", persons.all, None, maxTopics = Int.MaxValue)
+      lazy val b: Slot = Slot(1, "B", persons.all, None, maxTopics = 5)
+      lazy val c: Slot = Slot(2, "C", persons.all, None, maxTopics = 5)
       val all: Set[Slot] = Set(a, b, c)
     }
 

@@ -62,7 +62,8 @@ private[input] final class InputTranscription(rawInput: InputModel) {
     // Then we do a second pass to set the nextSlot (we need to iterate in reverse for this).
     val slotsBase = inSequence.map { inSlot => // not setting the next-slot yet
       val personsPresent = input.personsSet.filterNot(_.absences.contains(inSlot.name)).map(p => personsByName(p.name))
-      inSlot.name -> Slot(slotIx.getAndIncrement(), inSlot.name, personsPresent, None, inSlot.maxTopics.getOrElse(Int.MaxValue))
+      val maxTopics = inSlot.maxTopics.orElse(settings.defaultMaxTopicsPerSlot).getOrElse(Int.MaxValue)
+      inSlot.name -> Slot(slotIx.getAndIncrement(), inSlot.name, personsPresent, None, maxTopics)
     }
     slotsBase.reverseIterator.mapWithState(Option.empty[Slot]) { case ((slotName, slot), nextSlot) =>
       val newSlot = slot.copy(next = nextSlot)

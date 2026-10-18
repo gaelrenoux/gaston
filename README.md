@@ -87,7 +87,7 @@ the values of the scores, each person has 1000 points distributed over their wis
       structure of one slot.
         - `name`: Name of the slot. Must be unique among slots.
         - `max-topics`: Maximum number of topics to schedule on this slot (e.g. because space is limited at that time).
-          Default is no limit.
+          Default is to use `default-max-topics-per-slot`.
     - `topics`: The topics to schedule. The following lines describe the structure of one topic.
         - `name`: Name of the topic. Must be unique among topics. It cannot start with `@`, nor contain `#` or `~` (
           those are used for generated names).
