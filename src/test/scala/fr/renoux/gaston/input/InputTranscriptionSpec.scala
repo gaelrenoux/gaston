@@ -455,7 +455,11 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   }
 
 
-  behavior of "Slots" {
+  behavior of "Slots"
+
+  {
+    val inputSlots = List(List(InputSlot("one"), InputSlot("two")), List(InputSlot("three")))
+
     it should "chain slots only inside a sequence" in {
       given problem: Problem = from(InputModel(slots = inputSlots))
       slot"one".next should be(Some(slot"two"))
