@@ -1,4 +1,4 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.model
 
 import fr.renoux.gaston.SimpleTestModel
 import fr.renoux.gaston.model.*
