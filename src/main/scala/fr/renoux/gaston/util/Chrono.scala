@@ -35,7 +35,7 @@ sealed class Chrono(blocking: Boolean = false) {
           _times.put(name, _times(name) + time)
           _counts.put(name, _counts(name) + 1)
         }
-      }(ExecutionContext.global)
+      }(using ExecutionContext.global)
     }
 
   def timesTotal: Map[String, Long] = synchronized {

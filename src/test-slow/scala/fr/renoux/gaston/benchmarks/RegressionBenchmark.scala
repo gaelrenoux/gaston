@@ -99,6 +99,6 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
           lastMinute = lastMinute + 1
         }
       }
-    }(ExecutionContext.global)
+    }(using ExecutionContext.global)
   }
 }
