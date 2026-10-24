@@ -11,7 +11,7 @@ import fr.renoux.gaston.util.{Chrono, Context, Tools}
 import java.time.Instant
 import scala.concurrent.duration.*
 
-object PerformanceAnalysis extends App {
+object PerformanceAnalysis {
 
   private val udoConProblem = problemFromClassPath("udocon2019/uc19.conf").force
   // TODO check a solution
@@ -36,13 +36,16 @@ object PerformanceAnalysis extends App {
   val orchestrator = new ParallelRunner(seed = globalSeed)
   val termination = Termination(timeout = Some(Instant.now() + duration))
 
-  val (schedule, count) = tools.chrono("Total") {
+  lazy val (schedule, count) = tools.chrono("Total") {
     orchestrator.run(termination)
   }
 
-  println(s"${schedule.score} after $count iterations")
-  println(s"Times: ${tools.chrono.timesTotalPretty}")
-  println(s"Counts: ${tools.chrono.countsPretty}")
-  println(s"Average times: ${tools.chrono.timesAveragePretty}")
+  @main
+  def run(): Unit = {
+    println(s"${schedule.score} after $count iterations")
+    println(s"Times: ${tools.chrono.timesTotalPretty}")
+    println(s"Counts: ${tools.chrono.countsPretty}")
+    println(s"Average times: ${tools.chrono.timesAveragePretty}")
+  }
 
 }
