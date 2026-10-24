@@ -10,8 +10,8 @@ isSnapshot := true
 scalaVersion := "3.9.0"
 
 lazy val gaston = (project in file("."))
-  .configs(SlowTest)
-  .settings(inConfig(SlowTest)(Defaults.testSettings)*)
+    .configs(SlowTest)
+    .settings(inConfig(SlowTest)(Defaults.testSettings) *)
 
 /* Those tests are much slower */
 lazy val SlowTest = config("test-slow") extend (Test)
@@ -21,7 +21,7 @@ scalacOptions ++= Seq(
   "-language:higherKinds",
   "-language:existentials",
 
-  // "-Werror", // Fail the compilation if there are any warnings. // TODO restore once Scala 3 migration is done
+  "-Werror", // Fail the compilation if there are any warnings.
   "-explain", // Explain type errors in more detail.
 
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
@@ -76,7 +76,7 @@ libraryDependencies ++= Seq(
 assembly / mainClass := Some("fr.renoux.gaston.command.Main")
 assembly / assemblyMergeStrategy := {
   case PathList("META-INF", _*) => MergeStrategy.discard
-  case _                        => MergeStrategy.first
+  case _ => MergeStrategy.first
 }
 
 Test / fork := true
