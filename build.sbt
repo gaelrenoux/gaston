@@ -10,11 +10,11 @@ isSnapshot := true
 scalaVersion := "3.9.0"
 
 lazy val gaston = (project in file("."))
-    .configs(SlowTest)
-    .settings(inConfig(SlowTest)(Defaults.testSettings) *)
+    .configs(TestSlow)
+    .settings(inConfig(TestSlow)(Defaults.testSettings) *)
 
 /* Those tests are much slower */
-lazy val SlowTest = config("test-slow") extend (Test)
+lazy val TestSlow = config("test-slow") extend (Test)
 
 scalacOptions ++= Seq(
   "-language:implicitConversions",
