@@ -45,31 +45,31 @@ scalacOptions ++= Seq(
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 val catsVersion = "2.13.0"
-val ironVersion = "3.2.2"
+val ironVersion = "3.4.1"
 
 libraryDependencies ++= Seq(
 
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
-  "ch.qos.logback" % "logback-classic" % "1.5.18",
+  "ch.qos.logback" % "logback-classic" % "1.6.5",
 
   "org.typelevel" %% "cats-core" % catsVersion,
   "org.typelevel" %% "alleycats-core" % catsVersion,
-  "org.typelevel" %% "mouse" % "1.3.2",
+  "org.typelevel" %% "mouse" % "1.4.0",
 
-  "com.typesafe" % "config" % "1.4.3",
-  "com.github.pureconfig" %% "pureconfig-core" % "0.17.8",
-  "com.github.pureconfig" %% "pureconfig-generic-scala3" % "0.17.8",
-  "org.typelevel" %% "shapeless3-deriving" % "3.5.0",
-  "com.github.scopt" %% "scopt" % "4.1.0",
+  "com.typesafe" % "config" % "1.4.9",
+  "com.github.pureconfig" %% "pureconfig-core" % "0.17.11",
+  "com.github.pureconfig" %% "pureconfig-generic-scala3" % "0.17.11",
+  "org.typelevel" %% "shapeless3-deriving" % "3.6.0",
+  "com.github.scopt" %% "scopt" % "4.2.0",
 
   "io.github.iltotore" %% "iron" % ironVersion,
   "io.github.iltotore" %% "iron-pureconfig" % ironVersion,
 
-  "com.softwaremill.quicklens" %% "quicklens" % "1.9.12",
+  "com.softwaremill.quicklens" %% "quicklens" % "1.9.15",
 
   /* Tests */
-  "com.github.jatcwang" %% "difflicious-scalatest" % "0.4.3" % Test,
-  "org.scalatest" %% "scalatest" % "3.2.19" % Test
+  "com.github.jatcwang" %% "difflicious-scalatest" % "0.7.1" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.20" % Test
 )
 
 
