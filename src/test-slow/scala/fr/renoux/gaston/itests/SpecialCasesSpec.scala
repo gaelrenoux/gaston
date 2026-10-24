@@ -3,7 +3,7 @@ package fr.renoux.gaston.itests
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.engine.assignment.RandomAssigner
 import fr.renoux.gaston.input.problemFromClassPath
-import fr.renoux.gaston.model.{Problem, Record, SlotSchedule, Topic}
+import fr.renoux.gaston.model.{Problem, Record, SlotSchedule}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

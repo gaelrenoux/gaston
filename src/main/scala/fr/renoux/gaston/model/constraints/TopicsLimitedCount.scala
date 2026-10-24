@@ -10,8 +10,6 @@ final case class TopicsLimitedCount(topics: ArraySet[Topic], count: Int) extends
 
   override def isHardCoded: Boolean = false
 
-  override val isApplicableToPartialSchedule: Boolean = true
-
   override def isRespected(schedule: Schedule): Boolean = {
     val scheduledCount = schedule.scheduledTopics.count(topics.contains)
     scheduledCount <= count

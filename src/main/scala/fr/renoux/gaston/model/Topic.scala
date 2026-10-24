@@ -61,10 +61,10 @@ object Topic {
   def unassignedName(slotName: String): String = s"${Topic.SyntheticPrefix}Unassigned ($slotName)"
 
   /** Create a special "unassigned" topic */
-  // TODO maybe find a better name than 'unassigned', maybe 'pending' ?
   def unassigned(id: Int, slot: Slot, min: Int = 0, max: Int = Constants.IntLowMaxValue): Topic = {
+    // If min is 1, then zero works just as well (there's just no one unassigned)
     val realMin = if (min <= 1) 0 else min
-    Topic(id, unassignedName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = min == 0, isUnassigned = true)
+    Topic(id, unassignedName(slot.name), min = realMin, max = max, slots = Some(Set(slot)), forced = realMin == 0, isUnassigned = true)
   }
 
   val DefaultMin = 1

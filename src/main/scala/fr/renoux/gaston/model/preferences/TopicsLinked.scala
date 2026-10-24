@@ -6,7 +6,6 @@ import fr.renoux.gaston.util.ArraySet
 /** Every person on any of these topics, must be on all of these topics. Note that the 'reward' is applied for each anomaly. */
 final case class TopicsLinked(topics: ArraySet[Topic], reward: Score = Preference.NecessaryPreferenceScore)
   extends Preference.GlobalLevel with Preference.Anti with Preference.Impersonal {
-  // TODO Add unit test
 
   assert(topics.size > 1, s"$this should contain more than one topic")
 

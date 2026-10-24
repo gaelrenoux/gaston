@@ -471,7 +471,7 @@ object InputTranscription {
       input.constraints.notSimultaneous
         .flatMap(_.topics)
         .filter(!input.topicsNameSet.contains(_))
-        .map(t => s"SNot-simultaneous constraint: unknown topic: [$t]")
+        .map(t => s"Not-simultaneous constraint: unknown topic: [$t]")
     } ++ {
       input.constraints.limitedCount
         .flatMap(_.topics)
