@@ -1,14 +1,14 @@
-package fr.renoux.gaston.engine
+package fr.renoux.gaston.command
 
 import fr.renoux.gaston.SimpleTestModel
 import fr.renoux.gaston.command.{Output, SyncRunner}
+import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
 import fr.renoux.gaston.model.{Problem, Schedule}
 import fr.renoux.gaston.util.Context
-import org.scalatest.PrivateMethodTester
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class SyncRunnerSpec extends AnyFlatSpec with Matchers with PrivateMethodTester {
+class SyncRunnerSpec extends AnyFlatSpec with Matchers {
 
   private given Context = Context.Default
 
