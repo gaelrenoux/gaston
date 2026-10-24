@@ -5,7 +5,7 @@ import fr.renoux.gaston.input.{InputLoader, InputSettings}
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.model.constraints.*
-import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference}
+import fr.renoux.gaston.model.preferences.{PersonGroupAntiPreference, PersonTopicPreference, TopicDirectPreference}
 import fr.renoux.gaston.util.{ArrayMap, Context}
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -20,8 +20,8 @@ class SimpleTestModel(using settings: InputSettings) {
   object Persons {
     private val index = new AtomicInteger(0)
     val Arthur: Person = Person(index.getAndIncrement(), "Arthur")
-    val Bianca: Person = Person(index.getAndIncrement(), "Bianca")
-    val Corwin: Person = Person(index.getAndIncrement(), "Corwin")
+    val Bianca: Person = Person(index.getAndIncrement(), "Bianca", Weight(2))
+    val Corwin: Person = Person(index.getAndIncrement(), "Corwin", baseScore = weakPreference)
     val Daniela: Person = Person(index.getAndIncrement(), "Daniela")
     val Eric: Person = Person(index.getAndIncrement(), "Eric")
     val Fiona: Person = Person(index.getAndIncrement(), "Fiona")
@@ -113,10 +113,13 @@ class SimpleTestModel(using settings: InputSettings) {
 
     val ArthurHatesFionaAndDaniela: PersonGroupAntiPreference = PersonGroupAntiPreference(Arthur, Set(Fiona, Daniela).toArraySet, settings.incompatibilityAntiPreference)
 
+    val CookingSmellsGood = TopicDirectPreference(Cooking, strongPreference)
+
     val All: Set[Preference] = Set(
       AB, BC, CD, DE, EF, FG, GH, HI, IA,
       AC, BD, CE, DF, EG, FH, GI, HA, IB,
-      ArthurHatesFionaAndDaniela
+      ArthurHatesFionaAndDaniela,
+      CookingSmellsGood
     )
   }
 

@@ -13,7 +13,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
   import fr.renoux.gaston.SimpleTestModel.Slots.*
   import fr.renoux.gaston.SimpleTestModel.Solutions.*
   import fr.renoux.gaston.SimpleTestModel.Topics.*
-  import fr.renoux.gaston.SimpleTestModel.strongPreference
+  import fr.renoux.gaston.SimpleTestModel.{strongPreference, weakPreference}
 
   given Problem = WithUnassignedTopics
   given Context = Context.Default
@@ -287,17 +287,20 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
     val schedule2bis = schedule.swapPersons(Morning, (Acting, Corwin), (Dancing, Garion))
     schedule2bis should be(schedule2)
 
-    // Everyone on schedule 1 is at 0. On schedule 2, only Corwin is at 5. Having three persons less happy after him, his score is divided by 2^3
-    (schedule2.score - schedule.score) should be(strongPreference / Weight(8))
-    schedule.deltaScoreIfSwapPerson(Morning, (Acting, Corwin), (Dancing, Garion)) should be(Some(strongPreference / Weight(8)))
+    // Corwin at 1 on schedule 1 (its base score) and at 6 on schedule 2, everyone else stays at 0. Having 8 more persons less happy after him, his score is divided by 2^8
+    val factor = 1.0 / 256
+    schedule.score should be(Score(1.0) * factor)
+    schedule2.score should be((strongPreference + weakPreference) * factor)
+    schedule.deltaScoreIfSwapPerson(Morning, (Acting, Corwin), (Dancing, Garion)) should be(Some(schedule2.score - schedule.score))
   }
 
   "Empty schedule" should "have a zero score on empty problem" in {
     Schedule.empty(0)(using Problem.Empty, Context.Default).score should be(Score.Zero)
   }
 
-  it should "have a negative-or-zero score on current problem" in {
-    Schedule.empty(0).score should be <= Score.Zero
+  it should "have a score on current problem that only takes base-scores" in {
+    val corwinScore = weakPreference * (1.0 / math.pow(2, 8)) // his base-score makes him the best-scored person
+    Schedule.empty(0).score should be(corwinScore)
   }
 
   "startingUnassignedOrForced" should "return a schedule with all unassigned topics" in {
