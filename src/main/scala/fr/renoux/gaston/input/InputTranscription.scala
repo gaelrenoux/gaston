@@ -426,6 +426,15 @@ object InputTranscription {
         if (badPersons.isEmpty) None
         else Some(s"Person [${p.name}]: undefined incompatible persons: ${badPersons.mkString(", ")}")
       }
+    } ++ {
+      input.persons.flatMap { p =>
+        val badPersons = p.personWishes.keys.map(_.refineEither[Not[Empty]]).collect {
+          case Left(_) => "[]" // empty name
+          case Right(wished) if !input.personsNameSet.contains(wished) => s"[$wished]"
+        }
+        if (badPersons.isEmpty) None
+        else Some(s"Person [${p.name}]: undefined wished persons: ${badPersons.mkString(", ")}")
+      }
     }
   }
 
@@ -463,6 +472,19 @@ object InputTranscription {
         .flatMap(_.topics)
         .filter(!input.topicsNameSet.contains(_))
         .map(t => s"SNot-simultaneous constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.limitedCount
+        .flatMap(_.topics)
+        .filter(!input.topicsNameSet.contains(_))
+        .map(t => s"Limited-count constraint: unknown topic: [$t]")
+    } ++ {
+      input.constraints.limitedCount.flatMap { inConstraint =>
+        /* Each input-topic produces one topic per occurrence and per part. Unknown topics are reported above. */
+        val knownTopics = inConstraint.topics.toSeq.flatMap(input.topicsByName.get)
+        val topicsCount = knownTopics.map(t => t.forcedOccurrences * t.forcedDuration).sum
+        if (knownTopics.size < inConstraint.topics.size || inConstraint.count < topicsCount) None
+        else Some(s"Limited-count constraint: count (${inConstraint.count}) must be lower than the number of topics ($topicsCount): [${inConstraint.topics.mkString(", ")}]")
+      }
     }
   }
 

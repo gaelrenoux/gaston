@@ -1,8 +1,10 @@
 package fr.renoux.gaston.input
 
 import com.softwaremill.quicklens.*
-import fr.renoux.gaston.model.preferences.{PersonPersonPreference, PersonTopicPreference, TopicsExclusive}
-import fr.renoux.gaston.model.{Problem, Score}
+import fr.renoux.gaston.model.constraints.{TopicsLimitedCount, TopicsNotSimultaneous, TopicsSimultaneous}
+import fr.renoux.gaston.model.preferences.*
+import fr.renoux.gaston.model.Counts.given
+import fr.renoux.gaston.model.{Counts, Problem, Score, Weight, toArraySet}
 import io.github.iltotore.iron.autoRefine
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -257,6 +259,307 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       wishCharlie.get.person should be(arnold)
       wishCharlie.get.targetPerson should be(charlie)
       wishCharlie.get.reward.value should be(666.6 +- 0.1)
+    }
+  }
+
+  behavior of "Constraints"
+
+  {
+    val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+    val inputTopics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma"))
+
+    it should "create simultaneous constraints" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        constraints = InputGlobalConstraints(simultaneous = Set(InputSimultaneousConstraint(Set("alpha", "beta"))))
+      ))
+      problem.constraints should be(Set(TopicsSimultaneous(Set(t"alpha", t"beta"))))
+    }
+
+    it should "match occurrences one-to-one in simultaneous constraints" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = List(InputTopic("alpha", occurrences = Some(2)), InputTopic("beta", occurrences = Some(2))),
+        constraints = InputGlobalConstraints(simultaneous = Set(InputSimultaneousConstraint(Set("alpha", "beta"))))
+      ))
+      problem.constraints should be(Set(
+        TopicsSimultaneous(Set(t"alpha #1", t"beta #1")),
+        TopicsSimultaneous(Set(t"alpha #2", t"beta #2"))
+      ))
+    }
+
+    it should "create not-simultaneous constraints" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        constraints = InputGlobalConstraints(notSimultaneous = Set(InputSimultaneousConstraint(Set("alpha", "beta", "gamma"))))
+      ))
+      given Counts = problem.counts
+      problem.constraints should be(Set(TopicsNotSimultaneous(Set(t"alpha", t"beta", t"gamma").toArraySet)))
+    }
+
+    it should "create limited-count constraints" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        constraints = InputGlobalConstraints(limitedCount = Set(InputLimitedTopicsCountConstraint(Set("alpha", "beta", "gamma"), 2)))
+      ))
+      problem.constraints.toList match {
+        case List(TopicsLimitedCount(topics, count)) =>
+          topics.toIdSet should be(Set(t"alpha", t"beta", t"gamma").map(_.id))
+          count should be(2)
+        case other => fail(s"Unexpected constraints: $other")
+      }
+    }
+
+    it should "create exclusive preferences, with exemptions or inclusions" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold"), InputPerson("Bianca")),
+        constraints = InputGlobalConstraints(exclusive = Set(
+          InputExclusiveConstraint(Set("alpha", "beta"), exemptions = Some(Set("Arnold"))),
+          InputExclusiveConstraint(Set("beta", "gamma"), inclusions = Some(Set("Bianca")))
+        ))
+      ))
+      given Counts = problem.counts
+      problem.preferences should be(Set(
+        TopicsExclusive(Set(t"alpha", t"beta").toArraySet, Set(p"Arnold").toArraySet),
+        TopicsExclusiveFor(Set(t"beta", t"gamma").toArraySet, Set(p"Bianca").toArraySet)
+      ))
+    }
+
+    it should "create linked preferences" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        constraints = InputGlobalConstraints(linked = Set(InputLinkedConstraint(Set("alpha", "beta"))))
+      ))
+      given Counts = problem.counts
+      problem.preferences should be(Set(TopicsLinked(Set(t"alpha", t"beta").toArraySet)))
+    }
+  }
+
+
+  behavior of "Topics"
+
+  {
+    val inputSlots = List(List(InputSlot("one"), InputSlot("two")), List(InputSlot("three")))
+
+    it should "create linked parts with a followup for long topics" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = List(InputTopic("alpha", duration = Some(2)))
+      ))
+      given Counts = problem.counts
+      problem.topicsSet.map(_.name) should be(Set("alpha ~1", "alpha ~2"))
+      t"alpha ~1".followup should be(Some(t"alpha ~2"))
+      t"alpha ~1".isFollowup should be(false)
+      t"alpha ~2".followup should be(None)
+      t"alpha ~2".isFollowup should be(true)
+      problem.preferences should be(Set(TopicsLinked(Set(t"alpha ~1", t"alpha ~2").toArraySet)))
+    }
+
+    it should "use the default min and max persons, unless overridden" in {
+      given problem: Problem = from(InputModel(
+        settings = InputSettings(defaultMinPersonsPerTopic = 3, defaultMaxPersonsPerTopic = 7),
+        slots = inputSlots,
+        topics = List(InputTopic("alpha"), InputTopic("beta", min = Some(2), max = Some(4)))
+      ))
+      (t"alpha".min, t"alpha".max) should be((3, 7))
+      (t"beta".min, t"beta".max) should be((2, 4))
+    }
+
+    it should "handle forced topics, slot restrictions and presence scores" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = List(InputTopic("alpha", forced = true, slots = Some(Set("one", "three")), presence = Some(Score(42))))
+      ))
+      t"alpha".forced should be(true)
+      t"alpha".slots should be(Some(Set(slot"one", slot"three")))
+      problem.preferences should be(Set(TopicDirectPreference(t"alpha", Score(42))))
+    }
+
+    it should "apply the default max topics per slot, unless overridden" in {
+      given problem: Problem = from(InputModel(
+        settings = InputSettings(defaultMaxTopicsPerSlot = Some(4)),
+        slots = List(List(InputSlot("one"), InputSlot("two", maxTopics = Some(2)))),
+      ))
+      slot"one".maxTopics should be(4)
+      slot"two".maxTopics should be(2)
+    }
+  }
+
+
+  behavior of "Persons"
+
+  {
+    val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+    val inputTopics = List(InputTopic("alpha"), InputTopic("beta"))
+
+    it should "not have absent persons present on a slot" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold", absences = Set("one")), InputPerson("Bianca"))
+      ))
+      slot"one".personsPresent should be(Set(p"Bianca"))
+      slot"two".personsPresent should be(Set(p"Arnold", p"Bianca"))
+    }
+
+    it should "scale up the wishes of absent persons" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold", absences = Set("one"), wishes = Map("alpha" -> Score(50))))
+      ))
+      /* Absent on half the slots, with the default adjustment factor of 0.8 */
+      val expectedScore = Constants.PersonTotalScore.value / (1 - 0.5 * 0.8)
+      problem.preferences.toList match {
+        case List(PersonTopicPreference(_, _, score)) => score.value should be(expectedScore +- 0.001)
+        case other => fail(s"Unexpected preferences: $other")
+      }
+    }
+
+    it should "create anti-preferences for incompatible persons" in {
+      given problem: Problem = from(InputModel(
+        settings = InputSettings(incompatibilityAntiPreference = NonPosScore(-42.0)),
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold", incompatible = Set("Bianca", "Caroline")), InputPerson("Bianca"), InputPerson("Caroline"))
+      ))
+      given Counts = problem.counts
+      problem.preferences should be(Set(PersonGroupAntiPreference(p"Arnold", Set(p"Bianca", p"Caroline").toArraySet, Score(-42))))
+    }
+
+    it should "keep the weight and base score" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold", weight = Weight(2), baseScore = Score(12)))
+      ))
+      p"Arnold".weight should be(Weight(2))
+      p"Arnold".baseScore should be(Score(12))
+    }
+
+    it should "create free-slot preferences, and compensate them in the base score" in {
+      given problem: Problem = from(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold", minFreeSlots = Some(1)))
+      ))
+      problem.preferences should be(Set(PersonFreeSlotPreference(p"Arnold", 1)))
+      p"Arnold".baseScore should be(Score(1000))
+    }
+  }
+
+
+  behavior of "Slots" {
+    it should "chain slots only inside a sequence" in {
+      given problem: Problem = from(InputModel(slots = inputSlots))
+      slot"one".next should be(Some(slot"two"))
+      slot"two".next should be(None)
+      slot"three".next should be(None)
+    }
+  }
+
+
+  behavior of "Errors"
+
+  {
+    val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
+    val inputTopics = List(InputTopic("alpha"), InputTopic("beta"))
+
+    def errorsOf(model: InputModel): List[String] =
+      InputTranscription.transcribe(model).left.toOption.fold(Nil)(_.toList.map(_.description))
+
+    it should "report duplicate names" in {
+      errorsOf(InputModel(
+        slots = List(List(InputSlot("one"), InputSlot("one"))),
+        topics = List(InputTopic("alpha"), InputTopic("alpha")),
+        persons = List(InputPerson("Arnold"), InputPerson("Arnold"))
+      )) should be(List("Duplicate person name: Arnold", "Duplicate slot name: one", "Duplicate topic name: alpha"))
+    }
+
+    it should "report incorrect topics" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = List(
+          InputTopic("@alpha"),
+          InputTopic("beta", min = Some(5), max = Some(4)),
+          InputTopic("gamma~"),
+          InputTopic("delta", slots = Some(Set("three")))
+        )
+      )).size should be(4)
+    }
+
+    it should "report persons referencing unknown entities" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson(
+          "Arnold",
+          absences = Set("three"),
+          mandatory = Set("gamma"),
+          forbidden = Set("delta"),
+          incompatible = Set("Zorro"),
+          wishes = Map("epsilon" -> Score(1))
+        ))
+      )).size should be(5)
+    }
+
+    it should "report constraints referencing unknown topics" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        constraints = InputGlobalConstraints(
+          simultaneous = Set(InputSimultaneousConstraint(Set("alpha", "gamma"))),
+          notSimultaneous = Set(InputSimultaneousConstraint(Set("alpha", "delta"))),
+          exclusive = Set(InputExclusiveConstraint(Set("alpha", "epsilon"))),
+          linked = Set(InputLinkedConstraint(Set("alpha", "zeta")))
+        )
+      )).size should be(4)
+    }
+
+    it should "report simultaneous topics with different occurrence counts" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = List(InputTopic("alpha", occurrences = Some(2)), InputTopic("beta")),
+        constraints = InputGlobalConstraints(simultaneous = Set(InputSimultaneousConstraint(Set("alpha", "beta"))))
+      )).size should be(1)
+    }
+
+    it should "report persons wishing for unknown persons" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = List(InputPerson("Arnold", personWishes = Map("Zorro" -> Score(1))))
+      )).size should be(1)
+    }
+
+    it should "report limited-count constraints with unknown topics" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma")),
+        constraints = InputGlobalConstraints(limitedCount = Set(InputLimitedTopicsCountConstraint(Set("alpha", "beta", "zeta"), 2)))
+      )).size should be(1)
+    }
+
+    it should "report limited-count constraints whose count is not lower than their number of topics" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = inputTopics,
+        constraints = InputGlobalConstraints(limitedCount = Set(InputLimitedTopicsCountConstraint(Set("alpha", "beta"), 2)))
+      )).size should be(1)
+    }
+
+    it should "count each occurrence and part of a topic in limited-count constraints" in {
+      errorsOf(InputModel(
+        slots = inputSlots,
+        topics = List(InputTopic("alpha", occurrences = Some(2)), InputTopic("beta", duration = Some(2))),
+        constraints = InputGlobalConstraints(limitedCount = Set(InputLimitedTopicsCountConstraint(Set("alpha", "beta"), 3)))
+      )) should be(Nil)
     }
   }
 }
