@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 
 class MapExtensionsSpec extends AnyFlatSpec with Matchers {
 
-  "getMinKey" should "work" in {
+  "minKeyOption" should "work" in {
     Map(3 -> "orange", 2 -> "kiwi", 8 -> "tomato").minKeyOption should be(Some("kiwi"))
   }
 

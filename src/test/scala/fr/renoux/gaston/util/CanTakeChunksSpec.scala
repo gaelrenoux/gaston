@@ -1,15 +1,9 @@
 package fr.renoux.gaston.util
 
-import com.typesafe.scalalogging.Logger
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-/**
- * Created by gael on 07/05/17.
- */
 class CanTakeChunksSpec extends AnyFlatSpec with Matchers {
-  val log: Logger = Logger[CanTakeChunksSpec]
-
   import CanTakeChunks.given
 
   val testList: List[String] = List("adam", "brigit", "cedric", "daniel", "edward", "fatima", "george", "hermione", "isidore", "jennifer", "kevin")

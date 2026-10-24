@@ -18,7 +18,7 @@ class PersonPersonPreferenceSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
 
-  behavior of "PersonsPersonPreference"
+  behavior of "PersonPersonPreference"
   val leonardoLovesRaphael: Preference = PersonPersonPreference(Leonardo, Raphael, Score(42))
 
   it should "return the score when respected" in {

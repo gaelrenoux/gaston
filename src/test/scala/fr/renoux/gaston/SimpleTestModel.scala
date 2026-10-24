@@ -47,8 +47,8 @@ class SimpleTestModel(using settings: InputSettings) {
 
     private val index = new AtomicInteger(0)
 
-    val UnassignedMorning: Topic = Topic.unassigned(index.getAndIncrement(), SimpleTestModel.Slots.Morning)
-    val UnassignedAfternoon: Topic = Topic.unassigned(index.getAndIncrement(), SimpleTestModel.Slots.AfterNoon)
+    val UnassignedMorning: Topic = Topic.unassigned(index.getAndIncrement(), Slots.Morning)
+    val UnassignedAfternoon: Topic = Topic.unassigned(index.getAndIncrement(), Slots.AfterNoon)
     val UnassignedEvening: Topic = Topic.unassigned(index.getAndIncrement(), Slots.Evening)
 
     val Acting: Topic = Topic(index.getAndIncrement(), "Acting", mandatory = Set(Arthur), forbidden = Set(Bianca), min = 2, max = 5)
@@ -62,9 +62,9 @@ class SimpleTestModel(using settings: InputSettings) {
     val Inking: Topic = Topic(index.getAndIncrement(), "Inking", mandatory = Set(Iago), forbidden = Set(Arthur), min = 2, max = 5)
 
     val Unassigned: Map[Slot, Topic] = Map(
-      SimpleTestModel.Slots.Morning -> UnassignedMorning,
-      SimpleTestModel.Slots.AfterNoon -> UnassignedAfternoon,
-      SimpleTestModel.Slots.Evening -> UnassignedEvening
+      Slots.Morning -> UnassignedMorning,
+      Slots.AfterNoon -> UnassignedAfternoon,
+      Slots.Evening -> UnassignedEvening
     )
     val Concrete: Set[Topic] = Set(Acting, Bathing, Cooking, Dancing, Eating, Fighting, Grinding, Helping, Inking)
     val All: Set[Topic] = Concrete ++ Unassigned.values

@@ -20,7 +20,7 @@ class ArrayMapSpec extends AnyFlatSpec with Matchers {
     an[IndexOutOfBoundsException] should be thrownBy (bm(rintintin))
   }
   
-  it should "work from some elements elements" in {
+  it should "work from some elements" in {
     val bm = ArrayMap.from[Dog, Toy](3, ball)(List(milou -> stick))
     bm.capacity should be(3)
     bm.isEmpty should be(false)
