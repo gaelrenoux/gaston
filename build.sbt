@@ -36,7 +36,7 @@ scalacOptions ++= Seq(
   "-Wunused:locals", // Warn if a local definition is unused.
   // "-Wunused:patvars", // Warn if a variable bound in a pattern is unused.
   "-Wunused:privates", // Warn if a private member is unused.
-  "-Wvalue-discard", // Warn when non-Unit expression results are unused.
+  "-Wvalue-discard" // Warn when non-Unit expression results are unused.
 
   // "-XX:MaxInlineLevel=18", // see https://github.com/scala/bug/issues/11627#issuecomment-514619316 // check if still valid for Scala 3
 )
