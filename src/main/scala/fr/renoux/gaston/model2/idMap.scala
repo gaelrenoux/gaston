@@ -142,7 +142,7 @@ object IdMap {
     }
   }
 
-  extension [I >: Int <: Id, J >: Int <: Id : ClassTag](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
+  extension [I >: Int <: Id, J >: Int <: Id](m: IdMap[I, SmallIdSet[J]])(using cj: CountAll[J]) {
     inline def transpose: IdMap[J, SmallIdSet[I]] = {
       val array = new Array[SmallIdSet[I]](cj.value) // default value is 0 (empty SmallIdSet)
       m.fastForeachWithIndex { (js, i) =>
@@ -168,7 +168,7 @@ object IdMap {
     result
   }
 
-  def unsafeFrom[I >: Int <: Id, A: ClassTag](array: Array[A]): IdMap[I, A] = array
+  def unsafeFrom[I >: Int <: Id, A](array: Array[A]): IdMap[I, A] = array
 
   /** Note that for indexes that are missing in the argument, the default value is used. */
   def from[I >: Int <: Id, A: ClassTag](it: Iterable[(I, A)])(using countI: CountAll[I]): IdMap[I, A] = {
@@ -184,7 +184,7 @@ object IdMap {
   inline def empty[I >: Int <: Id, A: ClassTag](using count: CountAll[I]): IdMap[I, A] =
     new Array[A](count.value)
 
-  given [I <: Id : Printable, A: Printable]: Printable[IdMap[I, A]] with {
+  given [I <: Id, A: Printable]: Printable[IdMap[I, A]] with {
     extension (as: IdMap[I, A]) {
       override def toPrettyString: String =
         summon[Printable[Map[Int, A]]].toPrettyString(as.toSortedMap)

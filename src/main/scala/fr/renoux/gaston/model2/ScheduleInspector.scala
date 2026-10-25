@@ -19,7 +19,7 @@ final class ScheduleInspector(val schedule: Schedule) {
 
   def checkTopicConsistency() = {
     problem.slotsCount.foreach { slotId =>
-      val topicsFromSchedule = schedule.topicsToSlot.keysFilter { (tid, sid) => slotId == sid }.toSet
+      val topicsFromSchedule = schedule.topicsToSlot.keysFilter { (_, sid) => slotId == sid }.toSet
       val topicsFromAssignment = schedule.slotsToAssignment(slotId).personsToTopic.valuesSeq.toSet
       // it's not on the assignment is nobody has been assigned to it yet. However, if it's assigned, it should be in the schedule.
 

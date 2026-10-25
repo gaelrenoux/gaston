@@ -50,7 +50,7 @@ inline def fastExists(inline start: Int, inline until: Int, inline advance: Int 
 extension [A](inline as: Array[A]) {
   inline def fastCopy()(using ClassTag[A])= {
     val asl = as.length
-    var res = new Array[A](asl)
+    val res = new Array[A](asl)
     var ix = 0
     while (ix < asl) {
       res(ix) = as(ix)
