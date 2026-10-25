@@ -54,15 +54,6 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
     ))
   }
 
-  /*
-  "personsBySlot" should "work" in {
-    Best.personsBySlot should be(Map(
-      Morning -> Set(Arthur, Iago, Hercule, Daniela, Corwin, Bianca, Garion, Fiona),
-      AfterNoon -> Set(Bianca, Arthur, Eric, Daniela, Corwin, Hercule, Garion, Fiona),
-      Evening -> Set(Corwin, Bianca, Fiona, Eric, Daniela, Iago, Hercule, Garion)
-    ))
-  } */
-
   "personsByTopic" should "work" in {
     BestWithUnassignedTopics.personsByTopic should be(Map(
       Acting -> Set(Arthur, Iago, Hercule),
@@ -137,9 +128,8 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
     ))
   }
 
-  /*
-  "merge" should "work with two schedules" in {
-    val simple2 = Schedule(
+  "++" should "work with two schedules" in {
+    val simple2 = Schedule.from(
       AfterNoon(
         Bathing(Arthur, Eric), //new person on existing topic
         Eating(Fiona, Garion) //new topic on existing slot
@@ -149,7 +139,7 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
       )
     )
 
-    val result = Schedule(
+    val result = Schedule.from(
       Morning(
         Acting(Arthur, Bianca),
         Cooking(Corwin, Daniela)
@@ -164,14 +154,14 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
       ),
     )
 
-    Simple.merge(simple2) should be(result)
-    simple2.merge(Simple) should be(result)
+    (Simple ++ simple2) should be(result)
+    (simple2 ++ Simple) should be(result)
   }
 
   it should "work with an empty schedule" in {
-    Schedule.empty.merge(Best) should be(Best)
-    Best.merge(Schedule.empty) should be(Best)
-  } */
+    (Schedule.empty(0) ++ Simple) should be(Simple)
+    (Simple ++ Schedule.empty(0)) should be(Simple)
+  }
 
   "addPersonToExistingTopic" should "add someone to an existing topic" in {
     Simple.addPersonToExistingTopic(Morning, Acting, Eric) should be(Schedule.from(
@@ -202,19 +192,20 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
       )
     ))
   }
-  /*
-    it should "not do anything if the topics are missing" in {
-      Simple.swapPersons(Morning, Grinding -> Arthur, Cooking -> Daniela) should be (Simple)
-    }
 
-    it should "not do anything if the topics are wrong" in {
-      Simple.swapPersons(Morning, Cooking -> Arthur, Cooking -> Daniela) should be (Simple)
+  it should "throw an exception if the slot is missing" in {
+    a[NoSuchElementException] shouldBe thrownBy {
+      Simple.swapPersons(Evening, Acting -> Arthur, Cooking -> Daniela)
     }
-
-  it should "not do anything if the slot is missing" in {
-    Simple.swapPersons(Evening, Acting -> Arthur, Cooking -> Daniela) should be(Simple)
   }
-  */
+
+  it should "throw an exception if the topics are missing" in {
+    a[NoSuchElementException] shouldBe thrownBy {
+      Simple.swapPersons(Morning, Grinding -> Arthur, Cooking -> Daniela)
+    }
+  }
+
+  // behavior of swapPersons if the source topics are wrong is undetermined
 
   "movePerson" should "move a person from a source topic to a destination topic" in {
     Simple.movePerson(Morning, Acting, Cooking, Arthur) should be(Schedule.from(
@@ -229,19 +220,22 @@ class ScheduleSpec extends AnyFlatSpec with Matchers {
     ))
   }
 
-  /*
-  it should "not do anything if the topics are missing" in {
-    Simple.movePerson(Morning, Acting, Grinding, Arthur) should be (Simple)
-    Simple.movePerson(Morning, Grinding, Cooking, Arthur) should be (Simple)
+  it should "throw an exception if the slot is missing" in {
+    a[NoSuchElementException] shouldBe thrownBy {
+      Simple.movePerson(Evening, Acting, Cooking, Arthur)
+    }
   }
 
-  it should "not do anything if the topics are wrong" in {
-    Simple.movePerson(Morning, Cooking, Acting, Arthur) should be(Simple)
-  }*/
-  /*
-    it should "not do anything if the slot is missing" in {
-      Simple.movePerson(Evening, Acting, Cooking, Arthur) should be(Simple)
-    }*/
+  it should "throw an exception if the topics are missing" in {
+    a[NoSuchElementException] shouldBe thrownBy {
+      Simple.movePerson(Morning, Acting, Grinding, Arthur)
+    }
+    a[NoSuchElementException] shouldBe thrownBy {
+      Simple.movePerson(Morning, Grinding, Cooking, Arthur)
+    }
+  }
+
+  // behavior of movePerson if the source topics are wrong is undetermined
 
   "isSound" should "validate a correct schedule" in {
     Simple.isSound should be(true)
