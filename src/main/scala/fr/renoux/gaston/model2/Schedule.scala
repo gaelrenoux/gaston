@@ -150,7 +150,7 @@ final class Schedule(
   /** Calls the recalculateAll of the slot-assignments, and recalculate everything in the schedule as well. */
   def recalculateAll(): Unit = {
     recalculateTopicScore()
-    slotsToAssignment.foreach { (slot, sa) =>
+    slotsToAssignment.foreach { (_, sa) =>
       sa.recalculateAll()
     }
     problem.personsCount.foreach { p =>
