@@ -20,7 +20,7 @@ class ScheduleParserSpec extends AnyFlatSpec with Matchers {
   val formatted: String = BestWithUnassignedTopics.toFormattedString
   println(formatted)
 
-  "parseTopic" should "read a correct topic" in {
+  "parseRecord" should "read a correct topic" in {
     parser.parseRecord(Morning, "Bathing ==> Bianca, Arthur") should be(Right(Record(Morning, Bathing, Set(Bianca, Arthur))))
   }
 

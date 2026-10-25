@@ -10,8 +10,8 @@ import scala.util.Random
 
 
 /** Tools to explore the space solution for plannings (ie, not doing the assignment). Schedules returned are always
- * unfilled (they just contain the planning), and valid (all constraints are matched, and no one is mandatory on two
- * topics at the same time). */
+ * unfilled (they just contain the planning and the mandatory persons), and valid (all constraints are matched, and no
+  * one is mandatory on two topics at the same time). */
 @immutable
 final class PlanningSpaceNavigator(using private val problem: Problem) {
 

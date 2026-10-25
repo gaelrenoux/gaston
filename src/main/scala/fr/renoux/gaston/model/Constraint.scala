@@ -11,8 +11,10 @@ package fr.renoux.gaston.model
  */
 trait Constraint {
 
-  /** Can we test a partial schedule ? For example, it's false for checking linked topics (because the missing topic may
-   * be added later). */
+  /** If true, then on partial schedules, this constraint can be checked as OK for now (and we can continue filling in
+    * the schedule), or KO and there's no point in continuing using this partial schedule as a base. For example, this
+    * is false for checking linked topics, because the missing topic may be added later (so we should still continue on
+    * a partial schedule when the constraint is KO). */
   val isApplicableToPartialSchedule: Boolean = true
 
   /** Can we test an unfilled schedule ? For example, it's false for counting min numbers (because it may be reached

@@ -18,7 +18,7 @@ class TopicDirectPreferenceSpec extends AnyFlatSpec with Matchers {
   def scheduled(s: Slot, t: Topic, ps: Person*): Schedule = Schedule.from(s(t(ps *)))
 
 
-  behavior of "TopicDirectPreferenceSpec"
+  behavior of "TopicDirectPreference"
   val fightingIsGood: Preference = TopicDirectPreference(Fighting, Score(42))
 
   it should "return the score when respected" in {
