@@ -2,7 +2,7 @@ package fr.renoux.gaston.engine2
 
 import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.util.Context.chrono
-import fr.renoux.gaston.util.{Context, fastForeach, fastLoop}
+import fr.renoux.gaston.util.{Context, fastForeach}
 
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.util.Random

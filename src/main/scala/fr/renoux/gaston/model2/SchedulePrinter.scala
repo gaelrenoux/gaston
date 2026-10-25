@@ -1,7 +1,5 @@
 package fr.renoux.gaston.model2
 
-import scala.collection.immutable
-
 
 class SchedulePrinter(problem: SmallProblem) extends Printable[Schedule] {
 
