@@ -28,6 +28,12 @@ object IntModulo {
 
   extension (a: IntModulo) {
     inline def toInt: Int = a
+
+    @targetName("IntModuloEquals")
+    inline def ==(b: IntModulo): Boolean = a == b
+
+    @targetName("IntModuloNotEquals")
+    inline def !=(b: IntModulo): Boolean = a != b
   }
 
   extension (a: IntModulo)(using m: Modulo) {
@@ -36,11 +42,5 @@ object IntModulo {
 
     @targetName("IntModuloMinus")
     inline def -(b: IntModulo): IntModulo = (a + m - b) % m
-
-    @targetName("IntModuloEquals")
-    inline def ==(b: IntModulo): Boolean = a == b
-
-    @targetName("IntModuloNotEquals")
-    inline def !=(b: IntModulo): Boolean = a != b
   }
 }

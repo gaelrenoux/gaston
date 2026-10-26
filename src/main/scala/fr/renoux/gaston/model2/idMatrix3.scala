@@ -15,7 +15,7 @@ object IdMatrix3 {
   private inline def flatIndex[J <: Id, K <: Id](inline i: Id, inline j: J, inline k: K)(using inline countJ: CountAll[J], inline countK: CountAll[K]) =
     (countJ.value * i.value + j.value) * countK.value + k.value
 
-  extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A])(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]) {
+  extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A])(using countJ: CountAll[J], countK: CountAll[K]) {
     inline def apply(i: I, j: J, k: K): A =
       at(i, j, k)
 
@@ -28,6 +28,9 @@ object IdMatrix3 {
       val index = flatIndex(i, j, k)
       matrix(index) = a
     }
+  }
+
+  extension [I >: Int <: Id, J >: Int <: Id, K >: Int <: Id, A](matrix: IdMatrix3[I, J, K, A])(using countI: CountAll[I], countJ: CountAll[J], countK: CountAll[K]) {
 
     inline def toSeq3(using ClassTag[A]): Seq[Seq[Seq[A]]] = {
       val result = new Array[Array[Array[A]]](countI.value)

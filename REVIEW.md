@@ -17,11 +17,9 @@ date), and there are 6 unused-symbol warnings:
 - `model2/ids.scala:3` (unused import)
 - `util/IntModulo.scala:33` (unused implicit in `!=`)
 
-To run the tests without changing main code:
-
-```
-sbt 'set scalacOptions -= "-Werror"' "testOnly fr.renoux.gaston.model2.* fr.renoux.gaston.engine2.* fr.renoux.gaston.input.InputTranscription2Test"
-```
+**Fixed** after this review, along with 5 more warnings that only showed up once main compiled: 4 in
+`util/FastIterationsTest.scala` and 1 in `test-slow/.../NewModelSpecialCasesSpec.scala`. Main, test and test-slow now
+all compile with `-Werror`.
 
 ## Bugs confirmed by a failing test
 

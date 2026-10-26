@@ -2,6 +2,7 @@ package fr.renoux.gaston.model2
 
 import fr.renoux.gaston.util.*
 
+import scala.annotation.unused
 import scala.compiletime.uninitialized
 import scala.util.Random
 
@@ -49,7 +50,7 @@ final class SlotAssignment(
   }
 
   /** Returns true if that person can be added to this topic, without moving anyone else. Checks if the maximum number of persons is respected. */
-  def isAddableToTopic(pid: PersonId, tid: TopicId): Boolean = {
+  def isAddableToTopic(@unused pid: PersonId, tid: TopicId): Boolean = {
     inline def topicMax = problem.topicsToMaxPersons(tid)
 
     inline def topicPersonsCount = topicsToPersons(tid).size

@@ -1,6 +1,5 @@
 package fr.renoux.gaston.itests
 
-import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.engine2.AssignmentImprover
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2, problemFromClassPath}
 import fr.renoux.gaston.model2.*

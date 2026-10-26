@@ -15,10 +15,10 @@ class FastIterationsTest extends TestBase {
 
     "Empty loop" in {
       var acc = 0
-      fastLoop("z", _ < "aaaa", _ + "a") { str =>
+      fastLoop("z", _ < "aaaa", _ + "a") { _ =>
         acc += 1
       }
-      fastLoop("a", _ < "a", _ + "a") { str =>
+      fastLoop("a", _ < "a", _ + "a") { _ =>
         acc += 1
       }
       acc should be(0)
@@ -44,10 +44,10 @@ class FastIterationsTest extends TestBase {
 
     "Empty loop" in {
       var acc = 0
-      fastLoop(3, 0) { str =>
+      fastLoop(3, 0) { _ =>
         acc += 1
       }
-      fastLoop(4, 4) { str =>
+      fastLoop(4, 4) { _ =>
         acc += 1
       }
       acc should be(0)

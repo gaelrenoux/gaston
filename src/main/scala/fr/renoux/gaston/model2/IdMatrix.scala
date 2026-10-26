@@ -25,7 +25,7 @@ object IdMatrix {
     }
   }
 
-  extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A])(using countI: CountAll[I], countJ: CountAll[J]) {
+  extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A])(using countJ: CountAll[J]) {
     inline def apply(i: I, j: J): A = {
       val index = flatIndex(i, j)
       matrix(index)
@@ -35,7 +35,10 @@ object IdMatrix {
       val index = flatIndex(i, j)
       matrix(index) = a
     }
-    
+  }
+
+  extension [I >: Int <: Id, J >: Int <: Id, A](matrix: IdMatrix[I, J, A])(using countI: CountAll[I], countJ: CountAll[J]) {
+
     /** For each line (corresponding to one value of I), apply a function that gets a result. */
     inline def mapLines[B: ClassTag](inline f: Array[A] => B): IdMap[I, B] = {
       val result = new Array[B](countI.value)

@@ -7,7 +7,7 @@ import fr.renoux.gaston.model2.*
 import fr.renoux.gaston.util.CanGroupToMap.given
 import fr.renoux.gaston.util.{Count as _, *}
 import io.github.iltotore.iron.constraint.all.*
-import io.github.iltotore.iron.{Constraint as _, *}
+import io.github.iltotore.iron.*
 
 import scala.collection.mutable
 
