@@ -5,11 +5,12 @@ import fr.renoux.gaston.TestBase
 import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.input.{InputLoader, InputModel, InputTranscription2}
 import fr.renoux.gaston.model2.ScheduleMaker.mkSchedule
+import fr.renoux.gaston.util.fastLoop
+import org.scalatest.Assertion
 
+import scala.util.Random
 
 class ScheduleTest extends TestBase {
-  // TODO test move/swap individually
-  // TODO missing tests on SlotAssignment stuff
 
   object Model {
     val input: InputModel = InputLoader.fromClassPath("scoring-test.conf").force
@@ -139,6 +140,154 @@ class ScheduleTest extends TestBase {
       (notExpected.slotsToAssignment(0) == schedule.slotsToAssignment(0)) should be(false)
     }
 
+    "hashCode is consistent with equals" in {
+      val expected = mkSchedule(baseProblem) {
+        0.slot {
+          0.topic(0, 1, 2)
+          1.topic(3)
+        }
+        1.slot {
+          3.topic(0, 1, 2, 3)
+        }
+      }
+      schedule should be(expected)
+      schedule.hashCode should be(expected.hashCode)
+    }
+
+    "scheduledTopics on each assignment matches slotsToTopics, including empty topics" in {
+      val scheduleWithEmptyTopics = mkSchedule(baseProblem) {
+        0.slot {
+          0.topic(0, 1, 2, 3)
+          1.topicEmpty
+        }
+        1.slot {
+          2.topicEmpty
+          3.topicEmpty
+        }
+      }
+      countSlots.range.foreach { sid =>
+        scheduleWithEmptyTopics.slotsToAssignment(sid).scheduledTopics should be(scheduleWithEmptyTopics.slotsToTopics(sid))
+      }
+    }
+
+    "addTopic updates the assignment's scheduledTopics" in {
+      val s = mkSchedule(baseProblem) {
+        0.slot {
+          0.topic(0, 1, 2)
+          1.topic(3)
+        }
+        1.slot {
+          3.topic(0, 1, 2, 3)
+        }
+      }
+      s.addTopic(1, 2)
+      s.slotsToTopics(1).toSet should be(Set(2, 3))
+      s.slotsToAssignment(1).scheduledTopics should be(s.slotsToTopics(1))
+    }
+
+    "removeTopic updates the assignment's scheduledTopics" in {
+      val s = mkSchedule(baseProblem) {
+        0.slot {
+          0.topic(0, 1, 2, 3)
+          1.topicEmpty
+        }
+        1.slot {
+          3.topic(0, 1, 2, 3)
+        }
+      }
+      s.removeTopic(1)
+      s.slotsToTopics(0).toSet should be(Set(0))
+      s.slotsToAssignment(0).scheduledTopics should be(s.slotsToTopics(0))
+    }
+
+  }
+
+  "Moves and swaps" - {
+    import Model.*
+
+    "move updates all indexes" in {
+      val schedule = scheduleBase().on(d1)(_.move(fay, epsilon1, alpha))
+      val assignment = schedule.slotsToAssignment(d1)
+      assignment.personsToTopic(fay) should be(alpha)
+      assignment.topicsToPersons(alpha) should be(SmallIdSet(alf, dan, eli, fay))
+      assignment.topicsToPersons(epsilon1) should be(SmallIdSet(bab, cat))
+      schedule.personsToTopics(fay) should be(SmallIdSet(alpha, beta))
+      schedule.slowCheckup should be(Nil)
+    }
+
+    "undoMove restores all indexes" in {
+      val schedule = scheduleBase().on(d1)(_.move(fay, epsilon1, alpha)).on(d1)(_.undoMove(fay, epsilon1, alpha))
+      schedule should be(scheduleBase())
+      schedule.personsToTopics should be(scheduleBase().personsToTopics)
+      schedule.slotsToAssignment(d1).topicsToPersons should be(scheduleBase().slotsToAssignment(d1).topicsToPersons)
+    }
+
+    "swap updates all indexes" in {
+      val schedule = scheduleBase().on(d2)(_.swap(alf, epsilon2, bab, beta))
+      val assignment = schedule.slotsToAssignment(d2)
+      assignment.personsToTopic(alf) should be(beta)
+      assignment.personsToTopic(bab) should be(epsilon2)
+      assignment.topicsToPersons(beta) should be(SmallIdSet(alf, cat, fay))
+      assignment.topicsToPersons(epsilon2) should be(SmallIdSet(bab, dan, eli))
+      schedule.personsToTopics(alf) should be(SmallIdSet(alpha, beta))
+      schedule.personsToTopics(bab) should be(SmallIdSet(epsilon1, epsilon2))
+      schedule.slowCheckup should be(Nil)
+    }
+
+    "undoSwap restores all indexes" in {
+      val schedule = scheduleBase().on(d2)(_.swap(alf, epsilon2, bab, beta)).on(d2)(_.undoSwap(alf, epsilon2, bab, beta))
+      schedule should be(scheduleBase())
+      schedule.personsToTopics should be(scheduleBase().personsToTopics)
+      schedule.slotsToAssignment(d2).topicsToPersons should be(scheduleBase().slotsToAssignment(d2).topicsToPersons)
+    }
+  }
+
+  "Incremental scoring" - {
+    import Model.{*, given}
+
+    /** Checks the incrementally-maintained scores against a full recalculation (which also resets them). */
+    def checkAgainstFullRecalculation(schedule: Schedule): Assertion = {
+      val incrementalTotalScore = schedule.getTotalScore
+      val incrementalPersonsScores = schedule.getPersonsToScore.valuesSeq.toList // copy, as the underlying array is mutable
+      schedule.recalculateAll()
+      schedule.getPersonsToScore.valuesSeq.toList should be(incrementalPersonsScores)
+      schedule.getTotalScore should be(incrementalTotalScore)
+    }
+
+    "matches a full recalculation over random moves, swaps and undos" in {
+      given rand: Random = new Random(0)
+
+      val schedule = scheduleBase()
+      fastLoop(0, 1000) { _ =>
+        val sid: SlotId = problem.slotsCount.random
+        val assignment = schedule.slotsToAssignment(sid)
+        val pid1: PersonId = problem.personsCount.random
+        val pid2: PersonId = problem.personsCount.random
+        val tid1 = assignment.personsToTopic(pid1)
+        val tid2 = assignment.personsToTopic(pid2)
+        if (tid1 != tid2) {
+          val isSwap = rand.nextBoolean()
+          val isUndone = rand.nextBoolean()
+          schedule.saveScores()
+          if (isSwap) {
+            val _ = assignment.swap(pid1, tid1, pid2, tid2)
+          } else {
+            val _ = assignment.move(pid1, tid1, tid2)
+          }
+          schedule.recalculateScoreForPersonsPendingChanges()
+          if (isUndone) {
+            if (isSwap) {
+              val _ = assignment.undoSwap(pid1, tid1, pid2, tid2)
+            } else {
+              val _ = assignment.undoMove(pid1, tid1, tid2)
+            }
+            schedule.restoreSavedScores()
+          }
+          schedule.slowCheckup should be(Nil)
+          val _ = checkAgainstFullRecalculation(schedule)
+        }
+      }
+    }
   }
 
   "Scoring" - {

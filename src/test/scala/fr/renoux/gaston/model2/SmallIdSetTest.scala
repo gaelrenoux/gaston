@@ -626,6 +626,52 @@ class SmallIdSetTest extends TestBase {
       }
     }
 
+    "dropThenForeach" - {
+      "on empty set" in {
+        val set = SmallIdSet.empty[TopicId]
+        val result = mutable.Set[TopicId]()
+        set.dropThenForeach(0)(result += _)
+        result.isEmpty should be(true)
+      }
+
+      "dropping nothing" in {
+        val set: SmallIdSet[TopicId] = SmallIdSet(okIds *)
+        val result = mutable.Set[TopicId]()
+        set.dropThenForeach(0)(result += _)
+        result.toSet should be(okIds.toSet)
+      }
+
+      "dropping up to an id in the set (that id is kept)" in {
+        val set: SmallIdSet[TopicId] = SmallIdSet(okIds *)
+        val limit = okIds(1)
+        val result = mutable.Set[TopicId]()
+        set.dropThenForeach(limit.value)(result += _)
+        result.toSet should be(okIds.filter(_.value >= limit.value).toSet)
+      }
+
+      "dropping everything" in {
+        val set = SmallIdSet.full[TopicId]
+        val result = mutable.Set[TopicId]()
+        set.dropThenForeach(countAll.value)(result += _)
+        result.isEmpty should be(true)
+      }
+    }
+
+    "toArray" - {
+      "on empty set" in {
+        SmallIdSet.empty[TopicId].toArray.isEmpty should be(true)
+      }
+
+      "on non-empty set, values are sorted" in {
+        val set: SmallIdSet[TopicId] = SmallIdSet(okIds.reverse *)
+        set.toArray.toSeq should be(okIds.sorted)
+      }
+
+      "on full set" in {
+        SmallIdSet.full[TopicId].toArray.toSeq should be(allIds)
+      }
+    }
+
     "pickRandom" - {
 
       "always returns the same value if using the same random" in {

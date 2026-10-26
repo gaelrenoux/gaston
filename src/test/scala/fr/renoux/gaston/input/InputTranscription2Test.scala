@@ -304,6 +304,63 @@ class InputTranscription2Test extends TestBase {
 
   }
 
+  "Too many entities for a SmallProblem" - {
+    "persons" in {
+      val persons = (0 until 65).map { i => s"{name: \"P$i\"}" }.mkString(", ")
+      val input: InputModel = InputLoader.fromString(
+        s"""gaston { slots: [[{name: "D1"}]], topics: [{name: "Alpha"}], persons: [$persons] }"""
+      ).force
+      InputTranscription2(input).result.isInvalid should be(true)
+    }
+
+    "topics (including unassigned topics)" in {
+      val topics = (0 until 64).map { i => s"{name: \"T$i\"}" }.mkString(", ")
+      val input: InputModel = InputLoader.fromString(
+        s"""gaston { slots: [[{name: "D1"}]], topics: [$topics], persons: [{name: "Albert"}] }"""
+      ).force
+      InputTranscription2(input).result.isInvalid should be(true)
+    }
+  }
+
+  "Persons without any positive wish have finite preferences" in {
+    val input: InputModel = InputLoader.fromString(
+      """gaston {
+        |  slots: [[{name: "D1"}]]
+        |  topics: [{name: "Alpha"}, {name: "Beta"}]
+        |  persons: [
+        |    {name: "Albert", wishes {"Alpha": -1}},
+        |    {name: "Bianca", wishes {"Alpha": 0}},
+        |    {name: "Charly", person-wishes {"Albert": 0}}
+        |  ]
+        |}""".stripMargin
+    ).force
+    val transcription = InputTranscription2(input)
+    import transcription.given
+    val personTopicValues = transcription.preferences.prefsPersonTopic.toSeq2.flatten.map(_.value)
+    personTopicValues.filter { v => v.isNaN || v.isInfinite } should be(Nil)
+    val personPersonValues = transcription.preferences.prefsPersonPerson.toSeq2.flatten.map(_.value)
+    personPersonValues.filter { v => v.isNaN || v.isInfinite } should be(Nil)
+  }
+
+  "Simultaneous constraint on multi-occurrence topics pairs occurrences by index" in {
+    val input: InputModel = InputLoader.fromString(
+      """gaston {
+        |  slots: [[{name: "D1"}, {name: "D2"}]]
+        |  topics: [{name: "Alpha", occurrences: 2}, {name: "Beta", occurrences: 2}]
+        |  persons: [{name: "Albert"}]
+        |  constraints { simultaneous: [{topics: ["Alpha", "Beta"]}] }
+        |}""".stripMargin
+    ).force
+    val transcription = InputTranscription2(input)
+    transcription.errors should be(Set())
+    val Seq(_, _, alpha1, alpha2, beta1, beta2) = transcription.topicsCount.range
+    val simultaneous = transcription.constraints.topicsSimultaneous
+    simultaneous(alpha1) should be(SmallIdSet(beta1))
+    simultaneous(alpha2) should be(SmallIdSet(beta2))
+    simultaneous(beta1) should be(SmallIdSet(alpha1))
+    simultaneous(beta2) should be(SmallIdSet(alpha2))
+  }
+
   "Real-world" - {
     "udocon2017" ignore {
       val input: InputModel = InputLoader.fromClassPath("udocon2017/uc17-from-table.conf").force

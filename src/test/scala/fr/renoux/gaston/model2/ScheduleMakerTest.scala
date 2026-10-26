@@ -154,5 +154,26 @@ class ScheduleMakerTest extends TestBase {
       convertedSchedule.topicsToSlot should be(expectedSchedule.topicsToSlot)
       convertedSchedule should be(expectedSchedule)
     }
+
+    "fromOldSchedule sets the scheduled topics on each assignment" in {
+      import problem.given
+      given oldProblem: old.Problem = problemFromClassPath("scoring-test.conf").force
+      val Seq(oldDay1, oldDay2) = oldProblem.slotsList
+      val Seq(oldAlpha, oldBeta, oldGamma, oldDelta, oldEpsilon2, oldEpsilon1, oldEta1, oldEta2, _, oldUnassigned1, oldUnassigned2) = oldProblem.topicsList
+      val Seq(a, b, c, d, e, f, g, h, i, j, k, l) = oldProblem.personsList
+
+      val oldSchedule = old.Schedule.from(
+        oldDay1(oldUnassigned1(e), oldAlpha(a, d), oldEpsilon1(b, c, f), oldGamma(g, h, i), oldEta1(j, k, l)),
+        oldDay2(oldUnassigned2(), oldBeta(b, c, f), oldEpsilon2(a, d, e), oldDelta(g, h, i), oldEta2(j, k, l))
+      )
+      val convertedSchedule = ScheduleMaker.fromOldSchedule(oldSchedule, problem, true)
+
+      convertedSchedule.slotsToAssignment(day1).scheduledTopics.toSet should be(
+        Set(unassigned1, alpha, epsilon1, gamma, eta1)
+      )
+      convertedSchedule.slotsToAssignment(day2).scheduledTopics.toSet should be(
+        Set(unassigned2, beta, epsilon2, delta, eta2)
+      )
+    }
   }
 }

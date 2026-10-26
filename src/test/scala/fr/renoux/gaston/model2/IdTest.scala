@@ -28,16 +28,17 @@ class IdTest extends TestBase {
   }
 
   "ordering" - {
+    /* Comparing with the sort on raw Ints, as the `sorted` matcher would use the same Ordering we want to test */
     "work on the general Id type" in {
       val sids: Seq[Id] = Seq.fill(10)(rand.nextInt(64))
       val sortedSeq = sids.sorted
-      sortedSeq should be(sorted)
+      sortedSeq.map(_.value) should be(sids.map(_.value).sorted)
     }
-    
+
     "works on a specific id type" in {
       val sids: Seq[SlotId] = Seq.fill(10)(rand.nextInt(64))
       val sortedSeq = sids.sorted
-      sortedSeq should be(sorted)
+      sortedSeq.map(_.value) should be(sids.map(_.value).sorted)
     }
   }
 
