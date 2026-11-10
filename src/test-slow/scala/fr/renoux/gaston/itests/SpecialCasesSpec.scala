@@ -5,7 +5,9 @@ import fr.renoux.gaston.engine.assignment.RandomAssigner
 import fr.renoux.gaston.input.problemFromClassPath
 import fr.renoux.gaston.model.{Problem, Record, SlotSchedule}
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.concurrent.TimeLimits.failAfter
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.time.{Second, Span}
 
 import scala.util.Random
 
@@ -16,8 +18,7 @@ class SpecialCasesSpec extends AnyFlatSpec with Matchers {
 
   given Random = new Random(0)
 
-  // FIXME This actually doesn't work. Not easy to fix, except by making "forbidden" topics anti-preferences instead of hard constraints.
-  "Bad situation" should "work" ignore {
+  "Bad situation" should "be detected as impossible quickly" in {
     val jeudiSoir = r32019.slotsSet.find(_.name.startsWith("4")).get
     // val samediAprem = r32019.slotsSet.find(_.name.startsWith("7")).get
 
@@ -59,6 +60,9 @@ class SpecialCasesSpec extends AnyFlatSpec with Matchers {
      * On This war of mine (plateau): forbidden are [8] Fabien, Olivier, Valentin, Léa, Tipex, Céline, Antoine M, Uiop
      */
 
-    assigner.fillSlot(ss)
+    val result = failAfter(Span(1, Second)) {
+      assigner.fillSlot(ss)
+    }
+    result should be(None)
   }
 }
