@@ -8,7 +8,7 @@ class MutableArrayMapSpec extends AnyFlatSpec with Matchers {
   import MutableArrayMapSpec.*
 
   "MutableArrayMap.fill" should "work" in {
-    val mam = MutableArrayMap.fill(3, stick)
+    val mam = MutableArrayMap.fill(3)(stick)
     mam(0) should be(stick)
     mam(1) should be(stick)
     mam(2) should be(stick)
@@ -17,13 +17,13 @@ class MutableArrayMapSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "work with 0" in {
-    val mam = MutableArrayMap.fill(0, stick)
+    val mam = MutableArrayMap.fill(0)(stick)
     mam.capacity should be(0)
-    mam.toArrayMap.isEmpty should be(true)
+    mam.unsafeToArrayMap.isEmpty should be(true)
   }
 
   "MutableArrayMap.update" should "work" in {
-    val mam = MutableArrayMap.fill(3, stick)
+    val mam = MutableArrayMap.fill(3)(stick)
     mam(lassie) = ball
     mam(0) = rope
     mam(gromit) should be(rope)

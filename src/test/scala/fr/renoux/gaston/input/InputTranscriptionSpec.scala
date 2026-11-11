@@ -4,7 +4,7 @@ import com.softwaremill.quicklens.*
 import fr.renoux.gaston.model.constraints.{TopicsLimitedCount, TopicsNotSimultaneous, TopicsSimultaneous}
 import fr.renoux.gaston.model.preferences.*
 import fr.renoux.gaston.model.Counts.given
-import fr.renoux.gaston.model.{Counts, Problem, Score, Weight, toArraySet}
+import fr.renoux.gaston.model.{Counts, Problem, Score, Topic, Weight, toArraySet}
 import io.github.iltotore.iron.autoRefine
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -79,7 +79,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
   behavior of "Unassigned"
 
   {
-    val inputSettings = InputSettings(unassigned = InputSettings.Unassigned(allowed = true, maxPersons = 3, personAntiPreference = NonPosScore(-42.0)))
+    val inputSettings = InputSettings()
     val inputSlots = List(List(InputSlot("one"), InputSlot("two")))
     val inputTopics = List(InputTopic("alpha"), InputTopic("beta"), InputTopic("gamma"))
     val inputPersons = List(
@@ -94,51 +94,87 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       persons = inputPersons
     )
 
-    it should "have a basic anti-preference (when no scaling)" in {
-      given problem: Problem = from(inputModel)
-
-      val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
-      }
-      val biancaNothingPreferences = problem.preferencesByPerson(p"Bianca").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
-      }
-      val carolineNothingPreferences = problem.preferencesByPerson(p"Caroline").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
-      }
-      arnoldNothingPreferences.size should be(inputSlots.size)
-      arnoldNothingPreferences.foreach(_ should be(Score(-42)))
-      biancaNothingPreferences.size should be(inputSlots.size)
-      biancaNothingPreferences.foreach(_ should be(Score(-42)))
-      carolineNothingPreferences.size should be(inputSlots.size)
-      carolineNothingPreferences.foreach(_ should be(Score(-42)))
+    it should "reject holes when not allowed" in {
+      val in = inputModel.modify(_.settings.unassigned).setTo(InputSettings.Unassigned(allowed = false))
+      given problem: Problem = from(in)
+      problem.hasUnassignedTopics should be(false)
+      problem.preferences.collect { case p: PersonUnassignedPreference => p } should be(empty)
     }
 
-    it should "have a scaled anti-preference (with scaling enabled)" in {
-      given problem: Problem = from(
-        inputModel.modify(_.settings.unassigned.personAntiPreferenceScaling).setTo(Some(
-          InputSettings.UnassignedAntiPreferenceScaling(
-            forbiddenRatioForMaximum = 0.5,
-            maximumAntiPreference = NonPosScore(-12.0)
-          )
-        ))
+    it should "have unassigned topics when allowed" in {
+      val unassignedSettings = InputSettings.Unassigned(
+        allowed = true,
+        minPersons = 3,
+        maxPersons = 10
+      )
+      val inputModelWithUnassigned = InputModel(
+        settings = InputSettings(unassigned = unassignedSettings),
+        slots = inputSlots,
+        topics = inputTopics,
+        persons = inputPersons
       )
 
-      val arnoldNothingPreferences = problem.preferencesByPerson(p"Arnold").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
+      given problem: Problem = from(inputModelWithUnassigned)
+
+      problem.hasUnassignedTopics should be(true)
+      val expectedUnassignedTopics = problem.slotsList.map { slot =>
+        Topic.unassigned(slot.id, slot, min = 3, max = 10)
       }
-      val biancaNothingPreferences = problem.preferencesByPerson(p"Bianca").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
-      }
-      val carolineNothingPreferences = problem.preferencesByPerson(p"Caroline").collect {
-        case PersonTopicPreference(_, t, s) if t.name.startsWith("@Unassigned") => s
-      }
-      arnoldNothingPreferences.size should be(inputSlots.size)
-      arnoldNothingPreferences.foreach(_ should be(Score(-42)))
-      biancaNothingPreferences.size should be(inputSlots.size)
-      biancaNothingPreferences.foreach(_ should be(Score(-22)))
-      carolineNothingPreferences.size should be(inputSlots.size)
-      carolineNothingPreferences.foreach(_ should be(Score(-42)))
+      problem.unassignedTopics.unsafeContent should contain theSameElementsAs expectedUnassignedTopics
+    }
+
+    it should "have person-unassigned preferences when allowed" in {
+      val unassignedSettings = InputSettings.Unassigned(
+        allowed = true,
+        personBaseAntiPreference = NonPosScore(-3.0),
+        personScalingAntiPreference = NonPosScore(-300.0),
+        forbiddenRatioForZeroExpectedHole = 0.1,
+        forbiddenRatioForOneExpectedHole = 0.3,
+      )
+      val inputModelWithUnassigned = InputModel(
+        settings = InputSettings(unassigned = unassignedSettings),
+        slots = inputSlots,
+        topics = inputTopics ++ List(InputTopic("one"), InputTopic("two"), InputTopic("three"), InputTopic("four"), InputTopic("five"), InputTopic("six"), InputTopic("seven")), // 10 topics in total
+        persons = List(
+          InputPerson("Arnold", mandatory = Set("alpha"), forbidden = Set("beta")), // 10%, the zero-unassigned threshold
+          InputPerson("Bianca", forbidden = Set("alpha", "beta", "gamma", "one"), minFreeSlots = Some(1)), // 40%
+          InputPerson("Caroline", wishes = Map("alpha" -> Score(50)))
+        )
+      )
+
+      given problem: Problem = from(inputModelWithUnassigned)
+
+      val preferencesByPerson = problem.preferences.collect { case p: PersonUnassignedPreference => p.person -> p }.toMap
+      preferencesByPerson.keySet should be(Set(p"Arnold", p"Bianca", p"Caroline"))
+
+      val arnoldPref = preferencesByPerson(p"Arnold")
+      arnoldPref.requiredCount should be(0)
+      arnoldPref.expectedCount should be(0.0 +- 0.0001)
+      arnoldPref.baseReward should be(Score(-3))
+      arnoldPref.scalingReward should be(Score(-300))
+
+      val biancaPref = preferencesByPerson(p"Bianca")
+      biancaPref.requiredCount should be(1)
+      biancaPref.expectedCount should be(1.5 +- 0.0001)
+
+      val carolinePref = preferencesByPerson(p"Caroline")
+      carolinePref.requiredCount should be(0)
+      carolinePref.expectedCount should be(0.0)
+    }
+
+    it should "reject scaling settings with inconsistent ratios" in {
+      val unassignedSettings = InputSettings.Unassigned(
+        allowed = true,
+        personBaseAntiPreference = NonPosScore(-3.0),
+        personScalingAntiPreference = NonPosScore(-300.0),
+        forbiddenRatioForZeroExpectedHole = 0.4,
+        forbiddenRatioForOneExpectedHole = 0.1,
+      )
+      val badModel = inputModel.modify(_.settings.unassigned).setTo(unassignedSettings)
+
+      new InputTranscription(badModel).errors should be(Set(
+        "Settings: Forbidden ratio for zero unassigned (0.4) should be lower than forbidden ratio for one unassigned (0.1)"
+      ))
     }
   }
 
@@ -443,14 +479,22 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       p"Arnold".baseScore should be(Score(12))
     }
 
-    it should "create free-slot preferences, and compensate them in the base score" in {
+    it should "handle required free slots" in {
       given problem: Problem = from(InputModel(
+        settings = InputSettings(unassigned = InputSettings.Unassigned(allowed = true)),
         slots = inputSlots,
         topics = inputTopics,
         persons = List(InputPerson("Arnold", minFreeSlots = Some(1)))
       ))
-      problem.preferences should be(Set(PersonFreeSlotPreference(p"Arnold", 1)))
-      p"Arnold".baseScore should be(Score(1000))
+
+      val preferencesByPerson = problem.preferences.collect { case p: PersonUnassignedPreference => p.person -> p }.toMap
+
+      val arnoldPref = preferencesByPerson(p"Arnold")
+      arnoldPref.requiredCount should be(1)
+
+      preferencesByPerson.collect {
+        case (p, pref) if p.name != "Arnold" => pref.requiredCount
+      }.toSet should be(Set(0))
     }
   }
 
