@@ -20,6 +20,9 @@ object ArrayMap {
 
     /** /!\ Performance is linear with the capacity */
     inline def nonEmpty: Boolean = am.exists(_ != null)
+
+    /** Unsafe: returns the backing array, so you shouldn't modify it. */
+    inline def unsafeContent: Array[B] = am
   }
 
   def empty[A <: Identified, B: ClassTag]: ArrayMap[A, B] = {
