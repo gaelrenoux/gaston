@@ -120,6 +120,10 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       val expectedUnassignedTopics = problem.slotsList.map { slot =>
         Topic.unassigned(slot.id, slot, min = 3, max = 10)
       }
+      val topic0 = problem.unassignedTopics.unsafeContent.minBy(_.id)
+      val expectedTopic0 = expectedUnassignedTopics.minBy(_.id)
+      topic0 should be(expectedTopic0)
+      problem.unassignedTopics.unsafeContent.head should be(expectedUnassignedTopics.head)
       problem.unassignedTopics.unsafeContent should contain theSameElementsAs expectedUnassignedTopics
     }
 
@@ -173,7 +177,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
       val badModel = inputModel.modify(_.settings.unassigned).setTo(unassignedSettings)
 
       new InputTranscription(badModel).errors should be(Set(
-        "Settings: Forbidden ratio for zero unassigned (0.4) should be lower than forbidden ratio for one unassigned (0.1)"
+        "Settings: Forbidden ratio for zero expected hole (0.4) is higher than forbidden ratio for one expected hole (0.1)"
       ))
     }
   }
@@ -484,7 +488,7 @@ class InputTranscriptionSpec extends AnyFlatSpec with Matchers {
         settings = InputSettings(unassigned = InputSettings.Unassigned(allowed = true)),
         slots = inputSlots,
         topics = inputTopics,
-        persons = List(InputPerson("Arnold", minFreeSlots = Some(1)))
+        persons = List(InputPerson("Arnold", minFreeSlots = Some(1)), InputPerson("Bianca", forbidden = Set("alpha")), InputPerson("Caroline"))
       ))
 
       val preferencesByPerson = problem.preferences.collect { case p: PersonUnassignedPreference => p.person -> p }.toMap
