@@ -15,9 +15,13 @@ final class Renderer(
   import Ordering.Double.IeeeOrdering
 
   /** For each person, preferences */
-  private val topicPreferencesByPerson: Map[Person, Set[PersonTopicPreference]] = problem.preferences.collect {
-    case p: PersonTopicPreference => p
-  }.groupBy(_.person)
+  private val topicPreferencesByPerson: Map[Person, Set[PersonTopicPreference]] = {
+    val existing = problem.preferences.collect {
+      case p: PersonTopicPreference => p
+    }.groupBy(_.person)
+    // Make sure that even someone with no preference appears in the map
+    problem.personsList.map { person => person -> existing.getOrElse(person, Set.empty) }.toMap
+  }
 
   private val otherPreferences: Set[Preference] = problem.preferences.filterNot(_.isInstanceOf[PersonTopicPreference])
 
