@@ -72,7 +72,7 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
   /* Topics */
   private val topicIx = new AtomicInteger(0) // ugly, simpler
-  lazy val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] =
+  val unassignedTopicsByNameAndSlot: Map[(NonEmptyString, Slot), Topic] = // not lazy, I want these topics to be the first ones created so that they take the first indexes (easier to test!)
     if (!input.settings.unassigned.allowed) Map.empty[(NonEmptyString, Slot), Topic] else {
       log.info("Unassigned persons are allowed")
       input.slots.flatten.map { inSlot =>
@@ -341,7 +341,7 @@ object InputTranscription {
             s"is higher than max persons on unassigned (${input.settings.unassigned.maxPersons})")
         } ++ {
           if (input.settings.unassigned.forbiddenRatioForZeroExpectedHole <= input.settings.unassigned.forbiddenRatioForOneExpectedHole) None
-          else Some(s"Settings: Forbidden ratio for zero expected hole (${input.settings.unassigned.forbiddenRatioForOneExpectedHole}) " +
+          else Some(s"Settings: Forbidden ratio for zero expected hole (${input.settings.unassigned.forbiddenRatioForZeroExpectedHole}) " +
               s"is higher than forbidden ratio for one expected hole (${input.settings.unassigned.forbiddenRatioForOneExpectedHole})")
         } ++ {
           if (input.settings.unassigned.forbiddenRatioForZeroExpectedHole <= 1) None // the >= 0 part is checked by the fact that it's a NonNegDouble

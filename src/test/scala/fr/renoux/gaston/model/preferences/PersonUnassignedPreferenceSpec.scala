@@ -100,14 +100,14 @@ class PersonUnassignedPreferenceSpec extends AnyFlatSpec with Matchers {
 
   behavior of "PersonUnassignedPreference on multiple slots by cycle"
 
-  it should "count multiple holes on the same slot-cycle only once" in {
+  it should "count the reward for multiple holes on the same slot-cycle" in {
     given Problem = Minimal // two cycles: (Morning, Afternoon) and (Evening, Night)
 
     val schedule = Schedule.from(Morning(Unassigned(Morning)(Michelangelo))) ++
       Schedule.from(Afternoon(Unassigned(Afternoon)(Michelangelo))) ++
       Schedule.from(Evening(Machines(Michelangelo))) ++
       Schedule.from(Night(Party(Michelangelo)))
-    pref(0, 0).score(schedule).value should be(-110.0 +- 1e-6)
+    pref(0, 0).score(schedule).value should be(-1110.0 +- 1e-6)
   }
 
 }

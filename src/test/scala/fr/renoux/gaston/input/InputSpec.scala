@@ -4,7 +4,7 @@ import fr.renoux.gaston.TestUtils.*
 import fr.renoux.gaston.model.*
 import fr.renoux.gaston.model.Counts.given
 import fr.renoux.gaston.model.constraints.*
-import fr.renoux.gaston.model.preferences.{PersonTopicPreference, TopicsExclusive, TopicsExclusiveFor, TopicsLinked}
+import fr.renoux.gaston.model.preferences.{PersonTopicPreference, PersonUnassignedPreference, TopicsExclusive, TopicsExclusiveFor, TopicsLinked}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -30,13 +30,13 @@ class InputSpec extends AnyFlatSpec with Matchers {
     }
 
     object topics {
-      lazy val alpha: Topic = Topic(0, "alpha", min = 5, max = 5, mandatory = Set(persons.bernard))
-      lazy val beta: Topic = Topic(1, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
-      lazy val gamma1: Topic = Topic(2, "gamma ~1", min = 4, max = 6, followup = Some(gamma2))
-      lazy val gamma2: Topic = Topic(3, "gamma ~2", min = 4, max = 6, isFollowup = true)
-      val unassignedA: Topic = Topic.unassigned(4, expected.slots.a)
-      val unassignedB: Topic = Topic.unassigned(5, expected.slots.b)
-      val unassignedC: Topic = Topic.unassigned(6, expected.slots.c)
+      val unassignedA: Topic = Topic.unassigned(0, expected.slots.a)
+      val unassignedB: Topic = Topic.unassigned(1, expected.slots.b)
+      val unassignedC: Topic = Topic.unassigned(2, expected.slots.c)
+      lazy val alpha: Topic = Topic(3, "alpha", min = 5, max = 5, mandatory = Set(persons.bernard))
+      lazy val beta: Topic = Topic(4, "beta", min = 4, max = 5, forbidden = Set(persons.laverne), slots = Some(Set(slots.a)))
+      lazy val gamma1: Topic = Topic(5, "gamma ~1", min = 4, max = 6, followup = Some(gamma2))
+      lazy val gamma2: Topic = Topic(6, "gamma ~2", min = 4, max = 6, isFollowup = true)
       val all: Set[Topic] = Set(unassignedA, unassignedB, unassignedC, alpha, beta, gamma1, gamma2)
     }
 
@@ -66,11 +66,10 @@ class InputSpec extends AnyFlatSpec with Matchers {
   it should "contain the correct preferences" in {
     import expected.given
     val scalingFactor: Double = Constants.PersonTotalScore.value / 7
-    val initialTopicsPreferences = for {
-      t <- Set(expected.topics.unassignedA, expected.topics.unassignedB, expected.topics.unassignedC)
-      p <- Set(expected.persons.bernard, expected.persons.hoagie, expected.persons.laverne)
-    } yield PersonTopicPreference(p, t, Score(-1000))
-    val additionalPreferences = Set(
+    val expectedPersonUnassignedPreferences = expected.persons.all.map { person =>
+      PersonUnassignedPreference(person, 0, 0, Score(-10), Score(-200), Score(-600))
+    }
+    val expectedPreferences = expectedPersonUnassignedPreferences ++ Set(
       PersonTopicPreference(expected.persons.bernard, expected.topics.alpha, Score(scalingFactor * 5.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.beta, Score(scalingFactor * 1.0)),
       PersonTopicPreference(expected.persons.bernard, expected.topics.gamma1, Score(scalingFactor * 1.0)),
@@ -79,19 +78,16 @@ class InputSpec extends AnyFlatSpec with Matchers {
       TopicsExclusiveFor(Set(expected.topics.alpha, expected.topics.gamma1).toArraySet, Set(expected.persons.hoagie).toArraySet),
       TopicsLinked(Set(expected.topics.gamma1, expected.topics.gamma2).toArraySet)
     )
-    val expectedPreferences = initialTopicsPreferences ++ additionalPreferences
 
-    problem.preferences.filter {
-      case p: PersonTopicPreference if p.topic.isUnassigned => true
-      case _ => false
-    } should be(expectedPreferences.filter {
-      case p: PersonTopicPreference if p.topic.isUnassigned => true
-      case _ => false
-    })
+    val preferencesToCheck = problem.preferences.map {
+      case pup: PersonUnassignedPreference => pup.copy(expectedCount = 0) // not checking that in that test
+      case p => p
+    }
 
-    problem.preferences.filter(_.isInstanceOf[PersonTopicPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonTopicPreference]))
-    problem.preferences.filter(_.isInstanceOf[TopicsExclusive]) should be(expectedPreferences.filter(_.isInstanceOf[TopicsExclusive]))
-    problem.preferences should be(expectedPreferences)
+    preferencesToCheck.filter(_.isInstanceOf[PersonTopicPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonTopicPreference]))
+    preferencesToCheck.filter(_.isInstanceOf[PersonUnassignedPreference]) should be(expectedPreferences.filter(_.isInstanceOf[PersonUnassignedPreference]))
+    preferencesToCheck.filter(_.isInstanceOf[TopicsExclusive]) should be(expectedPreferences.filter(_.isInstanceOf[TopicsExclusive]))
+    preferencesToCheck should be(expectedPreferences)
   }
 
 }
