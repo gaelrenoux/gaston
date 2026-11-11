@@ -23,12 +23,13 @@ object MutableArrayMap {
       am(i) = b
     }
 
-    inline def toArrayMap: ArrayMap[A, B] = ArrayMap.unsafeFrom(am)
-    
+    /** Unsafe: the resulting ArrayMap is backed by the same array as this mutable array map, so you need to stop modifying this one. */
+    inline def unsafeToArrayMap: ArrayMap[A, B] = ArrayMap.unsafeFrom(am)
+
     inline def unsafeContent: Array[B] = am
   }
 
-  def fill[A <: Identified, B: ClassTag](size: Int, default: B): MutableArrayMap[A, B] = {
+  def fill[A <: Identified, B: ClassTag](size: Int)(default: => B): MutableArrayMap[A, B] = {
     Array.fill[B](size)(default)
   }
 }

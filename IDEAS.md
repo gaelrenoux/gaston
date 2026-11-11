@@ -12,3 +12,21 @@
 - When reading the table format: check that a mandatory person isn't also put as forbidden on the same topic.
 - Multi-slots topics break down when there can be more than two slots that follow each other.
 
+
+
+
+# Rework empty slots/zeros
+
+Fix an expected number of empty-slots given your number of zeros.
+- Can be linear: starting at 0 for no zero, and 2 for maybe 60% zeros (remember, you can have more empty-slots than planned, its just that they count for more, so that would mean that at 60% zeros it's already possible to get a third empty-slot)
+- Or maybe use a logistic function (but not sure that's better than linear)
+
+Then, when counting the negative costs of empty slot:
+- Each full expected empty-slots count for the base amount (very low, e.g. -10, just to make sure it's still a drawback).
+- The last, partiall full empty-slot count for the remaining ratio on empty-slots.
+
+For example: with 1.3 expected empty-slots, the first empty-slot is the base cost (-10), then the second empty-slot is
+the base cost plus 70% of the full cost (so - 10 - 140, if we put the full empty-slot at -200).
+
+When having required empty-slots, you simply subtract back the negative cost for those empty-slot. So if our person at
+1.3 had required 1 empty slot, they only get back +10. If they had required 2, they would get back +160.s
