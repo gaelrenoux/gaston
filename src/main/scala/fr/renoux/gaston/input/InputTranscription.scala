@@ -36,23 +36,19 @@ private[input] final class InputTranscription(rawInput: InputModel) {
 
 
   /* Persons */
-  lazy val unassignedScoreByPersonId: Map[Person.Id, Score] = input.persons.zipWithIndex.map { case (inPerson, index) =>
-    val score: Score = settings.unassigned.personAntiPreferenceScaling match {
-      case None => settings.unassigned.personAntiPreference
-      case Some(scalingSettings) =>
-        val ratioOfForbiddenTopics = inPerson.forbidden.size.toDouble / input.topics.size
-        val antiPreferenceVariablePart: Score = settings.unassigned.personAntiPreference - scalingSettings.maximumAntiPreference
-        val ratioOnVariablePart = math.max(0, 1 - (ratioOfForbiddenTopics / scalingSettings.forbiddenRatioForMaximum))
-        scalingSettings.maximumAntiPreference + (antiPreferenceVariablePart * ratioOnVariablePart)
-    }
-    index -> score
-  }.toMap
   lazy val personsById: Array[Person] = input.persons.zipWithIndex.map { case (inPerson, index) =>
-    // Ugly adjustment: min-free-slots will lead to negative scores for the person, this will revert it
-    val baseScoreAdjustment = (unassignedScoreByPersonId(index) * inPerson.minFreeSlots.getOrElse(0)).opposite
-    Person(index, inPerson.name, inPerson.weight, inPerson.baseScore + baseScoreAdjustment)
+    Person(index, inPerson.name, inPerson.weight, inPerson.baseScore)
   }.toArray
   lazy val personsByName: Map[NonEmptyString, Person] = personsById.map { p => (p.name.refineUnsafe[Not[Empty]]: NonEmptyString) -> p }.toMap
+
+  lazy val expectedHoleCountByPersonId: Map[Person.Id, Double] = {
+    input.persons.zipWithIndex.map { case (inPerson, index) =>
+      val ratioOfForbiddenTopics = inPerson.forbidden.size.toDouble / input.topics.size
+      val ratioRange = settings.unassigned.forbiddenRatioForOneExpectedHole - settings.unassigned.forbiddenRatioForZeroExpectedHole
+      val expectedCount = math.max(0.0, ratioOfForbiddenTopics - settings.unassigned.forbiddenRatioForZeroExpectedHole) / ratioRange
+      index -> expectedCount
+    }.toMap
+  }
 
 
   /* Slots */
@@ -268,31 +264,20 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         wishedPerson = personsByName(wishedPersonName)
       } yield PersonPersonPreference(person, wishedPerson, inWish._2 * scoreFactor)
 
-    lazy val unassignedTopicPreferences: Set[PersonTopicPreference] = {
-      for {
-        unassignedTopic <- unassignedTopicsByNameAndSlot.values
-        inPerson <- input.personsSet
-        person = personsByName(inPerson.name)
-      } yield PersonTopicPreference(person, unassignedTopic, unassignedScoreByPersonId(person.id))
-    }.toSet
-
-    lazy val unassignedTopicsExclusivePreferences: Set[TopicsExclusive] =
-      input.settings.unassigned.personMultipleAntiPreference.fold(Set.empty[TopicsExclusive]) { reward =>
-        Set(TopicsExclusive(unassignedTopicsByNameAndSlot.values.toArraySet, ArraySet.empty, reward))
-      }
-    lazy val unassignedTopicsSameDayExclusivePreferences: Set[TopicsExclusive] =
-      input.settings.unassigned.personMultipleSameCycleAntiPreference.fold(Set.empty[Set[TopicsExclusive]]) { reward =>
-        slotSequences.map { slotCycle =>
-          val unassignedTopicsForCycle = unassignedTopicsByNameAndSlot.collect { case ((_, slot), topic) if slotCycle.contains(slot) => topic }
-          Set(TopicsExclusive(unassignedTopicsForCycle.toArraySet, ArraySet.empty, reward))
-        }.toSet
-      }.flatten
-
-    lazy val personFreeSlotsPreferences: Seq[PersonFreeSlotPreference] =
-      input.persons.flatMap { inPerson =>
+    lazy val personUnassignedPreferences: Set[PersonUnassignedPreference] = {
+      if (!settings.unassigned.allowed) Set.empty
+      else input.persons.map { inPerson =>
         val person = personsByName(inPerson.name)
-        inPerson.minFreeSlots.map(PersonFreeSlotPreference(person, _))
-      }
+        PersonUnassignedPreference(
+          person,
+          requiredCount = inPerson.minFreeSlots.getOrElse(0),
+          expectedCount = expectedHoleCountByPersonId(person.id),
+          baseReward = settings.unassigned.personBaseAntiPreference,
+          scalingReward = settings.unassigned.personScalingAntiPreference,
+          multipleSameCycleReward = settings.unassigned.personMultipleSameCycleAntiPreference,
+        )
+      }.toSet
+    }
 
 
     lazy val all: Set[Preference] = {
@@ -305,10 +290,8 @@ private[input] final class InputTranscription(rawInput: InputModel) {
         groupDislikes ++
         personTopicPreferences ++
         personPersonPreferences ++
-        unassignedTopicPreferences ++
-        unassignedTopicsExclusivePreferences ++
-        unassignedTopicsSameDayExclusivePreferences ++
-        personFreeSlotsPreferences
+        personUnassignedPreferences
+
     }
   }
 
@@ -351,9 +334,24 @@ object InputTranscription {
       else Some(s"Settings: default min persons per topic (${input.settings.defaultMinPersonsPerTopic}) " +
         s"is higher than default max persons per topic (${input.settings.defaultMaxPersonsPerTopic}) ")
     } ++ {
-      if (input.settings.unassigned.minPersons <= input.settings.unassigned.maxPersons) None
-      else Some(s"Settings: Min persons on unassigned (${input.settings.unassigned.minPersons}) " +
-        s"is higher than max persons on unassigned (${input.settings.unassigned.maxPersons})")
+      if (input.settings.unassigned.allowed) {
+        {
+          if (input.settings.unassigned.minPersons <= input.settings.unassigned.maxPersons) None
+          else Some(s"Settings: Min persons on unassigned (${input.settings.unassigned.minPersons}) " +
+            s"is higher than max persons on unassigned (${input.settings.unassigned.maxPersons})")
+        } ++ {
+          if (input.settings.unassigned.forbiddenRatioForZeroExpectedHole <= input.settings.unassigned.forbiddenRatioForOneExpectedHole) None
+          else Some(s"Settings: Forbidden ratio for zero expected hole (${input.settings.unassigned.forbiddenRatioForOneExpectedHole}) " +
+              s"is higher than forbidden ratio for one expected hole (${input.settings.unassigned.forbiddenRatioForOneExpectedHole})")
+        } ++ {
+          if (input.settings.unassigned.forbiddenRatioForZeroExpectedHole <= 1) None // the >= 0 part is checked by the fact that it's a NonNegDouble
+          else Some(s"Settings: Forbidden ratio for zero expected hole (${input.settings.unassigned.forbiddenRatioForZeroExpectedHole}) must be between 0 and 1 (included)")
+        } ++ {
+          if (input.settings.unassigned.forbiddenRatioForOneExpectedHole <= 1) None // the >= 0 part is checked by the fact that it's a NonNegDouble
+          else Some(s"Settings: Forbidden ratio for one expected hole (${input.settings.unassigned.forbiddenRatioForOneExpectedHole}) must be between 0 and 1 (included)")
+        }
+      }
+      else None
     }
   }
 

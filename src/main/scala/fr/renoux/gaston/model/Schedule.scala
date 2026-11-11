@@ -62,21 +62,19 @@ final case class Schedule(
   // lazy val minPersonsOnSlot: Map[Slot, Int] = planning.mapValuesStrict(_.foldLeft(0)(_ + _.min))
   lazy val personsByTopic: Map[Topic, Set[Person]] = slotSchedules.flatMap(_.personsByTopic).toMap
 
-  lazy val countSlotCyclesWithUnassignedByPerson: ArrayMap[Person, Int] = {
-    val counts = MutableArrayMap.fill[Person, Int](problem.counts.persons, 0)
-    val slotCycleIt = problem.slotSequences.iterator
-    while (slotCycleIt.hasNext) {
-      val slotCycle = slotCycleIt.next()
-      val found = MutableArraySet.empty[Person](problem.counts.persons)
-      val slotIt = slotCycle.iterator
-      while (slotIt.hasNext) {
-        val slotSchedule = on(slotIt.next())
-        found.addAll(slotSchedule.unassignedPersons)
+  lazy val countHolesByCycleByPerson: ArrayMap[Person, Array[Int]] = {
+    val counts = MutableArrayMap.fill[Person, Array[Int]](problem.counts.persons)(Array.fill(problem.slotSequences.size)(0))
+    var i = 0
+    problem.slotSequences.fastForeach { slotCycle =>
+      slotCycle.fastForeach { slot =>
+        val slotSchedule = on(slot)
+        slotSchedule.unassignedPersons.fastForeach { person =>
+          counts(person)(i) += 1
+        }
       }
-
-      found.foreachId { id => counts(id) = counts(id) + 1 }
+      i += 1
     }
-    counts.toArrayMap
+    counts.unsafeToArrayMap
   }
 
 
