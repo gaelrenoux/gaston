@@ -1,6 +1,7 @@
 package fr.renoux.gaston.engine.assignment
 
 import fr.renoux.gaston.model.{Person, Problem, Record}
+import fr.renoux.gaston.util.*
 
 import java.util
 import scala.util.Random
@@ -22,21 +23,26 @@ import scala.util.Random
  *
  * This class is mutable for performance. An instance only lives during a single call to `SlotMatcher.assign`.
  */
+// TODO what's the point of a separate class? This could be inlined in the random-assigner. The only element that makes
+//  this not thread-safe is the visited array, and it can be simply passed around as a parameter instead.
 final class SlotMatcher private(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random) {
 
   private val recordsCount = records.length
   private val personsCount = persons.length
 
   /** For each person (by index), the indices of the records they can be put on, in random order. */
-  private val allowedRecords: Array[Array[Int]] = persons.map { person =>
-    random.shuffle((0 until recordsCount).filterNot { r => records(r).topic.forbidden.contains(person) }).toArray
-  }
+  private val allowedRecords: Array[Array[Int]] =
+    persons.fastMap { person =>
+      random.shuffle(
+        (0 until recordsCount).filterNot { r => records(r).topic.forbidden.contains(person) }
+      ).toArray
+    }
 
-  /** For each record, how many persons it still needs to reach its topic's min. */
-  private val minNeeded: Array[Int] = records.map { record => math.max(0, record.topic.min - record.countPersons) }
+  /** For each record, how many persons it still needs to reach its topic's min. From the initial records, not updated afterwards. */
+  private val minNeeded: Array[Int] = records.map { record => math.max(0, record.topic.min - record.countPersons) } // TODO move into run, as a local variable
 
-  /** For each record, how many persons it can still take before reaching its topic's max. */
-  private val maxOpen: Array[Int] = records.map { record => record.topic.max - record.countPersons }
+  /** For each record, how many persons it can still take before reaching its topic's max. From the initial records, not updated afterwards. */
+  private val maxOpen: Array[Int] = records.map { record => record.topic.max - record.countPersons } // TODO move into run, as a local variable
 
   /** For each record, the current maximum number of new persons. */
   private val capacity: Array[Int] = new Array[Int](recordsCount)
@@ -52,14 +58,16 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
 
   private def run(): Option[Set[Record]] = {
     val minNeededTotal = minNeeded.sum
-    val maxOpenTotal = maxOpen.foldLeft(0L)(_ + _) // Long because the unassigned topic's max is very high
+    val maxOpenTotal = maxOpen.foldLeft(0L)(_ + _) // Long because the unassigned topic's max is very high // TODO I don't think a long is actually needed
     val isObviouslyImpossible = maxOpen.exists(_ < 0) || minNeededTotal > personsCount || maxOpenTotal < personsCount
 
-    if (isObviouslyImpossible) None
+    if (isObviouslyImpossible) None // TODO only if the base schedule is impossible, very rare case in practice
     else {
-      Array.copy(minNeeded, 0, capacity, 0, recordsCount)
-      if (augmentAll() < minNeededTotal) None
+      // Initializing the capacity with the same content as minNeeded
+      Array.copy(minNeeded, 0, capacity, 0, recordsCount) // TODO copy seems unnecessary. We are done using minNeeded. Why can't we use the same instance?
+      if (augmentAll() < minNeededTotal) None // capacity is only the minimum needed, so we're only filling in to the min values (phase 1)
       else {
+        // We now set the capacity to the max open, so that we fill everyone if possible (phase 2)
         Array.copy(maxOpen, 0, capacity, 0, recordsCount)
         if (augmentAll() < personsCount) None
         else Some(filledRecords)
@@ -73,9 +81,9 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
     var p = 0
     while (p < personsCount) {
       if (recordOfPerson(p) >= 0) {
-        assignedCount += 1
+        assignedCount += 1 // person is already assigned, nothing to do but count it as assigned
       } else {
-        util.Arrays.fill(isVisited, false)
+        util.Arrays.fill(isVisited, false) // Required to avoid loops when relocating other persons
         if (tryAssign(p)) {
           assignedCount += 1
         }
@@ -95,6 +103,7 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
       val r = candidates(i)
       if (!isVisited(r)) {
         isVisited(r) = true
+        // TODO Interesting: if the record is full, we try to relocate someone immediately. Wouldn't it be quicker to first check if there's an open candidate, then relocate only if all candidates are full?
         if (load(r) < capacity(r) || relocateSomeoneFrom(r)) {
           moveTo(p, r)
           isAssigned = true
