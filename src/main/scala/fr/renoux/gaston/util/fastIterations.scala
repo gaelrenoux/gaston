@@ -24,17 +24,6 @@ inline def fastLoop(inline start: Int, inline until: Int, inline advance: Int =>
   }
 }
 
-/** Loop that stops when it found the correct integer. Default value is required to avoid using an Option. */
-inline def fastFind(inline start: Int, inline until: Int, inline advance: Int => Int = _ + 1, inline default: Int = -1)(
-    inline loopBody: Int => Boolean
-): Int = {
-  var i = start
-  while (!loopBody(i) && i < until) {
-    i = advance(i)
-  }
-  if (i >= until) default else i
-}
-
 /** Loop that stops when it found a match. */
 inline def fastExists(inline start: Int, inline until: Int, inline advance: Int => Int = _ + 1)(
     inline loopBody: Int => Boolean
@@ -44,6 +33,17 @@ inline def fastExists(inline start: Int, inline until: Int, inline advance: Int 
     i = advance(i)
   }
   i < until
+}
+
+/** Loop that stops when it found the correct integer. Default value is required to avoid using an Option. */
+inline def fastFind(inline start: Int, inline until: Int, inline advance: Int => Int = _ + 1, inline default: Int = -1)(
+    inline loopBody: Int => Boolean
+): Int = {
+  var i = start
+  while (!loopBody(i) && i < until) {
+    i = advance(i)
+  }
+  if (i >= until) default else i
 }
 
 /** Array extension */
