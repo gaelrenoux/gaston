@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import scala.util.Random
 
 /** Compares SlotMatcher with a brute-force search on many small random slots. */
-class SlotMatcherSpec extends AnyFlatSpec with Matchers {
+class RandomAssignerSlotWorkerSpec extends AnyFlatSpec with Matchers {
 
   private val InstancesCount = 3000
 
@@ -92,7 +92,7 @@ class SlotMatcherSpec extends AnyFlatSpec with Matchers {
       val instance = randomInstance
       given Problem = instance.problem
 
-      val result = SlotMatcher.assign(instance.records, instance.newPersons)
+      val result = RandomAssignerSlotWorker.assign(instance.records, instance.newPersons)
       val isFeasible = hasBruteForceSolution(instance)
       withClue(instance.records.map(_.topic.toLongString).mkString("", "\n", "\n") + instance.records.mkString("\n")) {
         result.isDefined should be(isFeasible)

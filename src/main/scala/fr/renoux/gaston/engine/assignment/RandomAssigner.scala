@@ -45,7 +45,7 @@ final class RandomAssigner(using private val problem: Problem) {
   def fillSlot(slotSchedule: SlotSchedule)(using random: Random): Option[SlotSchedule] = {
     val records = random.shuffle(slotSchedule.recordsList).toArray
     val persons = random.shuffle(slotSchedule.unscheduledPersonsList).toArray
-    SlotMatcher.assign(records, persons).map(slotSchedule.addAll)
+    RandomAssignerSlotWorker.assign(records, persons).map(slotSchedule.addAll)
   }
 
 }

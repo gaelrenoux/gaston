@@ -5,9 +5,9 @@ import fr.renoux.gaston.util.*
 
 import scala.util.Random
 
-/** Assigns persons to the records of a single slot. Each person must end up on exactly one record, cannot be put on a
- * topic where they are forbidden, and each record must end up between its topic's min and max. Persons already on a
- * record stay there.
+/** Within the RandomAssigner, assigns persons to the records of a single slot. Each person must end up on exactly one
+ * record, cannot be put on a topic where they are forbidden, and each record must end up between its topic's min and
+ * max. Persons already on a record stay there (this class doesn't remove anything from the inital records).
  *
  * This is a bipartite b-matching, solved with augmenting paths (Kuhn's algorithm, with capacities on records), in two
  * phases:
@@ -20,9 +20,9 @@ import scala.util.Random
  *
  * With P persons and R records, the complexity is O(P² × R).
  *
- * This class is mutable for performance. An instance only lives during a single call to `SlotMatcher.assign`.
+ * This class is mutable for performance. An instance only lives during a single call to `RandomAssignerSlotWorker.assign`.
  */
-private[assignment] final class SlotMatcher private(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random) {
+private[assignment] final class RandomAssignerSlotWorker private(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random) {
 
   private val recordsCount = records.length
   private val personsCount = persons.length
@@ -142,11 +142,11 @@ private[assignment] final class SlotMatcher private(records: Array[Record], pers
 
 }
 
-object SlotMatcher {
+object RandomAssignerSlotWorker {
 
   /** Assigns all those persons to those records (see class doc). Returns the records that received new persons, or None
    * if no valid assignment exists. Randomness comes from the order of both arrays, and from the order in which each
    * person considers the records. */
   def assign(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random): Option[Set[Record]] =
-    new SlotMatcher(records, persons).run()
+    new RandomAssignerSlotWorker(records, persons).run()
 }
