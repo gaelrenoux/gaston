@@ -2,7 +2,16 @@ package fr.renoux.gaston.util
 
 import fr.renoux.gaston.TestBase
 
+import java.util.concurrent.atomic.AtomicInteger
+
 class FastIterationsTest extends TestBase {
+
+  /** Commodity function to count how many times a body has been called */
+  def incr[A, B](i: AtomicInteger)(f: A => B)(a: A): B = {
+    i.incrementAndGet()
+    val result = f(a)
+    result
+  }
 
   "Simple loops" - {
 
@@ -27,7 +36,7 @@ class FastIterationsTest extends TestBase {
       }
     }
 
-    "fastLoop (range)" - {
+    "fastLoop (integers)" - {
       "Nominal" in {
         var acc: String = ""
         fastLoop(0, 10, _ + 2) { i =>
@@ -56,55 +65,82 @@ class FastIterationsTest extends TestBase {
       }
     }
 
-    "fastFind (range)" - {
+    "fastExists (integers)" - {
       "Nominal" in {
-        println("Start")
-        val r = fastFind(1, 10, _ + 2)(_ % 7 == 0)
-        r should be(7)
+        val bodyCount = AtomicInteger(0)
+
+        val r = fastExists(1, 10, _ + 2)(incr(bodyCount)(_ % 7 == 0))
+        r should be(true)
+        bodyCount.get() should be(4) // ran on 1, 3, 5, 7
       }
 
       "Default advance" in {
-        val r = fastFind(1, 10)(_ % 7 == 0)
-        r should be(7)
+        val bodyCount = AtomicInteger(0)
+
+        val r = fastExists(1, 10)(incr(bodyCount)(_ % 7 == 0))
+        r should be(true)
+        bodyCount.get() should be(7)
       }
 
       "No result" in {
-        val r1 = fastFind(1, 10, _ + 2)(_ % 8 == 0)
+        val bodyCount = AtomicInteger(0)
+
+        val r1 = fastExists(1, 10, _ + 2)(incr(bodyCount)(_ % 8 == 0))
+        r1 should be(false)
+        bodyCount.get() should be(5) // ran on 1, 3, 5, 7, 9
+      }
+
+      "Empty loop" in {
+        val bodyCount = AtomicInteger(0)
+
+        val r1 = fastExists(3, 3)(incr(bodyCount)(_ => true))
+        r1 should be(false)
+        bodyCount.get() should be(0)
+
+        val r2 = fastExists(3, 2)(incr(bodyCount)(_ => true))
+        r2 should be(false)
+        bodyCount.get() should be(0)
+      }
+    }
+
+    "fastFind (integers)" - {
+      "Nominal" in {
+        val bodyCount = AtomicInteger(0)
+
+        val r = fastFind(1, 10, _ + 2)(incr(bodyCount)(_ % 7 == 0))
+        r should be(7)
+        bodyCount.get() should be(4) // ran on 1, 3, 5, 7
+      }
+
+      "Default advance" in {
+        val bodyCount = AtomicInteger(0)
+
+        val r = fastFind(1, 10)(incr(bodyCount)(_ % 7 == 0))
+        r should be(7)
+        bodyCount.get() should be(7)
+      }
+
+      "No result" in {
+        val bodyCount = AtomicInteger(0)
+
+        val r1 = fastFind(1, 10, _ + 2)(incr(bodyCount)(_ % 8 == 0))
         r1 should be(-1)
+        bodyCount.get() should be(5) // ran on 1, 3, 5, 7, 9
+
         val r2 = fastFind(1, 10, _ + 2, -14)(_ % 8 == 0)
         r2 should be(-14)
       }
 
       "Empty loop" in {
-        val r1 = fastFind(3, 3)(_ => true)
+        val bodyCount = AtomicInteger(0)
+
+        val r1 = fastFind(3, 3)(incr(bodyCount)(_ => true))
         r1 should be(-1)
-        val r2 = fastFind(3, 2)(_ => true)
+        bodyCount.get() should be(0)
+
+        val r2 = fastFind(3, 2)(incr(bodyCount)(_ => true))
         r2 should be(-1)
-      }
-    }
-
-    "fastExists (range)" - {
-      "Nominal" in {
-        println("Start")
-        val r = fastExists(1, 10, _ + 2)(_ % 7 == 0)
-        r should be(true)
-      }
-
-      "Default advance" in {
-        val r = fastExists(1, 10)(_ % 7 == 0)
-        r should be(true)
-      }
-
-      "No result" in {
-        val r1 = fastExists(1, 10, _ + 2)(_ % 8 == 0)
-        r1 should be(false)
-      }
-
-      "Empty loop" in {
-        val r1 = fastExists(3, 3)(_ => true)
-        r1 should be(false)
-        val r2 = fastExists(3, 2)(_ => true)
-        r2 should be(false)
+        bodyCount.get() should be(0)
       }
     }
   }
@@ -168,38 +204,58 @@ class FastIterationsTest extends TestBase {
     }
 
     "fastExists" - {
-      "returns true" in {
+      "Nominal" in {
+        val bodyCount = AtomicInteger(0)
+
         val array = Array(4, 7, 11)
-        val result = array.fastExists(_ % 2 == 1)
+        val result = array.fastExists(incr(bodyCount)(_ % 2 == 1))
         result should be(true)
+        bodyCount.get() should be(2)
       }
-      "returns false" in {
+
+      "No result" in {
+        val bodyCount = AtomicInteger(0)
+
         val array = Array(4, 7, 11)
-        val result = array.fastExists(_ % 2 == 2)
+        val result = array.fastExists(incr(bodyCount)(_ % 2 == 2))
         result should be(false)
+        bodyCount.get() should be(3)
       }
-      "empty" in {
+
+      "Empty" in {
+        val bodyCount = AtomicInteger(0)
+
         val array = Array.empty[Int]
-        val result = array.fastExists(_ % 2 == 1)
+        val result = array.fastExists(incr(bodyCount)(_ % 2 == 1))
         result should be(false)
+        bodyCount.get() should be(0)
       }
     }
 
     "fastFind" - {
-      "nominal" in {
+      "Nominal" in {
+        val bodyCount = AtomicInteger(0)
+
         val array = Array(4, 7, 11)
-        val result = array.fastFind(-1)(_ % 2 == 1)
+        val result = array.fastFind(-1)(incr(bodyCount)(_ % 2 == 1))
         result should be(7)
+        bodyCount.get() should be(2)
       }
-      "no result" in {
+      "No result" in {
+        val bodyCount = AtomicInteger(0)
+
         val array = Array(4, 7, 11)
-        val result = array.fastFind(-1)(_ % 2 == 2)
+        val result = array.fastFind(-1)(incr(bodyCount)(_ % 2 == 2))
         result should be(-1)
+        bodyCount.get() should be(3)
       }
-      "empty" in {
+      "Empty" in {
+        val bodyCount = AtomicInteger(0)
+
         val array = Array.empty[Int]
-        val result = array.fastFind(-1)(_ % 2 == 1)
+        val result = array.fastFind(-1)(incr(bodyCount)(_ % 2 == 1))
         result should be(-1)
+        bodyCount.get() should be(0)
       }
     }
 

@@ -29,10 +29,15 @@ inline def fastExists(inline start: Int, inline until: Int, inline advance: Int 
     inline loopBody: Int => Boolean
 ): Boolean = {
   var i = start
-  while (!loopBody(i) && i < until) {
-    i = advance(i)
+  var continue = true
+  while (continue && i < until) {
+    if (loopBody(i)) {
+      continue = false
+    } else {
+      i = advance(i)
+    }
   }
-  i < until
+  !continue
 }
 
 /** Loop that stops when it found the correct integer. Default value is required to avoid using an Option. */
@@ -40,15 +45,20 @@ inline def fastFind(inline start: Int, inline until: Int, inline advance: Int =>
     inline loopBody: Int => Boolean
 ): Int = {
   var i = start
-  while (!loopBody(i) && i < until) {
-    i = advance(i)
+  var continue = true
+  while (continue && i < until) {
+    if (loopBody(i)) {
+      continue = false
+    } else {
+      i = advance(i)
+    }
   }
-  if (i >= until) default else i
+  if (continue) default else i
 }
 
 /** Array extension */
 extension [A](inline as: Array[A]) {
-  inline def fastCopy()(using ClassTag[A])= {
+  inline def fastCopy()(using ClassTag[A]) = {
     val asl = as.length
     val res = new Array[A](asl)
     var ix = 0
