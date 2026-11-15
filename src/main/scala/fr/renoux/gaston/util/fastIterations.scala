@@ -94,6 +94,36 @@ extension [A](inline as: Array[A]) {
     res
   }
 
+  inline def fastExists(inline f: A => Boolean): Boolean = {
+    val asl = as.length
+    var ix = 0
+    var continue = true
+    while (continue && ix < asl) {
+      val a = as(ix)
+      if (f(a)) {
+        continue = false
+      }
+      ix += 1
+    }
+    !continue
+  }
+
+  inline def fastFind(inline default: A)(inline f: A => Boolean): A = {
+    val asl = as.length
+    var ix = 0
+    var continue = true
+    var result = default
+    while (continue && ix < asl) {
+      val a = as(ix)
+      if (f(a)) {
+        continue = false
+        result = a
+      }
+      ix += 1
+    }
+    result
+  }
+
   inline def fastForeach(inline f: A => Unit): Unit = {
     val asl = as.length
     var ix = 0

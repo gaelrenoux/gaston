@@ -167,6 +167,42 @@ class FastIterationsTest extends TestBase {
       }
     }
 
+    "fastExists" - {
+      "returns true" in {
+        val array = Array(4, 7, 11)
+        val result = array.fastExists(_ % 2 == 1)
+        result should be(true)
+      }
+      "returns false" in {
+        val array = Array(4, 7, 11)
+        val result = array.fastExists(_ % 2 == 2)
+        result should be(false)
+      }
+      "empty" in {
+        val array = Array.empty[Int]
+        val result = array.fastExists(_ % 2 == 1)
+        result should be(false)
+      }
+    }
+
+    "fastFind" - {
+      "nominal" in {
+        val array = Array(4, 7, 11)
+        val result = array.fastFind(-1)(_ % 2 == 1)
+        result should be(7)
+      }
+      "no result" in {
+        val array = Array(4, 7, 11)
+        val result = array.fastFind(-1)(_ % 2 == 2)
+        result should be(-1)
+      }
+      "empty" in {
+        val array = Array.empty[Int]
+        val result = array.fastFind(-1)(_ % 2 == 1)
+        result should be(-1)
+      }
+    }
+
     "fastForeach" - {
       "nominal" in {
         val array = Array(4, 7, 11)
