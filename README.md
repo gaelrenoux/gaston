@@ -10,7 +10,7 @@ completely a person's satisfaction so that other can have a great schedule).
 
 Clone the repository, and build with: `sbt assembly`
 
-This produces a fat JAR `target/scala-3.5.2/gaston-assembly-<version>.jar`, where `<version>` is defined in `build.sbt`.
+This produces a fat JAR `target/scala-<scalaversion>/gaston-assembly-<version>.jar`, where `<version>` is defined in `build.sbt`.
 In the commands below, `gaston.jar` stands for that file.
 
 Run the fat JAR with:
