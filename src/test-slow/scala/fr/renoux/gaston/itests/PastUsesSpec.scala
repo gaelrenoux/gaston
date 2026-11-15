@@ -42,7 +42,7 @@ class PastUsesSpec extends AnyFlatSpec with Matchers with PrivateMethodTester wi
     given Output = Output.silent
     val runner = new SyncRunner(seed = seed)
     val termination: Termination = Termination(count = Some(iterations))
-    runner.run(termination)
+    runner.runAndGetBest(termination)
   }
 
   "udocon2017" should "not crash after examining 10 schedules" in {

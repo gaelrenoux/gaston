@@ -16,7 +16,8 @@ final case class CommandLine(
     debug: Boolean = false,
     maxDuration: Option[FiniteDuration] = None,
     globalSeed: Long = Random.nextLong(),
-    parallelism: Int = Runtime.getRuntime.availableProcessors - 1
+    parallelism: Int = Runtime.getRuntime.availableProcessors - 1,
+    alternatives: Int = 5
 )
 
 object CommandLine {
@@ -70,6 +71,14 @@ object CommandLine {
         case _ => failure("Option --parallelism must be superior or equal to 1")
       }
       .text("How many improvement loops should run in parallel. Default is the number of available CPUs minus 1.")
+
+    opt[Int]('a', "alternatives").optional().valueName("<count>")
+      .action((a, in) => in.copy(alternatives = a))
+      .validate {
+        case a if a >= 1 => success
+        case _ => failure("Option --alternatives must be superior or equal to 1")
+      }
+      .text("How many of the best schedules (each from a different schedule chain) to display at the end. Default is 5.")
 
     help("help").text("Prints this usage text.")
   }

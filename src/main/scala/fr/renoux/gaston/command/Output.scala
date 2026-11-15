@@ -56,11 +56,17 @@ final class Output private(silent: Boolean)(using val problem: Problem) {
 
   def writeStartThread(threadSeed: Long): Unit = write(s"Starting on thread ${Thread.currentThread().getName} with thread-seed: $threadSeed")
 
-  def writeStopInstructions(): Unit = write("Press Enter at any time to stop and print the best schedule found\n(The current best schedule will also be printed regularly in this log)", separator = true)
+  def writeStopInstructions(): Unit = write("Press Enter at any time to stop and print the best schedules found\n(The current best schedule will also be printed regularly in this log)", separator = true)
 
-  def writeEnd(schedule: Schedule): Unit = {
+  /** Writes the best schedules found, best one last so that it is the closest to the end of the output. */
+  def writeEnd(bestSchedules: BestSchedules): Unit = {
+    val count = bestSchedules.schedules.size
+    write(s"Finished! Gathering $count alternative schedules")
     val render = new Renderer(problem)
-    write(s"Finished !\n${render(schedule)}", separator = true)
+    bestSchedules.schedules.zipWithIndex.reverseIterator.foreach { case (schedule, index) =>
+      write(s"Alternative #${index + 1} of $count (score ${schedule.score.toFormattedString}):\n${render(schedule)}", separator = true)
+    }
+    write(s"Displayed $count schedules, from worst (#$count) to best (#1).", separator = true)
   }
 
   def writeInput(input: InputModel): Unit =

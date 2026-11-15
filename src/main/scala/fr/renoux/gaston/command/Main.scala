@@ -76,10 +76,10 @@ object Main {
       val timeout = commandLine.maxDuration.map(Instant.now() + _)
       val termination = Termination(timeout = timeout, stopSignal = Some(stopSignal))
 
-      val (ss, _) = runner.run(termination)
+      val (bestSchedules, _) = runner.run(termination, commandLine.alternatives)
 
       /* Print final result */
-      output.writeEnd(ss)
+      output.writeEnd(bestSchedules)
     }
   }
 

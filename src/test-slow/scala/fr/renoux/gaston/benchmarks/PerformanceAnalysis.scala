@@ -37,7 +37,7 @@ object PerformanceAnalysis {
   val termination = Termination(timeout = Some(Instant.now() + duration))
 
   lazy val (schedule, count) = tools.chrono("Total") {
-    orchestrator.run(termination)
+    orchestrator.runAndGetBest(termination)
   }
 
   @main

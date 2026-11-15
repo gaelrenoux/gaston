@@ -24,11 +24,12 @@ class ParallelRunnerTest extends TestBase {
       stopper.start()
 
       val startMs = System.currentTimeMillis()
-      val (bestSchedule, _) = runner.run(Termination(stopSignal = Some(stopSignal)))
+      val (bestSchedules, _) = runner.run(Termination(stopSignal = Some(stopSignal)), 3)
       val durationMs = System.currentTimeMillis() - startMs
 
       durationMs should be < 5000L
-      bestSchedule.isSolution should be(true)
+      bestSchedules.schedules.size should be(3)
+      bestSchedules.schedules.map(_.chainSeed).distinct.size should be(3)
     }
   }
 }

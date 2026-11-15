@@ -67,7 +67,7 @@ class RegressionBenchmark extends AnyFlatSpec with Matchers {
       }
 
       val termination: Termination = Termination(score = Some(Score(expectsScore)), timeout = Some(Instant.now() + duration))
-      val (schedule, count) = runner.run(termination)
+      val (schedule, count) = runner.runAndGetBest(termination)
 
       println(s"${schedule.score} after $count iterations")
 
