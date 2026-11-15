@@ -38,14 +38,8 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
       ).toArray
     }
 
-  /** For each record, how many persons it still needs to reach its topic's min. From the initial records, not updated afterwards. */
-  private val minNeeded: Array[Int] = records.map { record => math.max(0, record.topic.min - record.countPersons) } // TODO move into run, as a local variable
-
-  /** For each record, how many persons it can still take before reaching its topic's max. From the initial records, not updated afterwards. */
-  private val maxOpen: Array[Int] = records.map { record => record.topic.max - record.countPersons } // TODO move into run, as a local variable
-
-  /** For each record, the current maximum number of new persons. */
-  private val capacity: Array[Int] = new Array[Int](recordsCount)
+  /** For each record, the current maximum number of new persons. Points to the capacities of the current phase. */
+  private var capacity: Array[Int] = Array.emptyIntArray
 
   /** For each record, the number of new persons currently on it. */
   private val load: Array[Int] = new Array[Int](recordsCount)
@@ -57,18 +51,19 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
   private val isVisited: Array[Boolean] = new Array[Boolean](recordsCount)
 
   private def run(): Option[Set[Record]] = {
-    val minNeededTotal = minNeeded.sum
-    val maxOpenTotal = maxOpen.foldLeft(0L)(_ + _) // Long because the unassigned topic's max is very high // TODO I don't think a long is actually needed
-    val isObviouslyImpossible = maxOpen.exists(_ < 0) || minNeededTotal > personsCount || maxOpenTotal < personsCount
+    /* For each record, how many persons it still needs to reach its topic's min. */
+    val minNeeded = records.fastMap { record => math.max(0, record.topic.min - record.countPersons) }
+    /* For each record, how many persons it can still take before reaching its topic's max. */
+    val maxOpen = records.fastMap { record => record.topic.max - record.countPersons }
 
-    if (isObviouslyImpossible) None // TODO only if the base schedule is impossible, very rare case in practice
+    // A record already over its max would get a negative capacity: no one would be added to it, but it would still be
+    // returned as valid.
+    if (maxOpen.exists(_ < 0)) None
     else {
-      // Initializing the capacity with the same content as minNeeded
-      Array.copy(minNeeded, 0, capacity, 0, recordsCount) // TODO copy seems unnecessary. We are done using minNeeded. Why can't we use the same instance?
-      if (augmentAll() < minNeededTotal) None // capacity is only the minimum needed, so we're only filling in to the min values (phase 1)
+      capacity = minNeeded // phase 1: only filling records up to their min
+      if (augmentAll() < minNeeded.sum) None
       else {
-        // We now set the capacity to the max open, so that we fill everyone if possible (phase 2)
-        Array.copy(maxOpen, 0, capacity, 0, recordsCount)
+        capacity = maxOpen // phase 2: filling everyone, without going over the max of each record
         if (augmentAll() < personsCount) None
         else Some(filledRecords)
       }
@@ -81,9 +76,11 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
     var p = 0
     while (p < personsCount) {
       if (recordOfPerson(p) >= 0) {
-        assignedCount += 1 // person is already assigned, nothing to do but count it as assigned
+        assignedCount += 1 // already assigned, nothing to do but count them
       } else {
-        util.Arrays.fill(isVisited, false) // Required to avoid loops when relocating other persons
+        // Each search starts with no record visited. Within a search, each record is explored at most once, which
+        // prevents cycles and bounds the search.
+        util.Arrays.fill(isVisited, false)
         if (tryAssign(p)) {
           assignedCount += 1
         }
@@ -94,24 +91,46 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
   }
 
   /** Looks for an augmenting path starting from that person: a record with spare capacity, or a full record where one
-   * of the persons can itself be moved somewhere else. Returns true if that person was assigned. */
+   * of the persons can itself be moved somewhere else. Free records are checked first, as relocating is much more
+   * expensive. Returns true if that person was assigned. */
   private def tryAssign(p: Int): Boolean = {
     val candidates = allowedRecords(p)
-    var isAssigned = false
-    var i = 0
-    while (!isAssigned && i < candidates.length) {
-      val r = candidates(i)
-      if (!isVisited(r)) {
-        isVisited(r) = true
-        // TODO Interesting: if the record is full, we try to relocate someone immediately. Wouldn't it be quicker to first check if there's an open candidate, then relocate only if all candidates are full?
-        if (load(r) < capacity(r) || relocateSomeoneFrom(r)) {
-          moveTo(p, r)
-          isAssigned = true
+    val freeRecord = findFreeRecord(candidates)
+    if (freeRecord >= 0) {
+      moveTo(p, freeRecord)
+      true
+    } else {
+      // All candidates are full, we need to relocate someone
+      var isAssigned = false
+      var i = 0
+      while (!isAssigned && i < candidates.length) {
+        val r = candidates(i)
+        if (!isVisited(r)) {
+          isVisited(r) = true
+          if (relocateSomeoneFrom(r)) {
+            moveTo(p, r)
+            isAssigned = true
+          }
         }
+        i += 1
+      }
+      isAssigned
+    }
+  }
+
+  /** Returns the first of those records with spare capacity, or -1 if there is none. There is no need to check for
+   * visited records: loads only change when a search succeeds, so a record visited in the current search is full. */
+  private def findFreeRecord(candidates: Array[Int]): Int = {
+    var result = -1
+    var i = 0
+    while (result < 0 && i < candidates.length) {
+      val r = candidates(i)
+      if (load(r) < capacity(r)) {
+        result = r
       }
       i += 1
     }
-    isAssigned
+    result
   }
 
   /** Tries to move one of the new persons on that record to another record. Returns true if it worked, in which case
