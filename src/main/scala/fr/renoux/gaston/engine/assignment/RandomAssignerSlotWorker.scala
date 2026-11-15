@@ -1,0 +1,152 @@
+package fr.renoux.gaston.engine.assignment
+
+import fr.renoux.gaston.model.{Person, Problem, Record}
+import fr.renoux.gaston.util.*
+
+import scala.util.Random
+
+/** Within the RandomAssigner, assigns persons to the records of a single slot. Each person must end up on exactly one
+ * record, cannot be put on a topic where they are forbidden, and each record must end up between its topic's min and
+ * max. Persons already on a record stay there (this class doesn't remove anything from the inital records).
+ *
+ * This is a bipartite b-matching, solved with augmenting paths (Kuhn's algorithm, with capacities on records), in two
+ * phases:
+ *   - Phase 1 caps each record to the number of persons it still needs to reach its topic's min.
+ *   - Phase 2 raises each cap to the number of persons it can still take before reaching its topic's max.
+ *
+ * An augmenting path only shifts persons between records, and ends on a record with spare capacity: the load of a
+ * record never decreases. The minimums reached in phase 1 therefore still hold at the end of phase 2. Both phases find
+ * a maximum matching, so the result is None only if no valid assignment exists.
+ *
+ * With P persons and R records, the complexity is O(P² × R).
+ *
+ * This class is mutable for performance. An instance only lives during a single call to `RandomAssignerSlotWorker.assign`.
+ */
+private[assignment] final class RandomAssignerSlotWorker private(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random) {
+
+  private val recordsCount = records.length
+  private val personsCount = persons.length
+
+  /** For each person (by index), the indices of the records they can be put on, in random order. */
+  private val allowedRecords: Array[Array[Int]] =
+    persons.fastMap { person =>
+      random.shuffle(
+        (0 until recordsCount).filterNot { r => records(r).topic.forbidden.contains(person) }
+      ).toArray
+    }
+
+  /** For each record, the current maximum number of new persons. Points to the capacities of the current phase. */
+  private var capacity: Array[Int] = Array.emptyIntArray
+
+  /** For each record, the number of new persons currently on it. */
+  private val load: Array[Int] = new Array[Int](recordsCount)
+
+  /** For each person, the index of their record, or -1 if they are not assigned yet. */
+  private val recordOfPerson: Array[Int] = Array.fill(personsCount)(-1)
+
+  /** Records already explored by the current augmenting-path search. */
+  private val isVisited: Array[Boolean] = new Array[Boolean](recordsCount)
+
+  private def run(): Option[Set[Record]] = {
+    /* For each record, how many persons it still needs to reach its topic's min. */
+    val minNeeded = records.fastMap { record => math.max(0, record.topic.min - record.countPersons) }
+    /* For each record, how many persons it can still take before reaching its topic's max. */
+    val maxOpen = records.fastMap { record => record.topic.max - record.countPersons }
+
+    // Negative value in max-open means that the topic is already over max capacity, there's no way to make this work without removing persons (which this class doesn't do)
+    if (maxOpen.exists(_ < 0)) {
+      return None
+    }
+
+    // Phase 1: only filling records up to their min
+    capacity = minNeeded
+    val phase1Result = augmentAll()
+    if (phase1Result < minNeeded.sum) {
+      return None
+    }
+
+    // Phase 2: filling everyone, without going over the max of each record
+    capacity = maxOpen
+    if (augmentAll() < personsCount) None
+    else Some(filledRecords)
+  }
+
+  /** Tries to assign every person not assigned yet. Returns the total count of assigned persons. */
+  private def augmentAll(): Int = {
+    var assignedCount = 0
+    fastLoop(0, personsCount) { p =>
+      if (recordOfPerson(p) >= 0) {
+        assignedCount += 1 // already assigned, nothing to do but count them
+      } else {
+        // Each search starts with no record visited. Within a search, each record is explored at most once, which
+        // prevents cycles and bounds the search.
+        isVisited.fastFill(false)
+        if (tryAssign(p)) {
+          assignedCount += 1
+        }
+      }
+    }
+    assignedCount
+  }
+
+  /** Looks for an augmenting path starting from that person: a record with spare capacity, or a full record where one
+   * of the persons can itself be moved somewhere else. Free records are checked first, as relocating is much more
+   * expensive. Returns true if that person was assigned. */
+  private def tryAssign(p: Int): Boolean = {
+    val candidates = allowedRecords(p)
+
+    /* Get the first candidate with spare capacity. There is no need to check for visited records: we stop a search at
+    the first record with spare capacity, so if there is spare capacity it can't have been visited yet. */
+    val freeRecord = candidates.fastFind(-1) { r => load(r) < capacity(r) }
+    if (freeRecord >= 0) {
+      moveTo(p, freeRecord)
+      true
+
+    } else {
+      // All candidates are full, we need to relocate someone
+      candidates.fastExists { r =>
+        if (!isVisited(r)) {
+          isVisited(r) = true
+          if (relocateSomeoneFrom(r)) {
+            moveTo(p, r)
+            true
+          } else false
+        } else false
+      }
+    }
+  }
+
+  /** Tries to move one of the new persons on that record to another record. Returns true if it worked, in which case
+   * that record has one free place. */
+  private def relocateSomeoneFrom(r: Int): Boolean = {
+    fastExists(0, personsCount) { q =>
+      if (recordOfPerson(q) == r) tryAssign(q)
+      else false
+    }
+  }
+
+  private def moveTo(p: Int, r: Int): Unit = {
+    val previous = recordOfPerson(p)
+    if (previous >= 0) {
+      load(previous) -= 1
+    }
+    recordOfPerson(p) = r
+    load(r) += 1
+  }
+
+  /** Records that received new persons, with those persons added. */
+  private def filledRecords: Set[Record] =
+    persons.indices.groupMap(recordOfPerson(_))(persons(_)).map { case (r, newPersons) =>
+      records(r).copy(persons = records(r).persons ++ newPersons)
+    }.toSet
+
+}
+
+object RandomAssignerSlotWorker {
+
+  /** Assigns all those persons to those records (see class doc). Returns the records that received new persons, or None
+   * if no valid assignment exists. Randomness comes from the order of both arrays, and from the order in which each
+   * person considers the records. */
+  def assign(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random): Option[Set[Record]] =
+    new RandomAssignerSlotWorker(records, persons).run()
+}
