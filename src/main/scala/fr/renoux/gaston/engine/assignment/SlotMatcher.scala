@@ -23,9 +23,7 @@ import scala.util.Random
  *
  * This class is mutable for performance. An instance only lives during a single call to `SlotMatcher.assign`.
  */
-// TODO what's the point of a separate class? This could be inlined in the random-assigner. The only element that makes
-//  this not thread-safe is the visited array, and it can be simply passed around as a parameter instead.
-final class SlotMatcher private(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random) {
+private[assignment] final class SlotMatcher private(records: Array[Record], persons: Array[Person])(using problem: Problem, random: Random) {
 
   private val recordsCount = records.length
   private val personsCount = persons.length
@@ -56,18 +54,22 @@ final class SlotMatcher private(records: Array[Record], persons: Array[Person])(
     /* For each record, how many persons it can still take before reaching its topic's max. */
     val maxOpen = records.fastMap { record => record.topic.max - record.countPersons }
 
-    // A record already over its max would get a negative capacity: no one would be added to it, but it would still be
-    // returned as valid.
-    if (maxOpen.exists(_ < 0)) None
-    else {
-      capacity = minNeeded // phase 1: only filling records up to their min
-      if (augmentAll() < minNeeded.sum) None
-      else {
-        capacity = maxOpen // phase 2: filling everyone, without going over the max of each record
-        if (augmentAll() < personsCount) None
-        else Some(filledRecords)
-      }
+    // Negative value in max-open means that the topic is already over max capacity, there's no way to make this work without removing persons (which this class doesn't do)
+    if (maxOpen.exists(_ < 0)) {
+      return None
     }
+
+    // Phase 1: only filling records up to their min
+    capacity = minNeeded
+    val phase1Result = augmentAll()
+    if (phase1Result < minNeeded.sum) {
+      return None
+    }
+
+    // Phase 2: filling everyone, without going over the max of each record
+    capacity = maxOpen
+    if (augmentAll() < personsCount) None
+    else Some(filledRecords)
   }
 
   /** Tries to assign every person not assigned yet. Returns the total count of assigned persons. */
