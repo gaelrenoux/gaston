@@ -3,7 +3,6 @@ package fr.renoux.gaston.engine.assignment
 import fr.renoux.gaston.model.{Person, Problem, Record}
 import fr.renoux.gaston.util.*
 
-import java.util
 import scala.util.Random
 
 /** Assigns persons to the records of a single slot. Each person must end up on exactly one record, cannot be put on a
@@ -75,19 +74,17 @@ private[assignment] final class SlotMatcher private(records: Array[Record], pers
   /** Tries to assign every person not assigned yet. Returns the total count of assigned persons. */
   private def augmentAll(): Int = {
     var assignedCount = 0
-    var p = 0
-    while (p < personsCount) {
+    fastLoop(0, personsCount) { p =>
       if (recordOfPerson(p) >= 0) {
         assignedCount += 1 // already assigned, nothing to do but count them
       } else {
         // Each search starts with no record visited. Within a search, each record is explored at most once, which
         // prevents cycles and bounds the search.
-        util.Arrays.fill(isVisited, false)
+        isVisited.fastFill(false)
         if (tryAssign(p)) {
           assignedCount += 1
         }
       }
-      p += 1
     }
     assignedCount
   }
@@ -97,56 +94,35 @@ private[assignment] final class SlotMatcher private(records: Array[Record], pers
    * expensive. Returns true if that person was assigned. */
   private def tryAssign(p: Int): Boolean = {
     val candidates = allowedRecords(p)
-    val freeRecord = findFreeRecord(candidates)
+
+    /* Get the first candidate with spare capacity. There is no need to check for visited records: we stop a search at
+    the first record with spare capacity, so if there is spare capacity it can't have been visited yet. */
+    val freeRecord = candidates.fastFind(-1) { r => load(r) < capacity(r) }
     if (freeRecord >= 0) {
       moveTo(p, freeRecord)
       true
+
     } else {
       // All candidates are full, we need to relocate someone
-      var isAssigned = false
-      var i = 0
-      while (!isAssigned && i < candidates.length) {
-        val r = candidates(i)
+      candidates.fastExists { r =>
         if (!isVisited(r)) {
           isVisited(r) = true
           if (relocateSomeoneFrom(r)) {
             moveTo(p, r)
-            isAssigned = true
-          }
-        }
-        i += 1
+            true
+          } else false
+        } else false
       }
-      isAssigned
     }
-  }
-
-  /** Returns the first of those records with spare capacity, or -1 if there is none. There is no need to check for
-   * visited records: loads only change when a search succeeds, so a record visited in the current search is full. */
-  private def findFreeRecord(candidates: Array[Int]): Int = {
-    var result = -1
-    var i = 0
-    while (result < 0 && i < candidates.length) {
-      val r = candidates(i)
-      if (load(r) < capacity(r)) {
-        result = r
-      }
-      i += 1
-    }
-    result
   }
 
   /** Tries to move one of the new persons on that record to another record. Returns true if it worked, in which case
    * that record has one free place. */
   private def relocateSomeoneFrom(r: Int): Boolean = {
-    var isRelocated = false
-    var q = 0
-    while (!isRelocated && q < personsCount) {
-      if (recordOfPerson(q) == r) {
-        isRelocated = tryAssign(q)
-      }
-      q += 1
+    fastExists(0, personsCount) { q =>
+      if (recordOfPerson(q) == r) tryAssign(q)
+      else false
     }
-    isRelocated
   }
 
   private def moveTo(p: Int, r: Int): Unit = {
