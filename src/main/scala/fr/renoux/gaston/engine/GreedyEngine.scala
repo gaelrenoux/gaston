@@ -36,7 +36,7 @@ final class GreedyEngine(triggerOnBacktrackingFailure: BacktrackingFailures => U
       .distinctBy(_._1.planning) // TODO Check how useful that is, I'm not sold
       .filterNot(_._2.reverts(state.previousMove)) // TODO Might also be useless, especially with the distinctBy just before
       .zipWithIndex
-      .takeWhile { _ => !termination.checkTimeout() } // stop when we reach timeout
+      .takeWhile { _ => !termination.checkTimeout() && !termination.checkStopRequested() } // stop when we reach timeout or a stop is requested
       .takeWhile { case (_, index) => !termination.checkCount(index + state.attemptsCount) } // stop when we reach the max number of schedules to examine
     // Not checking the score: improving schedules are always reported up, where they can be checked, so no need to do it here
 

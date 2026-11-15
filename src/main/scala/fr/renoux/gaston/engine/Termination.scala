@@ -10,11 +10,13 @@ import scala.math.Ordering.Implicits.infixOrderingOps
  * @param score Stop once you reach a schedule with this score.
  * @param count Maximum number of schedules we want to examine.
  * @param timeout A timestamp when to stop.
+ * @param stopSignal A signal that can be raised at any moment to request a stop.
  */
 final case class Termination( // TODO Rename to Controls, or maybe TerminationConditions? And add class doc.
     score: Option[Score] = None,
     count: Option[Long] = None,
-    timeout: Option[Instant] = None
+    timeout: Option[Instant] = None,
+    stopSignal: Option[StopSignal] = None
 ) {
 
   lazy val intCount: Option[Int] = count.collect {
@@ -39,6 +41,9 @@ final case class Termination( // TODO Rename to Controls, or maybe TerminationCo
 
   /** Returns true if the current time has reached the timeout */
   def checkTimeout(): Boolean = timeoutMs.exists(_ <= System.currentTimeMillis())
+
+  /** Returns true if a stop has been requested through the stop signal */
+  def checkStopRequested(): Boolean = stopSignal.exists(_.isRequested)
 }
 
 object Termination {

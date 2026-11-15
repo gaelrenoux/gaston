@@ -56,6 +56,8 @@ final class Output private(silent: Boolean)(using val problem: Problem) {
 
   def writeStartThread(threadSeed: Long): Unit = write(s"Starting on thread ${Thread.currentThread().getName} with thread-seed: $threadSeed")
 
+  def writeStopInstructions(): Unit = write("Press Enter at any time to stop and print the best schedule found\n(The current best schedule will also be printed regularly in this log)", separator = true)
+
   def writeEnd(schedule: Schedule): Unit = {
     val render = new Renderer(problem)
     write(s"Finished !\n${render(schedule)}", separator = true)
@@ -98,6 +100,9 @@ final class Output private(silent: Boolean)(using val problem: Problem) {
       write(s"I'm having trouble generating a valid schedule (on thread ${Thread.currentThread().getName}). Probable causes are: \n$allMessages", separator = true)
     }
   }
+
+  def writeTerminationOnStopRequest(): Unit =
+    write(s"Termination on stop request on thread ${Thread.currentThread().getName}")
 
   def writeTerminationOnTimeout(termination: Termination, now: Instant): Unit =
     write(s"Termination on timeout: $now > ${termination.timeout.get} on thread ${Thread.currentThread().getName}")

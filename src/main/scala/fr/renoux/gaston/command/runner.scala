@@ -59,7 +59,11 @@ class SyncRunner(seed: Long, statusDisplayInterval: FiniteDuration = 1.day)
     val totalCount = currentChainCount + previousChainsCount
 
     /* Check for termination criteria */
-    if (termination.checkTimeout(now)) {
+    if (termination.checkStopRequested()) {
+      output.writeTerminationOnStopRequest()
+      (best, totalCount)
+
+    } else if (termination.checkTimeout(now)) {
       output.writeTerminationOnTimeout(termination, now)
       (best, totalCount)
 
@@ -107,7 +111,7 @@ class ParallelRunner(seed: Long = Random.nextLong(), parallelism: Int = Parallel
 
   /** Runs multiple Runners, in parallel, then wait for them to finish. Note that if no termination conditions are set,
    * this method will never terminate. */
-  def run(termination: Termination): (Schedule, Long) = {
+  override def run(termination: Termination): (Schedule, Long) = {
     val now = Instant.now()
     val maxDuration = termination.timeout.map(_ - now)
 

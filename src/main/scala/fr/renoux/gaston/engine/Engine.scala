@@ -47,7 +47,8 @@ abstract class Engine(triggerOnBacktrackingFailure: BacktrackingFailures => Unit
     val init = initialState(initialSchedule)
 
     lazy val unfolding: LazyList[(Schedule, Long)] = LazyList.unfold(init) { state =>
-      if (termination.checkTimeout()) None // reached timeout, we can stop
+      if (termination.checkStopRequested()) None // stop was requested, we must stop
+      else if (termination.checkTimeout()) None // reached timeout, we can stop
       else if (termination.checkCount(state.attemptsCount)) None // reached count, we can stop
       else if (termination.checkScore(state.schedule.score)) None // reached a good enough schedule on the last step, we can stop
       else step(state, termination).map { newState => (newState.result, newState) }

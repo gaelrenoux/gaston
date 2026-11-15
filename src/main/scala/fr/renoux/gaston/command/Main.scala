@@ -3,7 +3,7 @@ package fr.renoux.gaston.command
 import cats.implicits.*
 import ch.qos.logback.classic.{Level, LoggerContext}
 import com.typesafe.scalalogging.Logger
-import fr.renoux.gaston.engine.{Engine, GreedyEngine, Termination}
+import fr.renoux.gaston.engine.{Engine, GreedyEngine, StopSignal, Termination}
 import fr.renoux.gaston.input.*
 import fr.renoux.gaston.model.Problem
 import fr.renoux.gaston.util.CanAddDuration.given
@@ -68,12 +68,33 @@ object Main {
       )
 
       output.writeStart(commandLine.globalSeed)
+
+      val stopSignal = new StopSignal
+      startStopListener(stopSignal)
+      output.writeStopInstructions()
+
       val timeout = commandLine.maxDuration.map(Instant.now() + _)
-      val (ss, _) = runner.run(termination = Termination(timeout = timeout))
+      val termination = Termination(timeout = timeout, stopSignal = Some(stopSignal))
+
+      val (ss, _) = runner.run(termination)
 
       /* Print final result */
       output.writeEnd(ss)
     }
+  }
+
+  /** Starts a daemon thread raising the stop signal as soon as a line is read on the standard input (typically, when
+   * the user presses Enter). If the standard input is closed, the signal is never raised. */
+  private def startStopListener(stopSignal: StopSignal): Unit = {
+    val thread = new Thread(() => {
+      val line = scala.io.StdIn.readLine()
+      if (line != null) { // null is how readLine signals the end of the standard input
+        log.info("Stop requested from the standard input")
+        stopSignal.request()
+      }
+    }, "stop-listener")
+    thread.setDaemon(true)
+    thread.start()
   }
 
   /** Load the requested input, according to the command lines arguments */
